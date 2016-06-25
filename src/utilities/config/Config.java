@@ -69,47 +69,18 @@ public class Config {
         return o;
     }
 
-    public void setSection(String expr, Object val) throws ConfigException {
+    public void setSection(String section, Object val) throws ConfigException {
         if(this.content == null) {
             this.content = new HashMap<>();
         }
-
-        String tokens[] = expr.split("\\.");
-        String last = null;
-        Map<String, Object> map = this.content;
-
-        for(String s : tokens) {
-            last = s;
-            Object o = map.get(s);
-            if(o == null) {
-                o = new HashMap<>();
-                map.put(s, o);
-            }
-            map = (Map<String, Object>)o;
-        }
-
-        map.put(last, val);
+        this.content.put(section, val);
     }
 
-    public boolean removeSection(String expr) throws ConfigException {
-        String tokens[] = expr.split("\\.");
-
-        Object o = this.content;
-        Map<String, Object> map = null;
-        String last = null;
-
-        for(String s : tokens) {
-            map = (Map<String, Object>)o;
-            if(map == null) {
-                throw new ConfigException("object is null");
-            }
-            o = map.get(s);
-            last = s;
-        }
-        if(map == null) {
+    public boolean removeSection(String section) throws ConfigException {
+        if(this.content == null) {
             throw new ConfigException("object is null");
         }
-        return (map.remove(last) != null);
+        return (this.content.remove(section) != null);
     }
 
     public boolean sectionExists(String section) {
