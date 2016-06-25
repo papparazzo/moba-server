@@ -32,11 +32,11 @@ public class GlobalTimer extends Thread implements JSONToStringI {
     protected Dispatcher dispatcher = null;
     protected long intervall        = 60;
     protected long multiplicator    = 60 * 60;
-    protected long curModelTime = 0;
-    protected boolean isRunning = false;
+    protected long curModelTime     = 0;
+    protected boolean isRunning     = false;
 
-    protected long dimTime;
-    protected long brightTime;
+    protected long dimTime = 9 * 60 * 60;
+    protected long brightTime = 21 * 60 * 60;
 
     public enum ColorTheme {
         BRIGHT,
@@ -82,12 +82,12 @@ public class GlobalTimer extends Thread implements JSONToStringI {
         return this.multiplicator;
     }
 
-    public long getDimTime() {
-        return this.dimTime;
+    public String getDimTimeString() {
+        return this.getTimeAsString(this.dimTime);
     }
 
-    public long getBrightTime() {
-        return this.brightTime;
+    public String getBrightTimeString() {
+        return this.getTimeAsString(this.brightTime);
     }
 
     public void setMultiplicator(long multiplicator)
@@ -115,6 +115,11 @@ public class GlobalTimer extends Thread implements JSONToStringI {
 
     public boolean setModelTime(String modelTime) {
         String tokens[] = modelTime.split(" ");
+
+        if(tokens.length != 2) {
+            return false;
+        }
+
         String day = tokens[0];
 
         long r;
@@ -199,6 +204,25 @@ public class GlobalTimer extends Thread implements JSONToStringI {
         } catch(InterruptedException e) {
 
         }
+    }
+
+    protected String getTimeAsString(long t) {
+        t /= 60;
+        long m = t % 60;
+        t /= 60;
+        long h = t % 60;
+
+        StringBuilder sb = new StringBuilder();
+        if(h < 10) {
+            sb.append("0");
+        }
+        sb.append(h);
+        sb.append(":");
+        if(m < 10) {
+            sb.append("0");
+        }
+        sb.append(m);
+        return sb.toString();
     }
 
     public String getCurrentModelTime() {

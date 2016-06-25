@@ -20,17 +20,16 @@
 
 package messagehandler;
 
-import utilities.config.Config;
-import json.streamwriter.JSONStreamWriterStringBuilder;
+import utilities.config.*;
+import json.streamwriter.*;
 import java.util.*;
 
 import com.*;
 import global.*;
-import java.io.IOException;
+import java.io.*;
 import json.*;
 import messages.*;
 import utilities.*;
-import utilities.config.ConfigException;
 
 public class Environment extends MessageHandlerA implements JSONToStringI {
     protected Dispatcher  dispatcher = null;
@@ -41,6 +40,9 @@ public class Environment extends MessageHandlerA implements JSONToStringI {
     protected ThreeState wind = ThreeState.OFF;
     protected ThreeState rain = ThreeState.OFF;
     protected ThreeState aux01 = ThreeState.OFF;
+    protected ThreeState aux02 = ThreeState.OFF;
+    protected ThreeState aux03 = ThreeState.OFF;
+
     protected boolean curtainUp = false;
     protected boolean dayNightSimulation = false;
     protected boolean mainLightOn = false;
@@ -93,8 +95,7 @@ public class Environment extends MessageHandlerA implements JSONToStringI {
 
                 case SET_GLOBAL_TIMER:
                     this.setGlobalTimer((Map<String, Object>)msg.getData());
-                    this.config.setSection("environment.globaltimer", this.getGlobalTimerData());
-                    this.config.writeFile();
+                    this.storeData();
                     this.dispatcher.dispatch(
                         new Message(
                             MessageType.SET_GLOBAL_TIMER,
@@ -115,8 +116,7 @@ public class Environment extends MessageHandlerA implements JSONToStringI {
 
                 case SET_ENVIRONMENT:
                     this.setEnvironment((Map<String, Object>)msg.getData());
-                    this.config.setSection("environment.environment", this);
-                    this.config.writeFile();
+                    this.storeData();
                     this.dispatcher.dispatch(
                         new Message(
                             MessageType.SET_ENVIRONMENT,
@@ -137,8 +137,7 @@ public class Environment extends MessageHandlerA implements JSONToStringI {
 
                 case SET_COLOR_THEME:
                     this.setColorTheme((Map<String, Object>)msg.getData());
-                    this.config.setSection("environment.colortheme", this.getColorThemeData());
-                    this.config.writeFile();
+                    this.storeData();
                     this.dispatcher.dispatch(
                         new Message(
                             MessageType.SET_COLOR_THEME,
@@ -170,6 +169,16 @@ public class Environment extends MessageHandlerA implements JSONToStringI {
         }
     }
 
+    protected void storeData()
+    throws ConfigException, IOException, JSONException {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("globaltimer", this.getGlobalTimerData());
+        map.put("colortheme", this.getColorThemeData());
+        map.put("environment", this);
+        this.config.setSection("environment", map);
+        this.config.writeFile();
+    }
+
     protected void setGlobalTimer(Map<String, Object> map)
     throws GlobalTimerException {
         this.globalTimer.setModelTime((String)map.get("curModelTime"));
@@ -182,6 +191,8 @@ public class Environment extends MessageHandlerA implements JSONToStringI {
         this.wind = (ThreeState)map.get("wind");
         this.rain = (ThreeState)map.get("rain");
         this.aux01 = (ThreeState)map.get("aux01");
+        this.aux02 = (ThreeState)map.get("aux02");
+        this.aux03 = (ThreeState)map.get("aux03");
         this.curtainUp = (boolean)map.get("curtainUp");
         this.mainLightOn = (boolean)map.get("mainLightOn");
     }
@@ -196,21 +207,17 @@ public class Environment extends MessageHandlerA implements JSONToStringI {
 
     protected Object getColorThemeData() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("dimTime",    this.globalTimer.getDimTime());
-        map.put("brightTime", this.globalTimer.getBrightTime());
+        map.put("dimTime",    this.globalTimer.getDimTimeString());
+        map.put("brightTime", this.globalTimer.getBrightTimeString());
         return map;
     }
 
     protected void setAutoMode(Object o) {
-        if(o == null) {
-            this.dayNightSimulation = !this.dayNightSimulation;
-        } else {
-            boolean active = (boolean)o;
-            if(this.dayNightSimulation == active) {
-                return;
-            }
-            this.dayNightSimulation = active;
+        boolean active = (boolean)o;
+        if(this.dayNightSimulation == active) {
+            return;
         }
+        this.dayNightSimulation = active;
 
         if(this.dayNightSimulation) {
             this.globalTimer.startGlobalTimer();
@@ -239,9 +246,11 @@ public class Environment extends MessageHandlerA implements JSONToStringI {
         map.put("thunderStorm", this.thunderStorm);
         map.put("wind", this.wind);
         map.put("rain", this.rain);
-        map.put("aux01", this.aux01);
         map.put("curtainUp", this.curtainUp);
         map.put("mainLightOn", this.mainLightOn);
+        map.put("aux01", this.aux01);
+        map.put("aux02", this.aux02);
+        map.put("aux03", this.aux03);
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
