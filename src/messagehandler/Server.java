@@ -19,7 +19,7 @@
  */
 package messagehandler;
 
-import appserver.ServerApplication;
+import appserver.*;
 import com.Endpoint;
 import java.text.*;
 import java.util.*;
@@ -74,6 +74,10 @@ public class Server extends MessageHandlerA {
         switch(msg.getMsgType()) {
             case RESET_CLIENT:
                 this.sendToClient(msg, MessageType.CLIENT_RESET);
+                break;
+
+            case SELF_TESTING_CLIENT:
+                this.sendToClient(msg, MessageType.CLIENT_SELF_TESTING);
                 break;
 
             default:

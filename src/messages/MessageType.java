@@ -44,6 +44,7 @@ public enum MessageType {
     CLIENT_CLOSE(MessageGroup.CLIENT, MessageClass.SINGLE),
     CLIENT_SHUTDOWN(MessageGroup.CLIENT, MessageClass.SINGLE),
     CLIENT_RESET(MessageGroup.CLIENT, MessageClass.SINGLE),
+    CLIENT_SELF_TESTING(MessageGroup.CLIENT, MessageClass.SINGLE),
 
     //---------------------------------------------------
     // Server
@@ -56,6 +57,7 @@ public enum MessageType {
     SERVER_INFO_RES(MessageGroup.SERV, MessageClass.SINGLE),
     CON_CLIENTS_REQ(MessageGroup.SERV, MessageClass.SINGLE),
     CON_CLIENTS_RES(MessageGroup.SERV, MessageClass.SINGLE),
+    SELF_TESTING_CLIENT(MessageGroup.SERV, MessageClass.SINGLE),
 
     //---------------------------------------------------
     // Environment
