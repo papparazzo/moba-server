@@ -73,7 +73,7 @@ public class JSONMessageDecoder extends JSONDecoder {
         }
         this.checkNext('}');
 
-        if(msgtype == null || o == null) {
+        if(msgtype == null) {
             throw new JSONException("invalid message arrived");
         }
         return new Message(msgtype, o, ep);
