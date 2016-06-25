@@ -12,3 +12,5 @@
 hs_err_pid*
 /nbproject/
 /config.json
+/build.xml
+/manifest.mf
