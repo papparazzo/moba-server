@@ -19,16 +19,77 @@
  */
 package utilities;
 
-import java.io.IOException;
-import json.JSONException;
-import json.JSONToStringI;
+import java.io.*;
+import json.*;
 
 public enum ThreeState implements JSONToStringI {
     ON,
-    AUTO,
+    UNSET,
     OFF;
 
     protected final int value;
+
+    public static boolean getValue(ThreeState t, boolean def) {
+        switch(t) {
+            case UNSET:
+                return def;
+
+            case ON:
+                return true;
+
+            case OFF:
+                return false;
+
+            default:
+                throw new UnsupportedOperationException("Not supported yet.");
+        }
+    }
+
+    public static boolean getValue(Switch s, boolean def) {
+        switch(s) {
+            case UNSET:
+                return def;
+
+            case ON:
+                return true;
+
+            case OFF:
+                return false;
+
+            default:
+                throw new UnsupportedOperationException("Not supported yet.");
+        }
+    }
+
+    public static ThreeState getValue(ThreeState t, ThreeState def) {
+        if(t == ThreeState.UNSET) {
+            return def;
+        }
+        return t;
+    }
+
+    public static ThreeState getValue(Switch s, ThreeState def) {
+        switch(s) {
+            case OFF:
+                return ThreeState.OFF;
+
+            case ON:
+                return ThreeState.ON;
+
+            case UNSET:
+                return def;
+
+            default:
+                throw new UnsupportedOperationException("Not supported yet.");
+        }
+    }
+
+    public static ThreeState getValue(boolean val) {
+        if(val) {
+            return ThreeState.ON;
+        }
+        return ThreeState.OFF;
+    }
 
     private ThreeState() {
         this.value = ordinal();

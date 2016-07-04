@@ -276,7 +276,7 @@ public class JSONEncoder {
     protected void flush()
     throws IOException {
         String s = this.sb.toString();
-
+//System.err.print(s);
         for(JSONStreamWriterI writer : this.writers) {
             writer.write(s);
             writer.close();

@@ -19,24 +19,33 @@
  */
 package utilities;
 
-import java.io.IOException;
-import json.JSONException;
-import json.JSONToStringI;
+import java.io.*;
+import json.*;
 
-public enum ThreeState implements JSONToStringI {
+public enum Switch implements JSONToStringI {
     ON,
     AUTO,
+    UNSET,
+    TRIGGER,
     OFF;
 
     protected final int value;
 
-    private ThreeState() {
+    public static Switch getValue(Object o, Switch def) {
+        Switch t = (Switch)o;
+        if(t == Switch.UNSET) {
+            return def;
+        }
+        return t;
+    }
+
+    private Switch() {
         this.value = ordinal();
     }
 
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
-        return ThreeState.values()[this.value].toString();
+        return Switch.values()[this.value].toString();
     }
 }
