@@ -53,6 +53,18 @@ public class Notice implements JSONToStringI {
         this.text = text;
     }
 
+    public NoticeType getType() {
+        return this.noticeType;
+    }
+
+    public String getCaption() {
+        return this.caption;
+    }
+
+    public String getText() {
+        return this.text;
+    }
+
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {

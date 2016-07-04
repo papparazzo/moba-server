@@ -78,7 +78,19 @@ public class MessageLogger {
     }
 
     protected static void msg(Message msg) {
-        Map<String, Object> map = (Map<String, Object>)msg.getData();
+        Object o = msg.getData();
+        Map<String, Object> map;
+
+        if(o instanceof Notice) {
+            Notice n = (Notice)o;
+            map = new HashMap<>();
+            map.put("type", n.getType().toString());
+            map.put("caption", n.getCaption());
+            map.put("text", n.getText());
+        } else {
+            map = (Map<String, Object>)o;
+        }
+
         StringBuilder sb = new StringBuilder();
         SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS ");
 
