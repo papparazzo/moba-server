@@ -29,11 +29,11 @@ import com.*;
 import messages.*;
 
 public class GlobalTimer extends Thread implements JSONToStringI {
-    protected Dispatcher dispatcher = null;
-    protected long intervall        = 60;
-    protected long multiplicator    = 60 * 60;
-    protected long curModelTime     = 0;
-    protected boolean isRunning     = false;
+    protected Dispatcher dispatcher      = null;
+    protected long intervall             = 60;
+    protected long multiplicator         = 60 * 60;
+    protected long curModelTime          = 0;
+    protected volatile boolean isRunning = false;
 
     protected long dimTime = 9 * 60 * 60;
     protected long brightTime = 21 * 60 * 60;
@@ -52,25 +52,15 @@ public class GlobalTimer extends Thread implements JSONToStringI {
     }
 
     public void startGlobalTimer() {
-        if(this.isRunning) {
+        this.isRunning = true;
+        if(this.isAlive()) {
             return;
         }
         this.setName("globaltimer");
         this.start();
-        this.isRunning = true;
     }
 
     public void stopGlobalTimer() {
-        if(!this.isRunning) {
-            return;
-        }
-
-        try {
-            this.interrupt();
-            this.join(250);
-        } catch(InterruptedException e) {
-
-        }
         this.isRunning = false;
     }
 
@@ -184,21 +174,27 @@ public class GlobalTimer extends Thread implements JSONToStringI {
     public void run() {
         try {
             while(!isInterrupted()) {
+                Thread.sleep(this.intervall * 1000);
+                if(!this.isRunning) {
+                    continue;
+                }
+                this.curModelTime += (
+                    (this.intervall * this.multiplicator) % (60 * 60 * 24 * 7)
+                );
                 if(this.curModelTime % 3600 == this.brightTime) {
+                    // FIXME: Is this really thread-save??
                     this.dispatcher.dispatch(
                         new Message(MessageType.COLOR_THEME_EVENT, ColorTheme.BRIGHT)
                     );
                 } else if(this.curModelTime % 3600 == this.dimTime ) {
+                    // FIXME: Is this really thread-save??
                     this.dispatcher.dispatch(
                         new Message(MessageType.COLOR_THEME_EVENT, ColorTheme.DIM)
                     );
                 }
+                // FIXME: Is this really thread-save??
                 this.dispatcher.dispatch(
                     new Message(MessageType.GLOBAL_TIMER_EVENT, this)
-                );
-                Thread.sleep(this.intervall * 1000);
-                this.curModelTime += (
-                    (this.intervall * this.multiplicator) % (60 * 60 * 24 * 7)
                 );
             }
         } catch(InterruptedException e) {
