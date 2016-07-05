@@ -91,16 +91,6 @@ public class Systems extends MessageHandlerA {
         switch(state) {
             case READY:
                 if(this.emergencyStop) {
-                    this.dispatcher.dispatch(
-                        new Message(
-                            MessageType.SYSTEM_NOTICE,
-                            new Notice(
-                                Notice.NoticeType.ERROR,
-                                "Nothalt gedrückt",
-                                "Es wurde ein Nothalt ausgelöst"
-                            )
-                        )
-                    );
                     return false;
                 }
             case ERROR:
