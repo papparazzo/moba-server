@@ -44,27 +44,7 @@ public class Dispatcher implements SenderI {
     }
 
     public void removeEndpoint(Endpoint ep) {
-        if(ep.isAlive()) {
-            try {
-                ep.interrupt();
-                ep.join(250);
-            } catch(InterruptedException e) {
-                Dispatcher.logger.log(
-                    Level.WARNING,
-                    "InterruptedException occured! <{0}>",
-                    new Object[]{e.toString()}
-                );
-            }
-        }
-        try {
-            ep.closeEndpoint();
-        } catch(Exception e) {
-            Dispatcher.logger.log(
-                Level.WARNING,
-                "Exception occured! <{0}> Closing socket failed!",
-                new Object[]{e.toString()}
-            );
-        }
+        this.shutDownEndpoint(ep);
 
         Iterator<Endpoint> iter = this.broadcastEP.iterator();
 
@@ -108,6 +88,30 @@ public class Dispatcher implements SenderI {
         );
     }
 
+    protected void shutDownEndpoint(Endpoint ep) {
+        if(ep.isAlive()) {
+            try {
+                ep.interrupt();
+                ep.join(250);
+            } catch(InterruptedException e) {
+                Dispatcher.logger.log(
+                    Level.WARNING,
+                    "InterruptedException occured! <{0}>",
+                    new Object[]{e.toString()}
+                );
+            }
+        }
+        try {
+            ep.closeEndpoint();
+        } catch(Exception e) {
+            Dispatcher.logger.log(
+                Level.WARNING,
+                "Exception occured! <{0}> Closing socket failed!",
+                new Object[]{e.toString()}
+            );
+        }
+    }
+
     public int getEndPointsCount() {
         return this.broadcastEP.size();
     }
@@ -116,7 +120,7 @@ public class Dispatcher implements SenderI {
         Iterator<Endpoint> iter = this.broadcastEP.iterator();
 
         while(iter.hasNext()) {
-            this.removeEndpoint(iter.next());
+            this.shutDownEndpoint(iter.next());
         }
     }
 
