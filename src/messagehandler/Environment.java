@@ -48,6 +48,8 @@ public class Environment extends MessageHandlerA implements JSONToStringI {
     protected boolean dayNightSimulation = false;
     protected boolean mainLightOn = false;
 
+    protected List<AmbientLightData> ambientLight = new ArrayList<>();
+
     public Environment(Dispatcher dispatcher, Config config) {
         this.globalTimer = new GlobalTimer(dispatcher);
         this.dispatcher = dispatcher;
@@ -73,6 +75,10 @@ public class Environment extends MessageHandlerA implements JSONToStringI {
             o = this.config.getSection("environment.colortheme");
             if(o != null) {
                 this.setColorTheme((Map<String, Object>)o);
+            }
+            o = this.config.getSection("environment.ambientlight");
+            if(o != null) {
+                this.setAmbientLight((ArrayList<Object>)o);
             }
         } catch(GlobalTimerException e) {
             throw new ExceptionInInitializerError();
@@ -186,12 +192,36 @@ public class Environment extends MessageHandlerA implements JSONToStringI {
                     );
                     break;
 
+                case GET_AMBIENT_LIGHT:
+                    this.dispatcher.dispatch(
+                        new Message(
+                            MessageType.SET_AMBIENT_LIGHT,
+                            this.getAmbientLight(),
+                            msg.getEndpoint()
+                        )
+                    );
+                    break;
+
+                case SET_AMBIENT_LIGHT:
+                    this.setAmbientLight((ArrayList<Object>)msg.getData());
+                    this.storeData();
+                    this.dispatcher.dispatch(
+                        new Message(
+                            MessageType.SET_AMBIENT_LIGHT,
+                            this.getAmbientLight()
+                        )
+                    );
+                    break;
+
                 default:
                     throw new UnsupportedOperationException(
                         "unknow msg <" + msg.getMsgType().toString() + ">."
                     );
             }
-        } catch(java.lang.ClassCastException | GlobalTimerException | IOException | JSONException | ConfigException e) {
+        } catch(
+            java.lang.ClassCastException | GlobalTimerException |
+            IOException | JSONException | ConfigException | NullPointerException e
+        ) {
             this.dispatcher.dispatch(
                 new Message(
                     MessageType.ERROR,
@@ -212,6 +242,7 @@ public class Environment extends MessageHandlerA implements JSONToStringI {
         map.put("colortheme", this.getColorThemeData());
         map.put("ambient", this.getAmbience());
         map.put("environment", this);
+        map.put("ambientlight", this.ambientLight);
         this.config.setSection("environment", map);
         this.config.writeFile();
     }
@@ -233,6 +264,20 @@ public class Environment extends MessageHandlerA implements JSONToStringI {
     protected void setAmbience(Map<String, Object> map) {
         this.curtainUp = ThreeState.getValue((Switch)map.get("curtainUp"), this.curtainUp);
         this.mainLightOn = ThreeState.getValue((Switch)map.get("mainLightOn"), this.mainLightOn);
+    }
+
+    protected void setAmbientLight(ArrayList<Object> arr) {
+        this.ambientLight.clear();
+
+        Map<String, Object> map;
+        for(int i = 0; i < arr.size(); ++i) {
+            map = (Map<String, Object>)arr.get(i);
+            this.ambientLight.add(new AmbientLightData(
+                (int)(long)map.get("red"),
+                (int)(long)map.get("blue"),
+                (int)(long)map.get("white")
+            ));
+        }
     }
 
     protected void setEnvironment(Map<String, Object> map) {
@@ -266,6 +311,10 @@ public class Environment extends MessageHandlerA implements JSONToStringI {
         map.put("curtainUp", ThreeState.getValue(this.curtainUp));
         map.put("mainLightOn", ThreeState.getValue(this.mainLightOn));
         return map;
+    }
+
+    protected Object getAmbientLight() {
+        return this.ambientLight;
     }
 
     protected void setAutoMode(Object o) {

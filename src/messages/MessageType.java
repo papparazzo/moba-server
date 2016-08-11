@@ -74,6 +74,8 @@ public enum MessageType {
     GET_COLOR_THEME(MessageGroup.ENV, MessageClass.SINGLE),
     SET_COLOR_THEME(MessageGroup.ENV, MessageClass.GROUP),
     COLOR_THEME_EVENT(MessageGroup.ENV, MessageClass.BROADCAST),
+    GET_AMBIENT_LIGHT(MessageGroup.ENV, MessageClass.SINGLE),
+    SET_AMBIENT_LIGHT(MessageGroup.ENV, MessageClass.GROUP),
 
     //---------------------------------------------------
     // System
