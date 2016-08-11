@@ -211,7 +211,7 @@ public class JSONDecoder {
     throws JSONException, IOException {
         ArrayList<Object> arrayList = new ArrayList<>();
 
-        char c = this.next();
+        char c = this.next(!this.strict);
 
         if(c == ']') {
             return arrayList;
@@ -220,7 +220,7 @@ public class JSONDecoder {
         arrayList.add(this.nextValue());
 
         while(true) {
-            c = this.next();
+            c = this.next(!this.strict);
 
             switch(c) {
                 case ',':
