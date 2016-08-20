@@ -178,15 +178,15 @@ public class GlobalTimer extends Thread implements JSONToStringI {
                 if(!this.isRunning) {
                     continue;
                 }
-                this.curModelTime += (
-                    (this.intervall * this.multiplicator) % (60 * 60 * 24 * 7)
+                this.curModelTime = (
+                    (this.curModelTime + this.intervall * this.multiplicator) % (60 * 60 * 24 * 7)
                 );
-                if(this.curModelTime % 3600 == this.brightTime) {
+                if(this.curModelTime % this.brightTime == 0) {
                     // FIXME: Is this really thread-save??
                     this.dispatcher.dispatch(
                         new Message(MessageType.COLOR_THEME_EVENT, ColorTheme.BRIGHT)
                     );
-                } else if(this.curModelTime % 3600 == this.dimTime ) {
+                } else if(this.curModelTime % this.dimTime == 0) {
                     // FIXME: Is this really thread-save??
                     this.dispatcher.dispatch(
                         new Message(MessageType.COLOR_THEME_EVENT, ColorTheme.DIM)
@@ -206,7 +206,7 @@ public class GlobalTimer extends Thread implements JSONToStringI {
         t /= 60;
         long m = t % 60;
         t /= 60;
-        long h = t % 60;
+        long h = t % 24;
 
         StringBuilder sb = new StringBuilder();
         if(h < 10) {
