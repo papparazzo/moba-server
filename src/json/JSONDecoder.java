@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.*;
 
 import json.streamreader.*;
-import utilities.Switch;
 
 public class JSONDecoder {
     private JSONStreamReaderI reader = null;
@@ -282,26 +281,6 @@ public class JSONDecoder {
         }
         if(s.equalsIgnoreCase("null")) {
             return null;
-        }
-
-        if(s.equalsIgnoreCase("auto")) {
-            return Switch.AUTO;
-        }
-
-        if(s.equalsIgnoreCase("on")) {
-            return Switch.ON;
-        }
-
-        if(s.equalsIgnoreCase("off")) {
-            return Switch.OFF;
-        }
-
-        if(s.equalsIgnoreCase("unset")) {
-            return Switch.UNSET;
-        }
-
-        if(s.equalsIgnoreCase("trigger")) {
-            return Switch.TRIGGER;
         }
 
         char b = s.charAt(0);

@@ -32,7 +32,8 @@ public enum Switch implements JSONToStringI {
     protected final int value;
 
     public static Switch getValue(Object o, Switch def) {
-        Switch t = (Switch)o;
+        String s = (String)o;
+        Switch t = Switch.valueOf(s);
         if(t == Switch.UNSET) {
             return def;
         }
@@ -46,6 +47,10 @@ public enum Switch implements JSONToStringI {
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
-        return Switch.values()[this.value].toString();
+        StringBuilder b = new StringBuilder();
+        b.append('"');
+        b.append(Switch.values()[this.value].toString());
+        b.append('"');
+        return b.toString();
     }
 }

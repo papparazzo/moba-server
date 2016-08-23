@@ -98,6 +98,10 @@ public enum ThreeState implements JSONToStringI {
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
-        return ThreeState.values()[this.value].toString();
+        StringBuilder b = new StringBuilder();
+        b.append('"');
+        b.append(ThreeState.values()[this.value].toString());
+        b.append('"');
+        return b.toString();
     }
 }
