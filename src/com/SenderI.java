@@ -19,7 +19,7 @@
  */
 package com;
 
-import messages.*;
+import messages.Message;
 
 public interface SenderI {
     public boolean dispatch(Message msg);

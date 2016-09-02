@@ -1,14 +1,20 @@
 
 package com;
 
-import java.util.*;
-import java.util.logging.*;
-import java.io.*;
+import java.io.IOException;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import json.*;
-import json.streamwriter.*;
-import messages.*;
-import utilities.*;
+import json.JSONException;
+import json.streamwriter.JSONStreamWriterSocket;
+import messages.JSONMessageEncoder;
+import messages.Message;
+import messages.MessageType;
+import utilities.MessageLogger;
 
 public class Dispatcher implements SenderI {
     protected final Set<Endpoint> broadcastEP = new HashSet<>();

@@ -20,10 +20,6 @@
 
 package messages;
 
-/**
- *
- * @author Admin
- */
 public enum MessageType {
     //---------------------------------------------------
     // Base (Intern)
@@ -60,20 +56,24 @@ public enum MessageType {
     SELF_TESTING_CLIENT(MessageGroup.SERV, MessageClass.SINGLE),
 
     //---------------------------------------------------
+    // GlobalTimer
+    //---------------------------------------------------
+    GLOBAL_TIMER_EVENT(MessageGroup.TIMER, MessageClass.BROADCAST, MessagePriority.REAL_TIME),
+    GET_GLOBAL_TIMER(MessageGroup.TIMER, MessageClass.SINGLE),
+    SET_GLOBAL_TIMER(MessageGroup.TIMER, MessageClass.GROUP),
+    GET_AUTO_MODE(MessageGroup.TIMER, MessageClass.SINGLE),
+    SET_AUTO_MODE(MessageGroup.TIMER, MessageClass.BROADCAST),
+    GET_COLOR_THEME(MessageGroup.TIMER, MessageClass.SINGLE),
+    SET_COLOR_THEME(MessageGroup.TIMER, MessageClass.GROUP),
+    COLOR_THEME_EVENT(MessageGroup.TIMER, MessageClass.BROADCAST),
+
+    //---------------------------------------------------
     // Environment
     //---------------------------------------------------
-    GLOBAL_TIMER_EVENT(MessageGroup.ENV, MessageClass.BROADCAST, MessagePriority.REAL_TIME),
-    GET_GLOBAL_TIMER(MessageGroup.ENV, MessageClass.SINGLE),
-    SET_GLOBAL_TIMER(MessageGroup.ENV, MessageClass.GROUP),
     GET_ENVIRONMENT(MessageGroup.ENV, MessageClass.SINGLE),
     SET_ENVIRONMENT(MessageGroup.ENV, MessageClass.GROUP),
     GET_AMBIENCE(MessageGroup.ENV, MessageClass.SINGLE),
     SET_AMBIENCE(MessageGroup.ENV, MessageClass.GROUP),
-    GET_AUTO_MODE(MessageGroup.ENV, MessageClass.SINGLE),
-    SET_AUTO_MODE(MessageGroup.ENV, MessageClass.BROADCAST),
-    GET_COLOR_THEME(MessageGroup.ENV, MessageClass.SINGLE),
-    SET_COLOR_THEME(MessageGroup.ENV, MessageClass.GROUP),
-    COLOR_THEME_EVENT(MessageGroup.ENV, MessageClass.BROADCAST),
     GET_AMBIENT_LIGHT(MessageGroup.ENV, MessageClass.SINGLE),
     SET_AMBIENT_LIGHT(MessageGroup.ENV, MessageClass.GROUP),
 
@@ -119,6 +119,7 @@ public enum MessageType {
         BASE,
         CLIENT,
         SERV,
+        TIMER,
         ENV,
         SYSTEM,
         LAYOUT,

@@ -1,7 +1,7 @@
 /*
- *  AppServer
+ *  moba-appServer
  *
- *  Copyright (C) 2015 stefan
+ *  Copyright (C) 2016 stefan
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -17,24 +17,32 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
  *
  */
+package datatypes.enumerations;
 
-package global;
+import java.io.IOException;
 
-public class GlobalTimerException extends Exception {
+import json.JSONException;
+import json.JSONToStringI;
 
-    public GlobalTimerException() {
-        super();
+public enum HardwareState implements JSONToStringI {
+    ERROR,
+    STANDBY,
+    POWER_OFF,
+    READY;
+
+    protected final int value;
+
+    private HardwareState() {
+        this.value = ordinal();
     }
 
-    public GlobalTimerException(String message) {
-        super(message);
-    }
-
-    public GlobalTimerException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public GlobalTimerException(Throwable cause) {
-        super(cause);
+    @Override
+    public String toJsonString(boolean formated, int indent)
+    throws JSONException, IOException {
+        StringBuilder b = new StringBuilder();
+        b.append('"');
+        b.append(HardwareState.values()[this.value].toString());
+        b.append('"');
+        return b.toString();
     }
 }

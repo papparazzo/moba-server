@@ -19,10 +19,13 @@
  */
 package messagehandler;
 
-import com.Endpoint;
-import com.*;
 import java.util.concurrent.PriorityBlockingQueue;
-import messages.*;
+
+import com.Dispatcher;
+import com.Endpoint;
+import messages.Message;
+import messages.MessageHandlerA;
+import messages.MessageType;
 
 public class Link extends MessageHandlerA {
 

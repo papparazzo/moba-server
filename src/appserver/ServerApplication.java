@@ -19,12 +19,21 @@
  */
 package appserver;
 
-import com.*;
-import app.*;
-import database.*;
-import java.util.*;
-import messagehandler.*;
-import messages.*;
+import java.util.HashMap;
+
+import app.Application;
+import com.Acceptor;
+import com.Dispatcher;
+import database.Database;
+import database.DatabaseException;
+import messagehandler.Environment;
+import messagehandler.GlobalTimer;
+import messagehandler.Layout;
+import messagehandler.Link;
+import messagehandler.Server;
+import messagehandler.Systems;
+import messages.MessageLoop;
+import messages.MessageType;
 
 public class ServerApplication extends Application {
 
@@ -46,6 +55,7 @@ public class ServerApplication extends Application {
                 MessageLoop loop = new MessageLoop(dispatcher);
                 loop.addHandler(MessageType.MessageGroup.CLIENT, new Link(dispatcher, this.in));
                 loop.addHandler(MessageType.MessageGroup.SERV, new Server(dispatcher, this));
+                loop.addHandler(MessageType.MessageGroup.TIMER, new GlobalTimer(dispatcher, this.config));
                 loop.addHandler(MessageType.MessageGroup.ENV, new Environment(dispatcher, this.config));
                 loop.addHandler(MessageType.MessageGroup.SYSTEM, new Systems(dispatcher, this.in));
                 loop.addHandler(MessageType.MessageGroup.LAYOUT, new Layout(dispatcher, new Database((HashMap<String, Object>)this.config.getSection("common.database"))));

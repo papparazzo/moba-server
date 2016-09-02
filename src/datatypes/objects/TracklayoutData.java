@@ -18,15 +18,19 @@
  *
  */
 
-package tracklayout;
+package datatypes.objects;
 
-import json.streamwriter.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import json.*;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 
-public class TracklayoutInfo implements JSONToStringI {
+import json.JSONEncoder;
+import json.JSONException;
+import json.JSONToStringI;
+import json.streamwriter.JSONStreamWriterStringBuilder;
+
+public class TracklayoutData implements JSONToStringI {
     protected long    id;
     protected String  name;
     protected String  description;
@@ -36,7 +40,7 @@ public class TracklayoutInfo implements JSONToStringI {
     protected int     height;
     protected int     locked;
 
-    public TracklayoutInfo(
+    public TracklayoutData(
         long id, String name, String description, int width, int height, int locked, Date modified, Date created
     ) {
         if(width < 1 || height < 1 || name == null || name.isEmpty()) {
@@ -57,7 +61,7 @@ public class TracklayoutInfo implements JSONToStringI {
         this.created     = created;
     }
 
-    public TracklayoutInfo(String name, String description, int width, int height) {
+    public TracklayoutData(String name, String description, int width, int height) {
         this(-1, name, description, width, height, 0, new Date(), new Date());
     }
 

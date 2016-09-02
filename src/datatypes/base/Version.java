@@ -18,9 +18,9 @@
  *
  */
 
-package utilities;
+package datatypes.base;
 
-import json.*;
+import json.JSONToStringI;
 
 public class Version implements Comparable, JSONToStringI {
 

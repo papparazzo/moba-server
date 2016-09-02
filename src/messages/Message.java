@@ -20,12 +20,8 @@
 
 package messages;
 
-import com.*;
+import com.Endpoint;
 
-/**
- *
- * @author Admin
- */
 public class Message implements Comparable {
     protected long   trigger;
 

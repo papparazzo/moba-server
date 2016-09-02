@@ -1,7 +1,7 @@
 /*
- *  common
+ *  moba-appServer
  *
- *  Copyright (C) 2013 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2016 stefan
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -18,31 +18,39 @@
  *
  */
 
-package messages;
+package datatypes.base;
 
 import java.io.IOException;
-import java.util.HashMap;
 
-import json.JSONEncoder;
 import json.JSONException;
-import json.streamwriter.JSONStreamWriterI;
+import json.JSONToStringI;
 
-public class JSONMessageEncoder extends JSONEncoder {
-    public JSONMessageEncoder()
-    throws IOException {
-        super();
+public class Percent implements JSONToStringI {
+    protected int value = 0;
+
+    public Percent() {
+
     }
 
-    public JSONMessageEncoder(JSONStreamWriterI writer)
-    throws IOException {
-        super(writer);
+    public Percent(int val) {
+        this.setValue(val);
     }
 
-    public void encodeMsg(Message msg)
-    throws IOException, JSONException {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put(Message.MSG_HEADER, String.valueOf(msg.getMsgType()));
-        map.put(Message.DATA_HEADER, msg.getData());
-        this.encode(map);
+    public final void setValue(int val)
+    throws IllegalArgumentException {
+        if(val > 100 || val < 0) {
+            throw new IllegalArgumentException();
+        }
+        this.value = val;
+    }
+
+    public int getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toJsonString(boolean formated, int indent)
+    throws JSONException, IOException {
+        return String.valueOf(this.value);
     }
 }

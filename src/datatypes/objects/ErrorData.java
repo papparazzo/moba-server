@@ -1,7 +1,7 @@
 /*
- *  AppServer
+ *  common
  *
- *  Copyright (C) 2015 stefan
+ *  Copyright (C) 2014 stefan
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -18,60 +18,38 @@
  *
  */
 
-package utilities;
+package datatypes.objects;
 
 import java.io.IOException;
 import java.util.HashMap;
+
+import datatypes.enumerations.ErrorId;
 import json.JSONEncoder;
 import json.JSONException;
 import json.JSONToStringI;
 import json.streamwriter.JSONStreamWriterStringBuilder;
 
-public class Notice implements JSONToStringI {
+public class ErrorData implements JSONToStringI {
 
-    protected final NoticeType noticeType;
-    protected final String caption;
-    protected final String text;
+    protected final ErrorId errorId;
+    protected final String additonalMsg;
 
-    public enum NoticeType {
-        INFO,
-        WARNING,
-        ERROR
+
+    public ErrorData(ErrorId errorId) {
+        this(errorId, "");
     }
 
-    public Notice(String caption) {
-        this(caption, caption);
-    }
-
-    public Notice(String caption, String text) {
-        this(NoticeType.INFO, caption, text);
-    }
-
-    public Notice(NoticeType noticeType, String caption, String text) {
-        this.noticeType = noticeType;
-        this.caption = caption;
-        this.text = text;
-    }
-
-    public NoticeType getType() {
-        return this.noticeType;
-    }
-
-    public String getCaption() {
-        return this.caption;
-    }
-
-    public String getText() {
-        return this.text;
+    public ErrorData(ErrorId errorId, String additonalMsg) {
+        this.errorId = errorId;
+        this.additonalMsg = additonalMsg;
     }
 
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("type",    this.noticeType);
-        map.put("caption", this.caption);
-        map.put("text",    this.text);
+        map.put("errorId",      this.errorId);
+        map.put("additonalMsg", this.additonalMsg);
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);

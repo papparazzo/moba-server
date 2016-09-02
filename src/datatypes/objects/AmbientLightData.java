@@ -1,7 +1,7 @@
 /*
- *  common
+ *  AppServer
  *
- *  Copyright (C) 2014 stefan
+ *  Copyright (C) 2016 stefan
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -18,45 +18,58 @@
  *
  */
 
-package utilities;
+package datatypes.objects;
 
+import java.io.IOException;
+import java.util.HashMap;
+
+import datatypes.base.Percent;
+import java.util.Map;
+import json.JSONEncoder;
+import json.JSONException;
+import json.JSONToStringI;
 import json.streamwriter.JSONStreamWriterStringBuilder;
-import json.*;
 
-import java.io.*;
-import java.util.*;
+public class AmbientLightData implements JSONToStringI {
+    protected Percent red;
+    protected Percent blue;
+    protected Percent white;
 
-public class ErrorInfo implements JSONToStringI {
+    public AmbientLightData() {
 
-    protected final ErrorId errorId;
-    protected final String additonalMsg;
-
-    public enum ErrorId {
-        SAME_ORIGIN_NEEDED,
-        INVALID_APP_ID,
-        FAULTY_MESSAGE,
-        INVALID_DATA_SEND,
-        DATASET_LOCKED,
-        DATASET_MISSING,
-        DATABASE_ERROR,
-        UNKNOWN_ERROR
     }
 
-    public ErrorInfo(ErrorId errorId) {
-        this(errorId, "");
+    public AmbientLightData(Percent red, Percent blue, Percent white) {
+        this.setRed(red);
+        this.setBlue(blue);
+        this.setWhite(white);
     }
 
-    public ErrorInfo(ErrorId errorId, String additonalMsg) {
-        this.errorId = errorId;
-        this.additonalMsg = additonalMsg;
+    public final void setRed(Percent red) {
+        this.red = red;
+    }
+
+    public final void setBlue(Percent blue) {
+        this.blue = blue;
+    }
+
+    public final void setWhite(Percent white) {
+        this.white = white;
+    }
+
+    public void fromJsonObject(Map<String, Object> map) {
+        this.red = new Percent((int)map.get("red"));
+        this.blue = new Percent((int)map.get("blue"));
+        this.white = new Percent((int)map.get("white"));
     }
 
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("errorId",      this.errorId);
-        map.put("additonalMsg", this.additonalMsg);
+        map.put("red",   this.red);
+        map.put("blue",  this.blue);
+        map.put("white", this.white);
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);

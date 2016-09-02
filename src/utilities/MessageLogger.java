@@ -20,9 +20,15 @@
 
 package utilities;
 
-import java.text.*;
-import java.util.*;
-import messages.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import datatypes.enumerations.NoticeType;
+import datatypes.objects.NoticeData;
+import messages.Message;
+import messages.MessageType;
 
 public class MessageLogger {
     protected static final String ANSI_RESET  = "\u001B[0m";
@@ -81,8 +87,8 @@ public class MessageLogger {
         Object o = msg.getData();
         Map<String, Object> map;
 
-        if(o instanceof Notice) {
-            Notice n = (Notice)o;
+        if(o instanceof NoticeType) {
+            NoticeData n = (NoticeData)o;
             map = new HashMap<>();
             map.put("type", n.getType().toString());
             map.put("caption", n.getCaption());

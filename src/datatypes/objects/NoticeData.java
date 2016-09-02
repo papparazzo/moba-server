@@ -1,5 +1,5 @@
 /*
- *  AppServer
+ *  moba-appServer
  *
  *  Copyright (C) 2016 stefan
  *
@@ -18,56 +18,57 @@
  *
  */
 
-package utilities;
+package datatypes.objects;
 
-import java.io.*;
-import java.util.*;
-import json.*;
-import json.streamwriter.*;
+import java.io.IOException;
+import java.util.HashMap;
 
-public class AmbientLightData implements JSONToStringI {
-    protected int red = 0;
-    protected int blue = 0;
-    protected int white = 0;
+import datatypes.enumerations.NoticeType;
+import json.JSONEncoder;
+import json.JSONException;
+import json.JSONToStringI;
+import json.streamwriter.JSONStreamWriterStringBuilder;
 
-    public AmbientLightData() {
+public class NoticeData implements JSONToStringI {
 
+    protected final NoticeType noticeType;
+    protected final String caption;
+    protected final String text;
+
+
+    public NoticeData(String caption) {
+        this(caption, caption);
     }
 
-    public AmbientLightData(int red, int blue, int white) {
-        this.setRed(red);
-        this.setBlue(blue);
-        this.setWhite(white);
+    public NoticeData(String caption, String text) {
+        this(NoticeType.INFO, caption, text);
     }
 
-    public final void setRed(int red) {
-        this.checkValue(red);
-        this.red = red;
+    public NoticeData(NoticeType noticeType, String caption, String text) {
+        this.noticeType = noticeType;
+        this.caption = caption;
+        this.text = text;
     }
 
-    public final void setBlue(int blue) {
-        this.checkValue(blue);
-        this.blue = blue;
+    public NoticeType getType() {
+        return this.noticeType;
     }
 
-    public final void setWhite(int white) {
-        this.checkValue(white);
-        this.white = white;
+    public String getCaption() {
+        return this.caption;
     }
 
-    protected void checkValue(int val) {
-        if(red < 0 || red > 100) {
-            throw new IllegalArgumentException("value is less 0 or greate 100");
-        }
+    public String getText() {
+        return this.text;
     }
 
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("red",   this.red);
-        map.put("blue",  this.blue);
-        map.put("white", this.white);
+        map.put("type",    this.noticeType);
+        map.put("caption", this.caption);
+        map.put("text",    this.text);
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);

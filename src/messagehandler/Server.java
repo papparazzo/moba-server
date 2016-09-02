@@ -19,16 +19,19 @@
  */
 package messagehandler;
 
-import appserver.*;
-import com.Endpoint;
-import java.text.*;
-import java.util.*;
-import java.util.concurrent.*;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.concurrent.PriorityBlockingQueue;
 
-import com.*;
-import messages.*;
-import utilities.*;
-import utilities.ErrorInfo.*;
+import appserver.ServerApplication;
+import com.Dispatcher;
+import com.Endpoint;
+import datatypes.objects.ErrorData;
+import datatypes.enumerations.ErrorId;
+import messages.Message;
+import messages.MessageHandlerA;
+import messages.MessageType;
+
 
 public class Server extends MessageHandlerA {
 
@@ -61,10 +64,9 @@ public class Server extends MessageHandlerA {
         }
 
         if(!this.checkForSameOrigin(msg.getEndpoint())) {
-            this.dispatcher.dispatch(
-                new Message(
+            this.dispatcher.dispatch(new Message(
                     MessageType.ERROR,
-                    new ErrorInfo(ErrorId.SAME_ORIGIN_NEEDED),
+                    new ErrorData(ErrorId.SAME_ORIGIN_NEEDED),
                     msg.getEndpoint()
                 )
             );
@@ -93,10 +95,9 @@ public class Server extends MessageHandlerA {
             this.dispatcher.dispatch(new Message(mType, null, ep));
             return;
         }
-        this.dispatcher.dispatch(
-            new Message(
+        this.dispatcher.dispatch(new Message(
                 MessageType.ERROR,
-                new ErrorInfo(ErrorId.INVALID_APP_ID),
+                new ErrorData(ErrorId.INVALID_APP_ID),
                 msg.getEndpoint()
             )
         );

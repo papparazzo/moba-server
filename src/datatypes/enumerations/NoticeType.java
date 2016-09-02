@@ -1,7 +1,7 @@
 /*
- *  common
+ *  AppServer
  *
- *  Copyright (C) 2013 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2015 stefan
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -18,31 +18,31 @@
  *
  */
 
-package messages;
+package datatypes.enumerations;
 
 import java.io.IOException;
-import java.util.HashMap;
 
-import json.JSONEncoder;
 import json.JSONException;
-import json.streamwriter.JSONStreamWriterI;
+import json.JSONToStringI;
 
-public class JSONMessageEncoder extends JSONEncoder {
-    public JSONMessageEncoder()
-    throws IOException {
-        super();
+public enum NoticeType implements JSONToStringI {
+    INFO,
+    WARNING,
+    ERROR;
+
+    protected final int value;
+
+    private NoticeType() {
+        this.value = ordinal();
     }
 
-    public JSONMessageEncoder(JSONStreamWriterI writer)
-    throws IOException {
-        super(writer);
-    }
-
-    public void encodeMsg(Message msg)
-    throws IOException, JSONException {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put(Message.MSG_HEADER, String.valueOf(msg.getMsgType()));
-        map.put(Message.DATA_HEADER, msg.getData());
-        this.encode(map);
+    @Override
+    public String toJsonString(boolean formated, int indent)
+    throws JSONException, IOException {
+        StringBuilder b = new StringBuilder();
+        b.append('"');
+        b.append(NoticeType.values()[this.value].toString());
+        b.append('"');
+        return b.toString();
     }
 }

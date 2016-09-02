@@ -20,16 +20,24 @@
 
 package messagehandler;
 
-import java.sql.*;
-import java.util.*;
-import java.util.logging.*;
-import java.text.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import com.*;
-import database.*;
-import messages.*;
-import tracklayout.*;
-import utilities.*;
+import com.SenderI;
+import database.Database;
+import datatypes.enumerations.ErrorId;
+import datatypes.objects.TracklayoutData;
+import datatypes.objects.ErrorData;
+import messages.Message;
+import messages.MessageHandlerA;
+import messages.MessageType;
 
 public class Layout extends MessageHandlerA {
 
@@ -123,11 +131,11 @@ public class Layout extends MessageHandlerA {
                 "SELECT * " +
                 "FROM `TrackLayout`;";
 
-            ArrayList<TracklayoutInfo> arraylist;
+            ArrayList<TracklayoutData> arraylist;
             try(ResultSet rs = this.db.query(q)) {
                 arraylist = new ArrayList();
                 while(rs.next()) {
-                    arraylist.add(new TracklayoutInfo(
+                    arraylist.add(new TracklayoutData(
                         rs.getInt("Id"),
                         rs.getString("Name"),
                         rs.getString("Description"),
@@ -152,11 +160,10 @@ public class Layout extends MessageHandlerA {
                 "<{0}>",
                 new Object[]{e.toString()}
             );
-            this.dispatcher.dispatch(
-                new Message(
+            this.dispatcher.dispatch(new Message(
                     MessageType.ERROR,
-                    new ErrorInfo(
-                        ErrorInfo.ErrorId.DATABASE_ERROR,
+                    new ErrorData(
+                        ErrorId.DATABASE_ERROR,
                         e.getMessage()
                     ),
                     msg.getEndpoint()
@@ -196,11 +203,10 @@ public class Layout extends MessageHandlerA {
                     "tracklayout <{0}> is locked",
                     new Object[]{id}
                 );
-                this.dispatcher.dispatch(
-                    new Message(
+                this.dispatcher.dispatch(new Message(
                         MessageType.ERROR,
-                        new ErrorInfo(
-                            ErrorInfo.ErrorId.DATASET_LOCKED,
+                        new ErrorData(
+                            ErrorId.DATASET_LOCKED,
                             "" // FIXME: locked by...
                         ),
                         msg.getEndpoint()
@@ -227,11 +233,10 @@ public class Layout extends MessageHandlerA {
                     new Object[]{pstmt.toString()}
                 );
                 if(pstmt.executeUpdate() == 0) {
-                    this.dispatcher.dispatch(
-                        new Message(
+                    this.dispatcher.dispatch(new Message(
                             MessageType.ERROR,
-                            new ErrorInfo(
-                                ErrorInfo.ErrorId.DATASET_MISSING,
+                            new ErrorData(
+                                ErrorId.DATASET_MISSING,
                                 ""
                             ),
                             msg.getEndpoint()
@@ -250,11 +255,10 @@ public class Layout extends MessageHandlerA {
                 "<{0}>",
                 new Object[]{e.toString()}
             );
-            this.dispatcher.dispatch(
-                new Message(
+            this.dispatcher.dispatch(new Message(
                     MessageType.ERROR,
-                    new ErrorInfo(
-                        ErrorInfo.ErrorId.DATABASE_ERROR,
+                    new ErrorData(
+                        ErrorId.DATABASE_ERROR,
                         e.getMessage()
                     ),
                     msg.getEndpoint()
@@ -267,7 +271,7 @@ public class Layout extends MessageHandlerA {
         try {
             Map<String, Object> map = (Map)msg.getData();
 
-            TracklayoutInfo tl = new TracklayoutInfo(
+            TracklayoutData tl = new TracklayoutData(
                 (String)map.get("name"),
                 (String)map.get("description"),
                 (int)(long)map.get("width"),
@@ -316,11 +320,10 @@ public class Layout extends MessageHandlerA {
                 "<{0}>",
                 new Object[]{e.toString()}
             );
-            this.dispatcher.dispatch(
-                new Message(
+            this.dispatcher.dispatch(new Message(
                     MessageType.ERROR,
-                    new ErrorInfo(
-                        ErrorInfo.ErrorId.DATABASE_ERROR,
+                    new ErrorData(
+                        ErrorId.DATABASE_ERROR,
                         e.getMessage()
                     ),
                     msg.getEndpoint()
@@ -339,11 +342,10 @@ public class Layout extends MessageHandlerA {
                     "tracklayout <{0}> is locked",
                     new Object[]{id}
                 );
-                this.dispatcher.dispatch(
-                    new Message(
+                this.dispatcher.dispatch(new Message(
                         MessageType.ERROR,
-                        new ErrorInfo(
-                            ErrorInfo.ErrorId.DATASET_LOCKED,
+                        new ErrorData(
+                            ErrorId.DATASET_LOCKED,
                             "" // FIXME: locked by...
                         ),
                         msg.getEndpoint()
@@ -351,10 +353,10 @@ public class Layout extends MessageHandlerA {
                 );
                 return;
             }
-            TracklayoutInfo tl;
+            TracklayoutData tl;
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
-            tl = new TracklayoutInfo(
+            tl = new TracklayoutData(
                 id,
                 (String)map.get("name"),
                 (String)map.get("description"),
@@ -386,11 +388,10 @@ public class Layout extends MessageHandlerA {
                 pstmt.setLong(7, msg.getEndpoint().getAppId());
                 pstmt.setLong(8, id);
                 if(pstmt.executeUpdate() == 0) {
-                    this.dispatcher.dispatch(
-                        new Message(
+                    this.dispatcher.dispatch(new Message(
                             MessageType.ERROR,
-                            new ErrorInfo(
-                                ErrorInfo.ErrorId.DATASET_MISSING,
+                            new ErrorData(
+                                ErrorId.DATASET_MISSING,
                                 "Could not update <" + String.valueOf(id) + ">"
                             ),
                             msg.getEndpoint()
@@ -408,11 +409,10 @@ public class Layout extends MessageHandlerA {
                 "<{0}>",
                 new Object[]{e.toString()}
             );
-            this.dispatcher.dispatch(
-                new Message(
+            this.dispatcher.dispatch(new Message(
                     MessageType.ERROR,
-                    new ErrorInfo(
-                        ErrorInfo.ErrorId.UNKNOWN_ERROR,
+                    new ErrorData(
+                        ErrorId.UNKNOWN_ERROR,
                         e.getMessage()
                     ),
                     msg.getEndpoint()
@@ -430,11 +430,10 @@ public class Layout extends MessageHandlerA {
                     "tracklayout <{0}> is locked",
                     new Object[]{id}
                 );
-                this.dispatcher.dispatch(
-                    new Message(
+                this.dispatcher.dispatch(new Message(
                         MessageType.ERROR,
-                        new ErrorInfo(
-                            ErrorInfo.ErrorId.DATASET_LOCKED
+                        new ErrorData(
+                            ErrorId.DATASET_LOCKED
                         ),
                         msg.getEndpoint()
                     )
@@ -461,11 +460,10 @@ public class Layout extends MessageHandlerA {
                 );
 
                 if(pstmt.executeUpdate() == 0) {
-                    this.dispatcher.dispatch(
-                        new Message(
+                    this.dispatcher.dispatch(new Message(
                             MessageType.ERROR,
-                            new ErrorInfo(
-                                ErrorInfo.ErrorId.DATASET_MISSING
+                            new ErrorData(
+                                ErrorId.DATASET_MISSING
                             ),
                             msg.getEndpoint()
                         )
@@ -483,11 +481,10 @@ public class Layout extends MessageHandlerA {
                 "<{0}>",
                 new Object[]{e.toString()}
             );
-            this.dispatcher.dispatch(
-                new Message(
+            this.dispatcher.dispatch(new Message(
                     MessageType.ERROR,
-                    new ErrorInfo(
-                        ErrorInfo.ErrorId.DATABASE_ERROR,
+                    new ErrorData(
+                        ErrorId.DATABASE_ERROR,
                         e.getMessage()
                     ),
                     msg.getEndpoint()

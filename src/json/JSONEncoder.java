@@ -20,12 +20,17 @@
 
 package json;
 
-import json.streamwriter.JSONStreamWriterI;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import json.streamwriter.JSONStreamWriterI;
 
 public class JSONEncoder {
     protected boolean          formated;

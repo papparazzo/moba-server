@@ -20,11 +20,15 @@
 
 package utilities.config;
 
-import java.io.*;
-import java.util.*;
-import json.*;
-import json.streamreader.*;
-import json.streamwriter.*;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import json.JSONDecoder;
+import json.JSONEncoder;
+import json.JSONException;
+import json.streamreader.JSONStreamReaderFile;
+import json.streamwriter.JSONStreamWriterFile;
 
 public class Config {
     protected String              fileName;

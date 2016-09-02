@@ -21,9 +21,11 @@
 package json;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-import json.streamreader.*;
+import json.streamreader.JSONStreamReaderI;
 
 public class JSONDecoder {
     private JSONStreamReaderI reader = null;

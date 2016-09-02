@@ -19,18 +19,28 @@
  */
 package com;
 
-import json.streamwriter.*;
-import java.io.*;
-import java.net.*;
-import java.text.*;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.logging.*;
+import java.io.IOException;
+import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import json.*;
-import json.streamreader.*;
-import messages.*;
-import utilities.*;
+import datatypes.base.Version;
+import json.JSONEncoder;
+import json.JSONException;
+import json.JSONToStringI;
+import json.streamreader.JSONStreamReaderSocket;
+import json.streamwriter.JSONStreamWriterStringBuilder;
+import messages.JSONMessageDecoder;
+import messages.Message;
+import messages.MessageType;
+import utilities.MessageLogger;
 
 public class Endpoint extends Thread implements JSONToStringI {
 

@@ -19,11 +19,14 @@
  */
 package com;
 
-import java.io.*;
-import java.util.logging.*;
-import json.*;
-import messages.*;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import json.JSONException;
+import messages.JSONMessageEncoder;
 import messages.Message;
+import messages.MessageType;
 
 public class Transmitter implements SenderI {
 

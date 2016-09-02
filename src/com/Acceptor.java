@@ -20,12 +20,15 @@
 
 package com;
 
-import java.net.*;
-import java.io.*;
-import java.util.concurrent.*;
-import java.util.logging.*;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import messages.*;
+import messages.Message;
+import messages.MessageType;
 
 public class Acceptor extends Thread {
     protected static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);

@@ -20,11 +20,12 @@
 
 package messages;
 
-import com.Endpoint;
-import java.io.*;
+import java.io.IOException;
 
-import json.*;
-import json.streamreader.*;
+import com.Endpoint;
+import json.JSONDecoder;
+import json.JSONException;
+import json.streamreader.JSONStreamReaderI;
 
 public class JSONMessageDecoder extends JSONDecoder {
 

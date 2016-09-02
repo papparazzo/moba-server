@@ -5,12 +5,11 @@
 
 package utilities.logger;
 
+import datatypes.base.Version;
 import java.util.logging.*;
 import java.io.*;
 import java.text.*;
 import java.util.Date;
-
-import utilities.*;
 
 public class CustomFormatter extends Formatter {
 

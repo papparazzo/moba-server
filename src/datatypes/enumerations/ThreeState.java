@@ -17,49 +17,20 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
  *
  */
-package utilities;
+package datatypes.enumerations;
 
-import java.io.*;
-import json.*;
+import java.io.IOException;
+
+import json.JSONException;
+import json.JSONToStringI;
 
 public enum ThreeState implements JSONToStringI {
     ON,
-    UNSET,
-    OFF;
+    OFF,
+    AUTO,
+    UNSET;
 
     protected final int value;
-
-    public static boolean getValue(ThreeState t, boolean def) {
-        switch(t) {
-            case UNSET:
-                return def;
-
-            case ON:
-                return true;
-
-            case OFF:
-                return false;
-
-            default:
-                throw new UnsupportedOperationException("Not supported yet.");
-        }
-    }
-
-    public static boolean getValue(Switch s, boolean def) {
-        switch(s) {
-            case UNSET:
-                return def;
-
-            case ON:
-                return true;
-
-            case OFF:
-                return false;
-
-            default:
-                throw new UnsupportedOperationException("Not supported yet.");
-        }
-    }
 
     public static ThreeState getValue(ThreeState t, ThreeState def) {
         if(t == ThreeState.UNSET) {
@@ -68,27 +39,19 @@ public enum ThreeState implements JSONToStringI {
         return t;
     }
 
-    public static ThreeState getValue(Switch s, ThreeState def) {
-        switch(s) {
-            case OFF:
-                return ThreeState.OFF;
-
-            case ON:
-                return ThreeState.ON;
-
-            case UNSET:
-                return def;
-
-            default:
-                throw new UnsupportedOperationException("Not supported yet.");
-        }
-    }
-
     public static ThreeState getValue(boolean val) {
         if(val) {
             return ThreeState.ON;
         }
         return ThreeState.OFF;
+    }
+
+    public static ThreeState getValue(String s, ThreeState def) {
+        ThreeState t = ThreeState.valueOf(s);
+        if(t == ThreeState.UNSET) {
+            return def;
+        }
+        return t;
     }
 
     private ThreeState() {

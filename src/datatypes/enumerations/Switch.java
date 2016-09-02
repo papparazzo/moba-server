@@ -17,10 +17,12 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
  *
  */
-package utilities;
+package datatypes.enumerations;
 
-import java.io.*;
-import json.*;
+import java.io.IOException;
+
+import json.JSONException;
+import json.JSONToStringI;
 
 public enum Switch implements JSONToStringI {
     ON,
@@ -31,8 +33,7 @@ public enum Switch implements JSONToStringI {
 
     protected final int value;
 
-    public static Switch getValue(Object o, Switch def) {
-        String s = (String)o;
+    public static Switch getValue(String s, Switch def) {
         Switch t = Switch.valueOf(s);
         if(t == Switch.UNSET) {
             return def;
