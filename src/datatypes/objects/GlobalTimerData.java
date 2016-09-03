@@ -35,19 +35,20 @@ public class GlobalTimerData implements JSONToStringI {
     protected DayTime curModelTime = new DayTime();
     protected int     multiplicator = 240;
 
-
     public int getMultiplicator() {
         return this.multiplicator;
     }
 
     public void setMultiplicator(int multiplicator)
     throws IllegalArgumentException {
-        if(multiplicator > 3600) {
-            multiplicator = 3600;
-        }
-        if(multiplicator % 15 != 0) {
+        if(multiplicator < 60 || multiplicator > 3600) {
             throw new IllegalArgumentException(
-                "modulo 15 check failed in multiplicator-setting"
+                "multiplicator out of range (< 60 || > 3600)"
+            );
+        }
+        if(3600 % multiplicator != 0) {
+            throw new IllegalArgumentException(
+                "modulo 3600 check failed in multiplicator-setting"
             );
         }
         this.multiplicator = multiplicator;
@@ -63,7 +64,7 @@ public class GlobalTimerData implements JSONToStringI {
 
     public void fromJsonObject(Map<String, Object> map) {
         this.curModelTime = new DayTime((String)map.get("curModelTime"));
-        this.multiplicator = (int)(long)map.get("multiplicator");
+        this.setMultiplicator((int)(long)map.get("multiplicator"));
     }
 
     public boolean setTick() {
