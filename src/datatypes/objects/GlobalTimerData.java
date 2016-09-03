@@ -68,7 +68,7 @@ public class GlobalTimerData implements JSONToStringI {
 
     public boolean setTick() {
         this.curModelTime.setValue(
-            this.curModelTime.getValue() + this.multiplicator % (60 * 60 * 24 * 7)
+            (this.curModelTime.getValue() + this.multiplicator) % (60 * 60 * 24 * 7)
         );
         return this.curModelTime.isFullHour();
     }
