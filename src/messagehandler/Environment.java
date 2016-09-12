@@ -21,9 +21,7 @@
 package messagehandler;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.Dispatcher;
@@ -44,9 +42,9 @@ public class Environment extends MessageHandlerA {
     protected Dispatcher  dispatcher = null;
     protected Config      config = null;
 
-    protected EnvironmentData environment = new EnvironmentData();
-    protected AmbienceData    ambience    = new AmbienceData();
-    protected List<AmbientLightData> ambientLight = new ArrayList<>();
+    protected EnvironmentData  environment  = new EnvironmentData();
+    protected AmbienceData     ambience     = new AmbienceData();
+    protected AmbientLightData ambientLight = new AmbientLightData();
 
     public Environment(Dispatcher dispatcher, Config config) {
         this.dispatcher = dispatcher;
@@ -66,7 +64,7 @@ public class Environment extends MessageHandlerA {
         }
         o = this.config.getSection("environment.ambientlight");
         if(o != null) {
-            this.setAmbientLight((ArrayList<Object>)o);
+            this.setAmbientLight((Map<String, Object>)o);
         }
     }
 
@@ -128,7 +126,7 @@ public class Environment extends MessageHandlerA {
                     break;
 
                 case SET_AMBIENT_LIGHT:
-                    this.setAmbientLight((ArrayList<Object>)msg.getData());
+                    this.setAmbientLight((Map<String, Object>)msg.getData());
                     this.storeData();
                     this.dispatcher.dispatch(
                         new Message(
@@ -159,18 +157,10 @@ public class Environment extends MessageHandlerA {
         }
     }
 
-    protected void setAmbientLight(ArrayList<Object> arr) {
-        this.ambientLight.clear();
-
-        Map<String, Object> map;
-        for(int i = 0; i < arr.size(); ++i) {
-            map = (Map<String, Object>)arr.get(i);
-            this.ambientLight.add(new AmbientLightData(
-                new Percent((int)(long)map.get("red")),
-                new Percent((int)(long)map.get("blue")),
-                new Percent((int)(long)map.get("white"))
-            ));
-        }
+    protected void setAmbientLight(Map<String, Object> map) {
+        this.ambientLight.setRed(new Percent((int)(long)map.get("red")));
+        this.ambientLight.setBlue(new Percent((int)(long)map.get("blue")));
+        this.ambientLight.setWhite(new Percent((int)(long)map.get("white")));
     }
 
     protected void storeData()
