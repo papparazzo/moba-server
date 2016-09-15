@@ -1,7 +1,7 @@
 /*
- *  common
+ *  Project:    moba-server
  *
- *  Copyright (C) 2013 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -17,13 +17,14 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
  *
  */
+
 package messagehandler;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import appserver.ServerApplication;
+import application.ServerApplication;
 import com.Dispatcher;
 import com.Endpoint;
 import datatypes.objects.ErrorData;
