@@ -1,5 +1,5 @@
 /*
- *  moba-appServer
+ *  Project:    moba-server
  *
  *  Copyright (C) 2016 stefan
  *
@@ -17,6 +17,7 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
  *
  */
+
 package datatypes.base;
 
 import static org.junit.Assert.assertEquals;
