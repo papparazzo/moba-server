@@ -40,7 +40,8 @@ public class Main {
         try {
             TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
             DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-            appl.run(Main.APP_NAME,
+            appl.run(
+                Main.APP_NAME,
                 new Version(Main.APP_VERSION),
                 formatter.parse(Main.APP_DATE),
                 new Config(Main.INI_FILE_NAME)
