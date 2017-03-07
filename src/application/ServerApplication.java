@@ -41,7 +41,7 @@ public class ServerApplication extends Application {
     protected int maxClients = -1;
 
     @Override
-    protected void loop() {
+    protected void loop() throws Exception {
         try {
             boolean restart;
             this.maxClients = (int)(long)this.config.getSection("common.serverConfig.maxClients");
@@ -67,7 +67,7 @@ public class ServerApplication extends Application {
                 acceptor.stopAcceptor();
             } while(restart);
         } catch(DatabaseException | InterruptedException e) {
-            throw new ExceptionInInitializerError();
+            throw new Exception(e);
         }
     }
 

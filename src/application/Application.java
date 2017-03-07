@@ -45,7 +45,7 @@ abstract public class Application {
     public void run(
         String appName, Version appVer, Date date, Config config
     )
-    throws IOException {
+    throws IOException, Exception {
         this.appVer    = appVer;
         this.appName   = appName;
         this.startTime = System.currentTimeMillis();
@@ -57,7 +57,8 @@ abstract public class Application {
         this.loop();
     }
 
-    abstract protected void loop();
+    abstract protected void loop()
+    throws Exception;
 
     public Version getVersion() {
         return this.appVer;
