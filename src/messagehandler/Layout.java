@@ -118,7 +118,7 @@ public class Layout extends MessageHandlerA {
                     Level.INFO, "<{0}>", new Object[]{pstmt.toString()}
                 );
             }
-        } catch(Exception e) {
+        } catch(SQLException e) {
             Layout.logger.log(
                 Level.WARNING, "<{0}>", new Object[]{e.toString()}
             );
@@ -475,7 +475,7 @@ public class Layout extends MessageHandlerA {
             this.dispatcher.dispatch(
                 new Message(MessageType.LAYOUT_UNLOCKED, id)
             );
-        } catch(Exception e) {
+        } catch(SQLException e) {
             Layout.logger.log(
                 Level.WARNING,
                 "<{0}>",

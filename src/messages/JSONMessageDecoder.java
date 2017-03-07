@@ -53,7 +53,8 @@ public class JSONMessageDecoder extends JSONDecoder {
                         msgtype = MessageType.valueOf(msgkey);
                     } catch(IllegalArgumentException e) {
                         throw new JSONException(
-                            "unknown message <" + msgkey + "> arrived"
+                            "unknown message <" + msgkey + "> arrived",
+                            e
                         );
                     }
                     break;

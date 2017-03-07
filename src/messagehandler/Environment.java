@@ -145,7 +145,8 @@ public class Environment extends MessageHandlerA {
             java.lang.ClassCastException | IOException | JSONException |
             ConfigException | NullPointerException e
         ) {
-            this.dispatcher.dispatch(new Message(
+            this.dispatcher.dispatch(
+                new Message(
                     MessageType.ERROR,
                     new ErrorData(
                         ErrorId.FAULTY_MESSAGE,

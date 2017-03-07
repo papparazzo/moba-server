@@ -81,7 +81,7 @@ public class Version implements Comparable, JSONToStringI {
             }
 
         } catch(NumberFormatException e) {
-            throw new IllegalArgumentException("converting failed");
+            throw new IllegalArgumentException("converting failed", e);
         }
     }
 
@@ -109,19 +109,26 @@ public class Version implements Comparable, JSONToStringI {
 
         if(this.major < v.major) {
             return -1;
-        } else if(this.major > v.major) {
+        } 
+        if(this.major > v.major) {
             return 1;
-        } else if(this.minor < v.minor) {
+        } 
+        if(this.minor < v.minor) {
             return -1;
-        } else if(this.minor > v.minor) {
+        } 
+        if(this.minor > v.minor) {
             return 1;
-        } else if(this.build < v.build) {
+        } 
+        if(this.build < v.build) {
             return -1;
-        } else if(this.build > v.build) {
+        } 
+        if(this.build > v.build) {
             return 1;
-        } else if(this.patch < v.patch) {
+        } 
+        if(this.patch < v.patch) {
             return -1;
-        } else if(this.patch > v.patch) {
+        } 
+        if(this.patch > v.patch) {
             return 1;
         }
         return 0;

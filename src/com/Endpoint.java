@@ -73,7 +73,7 @@ public class Endpoint extends Thread implements JSONToStringI {
         this.closing = true;
         try {
             this.socket.close();
-        } catch(Exception e) {
+        } catch(IOException e) {
 
         }
     }

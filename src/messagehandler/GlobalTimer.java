@@ -164,7 +164,8 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
             java.lang.ClassCastException | IOException | JSONException |
             ConfigException | NullPointerException e
         ) {
-            this.dispatcher.dispatch(new Message(
+            this.dispatcher.dispatch(
+                new Message(
                     MessageType.ERROR,
                     new ErrorData(
                         ErrorId.FAULTY_MESSAGE,
@@ -174,7 +175,8 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
                 )
             );
         } catch(IllegalArgumentException e) {
-            this.dispatcher.dispatch(new Message(
+            this.dispatcher.dispatch(
+                new Message(
                     MessageType.ERROR,
                     new ErrorData(
                         ErrorId.INVALID_DATA_SEND,

@@ -57,7 +57,8 @@ public class Message implements Comparable {
 
         if(i < j) {
             return -1;
-        } else if(i > j) {
+        } 
+        if(i > j) {
             return 1;
         }
         return 0;

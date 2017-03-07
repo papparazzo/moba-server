@@ -57,10 +57,7 @@ public class Transmitter implements SenderI {
                 msg.getMsgType().getMessageClass() ==
                 MessageType.MessageClass.INTERN
             ) {
-                Transmitter.logger.log(
-                    Level.WARNING,
-                    "msg-class is intern!"
-                );
+                Transmitter.logger.log(Level.WARNING, "msg-class is intern!");
                 return false;
             }
             this.encoder.encodeMsg(msg);

@@ -69,9 +69,8 @@ public class JSONDecoder {
                 String s = sb.toString().trim();
                 if(s.isEmpty()) {
                     throw new JSONException("key is empty");
-                } else {
-                    return s;
                 }
+                return s;
             }
             sb.append(c);
         }
@@ -302,14 +301,13 @@ public class JSONDecoder {
                     s.indexOf('E') > -1
                 ) {
                     return Double.valueOf(s);
-                } else {
-                    return Long.valueOf(s);
                 }
+                return Long.valueOf(s);
             }
-        } catch(Exception e) {
+        } catch(NumberFormatException e) {
             throw new JSONException(
-                "parsing, error could not determine value: <" +
-                e.toString() + ">"
+                "parsing, error could not determine value: <" + s + ">", 
+                e
             );
         }
         throw new JSONException("parsing error, could not determine value" );
