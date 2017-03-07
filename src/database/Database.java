@@ -59,10 +59,10 @@ public class Database {
     throws DatabaseException {
 
         try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
+            Class.forName("org.mariadb.jdbc.Driver").newInstance();
             this.con = DriverManager.getConnection(url, usr, pwd);
         } catch(ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException e) {
-            throw new DatabaseException("unable to connect url: <" + url + ">");
+            throw new DatabaseException("unable to connect url: <" + url + ">", e);
         }
     }
 
