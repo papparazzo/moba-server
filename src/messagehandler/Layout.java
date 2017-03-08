@@ -102,14 +102,13 @@ public class Layout extends MessageHandlerA {
 
             String q =
                 "UPDATE `TrackLayout` " +
-                "SET `Locked` = ? ";
+                "SET `Locked` = NULL ";
 
             if(id != -1) {
                 q += "WHERE `Locked` = ?";
             }
 
             try(PreparedStatement pstmt = con.prepareStatement(q)) {
-                pstmt.setLong(1, 0);
                 if(id != -1) {
                     pstmt.setLong(2, id);
                 }
@@ -177,7 +176,7 @@ public class Layout extends MessageHandlerA {
         Connection con = this.db.getConnection();
 
         String q =
-            "SELECT IF(`locked` = 0 OR `locked` = ?, 0, 1) AS `locked` " +
+            "SELECT IF(`locked` IS NULL OR `locked` = ?, 0, 1) AS `locked` " +
             "FROM `TrackLayout` " +
             "WHERE `Id` = ?";
 
