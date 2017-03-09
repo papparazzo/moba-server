@@ -42,9 +42,7 @@ abstract public class Application {
     protected Config config = null;
     protected PriorityBlockingQueue<Message> in = null;
 
-    public void run(
-        String appName, Version appVer, Date date, Config config
-    )
+    public void run(String appName, Version appVer, Date date, Config config)
     throws IOException, Exception {
         this.appVer    = appVer;
         this.appName   = appName;

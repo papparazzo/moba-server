@@ -202,7 +202,8 @@ public class Layout extends MessageHandlerA {
                     "tracklayout <{0}> is locked",
                     new Object[]{id}
                 );
-                this.dispatcher.dispatch(new Message(
+                this.dispatcher.dispatch(
+                    new Message(
                         MessageType.ERROR,
                         new ErrorData(
                             ErrorId.DATASET_LOCKED,
