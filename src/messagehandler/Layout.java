@@ -110,7 +110,7 @@ public class Layout extends MessageHandlerA {
 
             try(PreparedStatement pstmt = con.prepareStatement(q)) {
                 if(id != -1) {
-                    pstmt.setLong(2, id);
+                    pstmt.setLong(1, id);
                 }
                 pstmt.executeUpdate();
                 Layout.logger.log(
