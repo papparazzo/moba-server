@@ -98,7 +98,7 @@ public class Acceptor extends Thread {
                         "binding on port <{0}> failed! <{1}>",
                         new Object[]{this.serverport, e.toString()}
                     );
-                    Thread.sleep(1000);
+                    Thread.sleep(2500);
                 }
             } while(!isinit && !isInterrupted());
 
