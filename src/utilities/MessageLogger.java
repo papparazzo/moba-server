@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import datatypes.enumerations.NoticeType;
 import datatypes.objects.NoticeData;
 import messages.Message;
 import messages.MessageType;
@@ -87,7 +86,7 @@ public class MessageLogger {
         Object o = msg.getData();
         Map<String, Object> map;
 
-        if(o instanceof NoticeType) {
+        if(o instanceof NoticeData) {
             NoticeData n = (NoticeData)o;
             map = new HashMap<>();
             map.put("type", n.getType().toString());
