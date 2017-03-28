@@ -111,14 +111,15 @@ public class Endpoint extends Thread implements JSONToStringI {
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
+        HashMap<String, Object> app = new HashMap<>();
+        app.put("appName",   this.appName);
+        app.put("version",   this.version);
+        app.put("msgGroups", this.msgGroups);
 
         HashMap<String, Object> map = new HashMap<>();
         SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss.SSSS");
 
-        map.put("appName",   this.appName);
-        map.put("version",   this.version);
-        map.put("msgGroups", this.msgGroups);
-
+        map.put("appInfo",   app);
         map.put("appID",     this.id);
         map.put("upTime",    df.format(System.currentTimeMillis() - this.startTime));
         map.put("addr",      this.socket.getInetAddress());
