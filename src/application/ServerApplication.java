@@ -22,7 +22,6 @@ package application;
 
 import java.util.HashMap;
 
-import application.Application;
 import com.Acceptor;
 import com.Dispatcher;
 import database.Database;
@@ -30,6 +29,7 @@ import database.DatabaseException;
 import messagehandler.Environment;
 import messagehandler.GlobalTimer;
 import messagehandler.Layout;
+import messagehandler.Layouts;
 import messagehandler.Link;
 import messagehandler.Server;
 import messagehandler.Systems;
@@ -53,14 +53,15 @@ public class ServerApplication extends Application {
                     (int)(long)this.config.getSection("common.serverConfig.port"),
                     this.maxClients
                 );
+                Database database = new Database((HashMap<String, Object>)this.config.getSection("common.database"));
                 MessageLoop loop = new MessageLoop(dispatcher);
                 loop.addHandler(MessageType.MessageGroup.CLIENT, new Link(dispatcher, this.in));
                 loop.addHandler(MessageType.MessageGroup.SERV, new Server(dispatcher, this));
                 loop.addHandler(MessageType.MessageGroup.TIMER, new GlobalTimer(dispatcher, this.config));
                 loop.addHandler(MessageType.MessageGroup.ENV, new Environment(dispatcher, this.config));
                 loop.addHandler(MessageType.MessageGroup.SYSTEM, new Systems(dispatcher, this.in));
-                loop.addHandler(MessageType.MessageGroup.LAYOUT, new Layout(dispatcher, new Database((HashMap<String, Object>)this.config.getSection("common.database"))));
-
+                loop.addHandler(MessageType.MessageGroup.LAYOUT, new Layout(dispatcher, database));
+                loop.addHandler(MessageType.MessageGroup.LAYOUTS, new Layouts(dispatcher, database));
                 acceptor.startAcceptor();
                 restart = loop.loop(this.in);
                 dispatcher.resetDispatcher();

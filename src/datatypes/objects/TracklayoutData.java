@@ -35,16 +35,13 @@ public class TracklayoutData implements JSONToStringI {
     protected String  description;
     protected Date    created;
     protected Date    modified;
-    protected int     width;
-    protected int     height;
     protected int     locked;
 
     public TracklayoutData(
-        long id, String name, String description, int width, int height, int locked, Date modified, Date created
+        long id, String name, String description, int locked, Date modified, Date created
     ) {
-        if(width < 1 || height < 1 || name == null || name.isEmpty()) {
-            // FIXME Hier eine geeignete Exception werfen
-            return;
+        if(name == null || name.isEmpty()) {
+            name = "";
         }
         if(modified == null) {
             modified = created;
@@ -54,14 +51,12 @@ public class TracklayoutData implements JSONToStringI {
         this.locked      = locked;
         this.name        = name;
         this.description = description;
-        this.width       = width;
-        this.height      = height;
         this.modified    = modified;
         this.created     = created;
     }
 
-    public TracklayoutData(String name, String description, int width, int height) {
-        this(-1, name, description, width, height, 0, new Date(), new Date());
+    public TracklayoutData(String name, String description) {
+        this(-1, name, description, 0, new Date(), new Date());
     }
 
     public void setId(int id) {
@@ -88,14 +83,6 @@ public class TracklayoutData implements JSONToStringI {
         return this.created;
     }
 
-    public int getWidth() {
-        return this.width;
-    }
-
-    public int getHeight() {
-        return this.height;
-    }
-
     @Override
     public String toJsonString(boolean formated, int indent)
     throws IOException, JSONException {
@@ -108,8 +95,6 @@ public class TracklayoutData implements JSONToStringI {
         map.put("description", this.description);
         map.put("created",     df.format(this.created));
         map.put("modified",    df.format(this.modified));
-        map.put("width",       this.width);
-        map.put("height",      this.height);
         map.put("locked",      this.locked);
 
         StringBuilder sb = new StringBuilder();

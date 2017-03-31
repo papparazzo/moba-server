@@ -92,22 +92,20 @@ public enum MessageType {
     //---------------------------------------------------
     // Layout
     //---------------------------------------------------
-    GET_LAYOUTS_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    GET_LAYOUTS_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    DEL_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_DELETED(MessageGroup.LAYOUT, MessageClass.GROUP),
-    CREATE_LAYOUT_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    CREATE_LAYOUT_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_CREATED(MessageGroup.LAYOUT, MessageClass.GROUP),
-    UPDATE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_UPDATED(MessageGroup.LAYOUT, MessageClass.GROUP),
-    UNLOCK_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_UNLOCKED(MessageGroup.LAYOUT, MessageClass.GROUP),
+    GET_LAYOUTS_REQ(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    GET_LAYOUTS_RES(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    DEL_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    LAYOUT_DELETED(MessageGroup.LAYOUTS, MessageClass.GROUP),
+    CREATE_LAYOUT_REQ(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    CREATE_LAYOUT_RES(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    LAYOUT_CREATED(MessageGroup.LAYOUTS, MessageClass.GROUP),
+    UPDATE_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    LAYOUT_UPDATED(MessageGroup.LAYOUTS, MessageClass.GROUP),
+    UNLOCK_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    LAYOUT_UNLOCKED(MessageGroup.LAYOUTS, MessageClass.GROUP),
 
-//    //LOCK_LAYOUT_REQ(MessageGroup.TRACKLAYOUT),
-//    //LOCK_LAYOUT_RES(MessageGroup.TRACKLAYOUT, MessageClass.CLIENT),
-//    LAYOUT_LOCKED(MessageGroup.LAYOUT, MessageClass.GROUP);
-
+    GET_LAYOUT_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    GET_LAYOUT_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
 
     //---------------------------------------------------
     // GUI
@@ -122,6 +120,7 @@ public enum MessageType {
         TIMER,
         ENV,
         SYSTEM,
+        LAYOUTS,
         LAYOUT,
         GUI
     }
