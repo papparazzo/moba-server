@@ -198,8 +198,8 @@ public class Systems extends MessageHandlerA {
                 MessageType.SYSTEM_NOTICE,
                 new NoticeData(
                     NoticeType.INFO,
-                    "Nothalt freigabe",
-                    "Es wurde ein Nothalt freigegeben"
+                    "Nothaltfreigabe",
+                    "Der Nothalt wurde wieder freigegeben"
                 )
             )
         );
