@@ -80,7 +80,7 @@ public class Layout extends MessageHandlerA {
                 Layouts.logger.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
                 ResultSet rs = pstmt.executeQuery();
                 if(!rs.next()) {
-                    throw new NoSuchElementException(String.format("No layout with id <%4d>", id));
+                    throw new NoSuchElementException(String.format("No layout with id <%d>", id));
                 }
                 map.put("name", rs.getString("Name"));
             }
