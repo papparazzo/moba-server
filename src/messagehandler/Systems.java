@@ -46,6 +46,18 @@ public class Systems extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
+            case GET_EMERGENCY_STOP_STATE:
+                if(this.emergencyStop) {
+                    this.dispatcher.dispatch(
+                        new Message(MessageType.EMERGENCY_STOP, null, msg.getEndpoint())
+                    );
+                } else {
+                    this.dispatcher.dispatch(
+                        new Message(MessageType.EMERGENCY_STOP_CLEARING, null, msg.getEndpoint())
+                    );
+                }
+                break;
+
             case EMERGENCY_STOP:
                 this.emergencyStop();
                 break;
@@ -166,6 +178,7 @@ public class Systems extends MessageHandlerA {
             )
         );
         this.emergencyStop = true;
+        this.dispatcher.dispatch(new Message(MessageType.EMERGENCY_STOP));
         if(this.status == HardwareState.READY) {
             this.status = HardwareState.POWER_OFF;
             this.dispatcher.dispatch(
@@ -190,6 +203,7 @@ public class Systems extends MessageHandlerA {
                 )
             )
         );
+        this.dispatcher.dispatch(new Message(MessageType.EMERGENCY_STOP_CLEARING));
         this.emergencyStop = false;
     }
 }
