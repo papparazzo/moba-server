@@ -306,7 +306,7 @@ public class JSONDecoder {
             }
         } catch(NumberFormatException e) {
             throw new JSONException(
-                "parsing, error could not determine value: <" + s + ">", 
+                "parsing, error could not determine value: <" + s + ">",
                 e
             );
         }
