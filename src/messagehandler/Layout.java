@@ -73,7 +73,7 @@ public class Layout extends MessageHandlerA {
             String q =
                 "SELECT `Name` " +
                 "FROM `TrackLayouts` " +
-                "WHERE `Id` ?";
+                "WHERE `Id` = ?";
 
             try (PreparedStatement pstmt = con.prepareStatement(q)) {
                 pstmt.setLong(1, id);
