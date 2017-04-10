@@ -128,6 +128,15 @@ public class Systems extends MessageHandlerA {
                 if(this.status == state) {
                     return false;
                 }
+                this.dispatcher.dispatch(new Message(
+                    MessageType.SYSTEM_NOTICE,
+                    new NoticeData(
+                        NoticeType.INFO,
+                        "Änderung Hardwarestatus",
+                        "Der Hardwarestatus hat sich von <" + this.status.toString() +
+                        "> auf <" + state.toString() + "> geändert"
+                    )
+                ));
                 this.status = state;
                 return true;
 
@@ -139,23 +148,34 @@ public class Systems extends MessageHandlerA {
     }
 
     protected void setHardwareSwitchStandby() {
+        HardwareState newState = HardwareState.ERROR;
         switch(this.status) {
             case ERROR:
                 return;
 
             case READY:
             case POWER_OFF:
-                this.status = HardwareState.STANDBY;
+                newState = HardwareState.STANDBY;
                 break;
 
             case STANDBY:
                 if(this.emergencyStop) {
-                    this.status = HardwareState.POWER_OFF;
+                    newState = HardwareState.POWER_OFF;
                     break;
                 }
-                this.status = HardwareState.READY;
+                newState = HardwareState.READY;
                 break;
         }
+        this.dispatcher.dispatch(new Message(
+            MessageType.SYSTEM_NOTICE,
+            new NoticeData(
+                NoticeType.INFO,
+                "Änderung Hardwarestatus",
+                "Der Hardwarestatus hat sich von <" + this.status.toString() +
+                "> auf <" + newState.toString() + "> geändert"
+            )
+        ));
+        this.status = newState;
         this.dispatcher.dispatch(
             new Message(
                 MessageType.HARDWARE_STATE_CHANGED,
