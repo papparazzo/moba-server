@@ -33,6 +33,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import datatypes.base.Version;
+import java.util.Arrays;
+import java.util.Collections;
 import json.JSONEncoder;
 import json.JSONException;
 import json.JSONToStringI;
@@ -210,18 +212,23 @@ public class Endpoint extends Thread implements JSONToStringI {
         this.appName = (String)map.get("appName");
         this.version = new Version((String)map.get("version"));
         Object o = map.get("msgGroups");
-        if(o instanceof ArrayList){
+        if(o instanceof ArrayList) {
             ArrayList<String> arrayList = (ArrayList<String>)o;
-            for(String item : arrayList) {
-                try {
-                    MessageType.MessageGroup grp = MessageType.MessageGroup.valueOf(item);
-                    this.msgGroups.add(grp);
-                } catch(IllegalArgumentException e) {
-                    Endpoint.logger.log(
-                        Level.WARNING,
-                        "ignoring unknown message-group <{0}>",
-                        new Object[]{item}
-                    );
+            if(arrayList.isEmpty()) {
+                Endpoint.logger.log(Level.INFO, "arrayList is empty. Take all groups");
+                Collections.addAll(this.msgGroups, MessageType.MessageGroup.values());
+            } else {
+                for(String item : arrayList) {
+                    try {
+                        MessageType.MessageGroup grp = MessageType.MessageGroup.valueOf(item);
+                        this.msgGroups.add(grp);
+                    } catch(IllegalArgumentException e) {
+                        Endpoint.logger.log(
+                            Level.WARNING,
+                            "ignoring unknown message-group <{0}>",
+                            new Object[]{item}
+                        );
+                    }
                 }
             }
         }
