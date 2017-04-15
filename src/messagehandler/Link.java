@@ -91,10 +91,7 @@ public class Link extends MessageHandlerA {
         this.in.add(new Message(MessageType.FREE_RESOURCES, (long)msg.getEndpoint().getAppId()));
         this.dispatcher.removeEndpoint(msg.getEndpoint());
         this.dispatcher.dispatch(
-            new Message(
-                MessageType.CLIENT_CLOSED,
-                msg.getEndpoint().getAppId()
-            )
+            new Message(MessageType.CLIENT_CLOSED, msg.getEndpoint().getAppId())
         );
     }
 }

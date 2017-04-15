@@ -103,9 +103,6 @@ public class Dispatcher implements SenderI {
                 }
             }
         }
-
-        this.dispatch(new Message(MessageType.CLIENT_CLOSED, ep.id));
-
         Dispatcher.logger.log(
             Level.INFO,
             "endpoint <{0}> succesfully removed!",
