@@ -104,7 +104,7 @@ public class Dispatcher implements SenderI {
             }
         }
 
-        this.dispatch(new Message(MessageType.CLIENT_CLOSED, ep));
+        this.dispatch(new Message(MessageType.CLIENT_CLOSED, ep.id));
 
         Dispatcher.logger.log(
             Level.INFO,

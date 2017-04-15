@@ -93,7 +93,7 @@ public class Link extends MessageHandlerA {
         this.dispatcher.dispatch(
             new Message(
                 MessageType.CLIENT_CLOSED,
-                msg.getEndpoint()
+                msg.getEndpoint().getAppId()
             )
         );
     }
