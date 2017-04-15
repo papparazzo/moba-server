@@ -69,7 +69,7 @@ public class Systems extends MessageHandlerA {
             case GET_HARDWARE_STATE:
                 this.dispatcher.dispatch(
                     new Message(
-                        MessageType.SET_HARDWARE_STATE,
+                        MessageType.HARDWARE_STATE_CHANGED,
                         this.status.toString(),
                         msg.getEndpoint()
                     )
