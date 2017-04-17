@@ -98,7 +98,7 @@ public class Server extends MessageHandlerA {
         }
         this.dispatcher.dispatch(new Message(
                 MessageType.ERROR,
-                new ErrorData(ErrorId.INVALID_APP_ID),
+                new ErrorData(ErrorId.INVALID_APP_ID, "app-id <" + msg.getData().toString() + "> is invalid"),
                 msg.getEndpoint()
             )
         );
