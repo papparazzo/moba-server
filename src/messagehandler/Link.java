@@ -24,6 +24,8 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import com.Dispatcher;
 import com.Endpoint;
+import datatypes.enumerations.ErrorId;
+import datatypes.objects.ErrorData;
 import messages.Message;
 import messages.MessageHandlerA;
 import messages.MessageType;
@@ -71,7 +73,19 @@ public class Link extends MessageHandlerA {
 
     protected void handleClientStart(Message msg) {
         Endpoint ep = msg.getEndpoint();
-        this.dispatcher.addEndpoint(ep);
+        if(!this.dispatcher.addEndpoint(ep)) {
+            this.dispatcher.dispatch(
+                new Message(
+                    MessageType.ERROR,
+                    new ErrorData(
+                        ErrorId.INVALID_DATA_SEND,
+                        "Endpoint <" + ep.toString() + "> allready exists"
+                    ),
+                    msg.getEndpoint()
+                )
+            );
+            return;
+        }
         this.dispatcher.dispatch(
             new Message(
                 MessageType.CLIENT_CONNECTED,

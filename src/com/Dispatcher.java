@@ -43,7 +43,7 @@ public class Dispatcher implements SenderI {
     protected final EnumMap<MessageType.MessageGroup, Set<Endpoint>>
         groupEP = new EnumMap<>(MessageType.MessageGroup.class);
 
-    public void addEndpoint(Endpoint ep) {
+    public boolean addEndpoint(Endpoint ep) {
         Dispatcher.logger.log(
             Level.INFO,
             "try to add endpoint <{0}> appName <{1}> ver<{2}>",
@@ -53,6 +53,19 @@ public class Dispatcher implements SenderI {
                 ep.getVersion().toString()
             }
         );
+
+        Iterator<Endpoint> iter = this.broadcastEP.iterator();
+
+        while(iter.hasNext()) {
+            if(iter.next() == ep) {
+                Dispatcher.logger.log(
+                    Level.WARNING,
+                    "Enpoint <{0}> allready set",
+                    new Object[]{ep.toString()}
+                );
+                return false;
+            }
+        }
 
         Set<Endpoint> set;
         for(MessageType.MessageGroup msgGroup : ep.getMsgGroups()) {
@@ -66,6 +79,7 @@ public class Dispatcher implements SenderI {
         }
 
         this.broadcastEP.add(ep);
+        return true;
     }
 
     public void removeEndpoint(Endpoint ep) {
