@@ -77,7 +77,7 @@ public class Environment extends MessageHandlerA {
                     this.dispatcher.dispatch(
                         new Message(
                             MessageType.SET_ENVIRONMENT,
-                            this,
+                            this.environment,
                             msg.getEndpoint()
                         )
                     );
@@ -89,7 +89,7 @@ public class Environment extends MessageHandlerA {
                     this.dispatcher.dispatch(
                         new Message(
                             MessageType.SET_ENVIRONMENT,
-                            this
+                            this.environment
                         )
                     );
                     break;
