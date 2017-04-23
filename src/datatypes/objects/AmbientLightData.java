@@ -33,15 +33,16 @@ import json.streamwriter.JSONStreamWriterStringBuilder;
 public class AmbientLightData implements JSONToStringI {
     protected Percent red;
     protected Percent blue;
+    protected Percent green;
     protected Percent white;
 
     public AmbientLightData() {
-
     }
 
-    public AmbientLightData(Percent red, Percent blue, Percent white) {
+    public AmbientLightData(Percent red, Percent blue, Percent green, Percent white) {
         this.setRed(red);
         this.setBlue(blue);
+        this.setGreen(green);
         this.setWhite(white);
     }
 
@@ -53,6 +54,10 @@ public class AmbientLightData implements JSONToStringI {
         this.blue = blue;
     }
 
+    public final void setGreen(Percent green) {
+        this.green = green;
+    }
+
     public final void setWhite(Percent white) {
         this.white = white;
     }
@@ -60,6 +65,7 @@ public class AmbientLightData implements JSONToStringI {
     public void fromJsonObject(Map<String, Object> map) {
         this.red = new Percent((int)map.get("red"));
         this.blue = new Percent((int)map.get("blue"));
+        this.green = new Percent((int)map.get("green"));
         this.white = new Percent((int)map.get("white"));
     }
 
@@ -69,6 +75,7 @@ public class AmbientLightData implements JSONToStringI {
         HashMap<String, Object> map = new HashMap<>();
         map.put("red",   this.red);
         map.put("blue",  this.blue);
+        map.put("green", this.green);
         map.put("white", this.white);
 
         StringBuilder sb = new StringBuilder();

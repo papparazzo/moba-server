@@ -161,6 +161,7 @@ public class Environment extends MessageHandlerA {
     protected void setAmbientLight(Map<String, Object> map) {
         this.ambientLight.setRed(new Percent((int)(long)map.get("red")));
         this.ambientLight.setBlue(new Percent((int)(long)map.get("blue")));
+        this.ambientLight.setGreen(new Percent((int)(long)map.get("green")));
         this.ambientLight.setWhite(new Percent((int)(long)map.get("white")));
     }
 
