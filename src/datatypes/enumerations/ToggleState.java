@@ -64,6 +64,23 @@ public enum ToggleState implements JSONToStringI {
         }
     }
 
+    public static boolean getValue(String s, boolean def) {
+        ToggleState t = ToggleState.valueOf(s);
+        switch(t) {
+            case UNSET:
+                return def;
+
+            case ON:
+                return true;
+
+            case OFF:
+                return false;
+
+            default:
+                throw new UnsupportedOperationException("Not supported yet.");
+        }
+    }
+
     public static ToggleState getValue(String s, ToggleState def) {
         ToggleState t = ToggleState.valueOf(s);
         if(t == ToggleState.UNSET) {

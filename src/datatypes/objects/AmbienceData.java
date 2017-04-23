@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import datatypes.enumerations.Switch;
 import datatypes.enumerations.ToggleState;
 import json.JSONEncoder;
 import json.JSONException;
@@ -36,8 +35,8 @@ public class AmbienceData implements JSONToStringI {
     protected boolean mainLightOn = false;
 
     public void fromJsonObject(Map<String, Object> map) {
-        this.curtainUp = ToggleState.getValue((Switch)map.get("curtainUp"), this.curtainUp);
-        this.mainLightOn = ToggleState.getValue((Switch)map.get("mainLightOn"), this.mainLightOn);
+        this.curtainUp = ToggleState.getValue((String)map.get("curtainUp"), this.curtainUp);
+        this.mainLightOn = ToggleState.getValue((String)map.get("mainLightOn"), this.mainLightOn);
     }
 
     @Override
