@@ -280,7 +280,7 @@ public class Layouts extends MessageHandlerA {
             String q =
                 "INSERT INTO `TrackLayouts` " +
                 "(`Name`, `Description`, `CreationDate`, `ModificationDate`, `Locked`) " +
-                "VALUES (?, ?, NOW(), NOW(), ?, ?, ?)";
+                "VALUES (?, ?, NOW(), NOW(), ?)";
 
             try(
                 PreparedStatement pstmt = con.prepareStatement(
@@ -290,7 +290,7 @@ public class Layouts extends MessageHandlerA {
             ) {
                 pstmt.setString(1, tl.getName());
                 pstmt.setString(2, tl.getDescription());
-                pstmt.setLong(5, msg.getEndpoint().getAppId());
+                pstmt.setLong(3, msg.getEndpoint().getAppId());
                 pstmt.executeUpdate();
                 Layouts.logger.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
                 try(ResultSet rs = pstmt.getGeneratedKeys()) {
