@@ -143,7 +143,7 @@ public class Environment extends MessageHandlerA {
             }
         } catch(
             java.lang.ClassCastException | IOException | JSONException |
-            ConfigException | NullPointerException e
+            ConfigException | NullPointerException | IllegalArgumentException e
         ) {
             this.dispatcher.dispatch(
                 new Message(
