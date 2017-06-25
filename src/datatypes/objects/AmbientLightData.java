@@ -23,7 +23,6 @@ package datatypes.objects;
 import java.io.IOException;
 import java.util.HashMap;
 
-import datatypes.base.Percent;
 import java.util.Map;
 import json.JSONEncoder;
 import json.JSONException;
@@ -31,57 +30,65 @@ import json.JSONToStringI;
 import json.streamwriter.JSONStreamWriterStringBuilder;
 
 public class AmbientLightData implements JSONToStringI {
-    protected Percent red;
-    protected Percent blue;
-    protected Percent green;
-    protected Percent white;
+    protected int red;
+    protected int blue;
+    protected int green;
+    protected int white;
 
     public AmbientLightData() {
     }
 
-    public AmbientLightData(Percent red, Percent blue, Percent green, Percent white) {
-        this.setRed(red);
-        this.setBlue(blue);
-        this.setGreen(green);
-        this.setWhite(white);
+    public AmbientLightData(int red, int blue, int green, int white) {
+        setRed(red);
+        setBlue(blue);
+        setGreen(green);
+        setWhite(white);
     }
 
-    public final void setRed(Percent red) {
-        this.red = red;
+    public final void setRed(int val) {
+        red = validateValue(val);
     }
 
-    public final void setBlue(Percent blue) {
-        this.blue = blue;
+    public final void setBlue(int val) {
+        blue = validateValue(val);
     }
 
-    public final void setGreen(Percent green) {
-        this.green = green;
+    public final void setGreen(int val) {
+        green = validateValue(val);
     }
 
-    public final void setWhite(Percent white) {
-        this.white = white;
+    public final void setWhite(int val) {
+        white = validateValue(val);
     }
 
     public void fromJsonObject(Map<String, Object> map) {
-        this.red = new Percent((int)map.get("red"));
-        this.blue = new Percent((int)map.get("blue"));
-        this.green = new Percent((int)map.get("green"));
-        this.white = new Percent((int)map.get("white"));
+        setRed((int)map.get("red"));
+        setBlue((int)map.get("blue"));
+        setGreen((int)map.get("green"));
+        setWhite((int)map.get("white"));
     }
 
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("red",   this.red);
-        map.put("blue",  this.blue);
-        map.put("green", this.green);
-        map.put("white", this.white);
+        map.put("red",   red);
+        map.put("blue",  blue);
+        map.put("green", green);
+        map.put("white", white);
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
         JSONEncoder encoder = new JSONEncoder(jsb, formated);
         encoder.encode(map, indent);
         return sb.toString();
+    }
+
+    public final int validateValue(int val)
+    throws IllegalArgumentException {
+        if(val > 4095 || val < 0) {
+            throw new IllegalArgumentException(String.format("Val <%d> out of range", val));
+        }
+        return val;
     }
 }
