@@ -81,7 +81,7 @@ public enum MessageType {
     // Interface
     //---------------------------------------------------
 
-
+    SET_CONNECTIVITY(MessageGroup.INTERFACE, MessageClass.SINGLE),
 
     //---------------------------------------------------
     // System
@@ -126,6 +126,7 @@ public enum MessageType {
         SERVER,
         TIMER,
         ENV,
+        INTERFACE,
         SYSTEM,
         LAYOUTS,
         LAYOUT,
