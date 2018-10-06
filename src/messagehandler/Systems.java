@@ -77,9 +77,7 @@ public class Systems extends MessageHandlerA {
                 break;
 
             case SET_HARDWARE_STATE:
-                if(this.setHardwareState(
-                    HardwareState.valueOf((String)msg.getData())
-                )) {
+                if(this.setHardwareState(HardwareState.valueOf((String)msg.getData()))) {
                     this.dispatcher.dispatch(
                         new Message(
                             MessageType.HARDWARE_STATE_CHANGED,
