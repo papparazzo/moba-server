@@ -45,15 +45,15 @@ public enum MessageType {
     //---------------------------------------------------
     // Server
     //---------------------------------------------------
-    MAX_CLIENT_COUNT(MessageGroup.SERV, MessageClass.GROUP),
-    NEW_CLIENT_STARTED(MessageGroup.SERV, MessageClass.GROUP),
-    CLIENT_CLOSED(MessageGroup.SERV, MessageClass.GROUP),
-    RESET_CLIENT(MessageGroup.SERV, MessageClass.SINGLE),
-    SERVER_INFO_REQ(MessageGroup.SERV, MessageClass.SINGLE),
-    SERVER_INFO_RES(MessageGroup.SERV, MessageClass.SINGLE),
-    CON_CLIENTS_REQ(MessageGroup.SERV, MessageClass.SINGLE),
-    CON_CLIENTS_RES(MessageGroup.SERV, MessageClass.SINGLE),
-    SELF_TESTING_CLIENT(MessageGroup.SERV, MessageClass.SINGLE),
+    MAX_CLIENT_COUNT(MessageGroup.SERVER, MessageClass.GROUP),
+    NEW_CLIENT_STARTED(MessageGroup.SERVER, MessageClass.GROUP),
+    CLIENT_CLOSED(MessageGroup.SERVER, MessageClass.GROUP),
+    RESET_CLIENT(MessageGroup.SERVER, MessageClass.SINGLE),
+    SERVER_INFO_REQ(MessageGroup.SERVER, MessageClass.SINGLE),
+    SERVER_INFO_RES(MessageGroup.SERVER, MessageClass.SINGLE),
+    CON_CLIENTS_REQ(MessageGroup.SERVER, MessageClass.SINGLE),
+    CON_CLIENTS_RES(MessageGroup.SERVER, MessageClass.SINGLE),
+    SELF_TESTING_CLIENT(MessageGroup.SERVER, MessageClass.SINGLE),
 
     //---------------------------------------------------
     // GlobalTimer
@@ -76,6 +76,12 @@ public enum MessageType {
     SET_AMBIENCE(MessageGroup.ENV, MessageClass.GROUP),
     GET_AMBIENT_LIGHT(MessageGroup.ENV, MessageClass.SINGLE),
     SET_AMBIENT_LIGHT(MessageGroup.ENV, MessageClass.GROUP),
+
+    //---------------------------------------------------
+    // Interface
+    //---------------------------------------------------
+
+
 
     //---------------------------------------------------
     // System
@@ -117,7 +123,7 @@ public enum MessageType {
     public enum MessageGroup {
         BASE,
         CLIENT,
-        SERV,
+        SERVER,
         TIMER,
         ENV,
         SYSTEM,

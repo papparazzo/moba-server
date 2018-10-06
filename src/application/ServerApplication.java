@@ -56,7 +56,7 @@ public class ServerApplication extends Application {
                 Database database = new Database((HashMap<String, Object>)this.config.getSection("common.database"));
                 MessageLoop loop = new MessageLoop(dispatcher);
                 loop.addHandler(MessageType.MessageGroup.CLIENT, new Link(dispatcher, this.in));
-                loop.addHandler(MessageType.MessageGroup.SERV, new Server(dispatcher, this));
+                loop.addHandler(MessageType.MessageGroup.SERVER, new Server(dispatcher, this));
                 loop.addHandler(MessageType.MessageGroup.TIMER, new GlobalTimer(dispatcher, this.config));
                 loop.addHandler(MessageType.MessageGroup.ENV, new Environment(dispatcher, this.config));
                 loop.addHandler(MessageType.MessageGroup.SYSTEM, new Systems(dispatcher, this.in));
