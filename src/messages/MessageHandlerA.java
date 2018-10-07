@@ -20,6 +20,8 @@
 
 package messages;
 
+import datatypes.enumerations.HardwareState;
+
 public abstract class MessageHandlerA {
     public abstract void handleMsg(Message msg);
 
@@ -35,5 +37,8 @@ public abstract class MessageHandlerA {
     public void reset() {
         this.shutdown();
         this.init();
+    }
+
+    public void hardwareStateChanged(HardwareState state) {
     }
 }
