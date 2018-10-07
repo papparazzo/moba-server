@@ -23,6 +23,7 @@ package messagehandler;
 import com.Dispatcher;
 import datatypes.enumerations.ColorTheme;
 import datatypes.enumerations.ErrorId;
+import datatypes.enumerations.HardwareState;
 import datatypes.enumerations.ThreeState;
 import datatypes.objects.ColorThemeData;
 import datatypes.objects.ErrorData;
@@ -110,19 +111,6 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
                             this.timerData
                         )
                     );
-                    break;
-
-                case GET_AUTO_MODE:
-                    this.dispatcher.dispatch(new Message(
-                            MessageType.SET_AUTO_MODE,
-                            this.isRunning,
-                            msg.getEndpoint()
-                        )
-                    );
-                    break;
-
-                case SET_AUTO_MODE:
-                    this.setAutoMode(msg.getData());
                     break;
 
                 case GET_COLOR_THEME:
@@ -246,18 +234,13 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
         this.config.writeFile();
     }
 
-    protected void setAutoMode(Object o) {
-        boolean active = (boolean)o;
+    @Override
+    public void hardwareStateChanged(HardwareState state) {
+        boolean active = (state == HardwareState.AUTOMATIC);
         if(this.isRunning == active) {
             return;
         }
         this.isRunning = active;
-        this.dispatcher.dispatch(
-            new Message(
-                MessageType.SET_AUTO_MODE,
-                this.isRunning
-            )
-        );
 
         if(this.thread != null && this.thread.isAlive()) {
             return;
