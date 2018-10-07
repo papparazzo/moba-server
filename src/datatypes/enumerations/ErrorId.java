@@ -32,6 +32,7 @@ public enum ErrorId implements JSONToStringI {
     INVALID_DATA_SEND,
     DATASET_LOCKED,
     DATASET_MISSING,
+    INVALID_STATUS_CHANGE,
     DATABASE_ERROR,
     UNKNOWN_ERROR;
 
