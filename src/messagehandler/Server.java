@@ -22,7 +22,6 @@ package messagehandler;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.concurrent.PriorityBlockingQueue;
 
 import application.ServerApplication;
 import com.Dispatcher;
@@ -36,14 +35,12 @@ import messages.MessageType;
 
 public class Server extends MessageHandlerA {
 
-    protected PriorityBlockingQueue<Message> in = null;
     protected Dispatcher dispatcher = null;
     protected ServerApplication app = null;
 
     public Server(Dispatcher dispatcher, ServerApplication app) {
         this.dispatcher = dispatcher;
         this.app = app;
-        this.in = app.getQueue();
     }
 
     @Override
@@ -114,7 +111,7 @@ public class Server extends MessageHandlerA {
 //        return false;
     }
 
-    private void handleServerInfoReq(Endpoint ep){
+    private void handleServerInfoReq(Endpoint ep) {
         HashMap<String, Object> map = new HashMap<>();
         SimpleDateFormat dfu        = new SimpleDateFormat("HH:mm:ss");
         SimpleDateFormat dfs        = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
