@@ -20,12 +20,15 @@
 
 package messagehandler;
 
+import com.Endpoint;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Logger;
 
 import com.SenderI;
+import datatypes.enumerations.ErrorId;
 import datatypes.enumerations.HardwareState;
 import datatypes.enumerations.NoticeType;
+import datatypes.objects.ErrorData;
 import datatypes.objects.NoticeData;
 import messages.Message;
 import messages.MessageHandlerA;
@@ -35,39 +38,32 @@ public class Systems extends MessageHandlerA {
     protected static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     protected HardwareState status = HardwareState.ERROR;
     protected SenderI dispatcher = null;
-    protected boolean emergencyStop = false;
-    protected PriorityBlockingQueue<Message> in = null;
+    protected PriorityBlockingQueue<Message> msgQueue = null;
 
-    public Systems(SenderI dispatcher, PriorityBlockingQueue<Message> in) {
+    protected boolean automaticMode = false;
+
+    public Systems(SenderI dispatcher, PriorityBlockingQueue<Message> msgQueue) {
         this.dispatcher = dispatcher;
-        this.in = in;
+        this.msgQueue   = msgQueue;
     }
 
     @Override
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
-            case GET_EMERGENCY_STOP_STATE:
-                if(this.emergencyStop) {
-                    this.dispatcher.dispatch(
-                        new Message(MessageType.EMERGENCY_STOP, null, msg.getEndpoint())
-                    );
-                } else {
-                    this.dispatcher.dispatch(
-                        new Message(MessageType.EMERGENCY_STOP_CLEARING, null, msg.getEndpoint())
-                    );
-                }
+            case SET_AUTOMATIC_MODE:
+                setAutomaticMode(msg);
                 break;
 
-            case EMERGENCY_STOP:
-                this.emergencyStop();
+            case SET_EMERGENCY_STOP:
+                setEmergencyStop(msg);
                 break;
 
-            case EMERGENCY_STOP_CLEARING:
-                this.emergencyStopClearing();
+            case SET_STANDBY_MODE:
+                setStandByMode(msg);
                 break;
 
             case GET_HARDWARE_STATE:
-                this.dispatcher.dispatch(
+                dispatcher.dispatch(
                     new Message(
                         MessageType.HARDWARE_STATE_CHANGED,
                         this.status.toString(),
@@ -76,27 +72,12 @@ public class Systems extends MessageHandlerA {
                 );
                 break;
 
-            case SET_HARDWARE_STATE:
-                if(this.setHardwareState(HardwareState.valueOf((String)msg.getData()))) {
-                    this.dispatcher.dispatch(
-                        new Message(
-                            MessageType.HARDWARE_STATE_CHANGED,
-                            this.status.toString()
-                        )
-                    );
-                }
-                break;
-
             case HARDWARE_SHUTDOWN:
-                this.in.add(new Message(MessageType.SERVER_SHUTDOWN));
+                msgQueue.add(new Message(MessageType.SERVER_SHUTDOWN));
                 break;
 
             case HARDWARE_RESET:
-                this.in.add(new Message(MessageType.SERVER_RESET));
-                break;
-
-            case HARDWARE_SWITCH_STANDBY:
-                this.setHardwareSwitchStandby();
+                msgQueue.add(new Message(MessageType.SERVER_RESET));
                 break;
 
             default:
@@ -106,113 +87,84 @@ public class Systems extends MessageHandlerA {
         }
     }
 
-    public HardwareState getHardwareState() {
-        return this.status;
-    }
+    protected void setAutomaticMode(Message msg) {
+        if(
+            this.status == HardwareState.ERROR ||
+            this.status == HardwareState.EMERGENCY_STOP ||
+            this.status == HardwareState.STANDBY
+        ) {
+            this.sendErrorMessage(msg.getEndpoint());
+            return;
+        }
 
-    public boolean getEmergencyStopStatus() {
-        return this.emergencyStop;
-    }
+        boolean setAutomaticMode = (boolean)msg.getData();
 
-    protected boolean setHardwareState(HardwareState state) {
-        switch(state) {
-            case READY:
-                if(this.emergencyStop) {
-                    return false;
-                }
-            case ERROR:
-            case STANDBY:
-            case POWER_OFF:
-                if(this.status == state) {
-                    return false;
-                }
-                this.dispatcher.dispatch(new Message(
+        if(setAutomaticMode && this.status == HardwareState.AUTOMATIC) {
+            this.sendErrorMessage(msg.getEndpoint());
+            return;
+        }
+
+        this.automaticMode = setAutomaticMode;
+
+        if(setAutomaticMode) {
+            this.msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
+            this.dispatcher.dispatch(
+                new Message(
                     MessageType.SYSTEM_NOTICE,
                     new NoticeData(
                         NoticeType.INFO,
-                        "Änderung Hardwarestatus",
-                        "Der Hardwarestatus hat sich von <" + this.status.toString() +
-                        "> auf <" + state.toString() + "> geändert"
+                        "Automatik",
+                        "Die Hardware befindet sich im Automatikmodus"
                     )
-                ));
-                this.status = state;
-                return true;
-
-            default:
-                throw new UnsupportedOperationException(
-                    "unknow state <" + state.toString() + ">."
-                );
-        }
-    }
-
-    protected void setHardwareSwitchStandby() {
-        HardwareState newState = HardwareState.ERROR;
-        switch(this.status) {
-            case ERROR:
-                return;
-
-            case READY:
-            case POWER_OFF:
-                newState = HardwareState.STANDBY;
-                break;
-
-            case STANDBY:
-                if(this.emergencyStop) {
-                    newState = HardwareState.POWER_OFF;
-                    break;
-                }
-                newState = HardwareState.READY;
-                break;
-        }
-        this.dispatcher.dispatch(new Message(
-            MessageType.SYSTEM_NOTICE,
-            new NoticeData(
-                NoticeType.INFO,
-                "Änderung Hardwarestatus",
-                "Der Hardwarestatus hat sich von <" + this.status.toString() +
-                "> auf <" + newState.toString() + "> geändert"
-            )
-        ));
-        this.status = newState;
-        this.dispatcher.dispatch(
-            new Message(
-                MessageType.HARDWARE_STATE_CHANGED,
-                this.status.toString()
-            )
-        );
-    }
-
-    public void emergencyStop() {
-        if(this.emergencyStop) {
-            return;
-        }
-        this.dispatcher.dispatch(new Message(
-                MessageType.SYSTEM_NOTICE,
-                new NoticeData(
-                    NoticeType.WARNING,
-                    "Nothalt gedrückt",
-                    "Es wurde ein Nothalt ausgelöst"
-                )
-            )
-        );
-        this.emergencyStop = true;
-        this.dispatcher.dispatch(new Message(MessageType.EMERGENCY_STOP));
-        if(this.status == HardwareState.READY) {
-            this.status = HardwareState.POWER_OFF;
-            this.dispatcher.dispatch(
-                new Message(
-                    MessageType.HARDWARE_STATE_CHANGED,
-                    this.status.toString()
                 )
             );
-        }
-    }
-
-    public void emergencyStopClearing() {
-        if(!this.emergencyStop) {
             return;
         }
-        this.dispatcher.dispatch(new Message(
+        this.msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.MANUEL));
+        this.dispatcher.dispatch(
+            new Message(
+                MessageType.SYSTEM_NOTICE,
+                new NoticeData(
+                    NoticeType.INFO,
+                    "Automatik",
+                    "Automatikmodus wurde deaktiviert"
+                )
+            )
+        );
+    }
+
+    protected void setEmergencyStop(Message msg) {
+        if(
+            this.status == HardwareState.ERROR ||
+            this.status == HardwareState.STANDBY
+        ) {
+            this.sendErrorMessage(msg.getEndpoint());
+            return;
+        }
+
+        boolean emergencyStop = (boolean)msg.getData();
+
+        if(emergencyStop && this.status == HardwareState.EMERGENCY_STOP) {
+            this.sendErrorMessage(msg.getEndpoint());
+            return;
+        }
+
+        if(emergencyStop) {
+            this.dispatcher.dispatch(
+                new Message(
+                    MessageType.SYSTEM_NOTICE,
+                    new NoticeData(
+                        NoticeType.WARNING,
+                        "Nothalt gedrückt",
+                        "Es wurde ein Nothalt ausgelöst"
+                    )
+                )
+            );
+            this.msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.EMERGENCY_STOP));
+            return;
+        }
+        this.dispatcher.dispatch(
+            new Message(
                 MessageType.SYSTEM_NOTICE,
                 new NoticeData(
                     NoticeType.INFO,
@@ -221,7 +173,81 @@ public class Systems extends MessageHandlerA {
                 )
             )
         );
-        this.dispatcher.dispatch(new Message(MessageType.EMERGENCY_STOP_CLEARING));
-        this.emergencyStop = false;
+        if(this.automaticMode) {
+            this.msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
+        } else {
+            this.msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.MANUEL));
+        }
+    }
+
+    protected void setStandByMode(Message msg) {
+        if(
+            this.status == HardwareState.ERROR ||
+            this.status == HardwareState.EMERGENCY_STOP
+        ) {
+            this.sendErrorMessage(msg.getEndpoint());
+            return;
+        }
+
+        boolean setStandByMode = (boolean)msg.getData();
+
+        if(setStandByMode && this.status == HardwareState.STANDBY) {
+            this.sendErrorMessage(msg.getEndpoint());
+            return;
+        }
+
+        if(setStandByMode) {
+            this.dispatcher.dispatch(
+                new Message(
+                    MessageType.SYSTEM_NOTICE,
+                    new NoticeData(
+                        NoticeType.WARNING,
+                        "Standby",
+                        "Anlage wird in den Standby-Modus geschickt"
+                    )
+                )
+            );
+            this.msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.STANDBY));
+            return;
+        }
+        this.dispatcher.dispatch(
+            new Message(
+                MessageType.SYSTEM_NOTICE,
+                new NoticeData(
+                    NoticeType.INFO,
+                    "Standby",
+                    "Die Anlage wird aus dem Standby-Modus geholt"
+                )
+            )
+        );
+        if(this.automaticMode) {
+            this.msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
+        } else {
+            this.msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.MANUEL));
+        }
+    }
+
+    protected void sendErrorMessage(Endpoint endpoint) {
+        dispatcher.dispatch(
+            new Message(
+                MessageType.ERROR,
+                new ErrorData(
+                    ErrorId.INVALID_STATUS_CHANGE,
+                    "Current state is <" + this.status.toString() + ">"
+                ),
+                endpoint
+            )
+        );
+    }
+
+    @Override
+    public void hardwareStateChanged(HardwareState state) {
+        this.status = state;
+        this.dispatcher.dispatch(
+            new Message(
+                MessageType.HARDWARE_STATE_CHANGED,
+                this.status.toString()
+            )
+        );
     }
 }

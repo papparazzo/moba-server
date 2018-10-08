@@ -28,8 +28,9 @@ import json.JSONToStringI;
 public enum HardwareState implements JSONToStringI {
     ERROR,
     STANDBY,
-    POWER_OFF,
-    READY;
+    EMERGENCY_STOP,
+    MANUEL,
+    AUTOMATIC;
 
     protected final int value;
 
