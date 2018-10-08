@@ -27,6 +27,7 @@ public enum MessageType {
     SERVER_SHUTDOWN(MessageGroup.BASE, MessageClass.INTERN),
     SERVER_RESET(MessageGroup.BASE, MessageClass.INTERN),
     FREE_RESOURCES(MessageGroup.BASE, MessageClass.INTERN),
+    SET_HARDWARE_STATE(MessageGroup.BASE, MessageClass.INTERN),
 
     //---------------------------------------------------
     // Client
@@ -61,8 +62,6 @@ public enum MessageType {
     GLOBAL_TIMER_EVENT(MessageGroup.TIMER, MessageClass.BROADCAST, MessagePriority.REAL_TIME),
     GET_GLOBAL_TIMER(MessageGroup.TIMER, MessageClass.SINGLE),
     SET_GLOBAL_TIMER(MessageGroup.TIMER, MessageClass.GROUP),
-    GET_AUTO_MODE(MessageGroup.TIMER, MessageClass.SINGLE),
-    SET_AUTO_MODE(MessageGroup.TIMER, MessageClass.BROADCAST),
     GET_COLOR_THEME(MessageGroup.TIMER, MessageClass.SINGLE),
     SET_COLOR_THEME(MessageGroup.TIMER, MessageClass.GROUP),
     COLOR_THEME_EVENT(MessageGroup.TIMER, MessageClass.BROADCAST),
@@ -86,15 +85,13 @@ public enum MessageType {
     //---------------------------------------------------
     // System
     //---------------------------------------------------
-    GET_EMERGENCY_STOP_STATE(MessageGroup.SYSTEM, MessageClass.SINGLE),
-    EMERGENCY_STOP(MessageGroup.SYSTEM, MessageClass.BROADCAST, MessagePriority.REAL_TIME),
-    EMERGENCY_STOP_CLEARING(MessageGroup.SYSTEM, MessageClass.BROADCAST),
+    SET_AUTOMATIC_MODE(MessageGroup.SYSTEM, MessageClass.SINGLE, MessagePriority.REAL_TIME),
+    SET_EMERGENCY_STOP(MessageGroup.SYSTEM, MessageClass.SINGLE, MessagePriority.REAL_TIME),
+    SET_STANDBY_MODE(MessageGroup.SYSTEM, MessageClass.SINGLE),
     GET_HARDWARE_STATE(MessageGroup.SYSTEM),
-    SET_HARDWARE_STATE(MessageGroup.SYSTEM, MessageClass.SINGLE),
     HARDWARE_STATE_CHANGED(MessageGroup.SYSTEM, MessageClass.BROADCAST),
     HARDWARE_SHUTDOWN(MessageGroup.SYSTEM, MessageClass.SINGLE),
     HARDWARE_RESET(MessageGroup.SYSTEM, MessageClass.SINGLE),
-    HARDWARE_SWITCH_STANDBY(MessageGroup.SYSTEM, MessageClass.SINGLE),
 
     //---------------------------------------------------
     // Layout
