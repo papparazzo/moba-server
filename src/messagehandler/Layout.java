@@ -42,11 +42,11 @@ import messages.MessageType;
 public class Layout extends MessageHandlerA {
 
     protected static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    protected Database db = null;
+    protected Database database   = null;
     protected SenderI  dispatcher = null;
 
-    public Layout(SenderI dispatcher, Database db) {
-        this.db = db;
+    public Layout(SenderI dispatcher, Database database) {
+        this.database   = database;
         this.dispatcher = dispatcher;
     }
 
@@ -66,7 +66,7 @@ public class Layout extends MessageHandlerA {
 
     protected void getLayout(Message msg) {
         try {
-            Connection con = this.db.getConnection();
+            Connection con = database.getConnection();
             long id = (Long)msg.getData();
             HashMap<String, Object> map = new HashMap<>();
 

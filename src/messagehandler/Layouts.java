@@ -42,11 +42,11 @@ import messages.MessageType;
 public class Layouts extends MessageHandlerA {
 
     protected static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    protected Database db = null;
+    protected Database database   = null;
     protected SenderI  dispatcher = null;
 
-    public Layouts(SenderI dispatcher, Database db) {
-        this.db = db;
+    public Layouts(SenderI dispatcher, Database database) {
+        this.database   = database;
         this.dispatcher = dispatcher;
     }
 
@@ -98,7 +98,7 @@ public class Layouts extends MessageHandlerA {
     @Override
     public void freeResources(long id) {
         try {
-            Connection con = this.db.getConnection();
+            Connection con = this.database.getConnection();
 
             String q =
                 "UPDATE `TrackLayouts` " +
@@ -131,7 +131,7 @@ public class Layouts extends MessageHandlerA {
                 "FROM `TrackLayouts`;";
 
             ArrayList<TracklayoutData> arraylist;
-            try(ResultSet rs = this.db.query(q)) {
+            try(ResultSet rs = this.database.query(q)) {
                 arraylist = new ArrayList();
                 while(rs.next()) {
                     arraylist.add(new TracklayoutData(
@@ -171,7 +171,7 @@ public class Layouts extends MessageHandlerA {
 
     protected boolean isLocked(long id, long epid)
     throws SQLException {
-        Connection con = this.db.getConnection();
+        Connection con = this.database.getConnection();
 
         String q =
             "SELECT IF(`locked` IS NULL OR `locked` = ?, 0, 1) AS `locked` " +
@@ -214,7 +214,7 @@ public class Layouts extends MessageHandlerA {
                 return;
             }
 
-            Connection con = this.db.getConnection();
+            Connection con = this.database.getConnection();
             String q =
                 "DELETE " +
                 "FROM `TrackLayouts` " +
@@ -275,7 +275,7 @@ public class Layouts extends MessageHandlerA {
                 (String)map.get("description")
             );
 
-            Connection con = this.db.getConnection();
+            Connection con = this.database.getConnection();
 
             String q =
                 "INSERT INTO `TrackLayouts` " +
@@ -360,7 +360,7 @@ public class Layouts extends MessageHandlerA {
               //  (java.util.Date)formatter.parse((String)map.get("created"))
             );
 
-            Connection con = this.db.getConnection();
+            Connection con = this.database.getConnection();
 
             String q =
                 "UPDATE `TrackLayouts` " +
@@ -429,7 +429,7 @@ public class Layouts extends MessageHandlerA {
                 );
                 return;
             }
-            Connection con = this.db.getConnection();
+            Connection con = this.database.getConnection();
 
             String q =
                 "UPDATE `TrackLayouts` " +

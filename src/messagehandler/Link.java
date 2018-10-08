@@ -33,11 +33,11 @@ import messages.MessageType;
 public class Link extends MessageHandlerA {
 
     protected Dispatcher dispatcher = null;
-    protected PriorityBlockingQueue<Message> in = null;
+    protected PriorityBlockingQueue<Message> msgQueue = null;
 
-    public Link(Dispatcher dispatcher, PriorityBlockingQueue<Message> in) {
+    public Link(Dispatcher dispatcher, PriorityBlockingQueue<Message> msgQueue) {
         this.dispatcher = dispatcher;
-        this.in = in;
+        this.msgQueue   = msgQueue;
     }
 
     @Override
@@ -102,7 +102,7 @@ public class Link extends MessageHandlerA {
     }
 
     protected void handleClientClose(Message msg) {
-        this.in.add(new Message(MessageType.FREE_RESOURCES, (long)msg.getEndpoint().getAppId()));
+        this.msgQueue.add(new Message(MessageType.FREE_RESOURCES, (long)msg.getEndpoint().getAppId()));
         this.dispatcher.removeEndpoint(msg.getEndpoint());
         this.dispatcher.dispatch(
             new Message(MessageType.CLIENT_CLOSED, msg.getEndpoint().getAppId())
