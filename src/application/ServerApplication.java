@@ -28,6 +28,7 @@ import database.Database;
 import database.DatabaseException;
 import messagehandler.Environment;
 import messagehandler.GlobalTimer;
+import messagehandler.Interface;
 import messagehandler.Layout;
 import messagehandler.Layouts;
 import messagehandler.Link;
@@ -44,26 +45,27 @@ public class ServerApplication extends Application {
     protected void loop() throws Exception {
         try {
             boolean restart;
-            this.maxClients = (int)(long)this.config.getSection("common.serverConfig.maxClients");
+            maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
             do {
                 Dispatcher dispatcher = new Dispatcher();
                 Acceptor acceptor = new Acceptor(
-                    this.in,
+                    msgQueue,
                     dispatcher,
-                    (int)(long)this.config.getSection("common.serverConfig.port"),
-                    this.maxClients
+                    (int)(long)config.getSection("common.serverConfig.port"),
+                    maxClients
                 );
-                Database database = new Database((HashMap<String, Object>)this.config.getSection("common.database"));
+                Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
                 MessageLoop loop = new MessageLoop(dispatcher);
-                loop.addHandler(MessageType.MessageGroup.CLIENT, new Link(dispatcher, this.in));
+                loop.addHandler(MessageType.MessageGroup.CLIENT, new Link(dispatcher, msgQueue));
                 loop.addHandler(MessageType.MessageGroup.SERVER, new Server(dispatcher, this));
-                loop.addHandler(MessageType.MessageGroup.TIMER, new GlobalTimer(dispatcher, this.config));
-                loop.addHandler(MessageType.MessageGroup.ENV, new Environment(dispatcher, this.config));
-                loop.addHandler(MessageType.MessageGroup.SYSTEM, new Systems(dispatcher, this.in));
+                loop.addHandler(MessageType.MessageGroup.TIMER, new GlobalTimer(dispatcher, config));
+                loop.addHandler(MessageType.MessageGroup.ENV, new Environment(dispatcher, config));
+                loop.addHandler(MessageType.MessageGroup.SYSTEM, new Systems(dispatcher, msgQueue));
                 loop.addHandler(MessageType.MessageGroup.LAYOUT, new Layout(dispatcher, database));
                 loop.addHandler(MessageType.MessageGroup.LAYOUTS, new Layouts(dispatcher, database));
+                loop.addHandler(MessageType.MessageGroup.INTERFACE, new Interface(dispatcher, msgQueue));
                 acceptor.startAcceptor();
-                restart = loop.loop(this.in);
+                restart = loop.loop(msgQueue);
                 dispatcher.resetDispatcher();
                 acceptor.stopAcceptor();
             } while(restart);
@@ -73,6 +75,6 @@ public class ServerApplication extends Application {
     }
 
     public int getMaxClients() {
-        return this.maxClients;
+        return maxClients;
     }
 }
