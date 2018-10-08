@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.Dispatcher;
+import com.SenderI;
 import datatypes.enumerations.ErrorId;
 import datatypes.objects.AmbienceData;
 import datatypes.objects.AmbientLightData;
@@ -38,14 +38,14 @@ import utilities.config.Config;
 import utilities.config.ConfigException;
 
 public class Environment extends MessageHandlerA {
-    protected Dispatcher  dispatcher = null;
-    protected Config      config = null;
+    protected SenderI dispatcher = null;
+    protected Config  config = null;
 
     protected EnvironmentData  environment  = new EnvironmentData();
     protected AmbienceData     ambience     = new AmbienceData();
     protected AmbientLightData ambientLight = new AmbientLightData();
 
-    public Environment(Dispatcher dispatcher, Config config) {
+    public Environment(SenderI dispatcher, Config config) {
         this.dispatcher = dispatcher;
         this.config = config;
     }

@@ -20,7 +20,7 @@
 
 package messagehandler;
 
-import com.Dispatcher;
+import com.SenderI;
 import datatypes.enumerations.ColorTheme;
 import datatypes.enumerations.ErrorId;
 import datatypes.enumerations.HardwareState;
@@ -39,16 +39,16 @@ import utilities.config.Config;
 import utilities.config.ConfigException;
 
 public class GlobalTimer extends MessageHandlerA implements Runnable {
-    protected Dispatcher  dispatcher = null;
-    protected Config      config = null;
-    protected Thread      thread = null;
+    protected SenderI         dispatcher = null;
+    protected Config          config = null;
+    protected Thread          thread = null;
     protected GlobalTimerData timerData = null;
     protected ColorThemeData  themeData = null;
 
     protected ColorTheme       curTheme = null;
     protected volatile boolean isRunning = false;
 
-    public GlobalTimer(Dispatcher dispatcher, Config config) {
+    public GlobalTimer(SenderI dispatcher, Config config) {
         this.dispatcher = dispatcher;
         this.config = config;
         this.timerData = new GlobalTimerData();
