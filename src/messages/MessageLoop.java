@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import com.Dispatcher;
 import com.Endpoint;
+import datatypes.enumerations.HardwareState;
 import messages.MessageType.MessageGroup;
 
 public class MessageLoop {
@@ -124,6 +125,14 @@ public class MessageLoop {
         Iterator<MessageGroup> iter = this.handlers.keySet().iterator();
         while(iter.hasNext()) {
             this.handlers.get(iter.next()).shutdown();
+        }
+    }
+
+    protected void hardwareStateChangedHandler(HardwareState state) {
+        Iterator<MessageGroup> iter = this.handlers.keySet().iterator();
+
+        while(iter.hasNext()) {
+            this.handlers.get(iter.next()).hardwareStateChanged(state);
         }
     }
 }
