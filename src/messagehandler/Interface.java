@@ -24,6 +24,8 @@ import application.ServerApplication;
 import com.SenderI;
 import datatypes.enumerations.Connectivity;
 import datatypes.enumerations.HardwareState;
+import datatypes.enumerations.NoticeType;
+import datatypes.objects.NoticeData;
 import java.util.concurrent.PriorityBlockingQueue;
 import messages.Message;
 import messages.MessageHandlerA;
@@ -63,6 +65,16 @@ public class Interface extends MessageHandlerA {
 
             case ERROR:
                 this.msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.ERROR));
+                this.dispatcher.dispatch(
+                    new Message(
+                        MessageType.SYSTEM_NOTICE,
+                        new NoticeData(
+                            NoticeType.ERROR,
+                            "Hardwarefehler",
+                            "Die Verbindung zur Harware wurde unterbrochen"
+                        )
+                    )
+                );
                 break;
         }
     }
