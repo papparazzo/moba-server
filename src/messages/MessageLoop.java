@@ -78,6 +78,9 @@ public class MessageLoop {
                         this.freeResources((long)msg.getData());
                         continue;
 
+                    case SET_HARDWARE_STATE:
+                        this.hardwareStateChangedHandler((HardwareState)msg.getData());
+                        continue;
                 }
             }
 
