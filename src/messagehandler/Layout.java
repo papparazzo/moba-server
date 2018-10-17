@@ -71,21 +71,6 @@ public class Layout extends MessageHandlerA {
             HashMap<String, Object> map = new HashMap<>();
 
             String q =
-                "SELECT `Name` " +
-                "FROM `TrackLayouts` " +
-                "WHERE `Id` = ?";
-
-            try (PreparedStatement pstmt = con.prepareStatement(q)) {
-                pstmt.setLong(1, id);
-                Layouts.logger.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
-                ResultSet rs = pstmt.executeQuery();
-                if(!rs.next()) {
-                    throw new NoSuchElementException(String.format("No layout with id <%d>", id));
-                }
-                map.put("name", rs.getString("Name"));
-            }
-
-            q =
                 "SELECT MAX(`XPos`) AS `Width`, MAX(`YPos`) AS `Height` " +
                 "FROM `TrackLayoutSymbols` " +
                 "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
@@ -98,14 +83,14 @@ public class Layout extends MessageHandlerA {
                 );
                 ResultSet rs = pstmt.executeQuery();
                 if(!rs.next()) {
-                    throw new IllegalStateException(String.format("no elements found for layout <%4d>", id));
+                    throw new NoSuchElementException(String.format("no elements found for layout <%4d>", id));
                 }
                 map.put("width", rs.getLong("Width"));
                 map.put("height", rs.getLong("Height"));
             }
 
             q =
-                "SELECT * " +
+                "SELECT `Id`, `XPos`, `YPos`, `Symbol` " +
                 "FROM `TrackLayoutSymbols` " +
                 "WHERE `TrackLayoutId` = ?";
 
@@ -129,7 +114,7 @@ public class Layout extends MessageHandlerA {
                 this.dispatcher.dispatch(
                     new Message(
                         MessageType.GET_LAYOUT_RES,
-                        arraylist,
+                        map,
                         msg.getEndpoint()
                     )
                 );
