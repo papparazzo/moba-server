@@ -20,6 +20,46 @@
 
 package tracklayout;
 
+import datatypes.base.Point;
+
 public class Tracklayout {
+
+    protected Symbol[][] layout;
+
+    protected int height;
+    protected int width;
+
+    public Tracklayout(int height, int width) {
+        this.height = height;
+        this.width = width;
+
+        layout = new Symbol[width][height];
+    }
+
+    public void addSymbol(int x, int y, Symbol symbol) {
+        if(x >= width || y >= height) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+        layout[x][y] = new Symbol();
+    }
+
+    public Point getStartPoint() {
+        for(int y = 0; y < height; ++y) {
+            for(int x = 0; x < width; ++x) {
+                if(layout[x][y] != null) {
+                    return new Point(x, y);
+                }
+            }
+        }
+        throw new ArrayIndexOutOfBoundsException("No start found");
+    }
+
+    public boolean validate() {
+        return false;
+
+
+    }
+
+
 
 }
