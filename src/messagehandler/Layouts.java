@@ -20,6 +20,7 @@
 
 package messagehandler;
 
+import com.Endpoint;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.NoSuchElementException;
 
 import com.SenderI;
 import database.Database;
@@ -54,23 +56,23 @@ public class Layouts extends MessageHandlerA {
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
             case GET_LAYOUTS_REQ:
-                this.getLayouts(msg);
+                getLayouts(msg);
                 break;
 
             case DEL_LAYOUT:
-                this.deleteLayout(msg);
+                deleteLayout(msg);
                 break;
 
             case CREATE_LAYOUT_REQ:
-                this.createLayout(msg);
+                createLayout(msg);
                 break;
 
             case UPDATE_LAYOUT:
-                this.updateLayout(msg);
+                updateLayout(msg);
                 break;
 
             case UNLOCK_LAYOUT:
-                this.unlockLayout(msg);
+                unlockLayout(msg);
                 break;
 
             default:
@@ -82,27 +84,25 @@ public class Layouts extends MessageHandlerA {
 
     @Override
     public void init() {
-        this.freeResources(-1);
+        freeResources(-1);
     }
 
     @Override
     public void reset() {
-        this.freeResources(-1);
+        freeResources(-1);
     }
 
     @Override
     public void shutdown() {
-        this.freeResources(-1);
+        freeResources(-1);
     }
 
     @Override
     public void freeResources(long id) {
         try {
-            Connection con = this.database.getConnection();
+            Connection con = database.getConnection();
 
-            String q =
-                "UPDATE `TrackLayouts` " +
-                "SET `Locked` = NULL ";
+            String q = "UPDATE `TrackLayouts` SET `Locked` = NULL ";
 
             if(id != -1) {
                 q += "WHERE `Locked` = ?";
@@ -113,25 +113,19 @@ public class Layouts extends MessageHandlerA {
                     pstmt.setLong(1, id);
                 }
                 pstmt.executeUpdate();
-                Layouts.logger.log(
-                    Level.INFO, "<{0}>", new Object[]{pstmt.toString()}
-                );
+                Layouts.logger.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
             }
         } catch(SQLException e) {
-            Layouts.logger.log(
-                Level.WARNING, "<{0}>", new Object[]{e.toString()}
-            );
+            Layouts.logger.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
         }
     }
 
     protected void getLayouts(Message msg) {
         try {
-            String q =
-                "SELECT * " +
-                "FROM `TrackLayouts`;";
+            String q = "SELECT * FROM `TrackLayouts`;";
 
             ArrayList<TracklayoutData> arraylist;
-            try(ResultSet rs = this.database.query(q)) {
+            try(ResultSet rs = database.query(q)) {
                 arraylist = new ArrayList();
                 while(rs.next()) {
                     arraylist.add(new TracklayoutData(
@@ -144,125 +138,87 @@ public class Layouts extends MessageHandlerA {
                     ));
                 }
             }
-            this.dispatcher.dispatch(
-                new Message(
-                    MessageType.GET_LAYOUTS_RES,
-                    arraylist,
-                    msg.getEndpoint()
-                )
-            );
+            dispatcher.dispatch(new Message(MessageType.GET_LAYOUTS_RES, arraylist, msg.getEndpoint()));
         } catch(SQLException e) {
-            Layouts.logger.log(
-                Level.WARNING,
-                "<{0}>",
-                new Object[]{e.toString()}
-            );
-            this.dispatcher.dispatch(new Message(
-                    MessageType.ERROR,
-                    new ErrorData(
-                        ErrorId.DATABASE_ERROR,
-                        e.getMessage()
-                    ),
-                    msg.getEndpoint()
-                )
-            );
+            Layouts.logger.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            dispatcher.dispatch(new Message(
+                MessageType.ERROR,
+                new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
+                msg.getEndpoint()
+            ));
         }
     }
 
+    protected boolean isLocked(long id, Endpoint ep)
+    throws SQLException, NoSuchElementException {
+        if(!isLocked(id, ep.getAppId())) {
+            return false;
+        }
+        Layouts.logger.log(Level.WARNING, "layout <{0}> is locked", new Object[]{id});
+        dispatcher.dispatch(
+            new Message(
+                MessageType.ERROR,
+                new ErrorData(
+                    ErrorId.DATASET_LOCKED,
+                    "layout is locked by <" + Long.toString(id) + ">"
+                ),
+                ep
+            )
+        );
+        return true;
+    }
+
     protected boolean isLocked(long id, long epid)
-    throws SQLException {
+    throws SQLException, NoSuchElementException {
         Connection con = this.database.getConnection();
 
-        String q =
-            "SELECT IF(`locked` IS NULL OR `locked` = ?, 0, 1) AS `locked` " +
-            "FROM `TrackLayouts` " +
-            "WHERE `Id` = ?";
+        String q = "SELECT IF(`locked` IS NULL OR `locked` = ?, 0, 1) AS `locked` FROM `TrackLayouts` WHERE `Id` = ?";
 
         try(PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setLong(1, epid);
             pstmt.setLong(2, id);
             ResultSet rs = pstmt.executeQuery();
 
-            if(rs.next()) {
-                return rs.getBoolean("locked");
+            if(!rs.next()) {
+                throw new NoSuchElementException("no layout found with id <" + Long.toString(id) + ">");
             }
-            // FIXME: Wenn RS nicht existiert dann error-msg senden
-            return false;
+            return rs.getBoolean("locked");
         }
     }
 
     protected void deleteLayout(Message msg) {
         try {
             long id = (Long)msg.getData();
-            if(this.isLocked(id, msg.getEndpoint().getAppId())) {
-                Layouts.logger.log(
-                    Level.WARNING,
-                    "tracklayout <{0}> is locked",
-                    new Object[]{id}
-                );
-                this.dispatcher.dispatch(
-                    new Message(
-                        MessageType.ERROR,
-                        new ErrorData(
-                            ErrorId.DATASET_LOCKED,
-                            //String.format("layout is locked by < %4d", i * j);
-                            "" // FIXME: locked by...
-                        ),
-                        msg.getEndpoint()
-                    )
-                );
+            if(isLocked(id, msg.getEndpoint())) {
                 return;
             }
 
-            Connection con = this.database.getConnection();
-            String q =
-                "DELETE " +
-                "FROM `TrackLayouts` " +
-                "WHERE (`locked` = ? " +
-                "OR `locked` = ?) " +
-                "AND `id` = ? ";
+            Connection con = database.getConnection();
+            String q = "DELETE FROM `TrackLayouts` WHERE (`locked` = ? OR `locked` = ?) AND `id` = ? ";
 
             try (PreparedStatement pstmt = con.prepareStatement(q)) {
                 pstmt.setLong(1, 0);
                 pstmt.setLong(2, msg.getEndpoint().getAppId());
                 pstmt.setLong(3, id);
-                Layouts.logger.log(
-                    Level.INFO,
-                    "<{0}>",
-                    new Object[]{pstmt.toString()}
-                );
+                Layouts.logger.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
                 if(pstmt.executeUpdate() == 0) {
-                    this.dispatcher.dispatch(new Message(
-                            MessageType.ERROR,
-                            new ErrorData(
-                                ErrorId.DATASET_MISSING,
-                                ""
-                            ),
-                            msg.getEndpoint()
-                        )
-                    );
+                    dispatcher.dispatch(new Message(
+                        MessageType.ERROR,
+                        new ErrorData(ErrorId.DATASET_MISSING, ""),
+                        msg.getEndpoint()
+                    ));
                     pstmt.close();
                     return;
                 }
             }
-            this.dispatcher.dispatch(
-                new Message(MessageType.LAYOUT_DELETED, id)
-            );
+            dispatcher.dispatch(new Message(MessageType.LAYOUT_DELETED, id));
         } catch(SQLException e) {
-            Layouts.logger.log(
-                Level.WARNING,
-                "<{0}>",
-                new Object[]{e.toString()}
-            );
-            this.dispatcher.dispatch(new Message(
-                    MessageType.ERROR,
-                    new ErrorData(
-                        ErrorId.DATABASE_ERROR,
-                        e.getMessage()
-                    ),
-                    msg.getEndpoint()
-                )
-            );
+            Layouts.logger.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            dispatcher.dispatch(new Message(
+                MessageType.ERROR,
+                new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
+                msg.getEndpoint()
+            ));
         }
     }
 
@@ -270,24 +226,15 @@ public class Layouts extends MessageHandlerA {
         try {
             Map<String, Object> map = (Map)msg.getData();
 
-            TracklayoutData tl = new TracklayoutData(
-                (String)map.get("name"),
-                (String)map.get("description")
-            );
-
-            Connection con = this.database.getConnection();
+            TracklayoutData tl = new TracklayoutData((String)map.get("name"), (String)map.get("description"));
+            Connection con = database.getConnection();
 
             String q =
                 "INSERT INTO `TrackLayouts` " +
                 "(`Name`, `Description`, `CreationDate`, `ModificationDate`, `Locked`) " +
                 "VALUES (?, ?, NOW(), NOW(), ?)";
 
-            try(
-                PreparedStatement pstmt = con.prepareStatement(
-                    q,
-                    PreparedStatement.RETURN_GENERATED_KEYS
-                 )
-            ) {
+            try(PreparedStatement pstmt = con.prepareStatement(q, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, tl.getName());
                 pstmt.setString(2, tl.getDescription());
                 pstmt.setLong(3, msg.getEndpoint().getAppId());
@@ -298,31 +245,15 @@ public class Layouts extends MessageHandlerA {
                     tl.setId(rs.getInt(1));
                 }
             }
-            this.dispatcher.dispatch(
-                new Message(MessageType.LAYOUT_CREATED, tl)
-            );
-            this.dispatcher.dispatch(
-                new Message(
-                    MessageType.CREATE_LAYOUT_RES,
-                    tl.getId(),
-                    msg.getEndpoint()
-                )
-            );
+            dispatcher.dispatch(new Message(MessageType.LAYOUT_CREATED, tl));
+            dispatcher.dispatch(new Message(MessageType.CREATE_LAYOUT_RES, tl.getId(), msg.getEndpoint()));
         } catch(SQLException e) {
-            Layouts.logger.log(
-                Level.WARNING,
-                "<{0}>",
-                new Object[]{e.toString()}
-            );
-            this.dispatcher.dispatch(new Message(
-                    MessageType.ERROR,
-                    new ErrorData(
-                        ErrorId.DATABASE_ERROR,
-                        e.getMessage()
-                    ),
-                    msg.getEndpoint()
-                )
-            );
+            Layouts.logger.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            dispatcher.dispatch(new Message(
+                MessageType.ERROR,
+                new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
+                msg.getEndpoint()
+            ));
         }
     }
 
@@ -330,21 +261,7 @@ public class Layouts extends MessageHandlerA {
         Map<String, Object> map = (Map)msg.getData();
         try {
             long id = (Long)map.get("id");
-            if(this.isLocked(id, msg.getEndpoint().getAppId())) {
-                Layouts.logger.log(
-                    Level.WARNING,
-                    "tracklayout <{0}> is locked",
-                    new Object[]{id}
-                );
-                this.dispatcher.dispatch(new Message(
-                        MessageType.ERROR,
-                        new ErrorData(
-                            ErrorId.DATASET_LOCKED,
-                            "" // FIXME: locked by...
-                        ),
-                        msg.getEndpoint()
-                    )
-                );
+            if(isLocked(id, msg.getEndpoint())) {
                 return;
             }
             TracklayoutData tl;
@@ -360,7 +277,7 @@ public class Layouts extends MessageHandlerA {
               //  (java.util.Date)formatter.parse((String)map.get("created"))
             );
 
-            Connection con = this.database.getConnection();
+            Connection con = database.getConnection();
 
             String q =
                 "UPDATE `TrackLayouts` " +
@@ -377,35 +294,21 @@ public class Layouts extends MessageHandlerA {
                 pstmt.setLong(7, msg.getEndpoint().getAppId());
                 pstmt.setLong(8, id);
                 if(pstmt.executeUpdate() == 0) {
-                    this.dispatcher.dispatch(new Message(
-                            MessageType.ERROR,
-                            new ErrorData(
-                                ErrorId.DATASET_MISSING,
-                                "Could not update <" + String.valueOf(id) + ">"
-                            ),
-                            msg.getEndpoint()
-                        )
-                    );
+                    dispatcher.dispatch(new Message(
+                        MessageType.ERROR,
+                        new ErrorData(ErrorId.DATASET_MISSING, "Could not update <" + String.valueOf(id) + ">"),
+                        msg.getEndpoint()
+                    ));
                     pstmt.close();
                     return;
                 }
                 Layouts.logger.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
-                this.dispatcher.dispatch(new Message(MessageType.LAYOUT_UPDATED, tl));
+                dispatcher.dispatch(new Message(MessageType.LAYOUT_UPDATED, tl));
             }
         } catch(SQLException | NumberFormatException e) {
-            Layouts.logger.log(
-                Level.WARNING,
-                "<{0}>",
-                new Object[]{e.toString()}
-            );
-            this.dispatcher.dispatch(new Message(
-                    MessageType.ERROR,
-                    new ErrorData(
-                        ErrorId.UNKNOWN_ERROR,
-                        e.getMessage()
-                    ),
-                    msg.getEndpoint()
-                )
+            Layouts.logger.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            dispatcher.dispatch(
+                new Message(MessageType.ERROR, new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()), msg.getEndpoint())
             );
         }
     }
@@ -413,71 +316,32 @@ public class Layouts extends MessageHandlerA {
     public void unlockLayout(Message msg) {
         try {
             long id = (Long)msg.getData();
-            if(this.isLocked(id, msg.getEndpoint().getAppId())) {
-                Layouts.logger.log(
-                    Level.WARNING,
-                    "tracklayout <{0}> is locked",
-                    new Object[]{id}
-                );
-                this.dispatcher.dispatch(new Message(
-                        MessageType.ERROR,
-                        new ErrorData(
-                            ErrorId.DATASET_LOCKED
-                        ),
-                        msg.getEndpoint()
-                    )
-                );
+            if(isLocked(id, msg.getEndpoint())) {
                 return;
             }
-            Connection con = this.database.getConnection();
-
-            String q =
-                "UPDATE `TrackLayouts` " +
-                "SET `locked` = ? " +
-                "WHERE `locked` = ? " +
-                "AND `id` = ? ";
+            Connection con = database.getConnection();
+            String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` = ? AND `id` = ? ";
 
             try(PreparedStatement pstmt = con.prepareStatement(q)) {
                 pstmt.setLong(1, 0);
                 pstmt.setLong(2, msg.getEndpoint().getAppId());
                 pstmt.setLong(3, id);
 
-                Layouts.logger.log(
-                    Level.INFO,
-                    "<{0}>",
-                    new Object[]{pstmt.toString()}
-                );
+                Layouts.logger.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
 
                 if(pstmt.executeUpdate() == 0) {
-                    this.dispatcher.dispatch(new Message(
-                            MessageType.ERROR,
-                            new ErrorData(
-                                ErrorId.DATASET_MISSING
-                            ),
-                            msg.getEndpoint()
-                        )
+                    dispatcher.dispatch(
+                        new Message(MessageType.ERROR, new ErrorData(ErrorId.DATASET_MISSING), msg.getEndpoint())
                     );
                     pstmt.close();
                     return;
                 }
             }
-            this.dispatcher.dispatch(
-                new Message(MessageType.LAYOUT_UNLOCKED, id)
-            );
+            dispatcher.dispatch(new Message(MessageType.LAYOUT_UNLOCKED, id));
         } catch(SQLException e) {
-            Layouts.logger.log(
-                Level.WARNING,
-                "<{0}>",
-                new Object[]{e.toString()}
-            );
-            this.dispatcher.dispatch(new Message(
-                    MessageType.ERROR,
-                    new ErrorData(
-                        ErrorId.DATABASE_ERROR,
-                        e.getMessage()
-                    ),
-                    msg.getEndpoint()
-                )
+            Layouts.logger.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            dispatcher.dispatch(
+                new Message(MessageType.ERROR, new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()), msg.getEndpoint())
             );
         }
     }
