@@ -25,10 +25,10 @@ import java.io.InputStream;
 import java.net.Socket;
 
 public class JSONStreamReaderSocket implements JSONStreamReaderI {
-    private InputStream   is;
+    private final InputStream is;
 
     public JSONStreamReaderSocket(Socket socket) throws IOException {
-        this.is = socket.getInputStream();
+        is = socket.getInputStream();
     }
 
     @Override

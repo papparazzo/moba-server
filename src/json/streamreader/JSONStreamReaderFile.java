@@ -30,7 +30,7 @@ public class JSONStreamReaderFile implements JSONStreamReaderI {
 
     public JSONStreamReaderFile(String fileName)
     throws FileNotFoundException {
-        this.fh = new BufferedReader(new FileReader(fileName));
+        fh = new BufferedReader(new FileReader(fileName));
     }
 
     @Override
