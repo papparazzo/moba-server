@@ -39,13 +39,13 @@ public class Gui extends MessageHandlerA {
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
             case SYSTEM_NOTICE:
-                this.sendSystemNotice(msg);
+                sendSystemNotice(msg);
                 break;
         }
     }
 
     public void sendSystemNotice(Message msg) {
-        this.dispatcher.dispatch(
+        dispatcher.dispatch(
             new Message(
                 MessageType.SYSTEM_NOTICE,
                 msg.getData()

@@ -47,14 +47,10 @@ public class Dispatcher implements SenderI {
         Dispatcher.LOGGER.log(
             Level.INFO,
             "try to add endpoint <{0}> appName <{1}> ver<{2}>",
-            new Object[]{
-                ep.getSocket(),
-                ep.getAppName(),
-                ep.getVersion().toString()
-            }
+            new Object[]{ep.getSocket(), ep.getAppName(), ep.getVersion().toString()}
         );
 
-        Iterator<Endpoint> iter = this.broadcastEP.iterator();
+        Iterator<Endpoint> iter = broadcastEP.iterator();
 
         while(iter.hasNext()) {
             if(iter.next() == ep) {
@@ -69,23 +65,23 @@ public class Dispatcher implements SenderI {
 
         Set<Endpoint> set;
         for(MessageType.MessageGroup msgGroup : ep.getMsgGroups()) {
-            if(this.groupEP.containsKey(msgGroup)) {
-                set = this.groupEP.get(msgGroup);
+            if(groupEP.containsKey(msgGroup)) {
+                set = groupEP.get(msgGroup);
             } else {
                 set = new HashSet();
             }
             set.add(ep);
-            this.groupEP.put(msgGroup, set);
+            groupEP.put(msgGroup, set);
         }
 
-        this.broadcastEP.add(ep);
+        broadcastEP.add(ep);
         return true;
     }
 
     public void removeEndpoint(Endpoint ep) {
         this.shutDownEndpoint(ep);
 
-        Iterator<Endpoint> iter = this.broadcastEP.iterator();
+        Iterator<Endpoint> iter = broadcastEP.iterator();
 
         boolean removed = false;
 
@@ -106,8 +102,8 @@ public class Dispatcher implements SenderI {
         }
 
         for(MessageType.MessageGroup msgGroup : ep.getMsgGroups()) {
-            if(this.groupEP.containsKey(msgGroup)) {
-                Set<Endpoint> set = this.groupEP.get(msgGroup);
+            if(groupEP.containsKey(msgGroup)) {
+                Set<Endpoint> set = groupEP.get(msgGroup);
                 iter = set.iterator();
 
                 while(iter.hasNext()) {
@@ -149,23 +145,23 @@ public class Dispatcher implements SenderI {
     }
 
     public int getEndPointsCount() {
-        return this.broadcastEP.size();
+        return broadcastEP.size();
     }
 
     public void resetDispatcher() {
-        Iterator<Endpoint> iter = this.broadcastEP.iterator();
+        Iterator<Endpoint> iter = broadcastEP.iterator();
 
         while(iter.hasNext()) {
-            this.shutDownEndpoint(iter.next());
+            shutDownEndpoint(iter.next());
         }
     }
 
     public Set<Endpoint> getEndpoints() {
-        return this.broadcastEP;
+        return broadcastEP;
     }
 
     public Endpoint getEndpointByAppId(long appID) {
-        for(Endpoint item : this.broadcastEP) {
+        for(Endpoint item : broadcastEP) {
             if(item.getAppId() == appID) {
                 return item;
             }
@@ -197,30 +193,21 @@ public class Dispatcher implements SenderI {
 
             switch(cls) {
                 case INTERN:
-                    Dispatcher.LOGGER.log(
-                        Level.INFO,
-                        "msg-class is intern!"
-                    );
+                    Dispatcher.LOGGER.log(Level.INFO, "msg-class is intern!");
                     return false;
 
                 case SINGLE:
                     if(msg.getEndpoint() == null) {
-                        Dispatcher.LOGGER.log(
-                            Level.WARNING,
-                            "msg contains not endpoint"
-                        );
+                        Dispatcher.LOGGER.log(Level.WARNING, "msg contains not endpoint");
                         return false;
                     }
                     encoder.addAdditionalWriter(
-                        new JSONStreamWriterSocket(
-                            msg.getEndpoint().getSocket()
-                        )
+                        new JSONStreamWriterSocket(msg.getEndpoint().getSocket())
                     );
                     break;
 
                 case GROUP:
-                    MessageType.MessageGroup grp =
-                        msg.getMsgType().getMessageGroup();
+                    MessageType.MessageGroup grp = msg.getMsgType().getMessageGroup();
 
                     if(!this.groupEP.containsKey(grp)) {
                         return false;
@@ -244,11 +231,7 @@ public class Dispatcher implements SenderI {
             encoder.encodeMsg(msg);
             return true;
         } catch(IOException | JSONException e) {
-            Dispatcher.LOGGER.log(
-                Level.WARNING,
-                "<{0}>",
-                new Object[]{e.toString()}
-            );
+            Dispatcher.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
         }
         return false;
     }

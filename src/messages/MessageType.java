@@ -94,7 +94,7 @@ public enum MessageType {
     HARDWARE_RESET(MessageGroup.SYSTEM, MessageClass.SINGLE),
 
     //---------------------------------------------------
-    // Layout
+    // Layouts
     //---------------------------------------------------
     GET_LAYOUTS_REQ(MessageGroup.LAYOUTS, MessageClass.SINGLE),
     GET_LAYOUTS_RES(MessageGroup.LAYOUTS, MessageClass.SINGLE),
@@ -108,6 +108,9 @@ public enum MessageType {
     UNLOCK_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
     LAYOUT_UNLOCKED(MessageGroup.LAYOUTS, MessageClass.GROUP),
 
+    //---------------------------------------------------
+    // Layout
+    //---------------------------------------------------
     GET_LAYOUT_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
     GET_LAYOUT_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
 
@@ -154,7 +157,7 @@ public enum MessageType {
         }
 
         public long getOffset() {
-            return this.offset;
+            return offset;
         }
     }
 
@@ -178,14 +181,14 @@ public enum MessageType {
     }
 
     public MessageGroup getMessageGroup() {
-        return this.grp;
+        return grp;
     }
 
     public MessagePriority getMessagePriority() {
-        return this.pty;
+        return pty;
     }
 
     public MessageClass getMessageClass() {
-        return this.cls;
+        return cls;
     }
 }

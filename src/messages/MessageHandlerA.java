@@ -35,8 +35,8 @@ public abstract class MessageHandlerA {
     }
 
     public void reset() {
-        this.shutdown();
-        this.init();
+        shutdown();
+        init();
     }
 
     public void hardwareStateChanged(HardwareState state) {

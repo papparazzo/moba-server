@@ -33,7 +33,7 @@ public enum NoticeType implements JSONToStringI {
     protected final int value;
 
     private NoticeType() {
-        this.value = ordinal();
+        value = ordinal();
     }
 
     @Override
@@ -41,7 +41,7 @@ public enum NoticeType implements JSONToStringI {
     throws JSONException, IOException {
         StringBuilder b = new StringBuilder();
         b.append('"');
-        b.append(NoticeType.values()[this.value].toString());
+        b.append(NoticeType.values()[value].toString());
         b.append('"');
         return b.toString();
     }

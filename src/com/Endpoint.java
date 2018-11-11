@@ -59,20 +59,18 @@ public class Endpoint extends Thread implements JSONToStringI {
 
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-    public Endpoint(
-        long id, Socket socket, PriorityBlockingQueue<Message> in
-    ) {
+    public Endpoint(long id, Socket socket, PriorityBlockingQueue<Message> in) {
         this.id        = id;
         this.startTime = System.currentTimeMillis();
         this.socket    = socket;
         this.in        = in;
-        this.setName("endpoint #" + String.valueOf(id));
+        setName("endpoint #" + String.valueOf(id));
     }
 
     public void closeEndpoint() {
-        this.closing = true;
+        closing = true;
         try {
-            this.socket.close();
+            socket.close();
         } catch(IOException e) {
 
         }
@@ -82,18 +80,18 @@ public class Endpoint extends Thread implements JSONToStringI {
     throws IOException {
         try {
             JSONMessageDecoder decoder = new JSONMessageDecoder(
-                new JSONStreamReaderSocket(this.socket)
+                new JSONStreamReaderSocket(socket)
             );
             Message msg = decoder.decodeMsg(this);
             Endpoint.LOGGER.log(
                 Level.INFO,
                 "Endpoint #{0}: new message <{1}> arrived",
-                new Object[]{this.id, msg.getMsgType().toString()}
+                new Object[]{id, msg.getMsgType().toString()}
             );
             MessageLogger.in(msg);
             return msg;
         } catch (IOException | JSONException e) {
-            if(!this.closing) {
+            if(!closing) {
                 throw new IOException(e);
             }
             return new Message(MessageType.VOID);
@@ -102,10 +100,10 @@ public class Endpoint extends Thread implements JSONToStringI {
 
     @Override
     public String toString() {
-        if(this.socket == null) {
+        if(socket == null) {
             return "intern";
         }
-        return String.valueOf(this.id) + ": " + this.socket.toString();
+        return String.valueOf(id) + ": " + socket.toString();
     }
 
     @Override
@@ -136,7 +134,7 @@ public class Endpoint extends Thread implements JSONToStringI {
     public void run() {
         Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: thread started", new Object[]{id});
         try {
-            if(!this.init()) {
+            if(!init()) {
                 Endpoint.LOGGER.log(Level.WARNING, "Endpoint #{0}: init failed!>", new Object[]{id});
                 in.add(new Message(MessageType.CLIENT_CLOSE, null, this));
                 return;
@@ -156,7 +154,7 @@ public class Endpoint extends Thread implements JSONToStringI {
     }
 
     public Socket getSocket() {
-        return this.socket;
+        return socket;
     }
 
     public long getAppId() {
@@ -215,7 +213,7 @@ public class Endpoint extends Thread implements JSONToStringI {
                 }
             }
         }
-        this.in.add(msg);
+        in.add(msg);
         return true;
     }
 }

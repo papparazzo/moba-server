@@ -56,7 +56,7 @@ public enum ThreeState implements JSONToStringI {
     }
 
     private ThreeState() {
-        this.value = ordinal();
+        value = ordinal();
     }
 
     @Override
@@ -64,7 +64,7 @@ public enum ThreeState implements JSONToStringI {
     throws JSONException, IOException {
         StringBuilder b = new StringBuilder();
         b.append('"');
-        b.append(ThreeState.values()[this.value].toString());
+        b.append(ThreeState.values()[value].toString());
         b.append('"');
         return b.toString();
     }

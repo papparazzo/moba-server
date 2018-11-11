@@ -34,30 +34,29 @@ import datatypes.enumerations.HardwareState;
 import messages.MessageType.MessageGroup;
 
 public class MessageLoop {
-    protected static final Logger logger =
-        Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     protected Map<MessageGroup, MessageHandlerA> handlers = new HashMap<>();
     protected Dispatcher dispatcher = null;
 
     public MessageLoop(Dispatcher dispatcher) {
-        this.dispatcher = dispatcher;
+        dispatcher = dispatcher;
     }
 
     public void addHandler(MessageGroup msgGroup, MessageHandlerA msgHandler) {
         msgHandler.init();
-        this.handlers.put(msgGroup, msgHandler);
+        handlers.put(msgGroup, msgHandler);
     }
 
-    public Set<MessageGroup> getRegisteredHandlers(){
-        return this.handlers.keySet();
+    public Set<MessageGroup> getRegisteredHandlers() {
+        return handlers.keySet();
     }
 
     public boolean loop(PriorityBlockingQueue<Message> in)
     throws InterruptedException {
         while(true) {
             Message msg = in.take();
-            MessageLoop.logger.log(
+            MessageLoop.LOGGER.log(
                 Level.INFO,
                 "handle msg <{0}> from <{1}>",
                 new Object[]{msg.getMsgType(), msg.getEndpoint()}
@@ -67,31 +66,29 @@ public class MessageLoop {
                 switch(msg.getMsgType()) {
                     case SERVER_RESET:
                         in.clear();
-                        this.resetHandler();
+                        resetHandler();
                         return true;
 
                     case SERVER_SHUTDOWN:
-                        this.shutdownHandler();
+                        shutdownHandler();
                         return false;
 
                     case FREE_RESOURCES:
-                        this.freeResources((long)msg.getData());
+                        freeResources((long)msg.getData());
                         continue;
 
                     case SET_HARDWARE_STATE:
-                        this.hardwareStateChangedHandler((HardwareState)msg.getData());
+                        hardwareStateChangedHandler((HardwareState)msg.getData());
                         continue;
                 }
             }
 
-            if(this.handlers.containsKey(msg.getMsgType().getMessageGroup())) {
-                this.handlers.get(
-                    msg.getMsgType().getMessageGroup()
-                ).handleMsg(msg);
+            if(handlers.containsKey(msg.getMsgType().getMessageGroup())) {
+                handlers.get(msg.getMsgType().getMessageGroup()).handleMsg(msg);
                 continue;
             }
 
-            MessageLoop.logger.log(
+            MessageLoop.LOGGER.log(
                 Level.SEVERE,
                 "handler for msg-group <{0}> was not registered!",
                 new Object[]{msg.getMsgType().getMessageGroup()}
@@ -100,42 +97,42 @@ public class MessageLoop {
     }
 
     protected void freeResources(long id) {
-        Iterator<MessageGroup> iter = this.handlers.keySet().iterator();
+        Iterator<MessageGroup> iter = handlers.keySet().iterator();
 
         while(iter.hasNext()) {
-            this.handlers.get(iter.next()).freeResources(id);
+            handlers.get(iter.next()).freeResources(id);
         }
     }
 
     protected void resetHandler() {
-        for(Endpoint ep : this.dispatcher.getEndpoints()) {
-            this.dispatcher.dispatch(
+        for(Endpoint ep : dispatcher.getEndpoints()) {
+            dispatcher.dispatch(
                 new Message(MessageType.CLIENT_RESET, null, ep)
             );
         }
-        Iterator<MessageGroup> iter = this.handlers.keySet().iterator();
+        Iterator<MessageGroup> iter = handlers.keySet().iterator();
         while(iter.hasNext()) {
-            this.handlers.get(iter.next()).reset();
+            handlers.get(iter.next()).reset();
         }
     }
 
     protected void shutdownHandler() {
-        for(Endpoint ep : this.dispatcher.getEndpoints()) {
-            this.dispatcher.dispatch(
+        for(Endpoint ep : dispatcher.getEndpoints()) {
+            dispatcher.dispatch(
                     new Message(MessageType.CLIENT_SHUTDOWN, null, ep)
             );
         }
-        Iterator<MessageGroup> iter = this.handlers.keySet().iterator();
+        Iterator<MessageGroup> iter = handlers.keySet().iterator();
         while(iter.hasNext()) {
-            this.handlers.get(iter.next()).shutdown();
+            handlers.get(iter.next()).shutdown();
         }
     }
 
     protected void hardwareStateChangedHandler(HardwareState state) {
-        Iterator<MessageGroup> iter = this.handlers.keySet().iterator();
+        Iterator<MessageGroup> iter = handlers.keySet().iterator();
 
         while(iter.hasNext()) {
-            this.handlers.get(iter.next()).hardwareStateChanged(state);
+            handlers.get(iter.next()).hardwareStateChanged(state);
         }
     }
 }

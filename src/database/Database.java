@@ -47,7 +47,7 @@ public class Database {
                 String url = "jdbc:mysql://" + (String)map.get("host") + "/" + (String)map.get("db");
                 String usr = (String)map.get("usr");
                 String pwd = (String)map.get("pwd");
-                this.connect(url, usr, pwd);
+                connect(url, usr, pwd);
                 break;
 
             default:
@@ -60,7 +60,7 @@ public class Database {
 
         try {
             Class.forName("org.mariadb.jdbc.Driver").newInstance();
-            this.con = DriverManager.getConnection(url, usr, pwd);
+            con = DriverManager.getConnection(url, usr, pwd);
         } catch(ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException e) {
             throw new DatabaseException("unable to connect url: <" + url + ">", e);
         }
@@ -68,11 +68,11 @@ public class Database {
 
     public ResultSet query(String query)
     throws SQLException {
-        Statement stmt = this.con.createStatement();
+        Statement stmt = con.createStatement();
         return stmt.executeQuery(query);
     }
 
     public Connection getConnection() {
-        return this.con;
+        return con;
     }
 }

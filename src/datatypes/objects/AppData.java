@@ -45,9 +45,9 @@ public class AppData implements JSONToStringI {
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("appName",   this.appName);
-        map.put("version",   this.version);
-        map.put("msgGroups", this.msgGroups);
+        map.put("appName",   appName);
+        map.put("version",   version);
+        map.put("msgGroups", msgGroups);
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);

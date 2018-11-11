@@ -41,26 +41,26 @@ public class Config {
             false
         );
         this.fileName = fileName;
-        this.content = decoder.decode();
+        content = decoder.decode();
     }
 
     public void writeFile()
     throws IOException, JSONException {
         JSONEncoder encoder = new JSONEncoder(
-            new JSONStreamWriterFile(this.fileName),
+            new JSONStreamWriterFile(fileName),
             true
         );
-        encoder.encode(this.content);
+        encoder.encode(content);
     }
 
     public Object getSection(String expr) {
-        if(this.content == null || this.content.isEmpty()) {
+        if(content == null || content.isEmpty()) {
             return null;
         }
 
         String tokens[] = expr.split("\\.");
 
-        Object o = this.content;
+        Object o = content;
 
         for(String s : tokens) {
             Map<String, Object> map = (Map<String, Object>)o;
@@ -74,20 +74,20 @@ public class Config {
     }
 
     public void setSection(String section, Object val) throws ConfigException {
-        if(this.content == null) {
-            this.content = new HashMap<>();
+        if(content == null) {
+            content = new HashMap<>();
         }
-        this.content.put(section, val);
+        content.put(section, val);
     }
 
     public boolean removeSection(String section) throws ConfigException {
-        if(this.content == null) {
+        if(content == null) {
             throw new ConfigException("object is null");
         }
-        return (this.content.remove(section) != null);
+        return (content.remove(section) != null);
     }
 
     public boolean sectionExists(String section) {
-        return (this.getSection(section) != null);
+        return (getSection(section) != null);
     }
 }

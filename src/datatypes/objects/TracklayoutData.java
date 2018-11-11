@@ -64,23 +64,23 @@ public class TracklayoutData implements JSONToStringI {
     }
 
     public long getId() {
-        return this.id;
+        return id;
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public String getDescription() {
-        return this.description;
+        return description;
     }
 
     public Date getModificationDate() {
-        return this.modified;
+        return modified;
     }
 
     public Date getCreationDate() {
-        return this.created;
+        return created;
     }
 
     @Override
@@ -90,12 +90,12 @@ public class TracklayoutData implements JSONToStringI {
 
         SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
-        map.put("id",          this.id);
-        map.put("name",        this.name);
-        map.put("description", this.description);
-        map.put("created",     df.format(this.created));
-        map.put("modified",    df.format(this.modified));
-        map.put("locked",      this.locked);
+        map.put("id",          id);
+        map.put("name",        name);
+        map.put("description", description);
+        map.put("created",     df.format(created));
+        map.put("modified",    df.format(modified));
+        map.put("locked",      locked);
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);

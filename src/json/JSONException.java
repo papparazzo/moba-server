@@ -29,16 +29,16 @@ public class JSONException extends Exception {
 
     public JSONException(Throwable t) {
         super(t.getMessage());
-        this.cause = t;
+        cause = t;
     }
 
     public JSONException(String message, Throwable t) {
         super(message);
-        this.cause = t;
+        cause = t;
     }
 
     @Override
     public Throwable getCause() {
-        return this.cause;
+        return cause;
     }
 }

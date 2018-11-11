@@ -43,10 +43,10 @@ public class TracklayoutSymbolData implements JSONToStringI {
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("id",          this.id);
-        map.put("xPos",        this.xPos);
-        map.put("yPos",        this.yPos);
-        map.put("symbol",      this.symbol);
+        map.put("id",          id);
+        map.put("xPos",        xPos);
+        map.put("yPos",        yPos);
+        map.put("symbol",      symbol);
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);

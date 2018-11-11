@@ -36,19 +36,19 @@ public class JSONMessageDecoder extends JSONDecoder {
 
     public Message decodeMsg(Endpoint ep)
     throws IOException, JSONException {
-        this.checkNext('{');
-        this.checkNext('"');
+        checkNext('{');
+        checkNext('"');
 
         MessageType msgtype = null;
         Object o = null;
 
         for(int i = 0; i < 2; i++) {
-            String key = this.nextKey();
-            this.checkNext(':');
+            String key = nextKey();
+            checkNext(':');
             switch(key) {
                 case Message.MSG_HEADER:
-                    this.checkNext('"');
-                    String msgkey = this.nextKey();
+                    checkNext('"');
+                    String msgkey = nextKey();
                     try {
                         msgtype = MessageType.valueOf(msgkey);
                     } catch(IllegalArgumentException e) {
@@ -60,7 +60,7 @@ public class JSONMessageDecoder extends JSONDecoder {
                     break;
 
                 case Message.DATA_HEADER:
-                    o = this.nextValue();
+                    o = nextValue();
                     break;
 
                 default:
@@ -69,11 +69,11 @@ public class JSONMessageDecoder extends JSONDecoder {
                     );
             }
             if(i == 0) {
-                this.checkNext(',');
-                this.checkNext('"');
+                checkNext(',');
+                checkNext('"');
             }
         }
-        this.checkNext('}');
+        checkNext('}');
 
         if(msgtype == null) {
             throw new JSONException("invalid message arrived");

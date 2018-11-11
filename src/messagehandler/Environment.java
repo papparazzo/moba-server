@@ -74,65 +74,36 @@ public class Environment extends MessageHandlerA {
 
                 case GET_ENVIRONMENT:
                     dispatcher.dispatch(
-                        new Message(
-                            MessageType.SET_ENVIRONMENT,
-                            environment,
-                            msg.getEndpoint()
-                        )
+                        new Message(MessageType.SET_ENVIRONMENT, environment, msg.getEndpoint())
                     );
                     break;
 
                 case SET_ENVIRONMENT:
                     environment.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(
-                        new Message(
-                            MessageType.SET_ENVIRONMENT,
-                            environment
-                        )
-                    );
+                    dispatcher.dispatch(new Message(MessageType.SET_ENVIRONMENT, environment));
                     break;
 
                 case GET_AMBIENCE:
-                    dispatcher.dispatch(
-                        new Message(
-                            MessageType.SET_AMBIENCE,
-                            ambience,
-                            msg.getEndpoint()
-                        )
-                    );
+                    dispatcher.dispatch(new Message(MessageType.SET_AMBIENCE, ambience, msg.getEndpoint()));
                     break;
 
                 case SET_AMBIENCE:
                     ambience.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(
-                        new Message(
-                            MessageType.SET_AMBIENCE,
-                            ambience
-                        )
-                    );
+                    dispatcher.dispatch(new Message(MessageType.SET_AMBIENCE, ambience));
                     break;
 
                 case GET_AMBIENT_LIGHT:
                     dispatcher.dispatch(
-                        new Message(
-                            MessageType.SET_AMBIENT_LIGHT,
-                            ambientLight,
-                            msg.getEndpoint()
-                        )
+                        new Message(MessageType.SET_AMBIENT_LIGHT, ambientLight, msg.getEndpoint())
                     );
                     break;
 
                 case SET_AMBIENT_LIGHT:
                     setAmbientLight((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(
-                        new Message(
-                            MessageType.SET_AMBIENT_LIGHT,
-                            ambientLight
-                        )
-                    );
+                    dispatcher.dispatch(new Message(MessageType.SET_AMBIENT_LIGHT, ambientLight));
                     break;
 
                 default:
@@ -147,10 +118,7 @@ public class Environment extends MessageHandlerA {
             dispatcher.dispatch(
                 new Message(
                     MessageType.ERROR,
-                    new ErrorData(
-                        ErrorId.FAULTY_MESSAGE,
-                        e.getMessage()
-                    ),
+                    new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()),
                     msg.getEndpoint()
                 )
             );

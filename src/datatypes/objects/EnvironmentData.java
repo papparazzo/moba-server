@@ -40,26 +40,26 @@ public class EnvironmentData implements JSONToStringI {
     protected Switch aux03 = Switch.OFF;
 
     public void fromJsonObject(Map<String, Object> map) {
-        this.thunderStorm = Switch.getValue((String)map.get("thunderStorm"), this.thunderStorm);
-        this.environmentSound = Switch.getValue((String)map.get("environmentSound"), this.environmentSound);
-        this.wind =  Switch.getValue((String)map.get("wind"), this.wind);
-        this.rain = Switch.getValue((String)map.get("rain"), this.rain);
-        this.aux01 = Switch.getValue((String)map.get("aux01"), this.aux01);
-        this.aux02 = Switch.getValue((String)map.get("aux02"), this.aux02);
-        this.aux03 = Switch.getValue((String)map.get("aux03"), this.aux03);
+        thunderStorm = Switch.getValue((String)map.get("thunderStorm"), thunderStorm);
+        environmentSound = Switch.getValue((String)map.get("environmentSound"), environmentSound);
+        wind =  Switch.getValue((String)map.get("wind"), wind);
+        rain = Switch.getValue((String)map.get("rain"), rain);
+        aux01 = Switch.getValue((String)map.get("aux01"), aux01);
+        aux02 = Switch.getValue((String)map.get("aux02"), aux02);
+        aux03 = Switch.getValue((String)map.get("aux03"), aux03);
     }
 
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("thunderStorm", this.thunderStorm);
-        map.put("wind", this.wind);
-        map.put("rain", this.rain);
-        map.put("environmentSound", this.environmentSound);
-        map.put("aux01", this.aux01);
-        map.put("aux02", this.aux02);
-        map.put("aux03", this.aux03);
+        map.put("thunderStorm", thunderStorm);
+        map.put("wind", wind);
+        map.put("rain", rain);
+        map.put("environmentSound", environmentSound);
+        map.put("aux01", aux01);
+        map.put("aux02", aux02);
+        map.put("aux03", aux03);
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);

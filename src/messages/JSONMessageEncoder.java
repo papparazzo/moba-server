@@ -43,6 +43,6 @@ public class JSONMessageEncoder extends JSONEncoder {
         HashMap<String, Object> map = new HashMap<>();
         map.put(Message.MSG_HEADER, String.valueOf(msg.getMsgType()));
         map.put(Message.DATA_HEADER, msg.getData());
-        this.encode(map);
+        encode(map);
     }
 }

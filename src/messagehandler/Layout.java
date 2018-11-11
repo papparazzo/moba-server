@@ -54,7 +54,7 @@ public class Layout extends MessageHandlerA {
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
             case GET_LAYOUT_REQ:
-                this.getLayout(msg);
+                getLayout(msg);
                 break;
 
             default:
@@ -76,11 +76,7 @@ public class Layout extends MessageHandlerA {
                 "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
             try (PreparedStatement pstmt = con.prepareStatement(q)) {
                 pstmt.setLong(1, id);
-                Layouts.logger.log(
-                    Level.INFO,
-                    "<{0}>",
-                    new Object[]{pstmt.toString()}
-                );
+                Layouts.logger.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
                 ResultSet rs = pstmt.executeQuery();
                 if(!rs.next()) {
                     throw new NoSuchElementException(String.format("no elements found for layout <%4d>", id));
@@ -111,22 +107,15 @@ public class Layout extends MessageHandlerA {
                 }
                 map.put("symbols", arraylist);
 
-                this.dispatcher.dispatch(
-                    new Message(
-                        MessageType.GET_LAYOUT_RES,
-                        map,
-                        msg.getEndpoint()
-                    )
+                dispatcher.dispatch(
+                    new Message(MessageType.GET_LAYOUT_RES, map, msg.getEndpoint())
                 );
             }
         } catch(SQLException e) {
             Layouts.logger.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
-            this.dispatcher.dispatch(new Message(
+            dispatcher.dispatch(new Message(
                     MessageType.ERROR,
-                    new ErrorData(
-                        ErrorId.DATABASE_ERROR,
-                        e.getMessage()
-                    ),
+                    new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
                     msg.getEndpoint()
                 )
             );

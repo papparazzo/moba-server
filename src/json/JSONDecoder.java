@@ -46,8 +46,8 @@ public class JSONDecoder {
 
     public Map<String, Object> decode()
     throws JSONException, IOException {
-        this.checkNext('{');
-        return this.nextObject();
+        checkNext('{');
+        return nextObject();
     }
 
     protected String nextKey()
@@ -56,12 +56,9 @@ public class JSONDecoder {
         StringBuilder sb = new StringBuilder();
 
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
-            c = this.next();
+            c = next();
 
-            if(
-                Character.isWhitespace(c) ||
-                !(Character.isLetterOrDigit(c) || c == '_' || c == '"')
-            ) {
+            if(Character.isWhitespace(c) || !(Character.isLetterOrDigit(c) || c == '_' || c == '"')) {
                 throw new JSONException("key contains invalide char!");
             }
 
@@ -87,32 +84,32 @@ public class JSONDecoder {
         char c;
 
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
-            c = this.next(!this.strict);
+            c = next(!strict);
             switch(c) {
                 case '}':
                     return map;
 
                 case '"':
-                    key = this.nextKey();
+                    key = nextKey();
                     break;
 
                 default:
                     throw new JSONException("invalid key");
             }
-            this.checkNext(':');
+            checkNext(':');
 
             if(map.containsKey(key)) {
                 throw new JSONException("duplicate key <" + key + ">");
             }
-            map.put(key, this.nextValue());
+            map.put(key, nextValue());
 
-            switch(this.next(!this.strict)) {
+            switch(next(!strict)) {
                 case ',':
-                    c = this.next(!this.strict);
+                    c = next(!strict);
                     if(c == '}') {
                         throw new JSONException("expected new key");
                     }
-                    this.lastChar = c;
+                    lastChar = c;
                     break;
 
                 case '}':
@@ -130,17 +127,17 @@ public class JSONDecoder {
 
     protected Object nextValue()
     throws JSONException, IOException {
-        char c = this.next(!this.strict);
+        char c = next(!strict);
         switch(c) {
             case '"':
-                return this.nextString();
+                return nextString();
             case '{':
-                return this.nextObject();
+                return nextObject();
             case '[':
-                return this.nextArray();
+                return nextArray();
             default:
-                this.lastChar = c;
-                return this.nextJValue();
+                lastChar = c;
+                return nextJValue();
         }
     }
 
@@ -149,14 +146,14 @@ public class JSONDecoder {
         char c;
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
-            c = this.next();
+            c = next();
             switch(c) {
                 case '\n':
                 case '\r':
                     throw new JSONException("invalid char");
 
                 case '\\':
-                    c = this.next();
+                    c = next();
                     switch (c) {
                         case 'b':
                             sb.append('\b');
@@ -179,7 +176,7 @@ public class JSONDecoder {
                             break;
 
                         case 'u':
-                            sb.append((char)Integer.parseInt(this.next(4), 16));
+                            sb.append((char)Integer.parseInt(next(4), 16));
                             break;
 
                         case '"':
@@ -211,20 +208,20 @@ public class JSONDecoder {
     throws JSONException, IOException {
         ArrayList<Object> arrayList = new ArrayList<>();
 
-        char c = this.next(!this.strict);
+        char c = next(!strict);
 
         if(c == ']') {
             return arrayList;
         }
-        this.lastChar = c;
-        arrayList.add(this.nextValue());
+        lastChar = c;
+        arrayList.add(nextValue());
 
         while(true) {
-            c = this.next(!this.strict);
+            c = next(!strict);
 
             switch(c) {
                 case ',':
-                    arrayList.add(this.nextValue());
+                    arrayList.add(nextValue());
                     break;
 
                 case ']':
@@ -240,15 +237,15 @@ public class JSONDecoder {
         char c;
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
-            c = this.next();
+            c = next();
 
             if("\n\r ".indexOf(c) != -1) {
                 continue;
             }
 
             if(",]}".indexOf(c) != -1) {
-                this.lastChar = c;
-                return this.parseValue(sb.toString());
+                lastChar = c;
+                return parseValue(sb.toString());
             }
 
             if(
@@ -315,26 +312,26 @@ public class JSONDecoder {
 
     protected void checkNext(char x)
     throws IOException {
-        char c = this.next(!this.strict);
+        char c = next(!strict);
         if(c != x) {
             throw new IOException("expected '" + x + "' found '" + c + "'!");
         }
     }
 
     protected char next() throws IOException {
-        return this.next(false);
+        return next(false);
     }
 
     protected char next(boolean ignoreWhitespace)
     throws IOException {
-        if(this.lastChar != 0) {
-            char t = this.lastChar;
-            this.lastChar = 0;
+        if(lastChar != 0) {
+            char t = lastChar;
+            lastChar = 0;
             return t;
         }
         int c;
         do {
-            c = this.reader.read();
+            c = reader.read();
         } while(Character.isWhitespace(c) && ignoreWhitespace);
 //System.err.print((char)c);
         if(c == -1 || c == 0) {
@@ -351,7 +348,7 @@ public class JSONDecoder {
         }
 
         for(int i = 0; i < n; ++i) {
-            char c = this.next();
+            char c = next();
             sb.append(c);
         }
         return sb.toString();

@@ -39,26 +39,24 @@ public class ColorThemeData implements JSONToStringI {
 
     public ColorThemeData()
     throws IllegalArgumentException {
-        this.dimTime = new Time(9, 0);
-        this.brightTime = new Time(21, 0);
-        this.condition = ThreeState.AUTO;
+        dimTime = new Time(9, 0);
+        brightTime = new Time(21, 0);
+        condition = ThreeState.AUTO;
     }
 
     public Time getDimTime() {
-        return this.dimTime;
+        return dimTime;
     }
 
     public Time getBrightTime() {
-        return this.brightTime;
+        return brightTime;
     }
 
     public ThreeState getColorThemeCondition() {
-        return this.condition;
+        return condition;
     }
 
-    public void setColorThemeChangeTimes(
-        Time dimTime, Time brightTime, ThreeState condition
-    )
+    public void setColorThemeChangeTimes(Time dimTime, Time brightTime, ThreeState condition)
     throws IllegalArgumentException {
         if(dimTime == null || brightTime == null) {
             throw new IllegalArgumentException();
@@ -69,18 +67,18 @@ public class ColorThemeData implements JSONToStringI {
     }
 
     public void fromJsonObject(Map<String, Object> map) {
-        this.dimTime = new Time((String)map.get("dimTime"));
-        this.brightTime = new Time((String)map.get("brightTime"));
-        this.condition = ThreeState.getValue((String)map.get("condition"), this.condition);
+        dimTime = new Time((String)map.get("dimTime"));
+        brightTime = new Time((String)map.get("brightTime"));
+        condition = ThreeState.getValue((String)map.get("condition"), condition);
     }
 
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("dimTime",    this.dimTime);
-        map.put("brightTime", this.brightTime);
-        map.put("condition",  this.condition);
+        map.put("dimTime",    dimTime);
+        map.put("brightTime", brightTime);
+        map.put("condition",  condition);
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);

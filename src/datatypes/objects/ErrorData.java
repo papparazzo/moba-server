@@ -48,8 +48,8 @@ public class ErrorData implements JSONToStringI {
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("errorId",      this.errorId);
-        map.put("additonalMsg", this.additonalMsg);
+        map.put("errorId",      errorId);
+        map.put("additonalMsg", additonalMsg);
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);

@@ -47,21 +47,17 @@ public class Link extends MessageHandlerA {
                 break;
 
             case ECHO_REQ:
-                this.dispatcher.dispatch(
-                    new Message(
-                        MessageType.ECHO_RES,
-                        msg.getData(),
-                        msg.getEndpoint()
-                    )
+                dispatcher.dispatch(
+                    new Message(MessageType.ECHO_RES, msg.getData(), msg.getEndpoint())
                 );
                 break;
 
             case CLIENT_START:
-                this.handleClientStart(msg);
+                handleClientStart(msg);
                 break;
 
             case CLIENT_CLOSE:
-                this.handleClientClose(msg);
+                handleClientClose(msg);
                 break;
 
             default:
@@ -73,8 +69,8 @@ public class Link extends MessageHandlerA {
 
     protected void handleClientStart(Message msg) {
         Endpoint ep = msg.getEndpoint();
-        if(!this.dispatcher.addEndpoint(ep)) {
-            this.dispatcher.dispatch(
+        if(!dispatcher.addEndpoint(ep)) {
+            dispatcher.dispatch(
                 new Message(
                     MessageType.ERROR,
                     new ErrorData(
@@ -86,27 +82,14 @@ public class Link extends MessageHandlerA {
             );
             return;
         }
-        this.dispatcher.dispatch(
-            new Message(
-                MessageType.CLIENT_CONNECTED,
-                ep.getAppId(),
-                ep
-            )
-        );
-        this.dispatcher.dispatch(
-            new Message(
-                MessageType.NEW_CLIENT_STARTED,
-                ep
-            )
-        );
+        dispatcher.dispatch(new Message(MessageType.CLIENT_CONNECTED, ep.getAppId(), ep));
+        dispatcher.dispatch(new Message(MessageType.NEW_CLIENT_STARTED, ep));
     }
 
     protected void handleClientClose(Message msg) {
-        this.msgQueue.add(new Message(MessageType.FREE_RESOURCES, (long)msg.getEndpoint().getAppId()));
-        this.dispatcher.removeEndpoint(msg.getEndpoint());
-        this.dispatcher.dispatch(
-            new Message(MessageType.CLIENT_CLOSED, msg.getEndpoint().getAppId())
-        );
+        msgQueue.add(new Message(MessageType.FREE_RESOURCES, (long)msg.getEndpoint().getAppId()));
+        dispatcher.removeEndpoint(msg.getEndpoint());
+        dispatcher.dispatch(new Message(MessageType.CLIENT_CLOSED, msg.getEndpoint().getAppId()));
     }
 }
 

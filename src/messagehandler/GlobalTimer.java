@@ -51,33 +51,33 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
     public GlobalTimer(SenderI dispatcher, Config config) {
         this.dispatcher = dispatcher;
         this.config = config;
-        this.timerData = new GlobalTimerData();
-        this.themeData = new ColorThemeData();
+        timerData = new GlobalTimerData();
+        themeData = new ColorThemeData();
     }
 
     @Override
     public void init() {
         Object o;
-        o = this.config.getSection("globaltimer.globaltimer");
+        o = config.getSection("globaltimer.globaltimer");
         if(o != null) {
-            this.timerData.fromJsonObject((Map<String, Object>)o);
+            timerData.fromJsonObject((Map<String, Object>)o);
         }
-        o = this.config.getSection("globaltimer.colortheme");
+        o = config.getSection("globaltimer.colortheme");
         if(o != null) {
-            this.themeData.fromJsonObject((Map<String, Object>)o);
+            themeData.fromJsonObject((Map<String, Object>)o);
         }
-        switch(this.themeData.getColorThemeCondition()) {
+        switch(themeData.getColorThemeCondition()) {
             case UNSET:
             case AUTO:
                 // FIXME: ...
                 break;
 
             case ON:
-                this.curTheme = ColorTheme.BRIGHT;
+                curTheme = ColorTheme.BRIGHT;
                 break;
 
             case OFF:
-                this.curTheme = ColorTheme.DIM;
+                curTheme = ColorTheme.DIM;
                 break;
 
         }
@@ -85,7 +85,7 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
 
     @Override
     public void shutdown() {
-        this.isRunning = false;
+        isRunning = false;
     }
 
     @Override
@@ -93,52 +93,32 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
         try {
             switch(msg.getMsgType()) {
                 case GET_GLOBAL_TIMER:
-                    this.dispatcher.dispatch(
-                        new Message(
-                            MessageType.SET_GLOBAL_TIMER,
-                            this.timerData,
-                            msg.getEndpoint()
-                        )
+                    dispatcher.dispatch(
+                        new Message(MessageType.SET_GLOBAL_TIMER, timerData, msg.getEndpoint())
                     );
                     break;
 
                 case SET_GLOBAL_TIMER:
-                    this.timerData.fromJsonObject((Map<String, Object>)msg.getData());
-                    this.storeData();
-                    this.dispatcher.dispatch(
-                        new Message(
-                            MessageType.SET_GLOBAL_TIMER,
-                            this.timerData
-                        )
+                    timerData.fromJsonObject((Map<String, Object>)msg.getData());
+                    storeData();
+                    dispatcher.dispatch(
+                        new Message(MessageType.SET_GLOBAL_TIMER, timerData)
                     );
                     break;
 
                 case GET_COLOR_THEME:
-                    this.dispatcher.dispatch(
-                        new Message(
-                            MessageType.SET_COLOR_THEME,
-                            this.themeData,
-                            msg.getEndpoint()
-                        )
+                    dispatcher.dispatch(
+                        new Message(MessageType.SET_COLOR_THEME, themeData, msg.getEndpoint())
                     );
-                    this.dispatcher.dispatch(
-                        new Message(
-                            MessageType.COLOR_THEME_EVENT,
-                            this.curTheme,
-                            msg.getEndpoint()
-                        )
+                    dispatcher.dispatch(
+                        new Message(MessageType.COLOR_THEME_EVENT, curTheme, msg.getEndpoint())
                     );
                     break;
 
                 case SET_COLOR_THEME:
-                    this.themeData.fromJsonObject((Map<String, Object>)msg.getData());
-                    this.storeData();
-                    this.dispatcher.dispatch(
-                        new Message(
-                            MessageType.SET_COLOR_THEME,
-                            this.themeData
-                        )
-                    );
+                    themeData.fromJsonObject((Map<String, Object>)msg.getData());
+                    storeData();
+                    dispatcher.dispatch(new Message(MessageType.SET_COLOR_THEME, themeData));
                     break;
 
 
@@ -152,24 +132,18 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
             java.lang.ClassCastException | IOException | JSONException |
             ConfigException | NullPointerException e
         ) {
-            this.dispatcher.dispatch(
+            dispatcher.dispatch(
                 new Message(
                     MessageType.ERROR,
-                    new ErrorData(
-                        ErrorId.FAULTY_MESSAGE,
-                        e.getMessage()
-                    ),
+                    new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()),
                     msg.getEndpoint()
                 )
             );
         } catch(IllegalArgumentException e) {
-            this.dispatcher.dispatch(
+            dispatcher.dispatch(
                 new Message(
                     MessageType.ERROR,
-                    new ErrorData(
-                        ErrorId.INVALID_DATA_SEND,
-                        e.getMessage()
-                    ),
+                    new ErrorData(ErrorId.INVALID_DATA_SEND, e.getMessage()),
                     msg.getEndpoint()
                 )
             );
@@ -179,46 +153,42 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
     @Override
     public void run() {
         try {
-            while(!this.thread.isInterrupted()) {
+            while(!thread.isInterrupted()) {
                 Thread.sleep(1000);
-                if(!this.isRunning) {
+                if(!isRunning) {
                     continue;
                 }
 
-                if(this.timerData.setTick()) {
+                if(timerData.setTick()) {
                     // FIXME: Is this really thread-save??
-                    this.dispatcher.dispatch(
-                        new Message(MessageType.GLOBAL_TIMER_EVENT, this.timerData)
-                    );
+                    dispatcher.dispatch(new Message(MessageType.GLOBAL_TIMER_EVENT, timerData));
                 }
 
-                if(this.themeData.getColorThemeCondition() != ThreeState.AUTO) {
+                if(themeData.getColorThemeCondition() != ThreeState.AUTO) {
                     continue;
                 }
 
-                boolean isBetween = this.timerData.isTimeBetween(
-                    this.themeData.getBrightTime(),
-                    this.themeData.getDimTime()
+                boolean isBetween = timerData.isTimeBetween(
+                    themeData.getBrightTime(),
+                    themeData.getDimTime()
                 );
 
-                if(isBetween && this.curTheme == ColorTheme.BRIGHT) {
+                if(isBetween && curTheme == ColorTheme.BRIGHT) {
                     continue;
                 }
 
-                if(!isBetween && this.curTheme == ColorTheme.DIM) {
+                if(!isBetween && curTheme == ColorTheme.DIM) {
                     continue;
                 }
 
-                if(this.curTheme == ColorTheme.BRIGHT) {
-                    this.curTheme = ColorTheme.DIM;
+                if(curTheme == ColorTheme.BRIGHT) {
+                    curTheme = ColorTheme.DIM;
                 } else {
-                    this.curTheme = ColorTheme.BRIGHT;
+                    curTheme = ColorTheme.BRIGHT;
                 }
 
                 // FIXME: Is this really thread-save??
-                this.dispatcher.dispatch(
-                    new Message(MessageType.COLOR_THEME_EVENT, this.curTheme)
-                );
+                dispatcher.dispatch(new Message(MessageType.COLOR_THEME_EVENT, curTheme));
             }
         } catch(InterruptedException e) {
 
@@ -228,21 +198,21 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
     protected void storeData()
     throws ConfigException, IOException, JSONException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("globaltimer", this.timerData);
-        map.put("colortheme", this.themeData);
-        this.config.setSection("globaltimer", map);
-        this.config.writeFile();
+        map.put("globaltimer", timerData);
+        map.put("colortheme", themeData);
+        config.setSection("globaltimer", map);
+        config.writeFile();
     }
 
     @Override
     public void hardwareStateChanged(HardwareState state) {
         boolean active = (state == HardwareState.AUTOMATIC);
-        if(this.isRunning == active) {
+        if(isRunning == active) {
             return;
         }
-        this.isRunning = active;
+        isRunning = active;
 
-        if(this.thread != null && this.thread.isAlive()) {
+        if(thread != null && thread.isAlive()) {
             return;
         }
 
@@ -250,9 +220,9 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
             return;
         }
 
-        this.thread = new Thread(this);
-        this.thread.setName("globaltimer");
-        this.thread.start();
+        thread = new Thread(this);
+        thread.setName("globaltimer");
+        thread.start();
     }
 }
 

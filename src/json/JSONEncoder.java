@@ -45,7 +45,7 @@ public class JSONEncoder {
         this(false);
     }
 
-    public JSONEncoder(boolean formated){
+    public JSONEncoder(boolean formated) {
         this.formated = formated;
     }
 
@@ -60,7 +60,7 @@ public class JSONEncoder {
             throw new IOException("stream-writer not set");
         }
         this.formated = formated;
-        this.writers.add(writer);
+        writers.add(writer);
     }
 
     public void addAdditionalWriter(JSONStreamWriterI writer)
@@ -68,122 +68,122 @@ public class JSONEncoder {
         if(writer == null) {
             throw new IOException("stream-writer not set");
         }
-        this.writers.add(writer);
+        writers.add(writer);
     }
 
     public void encode(Map map)
     throws IOException, JSONException {
-        this.addObject(map);
-        this.flush();
+        addObject(map);
+        flush();
     }
 
     public void encode(Map map, int indent)
     throws IOException, JSONException {
         this.indent = indent;
-        this.encode(map);
+        encode(map);
     }
 
     protected void addObject(Map map)
     throws IOException, JSONException {
-        this.write('{');
+        write('{');
         if(map != null) {
             Iterator iter = map.entrySet().iterator();
             while(iter.hasNext()) {
                 Map.Entry entry = (Map.Entry)iter.next();
-                this.write('"');
-                this.write((String)entry.getKey());
-                this.write("\":");
-                this.addJSONValue(entry.getValue());
+                write('"');
+                write((String)entry.getKey());
+                write("\":");
+                addJSONValue(entry.getValue());
                 if(iter.hasNext()) {
-                    this.write(',');
+                    write(',');
                 }
             }
         }
-        this.write('}');
+        write('}');
     }
 
     protected void addJSONValue(Object object)
     throws IOException, JSONException {
         if(object == null) {
-            this.addNull();
+            addNull();
         } else if(object instanceof Map) {
-            this.addObject((Map)object);
+            addObject((Map)object);
         } else if(object instanceof Boolean) {
-            this.addBoolean((Boolean)object);
+            addBoolean((Boolean)object);
         } else if(object instanceof ArrayList) {
-            this.addArray((ArrayList)object);
+            addArray((ArrayList)object);
         } else if(object instanceof String) {
-            this.addString((String)object);
+            addString((String)object);
         } else if(object instanceof Integer) {
-            this.addLong(object);
+            addLong(object);
         } else if(object instanceof Long) {
-            this.addLong(object);
+            addLong(object);
         } else if(object instanceof Double) {
-            this.addDouble(object);
+            addDouble(object);
         } else if(object instanceof Float) {
-            this.addDouble(object);
+            addDouble(object);
         } else if(object.getClass().isArray()) {
-            this.addArray((Object[])object);
+            addArray((Object[])object);
         } else if(object instanceof Date) {
-            this.addDate((Date)object);
+            addDate((Date)object);
         } else if(object instanceof InetAddress) {
-            this.addInetAddr((InetAddress)object);
+            addInetAddr((InetAddress)object);
         } else if(object instanceof JSONToStringI) {
-            this.write(((JSONToStringI)object).toJsonString(this.formated, this.indent));
+            write(((JSONToStringI)object).toJsonString(formated, indent));
         } else if(object instanceof Set) {
-            this.addSet((Set)object);
+            addSet((Set)object);
         } else {
-            this.addString(object.toString());
+            addString(object.toString());
         }
     }
 
     protected void addBoolean(boolean value)
     throws IOException {
         if(value) {
-            this.write("true");
+            write("true");
             return;
         }
-        this.write("false");
+        write("false");
     }
 
     protected void addArray(ArrayList arraylist)
     throws IOException, JSONException {
-        this.write('[');
+        write('[');
         for(int i = 0; i < arraylist.size(); ++i) {
             if(i != 0) {
-                this.write(',');
+                write(',');
             }
-            this.addJSONValue(arraylist.get(i));
+            addJSONValue(arraylist.get(i));
         }
-        this.write(']');
+        write(']');
     }
 
     protected void addSet(Set setlist)
     throws IOException, JSONException {
-        this.write('[');
+        write('[');
         boolean fr = true;
         for(Object item : setlist) {
             if(!fr) {
-                this.write(',');
+                write(',');
             }
-            this.addJSONValue(item);
+            addJSONValue(item);
             fr = false;
         }
-        this.write(']');
+        write(']');
     }
 
     protected void addArray(Object[] array)
     throws IOException, JSONException {
-        this.write('[');
+        write('[');
         boolean fr = true;
         for(Object item : array) {
-            if(!fr){
-                this.write(',');
+            if(!fr) {
+                write(',');
             }
-            this.addJSONValue(item);
+            addJSONValue(item);
             fr = false;
         }
-        this.write(']');
+        write(']');
     }
 
     protected void addString(String str)
@@ -191,52 +191,52 @@ public class JSONEncoder {
         // TODO Sonderzeichen maskieren!!
         //str.replace("\n", "\\n");
         //str.replace("\n", "\\n");
-        this.write('"');
-        this.write(str);
-        this.write('"');
+        write('"');
+        write(str);
+        write('"');
     }
 
     protected void addNull()
     throws IOException {
-        this.write("null");
+        write("null");
     }
 
     protected void addLong(Object obj)
     throws IOException {
-        this.write(String.valueOf(obj));
+        write(String.valueOf(obj));
     }
 
     protected void addDouble(Object obj)
     throws IOException {
-        this.write(String.valueOf(obj));
+        write(String.valueOf(obj));
     }
 
     protected void addDate(Date date)
     throws IOException {
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS");
-        this.addString(df.format(date));
+        addString(df.format(date));
     }
 
     protected void addInetAddr(InetAddress addr)
     throws IOException {
         String str = addr.getHostAddress();
         if(str == null) {
-            this.addString("0.0.0.0");
+            addString("0.0.0.0");
         } else {
-            this.addString(str);
+            addString(str);
         }
     }
 
     protected void addFormatStr(int indent)
     throws IOException {
-        if(!this.formated) {
+        if(!formated) {
             return;
         }
 
-        this.indent += indent * 4;
-        this.write(System.getProperty("line.separator"));
-        for(int i = 0; i < this.indent; i++) {
-            this.write(' ');
+        indent += indent * 4;
+        write(System.getProperty("line.separator"));
+        for(int i = 0; i < indent; i++) {
+            write(' ');
         }
     }
 
@@ -246,46 +246,46 @@ public class JSONEncoder {
         switch(c) {
             case '{':
             case '[':
-                this.sb.append(c);
-                this.addFormatStr(1);
+                sb.append(c);
+                addFormatStr(1);
                 break;
 
             case ',':
-                this.sb.append(c);
-                this.addFormatStr(0);
+                sb.append(c);
+                addFormatStr(0);
                 break;
 
             case '}':
             case ']':
-                this.addFormatStr(-1);
-                this.sb.append(c);
+                addFormatStr(-1);
+                sb.append(c);
                 break;
 
             default:
-                this.sb.append(c);
+                sb.append(c);
         }
 
-        if(JSONEncoder.MAX_STR_LENGTH == this.sb.length()) {
+        if(JSONEncoder.MAX_STR_LENGTH == sb.length()) {
             throw new IndexOutOfBoundsException();
         }
     }
 
     protected void write(String s)
     throws IOException {
-        if(JSONEncoder.MAX_STR_LENGTH < this.sb.length() + s.length()) {
+        if(JSONEncoder.MAX_STR_LENGTH < sb.length() + s.length()) {
             throw new IndexOutOfBoundsException();
         }
-        this.sb.append(s);
+        sb.append(s);
     }
 
     protected void flush()
     throws IOException {
-        String s = this.sb.toString();
+        String s = sb.toString();
 //System.err.print(s);
-        for(JSONStreamWriterI writer : this.writers) {
+        for(JSONStreamWriterI writer : writers) {
             writer.write(s);
             writer.close();
         }
-        this.sb.delete(0, this.sb.length());
+        sb.delete(0, sb.length());
     }
 }

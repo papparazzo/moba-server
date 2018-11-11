@@ -51,24 +51,24 @@ public class NoticeData implements JSONToStringI {
     }
 
     public NoticeType getType() {
-        return this.noticeType;
+        return noticeType;
     }
 
     public String getCaption() {
-        return this.caption;
+        return caption;
     }
 
     public String getText() {
-        return this.text;
+        return text;
     }
 
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("type",    this.noticeType);
-        map.put("caption", this.caption);
-        map.put("text",    this.text);
+        map.put("type",    noticeType);
+        map.put("caption", caption);
+        map.put("text",    text);
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);

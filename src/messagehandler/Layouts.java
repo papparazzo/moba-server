@@ -151,38 +151,35 @@ public class Layouts extends MessageHandlerA {
 
     protected boolean isLocked(long id, Endpoint ep)
     throws SQLException, NoSuchElementException {
-        if(!isLocked(id, ep.getAppId())) {
+        long appId = ep.getAppId();
+        long lockedBy = isLocked(id);
+
+        if(lockedBy == 0 || lockedBy == appId) {
             return false;
         }
         Layouts.logger.log(Level.WARNING, "layout <{0}> is locked", new Object[]{id});
-        dispatcher.dispatch(
-            new Message(
-                MessageType.ERROR,
-                new ErrorData(
-                    ErrorId.DATASET_LOCKED,
-                    "layout is locked by <" + Long.toString(id) + ">"
-                ),
-                ep
-            )
-        );
+        dispatcher.dispatch(new Message(
+            MessageType.ERROR,
+            new ErrorData(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">"),
+            ep
+        ));
         return true;
     }
 
-    protected boolean isLocked(long id, long epid)
+    protected long isLocked(long id)
     throws SQLException, NoSuchElementException {
-        Connection con = this.database.getConnection();
+        Connection con = database.getConnection();
 
-        String q = "SELECT IF(`locked` IS NULL OR `locked` = ?, 0, 1) AS `locked` FROM `TrackLayouts` WHERE `Id` = ?";
+        String q = "SELECT `locked` FROM `TrackLayouts` WHERE `Id` = ?";
 
         try(PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, epid);
-            pstmt.setLong(2, id);
+            pstmt.setLong(1, id);
             ResultSet rs = pstmt.executeQuery();
 
             if(!rs.next()) {
                 throw new NoSuchElementException("no layout found with id <" + Long.toString(id) + ">");
             }
-            return rs.getBoolean("locked");
+            return rs.getLong("locked");
         }
     }
 

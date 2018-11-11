@@ -39,7 +39,7 @@ public enum ErrorId implements JSONToStringI {
     protected final int value;
 
     private ErrorId() {
-        this.value = ordinal();
+        value = ordinal();
     }
 
     @Override
@@ -47,7 +47,7 @@ public enum ErrorId implements JSONToStringI {
     throws JSONException, IOException {
         StringBuilder b = new StringBuilder();
         b.append('"');
-        b.append(ErrorId.values()[this.value].toString());
+        b.append(ErrorId.values()[value].toString());
         b.append('"');
         return b.toString();
     }

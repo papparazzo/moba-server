@@ -35,16 +35,16 @@ public class AmbienceData implements JSONToStringI {
     protected boolean mainLightOn = false;
 
     public void fromJsonObject(Map<String, Object> map) {
-        this.curtainUp = ToggleState.getValue((String)map.get("curtainUp"), this.curtainUp);
-        this.mainLightOn = ToggleState.getValue((String)map.get("mainLightOn"), this.mainLightOn);
+        curtainUp = ToggleState.getValue((String)map.get("curtainUp"), curtainUp);
+        mainLightOn = ToggleState.getValue((String)map.get("mainLightOn"), mainLightOn);
     }
 
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("curtainUp",   ToggleState.getValue(this.curtainUp));
-        map.put("mainLightOn", ToggleState.getValue(this.mainLightOn));
+        map.put("curtainUp",   ToggleState.getValue(curtainUp));
+        map.put("mainLightOn", ToggleState.getValue(mainLightOn));
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);

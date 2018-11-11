@@ -35,7 +35,7 @@ public enum HardwareState implements JSONToStringI {
     protected final int value;
 
     private HardwareState() {
-        this.value = ordinal();
+        value = ordinal();
     }
 
     @Override
@@ -43,7 +43,7 @@ public enum HardwareState implements JSONToStringI {
     throws JSONException, IOException {
         StringBuilder b = new StringBuilder();
         b.append('"');
-        b.append(HardwareState.values()[this.value].toString());
+        b.append(HardwareState.values()[value].toString());
         b.append('"');
         return b.toString();
     }

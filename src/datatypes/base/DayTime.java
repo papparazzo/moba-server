@@ -168,7 +168,7 @@ public class DayTime implements JSONToStringI {
     throws JSONException, IOException {
         StringBuilder b = new StringBuilder();
         b.append('"');
-        b.append(this.toString());
+        b.append(toString());
         b.append('"');
         return b.toString();
     }

@@ -53,35 +53,27 @@ public class Acceptor extends Thread {
     }
 
     public void startAcceptor() {
-        this.setName("acceptor");
-        this.start();
+        setName("acceptor");
+        start();
     }
 
     public void stopAcceptor() {
         try {
-            if(this.serverSocket != null) {
-                this.serverSocket.close();
+            if(serverSocket != null) {
+                serverSocket.close();
             }
-            this.interrupt();
-            this.join(250);
+            interrupt();
+            join(250);
         } catch(IOException e) {
-            Acceptor.LOGGER.log(
-                Level.WARNING,
-                "could not close server socket! <{0}>",
-                new Object[]{e.toString()}
-            );
+            Acceptor.LOGGER.log(Level.WARNING, "could not close server socket! <{0}>", new Object[]{e.toString()});
         } catch(InterruptedException e) {
-            Acceptor.LOGGER.log(
-                Level.WARNING,
-                "InterruptedException occured! <{0}>",
-                new Object[]{e.toString()}
-            );
+            Acceptor.LOGGER.log(Level.WARNING, "InterruptedException occured! <{0}>", new Object[]{e.toString()});
         }
         Acceptor.LOGGER.info("Acceptor sucessfull stoped.");
     }
 
     @Override
-    public void run(){
+    public void run() {
         long    id = 0;
         boolean isinit = false;
 
@@ -90,7 +82,7 @@ public class Acceptor extends Thread {
         try {
             do {
                 try {
-                    this.serverSocket = new ServerSocket(this.serverport);
+                    serverSocket = new ServerSocket(serverport);
                     isinit = true;
                 } catch(IOException e) {
                     Acceptor.LOGGER.log(
@@ -102,20 +94,12 @@ public class Acceptor extends Thread {
                 }
             } while(!isinit && !isInterrupted());
 
-            Acceptor.LOGGER.log(
-                Level.INFO,
-                "Succesfull bind on port <{0}>",
-                new Object[]{this.serverport}
-            );
+            Acceptor.LOGGER.log(Level.INFO, "Succesfull bind on port <{0}>", new Object[]{serverport});
 
             while(!isInterrupted()) {
-                Socket socket = this.serverSocket.accept();
-                Acceptor.LOGGER.log(
-                    Level.INFO,
-                    "new client <{0}> socket <{1}>",
-                    new Object[]{id, socket.toString()}
-                );
-                if(this.dispatcher.getEndPointsCount() == this.maxClients) {
+                Socket socket = serverSocket.accept();
+                Acceptor.LOGGER.log(Level.INFO, "new client <{0}> socket <{1}>", new Object[]{id, socket.toString()});
+                if(dispatcher.getEndPointsCount() == maxClients) {
                     Acceptor.LOGGER.log(
                         Level.SEVERE,
                         "Max amount of clients <{0}> connected!",
@@ -123,25 +107,16 @@ public class Acceptor extends Thread {
                     );
                     break;
                 }
-                (new Endpoint(
-                    ++id,
-                    socket,
-                    this.in
-                )).start();
+                (new Endpoint(++id, socket, in)).start();
 
-                if(this.dispatcher.getEndPointsCount() == this.maxClients) {
+                if(dispatcher.getEndPointsCount() == maxClients) {
                     Acceptor.LOGGER.log(
                         Level.WARNING,
                         "Max amount of clients <{0}> reached!",
                         new Object[]{id}
                     );
 
-                    this.in.add(
-                        new Message(
-                            MessageType.MAX_CLIENT_COUNT,
-                            this.maxClients
-                        )
-                    );
+                    in.add(new Message(MessageType.MAX_CLIENT_COUNT, maxClients));
                 }
             }
         } catch (InterruptedException | IOException e) {

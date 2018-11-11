@@ -51,39 +51,39 @@ abstract public class Application {
         this.config    = config;
         this.msgQueue  = new PriorityBlockingQueue<>();
 
-        this.setUpLogger();
-        this.loop();
+        setUpLogger();
+        loop();
     }
 
     abstract protected void loop()
     throws Exception;
 
     public Version getVersion() {
-        return this.appVer;
+        return appVer;
     }
 
     public long getStartTime() {
-        return this.startTime;
+        return startTime;
     }
 
     public String getAppName() {
-        return this.appName;
+        return appName;
     }
 
     public Date getBuildDate() {
-        return this.buildDate;
+        return buildDate;
     }
 
     public PriorityBlockingQueue<Message> getQueue() {
-        return this.msgQueue;
+        return msgQueue;
     }
 
     protected void setUpLogger()
     throws IOException {
         //Level level    = Level.ALL;
 
-        String logfile = (String)this.config.getSection("common.logging.logfilepath");
-        Level level = Level.parse((String)this.config.getSection("common.logging.level"));
+        String logfile = (String)config.getSection("common.logging.logfilepath");
+        Level level = Level.parse((String)config.getSection("common.logging.level"));
 
         Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
         logger.setUseParentHandlers(false);
@@ -91,17 +91,13 @@ abstract public class Application {
 
         if(logfile != null && !logfile.isEmpty()) {
             FileHandler fh = new FileHandler(logfile);
-            fh.setFormatter(
-                new CustomFormatter(this.appName, this.appVer, this.buildDate)
-            );
+            fh.setFormatter(new CustomFormatter(appName, appVer, buildDate));
             fh.setLevel(level);
             logger.addHandler(fh);
         }
 
         ConsoleHandler ch = new ConsoleHandler();
-        ch.setFormatter(
-            new CustomFormatter(this.appName, this.appVer, this.buildDate)
-        );
+        ch.setFormatter(new CustomFormatter(appName, appVer, buildDate));
         ch.setLevel(level);
         logger.addHandler(ch);
     }

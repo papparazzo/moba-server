@@ -47,37 +47,34 @@ public class Server extends MessageHandlerA {
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
             case SERVER_INFO_REQ:
-                this.handleServerInfoReq(msg.getEndpoint());
+                handleServerInfoReq(msg.getEndpoint());
                 return;
 
             case CON_CLIENTS_REQ:
-                this.dispatcher.dispatch(
-                    new Message(
-                        MessageType.CON_CLIENTS_RES,
-                        this.dispatcher.getEndpoints(),
-                        msg.getEndpoint()
-                    )
-                );
+                dispatcher.dispatch(new Message(
+                    MessageType.CON_CLIENTS_RES,
+                    dispatcher.getEndpoints(),
+                    msg.getEndpoint()
+                ));
                 return;
         }
 
-        if(!this.checkForSameOrigin(msg.getEndpoint())) {
-            this.dispatcher.dispatch(new Message(
-                    MessageType.ERROR,
-                    new ErrorData(ErrorId.SAME_ORIGIN_NEEDED),
-                    msg.getEndpoint()
-                )
-            );
+        if(!checkForSameOrigin(msg.getEndpoint())) {
+            dispatcher.dispatch(new Message(
+                MessageType.ERROR,
+                new ErrorData(ErrorId.SAME_ORIGIN_NEEDED),
+                msg.getEndpoint()
+            ));
             return;
         }
 
         switch(msg.getMsgType()) {
             case RESET_CLIENT:
-                this.sendToClient(msg, MessageType.CLIENT_RESET);
+                sendToClient(msg, MessageType.CLIENT_RESET);
                 break;
 
             case SELF_TESTING_CLIENT:
-                this.sendToClient(msg, MessageType.CLIENT_SELF_TESTING);
+                sendToClient(msg, MessageType.CLIENT_SELF_TESTING);
                 break;
 
             default:
@@ -88,12 +85,12 @@ public class Server extends MessageHandlerA {
     }
 
     protected void sendToClient(Message msg, MessageType mType) {
-        Endpoint ep = this.dispatcher.getEndpointByAppId((long)msg.getData());
+        Endpoint ep = dispatcher.getEndpointByAppId((long)msg.getData());
         if(ep != null) {
-            this.dispatcher.dispatch(new Message(mType, null, ep));
+            dispatcher.dispatch(new Message(mType, null, ep));
             return;
         }
-        this.dispatcher.dispatch(new Message(
+        dispatcher.dispatch(new Message(
                 MessageType.ERROR,
                 new ErrorData(ErrorId.INVALID_APP_ID, "app-id <" + msg.getData().toString() + "> is invalid"),
                 msg.getEndpoint()
@@ -117,14 +114,14 @@ public class Server extends MessageHandlerA {
         SimpleDateFormat dfs        = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         SimpleDateFormat dfb        = new SimpleDateFormat("dd.MM.yyyy");
 
-        map.put("appName",           this.app.getAppName());
-        map.put("version",           this.app.getVersion());
-        map.put("buildDate",         dfb.format(this.app.getBuildDate()));
-        map.put("startTime",         dfs.format(this.app.getStartTime()));
-        map.put("upTime",            dfu.format(java.lang.System.currentTimeMillis() - this.app.getStartTime()));
+        map.put("appName",           app.getAppName());
+        map.put("version",           app.getVersion());
+        map.put("buildDate",         dfb.format(app.getBuildDate()));
+        map.put("startTime",         dfs.format(app.getStartTime()));
+        map.put("upTime",            dfu.format(java.lang.System.currentTimeMillis() - app.getStartTime()));
 
-        map.put("maxClients",        this.app.getMaxClients());
-        map.put("connectedClients",  this.dispatcher.getEndPointsCount());
+        map.put("maxClients",        app.getMaxClients());
+        map.put("connectedClients",  dispatcher.getEndPointsCount());
 
         map.put("supportedMessages", MessageType.values());
 
@@ -135,6 +132,6 @@ public class Server extends MessageHandlerA {
         map.put("fwType",            java.lang.System.getProperty("java.vm.vendor", ""));
         map.put("fwVersion",         java.lang.System.getProperty("java.version", ""));
 
-        this.dispatcher.dispatch(new Message(MessageType.SERVER_INFO_RES, map, ep));
+        dispatcher.dispatch(new Message(MessageType.SERVER_INFO_RES, map, ep));
     }
 }

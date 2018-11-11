@@ -34,7 +34,7 @@ public class Message implements Comparable {
 
     public Message(MessageType msgType, Object data, Endpoint ep) {
         this(msgType, data);
-        this.endpoint = ep;
+        endpoint = ep;
     }
 
     public Message(MessageType msgType, Object data) {
@@ -45,19 +45,17 @@ public class Message implements Comparable {
     public Message(MessageType msgType) {
         // throw Excpetion if msgType == null
         this.msgType = msgType;
-        this.trigger =
-            System.currentTimeMillis() +
-            msgType.getMessagePriority().getOffset();
+        trigger = System.currentTimeMillis() + msgType.getMessagePriority().getOffset();
     }
 
     @Override
     public int compareTo(Object o) {
-        long i = this.trigger;
+        long i = trigger;
         long j = ((Message)o).trigger;
 
         if(i < j) {
             return -1;
-        } 
+        }
         if(i > j) {
             return 1;
         }
@@ -65,28 +63,28 @@ public class Message implements Comparable {
     }
 
     public Endpoint getEndpoint() {
-        return this.endpoint;
+        return endpoint;
     }
 
     public Object getData() {
-        return this.data;
+        return data;
     }
 
     public MessageType getMsgType() {
-        return this.msgType;
+        return msgType;
     }
 
     @Override
     public String toString() {
         String rv = "";
 
-        if(this.endpoint != null) {
-            rv = "<" + this.endpoint.getSocket().toString() + ">";
+        if(endpoint != null) {
+            rv = "<" + endpoint.getSocket().toString() + ">";
         }
-        rv += "<" + this.msgType.toString() + ">";
+        rv += "<" + msgType.toString() + ">";
 
-        if(this.data != null) {
-            rv += "<" + this.data.toString() + ">";
+        if(data != null) {
+            rv += "<" + data.toString() + ">";
         }
         return rv;
     }

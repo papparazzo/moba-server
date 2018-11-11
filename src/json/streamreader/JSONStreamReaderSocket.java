@@ -33,6 +33,6 @@ public class JSONStreamReaderSocket implements JSONStreamReaderI {
 
     @Override
     public int read() throws IOException {
-        return this.is.read();
+        return is.read();
     }
 }

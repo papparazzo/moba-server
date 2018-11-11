@@ -47,7 +47,7 @@ public class Interface extends MessageHandlerA {
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
             case SET_CONNECTIVITY:
-                this.setConnectivity(Connectivity.valueOf((String)msg.getData()));
+                setConnectivity(Connectivity.valueOf((String)msg.getData()));
                 return;
 
             default:
@@ -60,12 +60,12 @@ public class Interface extends MessageHandlerA {
     private void setConnectivity(Connectivity connectivity) {
         switch(connectivity) {
             case CONNECTED:
-                this.msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.MANUEL));
+                msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.MANUEL));
                 break;
 
             case ERROR:
-                this.msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.ERROR));
-                this.dispatcher.dispatch(
+                msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.ERROR));
+                dispatcher.dispatch(
                     new Message(
                         MessageType.SYSTEM_NOTICE,
                         new NoticeData(

@@ -120,7 +120,7 @@ public enum ToggleState implements JSONToStringI {
     }
 
     private ToggleState() {
-        this.value = ordinal();
+        value = ordinal();
     }
 
     @Override
@@ -128,7 +128,7 @@ public enum ToggleState implements JSONToStringI {
     throws JSONException, IOException {
         StringBuilder b = new StringBuilder();
         b.append('"');
-        b.append(ToggleState.values()[this.value].toString());
+        b.append(ToggleState.values()[value].toString());
         b.append('"');
         return b.toString();
     }

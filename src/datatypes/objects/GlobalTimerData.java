@@ -36,7 +36,7 @@ public class GlobalTimerData implements JSONToStringI {
     protected int     multiplicator = 240;
 
     public int getMultiplicator() {
-        return this.multiplicator;
+        return multiplicator;
     }
 
     public void setMultiplicator(int multiplicator)
@@ -55,27 +55,25 @@ public class GlobalTimerData implements JSONToStringI {
     }
 
     public DayTime getModelTime() {
-        return this.curModelTime;
+        return curModelTime;
     }
 
     public void setModelTime(DayTime modelTime) {
-        this.curModelTime = modelTime;
+        curModelTime = modelTime;
     }
 
     public void fromJsonObject(Map<String, Object> map) {
-        this.curModelTime = new DayTime((String)map.get("curModelTime"));
-        this.setMultiplicator((int)(long)map.get("multiplicator"));
+        curModelTime = new DayTime((String)map.get("curModelTime"));
+        setMultiplicator((int)(long)map.get("multiplicator"));
     }
 
     public boolean setTick() {
-        this.curModelTime.setValue(
-            (this.curModelTime.getValue() + this.multiplicator) % (60 * 60 * 24 * 7)
-        );
-        return this.curModelTime.isFullHour();
+        curModelTime.setValue((curModelTime.getValue() + multiplicator) % (60 * 60 * 24 * 7));
+        return curModelTime.isFullHour();
     }
 
     public boolean isTimeBetween(Time start, Time end) {
-        int time = this.curModelTime.getValue() ;
+        int time = curModelTime.getValue() ;
         time %= (60 * 60 * 24);
         if(start.getValue() < time && end.getValue() > time) {
             return true;
@@ -87,8 +85,8 @@ public class GlobalTimerData implements JSONToStringI {
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("curModelTime",  this.curModelTime);
-        map.put("multiplicator", this.multiplicator);
+        map.put("curModelTime",  curModelTime);
+        map.put("multiplicator", multiplicator);
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);

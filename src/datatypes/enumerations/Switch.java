@@ -43,7 +43,7 @@ public enum Switch implements JSONToStringI {
     }
 
     private Switch() {
-        this.value = ordinal();
+        value = ordinal();
     }
 
     @Override
@@ -51,7 +51,7 @@ public enum Switch implements JSONToStringI {
     throws JSONException, IOException {
         StringBuilder b = new StringBuilder();
         b.append('"');
-        b.append(Switch.values()[this.value].toString());
+        b.append(Switch.values()[value].toString());
         b.append('"');
         return b.toString();
     }
