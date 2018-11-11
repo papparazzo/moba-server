@@ -29,21 +29,21 @@ public class JSONStreamWriterFile implements JSONStreamWriterI {
 
     public JSONStreamWriterFile(String fileName)
     throws IOException {
-        this.bw = new BufferedWriter(new FileWriter(fileName, false));
+        bw = new BufferedWriter(new FileWriter(fileName, false));
     }
 
     @Override
     public void write(char c) throws IOException {
-        this.bw.append(c);
+        bw.append(c);
     }
 
     @Override
     public void write(String s) throws IOException {
-        this.bw.append(s);
+        bw.append(s);
     }
 
     @Override
     public void close() throws IOException {
-        this.bw.close();
+        bw.close();
     }
 }

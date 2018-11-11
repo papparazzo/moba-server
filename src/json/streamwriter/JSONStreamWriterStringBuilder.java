@@ -31,17 +31,17 @@ public class JSONStreamWriterStringBuilder implements JSONStreamWriterI {
 
     @Override
     public void write(char c) throws IOException {
-        this.sb.append(c);
+        sb.append(c);
     }
 
     @Override
     public void write(String s) throws IOException {
-        this.sb.append(s);
+        sb.append(s);
     }
 
     @Override
     public String toString() {
-        return this.sb.toString();
+        return sb.toString();
     }
 
         @Override

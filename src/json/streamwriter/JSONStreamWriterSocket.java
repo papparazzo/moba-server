@@ -29,19 +29,19 @@ public class JSONStreamWriterSocket implements JSONStreamWriterI {
 
     public JSONStreamWriterSocket(Socket socket)
     throws IOException {
-        this.os = socket.getOutputStream();
+        os = socket.getOutputStream();
     }
 
     @Override
     public void write(char c)
     throws IOException {
-        this.os.write((byte)c);
+        os.write((byte)c);
     }
 
     @Override
     public void write(String s)
     throws IOException {
-        this.os.write(s.getBytes());
+        os.write(s.getBytes());
     }
 
     @Override
