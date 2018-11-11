@@ -31,7 +31,7 @@ public enum ColorTheme implements JSONToStringI {
     protected final int value;
 
     private ColorTheme() {
-        this.value = ordinal();
+        value = ordinal();
     }
 
     @Override
@@ -39,7 +39,7 @@ public enum ColorTheme implements JSONToStringI {
     throws JSONException, IOException {
         StringBuilder b = new StringBuilder();
         b.append('"');
-        b.append(ColorTheme.values()[this.value].toString());
+        b.append(ColorTheme.values()[value].toString());
         b.append('"');
         return b.toString();
     }

@@ -86,7 +86,7 @@ public class Version implements Comparable, JSONToStringI {
     }
 
     public int compareMajor(Version v) {
-        if(ts.major < v.major) {
+        if(major < v.major) {
             return -1;
         } else if(major > v.major) {
             return 1;
