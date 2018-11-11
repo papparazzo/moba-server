@@ -33,7 +33,7 @@ public class Percent implements JSONToStringI {
     }
 
     public Percent(int val) {
-        this.setValue(val);
+        setValue(val);
     }
 
     public final void setValue(int val)
@@ -41,16 +41,16 @@ public class Percent implements JSONToStringI {
         if(val > 100 || val < 0) {
             throw new IllegalArgumentException(String.format("Val <%d> out of range", val));
         }
-        this.value = val;
+        value = val;
     }
 
     public int getValue() {
-        return this.value;
+        return value;
     }
 
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
-        return String.valueOf(this.value);
+        return String.valueOf(value);
     }
 }

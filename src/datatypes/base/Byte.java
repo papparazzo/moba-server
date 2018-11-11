@@ -34,7 +34,7 @@ public class Byte implements JSONToStringI {
 
     public Byte(int val)
     throws IllegalArgumentException {
-        this.setValue(val);
+        setValue(val);
     }
 
     public final void setValue(int val)
@@ -42,16 +42,16 @@ public class Byte implements JSONToStringI {
         if(val > 255 || val < 0) {
             throw new IllegalArgumentException("val is > 255 or < 0");
         }
-        this.value = val;
+        value = val;
     }
 
     public int getValue() {
-        return this.value;
+        return value;
     }
 
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
-        return String.valueOf(this.value);
+        return String.valueOf(value);
     }
 }

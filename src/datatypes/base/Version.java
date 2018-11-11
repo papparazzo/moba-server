@@ -56,9 +56,9 @@ public class Version implements Comparable, JSONToStringI {
         str = sa[0];
         try {
             if(sa.length == 2) {
-                this.patch = Integer.parseInt(sa[1]);
-                if(this.patch > 9999) {
-                    this.patch = 9999;
+                patch = Integer.parseInt(sa[1]);
+                if(patch > 9999) {
+                    patch = 9999;
                 }
             } else if(sa.length > 2) {
                 throw new IllegalArgumentException("invalid Version-string");
@@ -66,18 +66,18 @@ public class Version implements Comparable, JSONToStringI {
 
             sa = str.split("\\.");
 
-            this.major = Integer.parseInt(sa[0]);
+            major = Integer.parseInt(sa[0]);
 
             if(sa.length > 1) {
-                this.minor = Integer.parseInt(sa[1]);
+                minor = Integer.parseInt(sa[1]);
             }
 
             if(sa.length > 2) {
-                this.build = Integer.parseInt(sa[2]);
+                build = Integer.parseInt(sa[2]);
             }
 
             if(sa.length > 3) {
-                this.patch = Integer.valueOf(sa[3]);
+                patch = Integer.valueOf(sa[3]);
             }
 
         } catch(NumberFormatException e) {
@@ -86,18 +86,18 @@ public class Version implements Comparable, JSONToStringI {
     }
 
     public int compareMajor(Version v) {
-        if(this.major < v.major) {
+        if(ts.major < v.major) {
             return -1;
-        } else if(this.major > v.major) {
+        } else if(major > v.major) {
             return 1;
         }
         return 0;
     }
 
     public int compareMinor(Version v) {
-        if(this.minor < v.minor) {
+        if(minor < v.minor) {
             return -1;
-        } else if(this.minor > v.minor) {
+        } else if(minor > v.minor) {
             return 1;
         }
         return 0;
@@ -107,28 +107,28 @@ public class Version implements Comparable, JSONToStringI {
     public int compareTo(Object o) {
         Version v = (Version)o;
 
-        if(this.major < v.major) {
+        if(major < v.major) {
             return -1;
-        } 
-        if(this.major > v.major) {
+        }
+        if(major > v.major) {
             return 1;
-        } 
-        if(this.minor < v.minor) {
+        }
+        if(minor < v.minor) {
             return -1;
-        } 
-        if(this.minor > v.minor) {
+        }
+        if(minor > v.minor) {
             return 1;
-        } 
-        if(this.build < v.build) {
+        }
+        if(build < v.build) {
             return -1;
-        } 
-        if(this.build > v.build) {
+        }
+        if(build > v.build) {
             return 1;
-        } 
-        if(this.patch < v.patch) {
+        }
+        if(patch < v.patch) {
             return -1;
-        } 
-        if(this.patch > v.patch) {
+        }
+        if(patch > v.patch) {
             return 1;
         }
         return 0;
@@ -136,42 +136,42 @@ public class Version implements Comparable, JSONToStringI {
 
     @Override
     public String toString() {
-        if(this.major == -1) {
+        if(major == -1) {
             return "0.0.0-0000";
         }
         StringBuilder b = new StringBuilder();
-        b.append(String.valueOf(this.major));
+        b.append(String.valueOf(major));
         b.append('.');
-        b.append(String.valueOf(this.minor));
+        b.append(String.valueOf(minor));
         b.append('.');
-        b.append(String.valueOf(this.build));
+        b.append(String.valueOf(build));
         b.append('-');
 
-        if(this.patch < 10) {
+        if(patch < 10) {
             b.append("000");
-        } else if(this.patch < 100) {
+        } else if(patch < 100) {
             b.append("00");
-        } else if(this.patch < 1000) {
+        } else if(patch < 1000) {
             b.append("0");
         }
-        b.append(String.valueOf(this.patch));
+        b.append(String.valueOf(patch));
         return b.toString();
     }
 
     @Override
     public String toJsonString(boolean formated, int indent) {
-        if(this.major == -1) {
+        if(major == -1) {
             return "\"0.0.0.0\"";
         }
         StringBuilder b = new StringBuilder();
         b.append('"');
-        b.append(String.valueOf(this.major));
+        b.append(String.valueOf(major));
         b.append('.');
-        b.append(String.valueOf(this.minor));
+        b.append(String.valueOf(minor));
         b.append('.');
-        b.append(String.valueOf(this.build));
+        b.append(String.valueOf(build));
         b.append('.');
-        b.append(String.valueOf(this.patch));
+        b.append(String.valueOf(patch));
         b.append('"');
         return b.toString();
     }

@@ -34,7 +34,7 @@ public class Time implements JSONToStringI {
 
     public Time(int val)
     throws IllegalArgumentException {
-        this.setValue(val);
+        setValue(val);
     }
 
    public Time(int hour, int minute)
@@ -42,13 +42,13 @@ public class Time implements JSONToStringI {
         if(hour < 0 || hour > 24 || minute < 0 || minute > 59) {
             throw new IllegalArgumentException();
         }
-        this.value = hour * 60 * 60;
-        this.value += minute * 60;
+        value = hour * 60 * 60;
+        value += minute * 60;
     }
 
     public Time(String val)
     throws IllegalArgumentException {
-        this.setValue(val);
+        setValue(val);
     }
 
     public final void setValue(int val)
@@ -56,24 +56,24 @@ public class Time implements JSONToStringI {
         if(val < 0 || val > ((60 * 60 * 24) - 1)) {
             throw new IllegalArgumentException();
         }
-        this.value = val;
+        value = val;
     }
 
     public final void setValue(String val)
     throws IllegalArgumentException {
         String[] tokens = val.split(":");
 
-        this.value = Integer.parseInt(tokens[0]) * 60 * 60;
-        this.value += Integer.parseInt(tokens[1]) * 60;
+        value = Integer.parseInt(tokens[0]) * 60 * 60;
+        value += Integer.parseInt(tokens[1]) * 60;
     }
 
     public int getValue() {
-        return this.value;
+        return value;
     }
 
     @Override
     public String toString() {
-        long t = this.value / 60;
+        long t = value / 60;
         long m = t % 60;
         t /= 60;
         long h = t % 24;
@@ -96,7 +96,7 @@ public class Time implements JSONToStringI {
     throws JSONException, IOException {
         StringBuilder b = new StringBuilder();
         b.append('"');
-        b.append(this.toString());
+        b.append(toString());
         b.append('"');
         return b.toString();
     }

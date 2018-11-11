@@ -29,7 +29,7 @@ public class DayTime implements JSONToStringI {
     protected int value;
 
     public DayTime() {
-        this.value = 0;
+        value = 0;
     }
 
     public DayTime(String day, int hour, int minute)
@@ -37,19 +37,19 @@ public class DayTime implements JSONToStringI {
         if(hour < 0 || hour > 24 || minute < 0 || minute > 59) {
             throw new IllegalArgumentException();
         }
-        this.value = this.getValOfDay(day);
-        this.value += hour * 60 * 60;
-        this.value += minute * 60;
+        value = getValOfDay(day);
+        value += hour * 60 * 60;
+        value += minute * 60;
     }
 
     public DayTime(int val)
     throws IllegalArgumentException {
-        this.setValue(val);
+        setValue(val);
     }
 
     public DayTime(String val)
     throws IllegalArgumentException {
-        this.setValue(val);
+        setValue(val);
     }
 
     public final void setValue(int val)
@@ -57,7 +57,7 @@ public class DayTime implements JSONToStringI {
         if(val < 0 || val > ((7 * 60 * 60 * 24) - 1)) {
             throw new IllegalArgumentException();
         }
-        this.value = val;
+        value = val;
     }
 
     public final void setValue(String val)
@@ -68,11 +68,11 @@ public class DayTime implements JSONToStringI {
             throw new IllegalArgumentException();
         }
 
-        this.value = this.getValOfDay(tokens[0]);
+        value = getValOfDay(tokens[0]);
         tokens = tokens[1].split(":");
 
-        this.value += Integer.parseInt(tokens[0]) * 60 * 60;
-        this.value += Integer.parseInt(tokens[1]) * 60;
+        value += Integer.parseInt(tokens[0]) * 60 * 60;
+        value += Integer.parseInt(tokens[1]) * 60;
     }
 
     protected final int getValOfDay(String val)
@@ -105,17 +105,17 @@ public class DayTime implements JSONToStringI {
     }
 
     public int getValue() {
-        return this.value;
+        return value;
     }
 
     public boolean isFullHour() {
-        long f = this.value / 60;
+        long f = value / 60;
         return (f % 60 == 0);
     }
 
     @Override
     public String toString() {
-        long f = this.value / 60;
+        long f = value / 60;
         long m = f % 60;
         f /= 60;
         long h = f % 24;

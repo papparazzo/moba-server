@@ -34,7 +34,7 @@ public class Hash implements JSONToStringI {
 
     public Hash(String val)
     throws IllegalArgumentException {
-        this.setValue(val);
+        setValue(val);
     }
 
     public final void setValue(String val)
@@ -42,11 +42,11 @@ public class Hash implements JSONToStringI {
         if(!val.matches("[A-F0-9]{64}")) {
             throw new IllegalArgumentException();
         }
-        this.value = val;
+        value = val;
     }
 
     public String getValue() {
-        return this.value;
+        return value;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class Hash implements JSONToStringI {
     throws JSONException, IOException {
         StringBuilder b = new StringBuilder();
         b.append('"');
-        b.append(this.value);
+        b.append(value);
         b.append('"');
         return b.toString();
     }
