@@ -38,13 +38,13 @@ import utilities.MessageLogger;
 public class Dispatcher implements SenderI {
     protected final Set<Endpoint> broadcastEP = new HashSet<>();
 
-    protected static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     protected final EnumMap<MessageType.MessageGroup, Set<Endpoint>>
         groupEP = new EnumMap<>(MessageType.MessageGroup.class);
 
     public boolean addEndpoint(Endpoint ep) {
-        Dispatcher.logger.log(
+        Dispatcher.LOGGER.log(
             Level.INFO,
             "try to add endpoint <{0}> appName <{1}> ver<{2}>",
             new Object[]{
@@ -58,7 +58,7 @@ public class Dispatcher implements SenderI {
 
         while(iter.hasNext()) {
             if(iter.next() == ep) {
-                Dispatcher.logger.log(
+                Dispatcher.LOGGER.log(
                     Level.WARNING,
                     "Enpoint <{0}> allready set",
                     new Object[]{ep.toString()}
@@ -98,7 +98,7 @@ public class Dispatcher implements SenderI {
         }
 
         if(!removed) {
-            Dispatcher.logger.log(
+            Dispatcher.LOGGER.log(
                 Level.WARNING,
                 "could not remove endpoint <{0}> from set!",
                 new Object[]{ep.getSocket()}
@@ -117,7 +117,7 @@ public class Dispatcher implements SenderI {
                 }
             }
         }
-        Dispatcher.logger.log(
+        Dispatcher.LOGGER.log(
             Level.INFO,
             "endpoint <{0}> succesfully removed!",
             new Object[]{ep.getSocket()}
@@ -130,7 +130,7 @@ public class Dispatcher implements SenderI {
                 ep.interrupt();
                 ep.join(250);
             } catch(InterruptedException e) {
-                Dispatcher.logger.log(
+                Dispatcher.LOGGER.log(
                     Level.WARNING,
                     "InterruptedException occured! <{0}>",
                     new Object[]{e.toString()}
@@ -140,7 +140,7 @@ public class Dispatcher implements SenderI {
         try {
             ep.closeEndpoint();
         } catch(Exception e) {
-            Dispatcher.logger.log(
+            Dispatcher.LOGGER.log(
                 Level.WARNING,
                 "Exception occured! <{0}> Closing socket failed!",
                 new Object[]{e.toString()}
@@ -177,11 +177,11 @@ public class Dispatcher implements SenderI {
     public boolean dispatch(Message msg) {
         try {
             if(msg == null) {
-                Dispatcher.logger.log(Level.SEVERE, "msg is null!");
+                Dispatcher.LOGGER.log(Level.SEVERE, "msg is null!");
                 return false;
             }
             MessageLogger.out(msg);
-            Dispatcher.logger.log(
+            Dispatcher.LOGGER.log(
                 Level.INFO,
                 "try to send message <{0}>",
                 new Object[]{msg.getMsgType().toString()}
@@ -197,7 +197,7 @@ public class Dispatcher implements SenderI {
 
             switch(cls) {
                 case INTERN:
-                    Dispatcher.logger.log(
+                    Dispatcher.LOGGER.log(
                         Level.INFO,
                         "msg-class is intern!"
                     );
@@ -205,7 +205,7 @@ public class Dispatcher implements SenderI {
 
                 case SINGLE:
                     if(msg.getEndpoint() == null) {
-                        Dispatcher.logger.log(
+                        Dispatcher.LOGGER.log(
                             Level.WARNING,
                             "msg contains not endpoint"
                         );
@@ -244,7 +244,7 @@ public class Dispatcher implements SenderI {
             encoder.encodeMsg(msg);
             return true;
         } catch(IOException | JSONException e) {
-            Dispatcher.logger.log(
+            Dispatcher.LOGGER.log(
                 Level.WARNING,
                 "<{0}>",
                 new Object[]{e.toString()}

@@ -31,7 +31,7 @@ import messages.Message;
 import messages.MessageType;
 
 public class Acceptor extends Thread {
-    protected static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     private PriorityBlockingQueue<Message> in = null;
 
@@ -65,19 +65,19 @@ public class Acceptor extends Thread {
             this.interrupt();
             this.join(250);
         } catch(IOException e) {
-            Acceptor.logger.log(
+            Acceptor.LOGGER.log(
                 Level.WARNING,
                 "could not close server socket! <{0}>",
                 new Object[]{e.toString()}
             );
         } catch(InterruptedException e) {
-            Acceptor.logger.log(
+            Acceptor.LOGGER.log(
                 Level.WARNING,
                 "InterruptedException occured! <{0}>",
                 new Object[]{e.toString()}
             );
         }
-        Acceptor.logger.info("Acceptor sucessfull stoped.");
+        Acceptor.LOGGER.info("Acceptor sucessfull stoped.");
     }
 
     @Override
@@ -85,7 +85,7 @@ public class Acceptor extends Thread {
         long    id = 0;
         boolean isinit = false;
 
-        Acceptor.logger.info("acceptor-thread started");
+        Acceptor.LOGGER.info("acceptor-thread started");
 
         try {
             do {
@@ -93,7 +93,7 @@ public class Acceptor extends Thread {
                     this.serverSocket = new ServerSocket(this.serverport);
                     isinit = true;
                 } catch(IOException e) {
-                    Acceptor.logger.log(
+                    Acceptor.LOGGER.log(
                         Level.WARNING,
                         "binding on port <{0}> failed! <{1}>",
                         new Object[]{this.serverport, e.toString()}
@@ -102,7 +102,7 @@ public class Acceptor extends Thread {
                 }
             } while(!isinit && !isInterrupted());
 
-            Acceptor.logger.log(
+            Acceptor.LOGGER.log(
                 Level.INFO,
                 "Succesfull bind on port <{0}>",
                 new Object[]{this.serverport}
@@ -110,13 +110,13 @@ public class Acceptor extends Thread {
 
             while(!isInterrupted()) {
                 Socket socket = this.serverSocket.accept();
-                Acceptor.logger.log(
+                Acceptor.LOGGER.log(
                     Level.INFO,
                     "new client <{0}> socket <{1}>",
                     new Object[]{id, socket.toString()}
                 );
                 if(this.dispatcher.getEndPointsCount() == this.maxClients) {
-                    Acceptor.logger.log(
+                    Acceptor.LOGGER.log(
                         Level.SEVERE,
                         "Max amount of clients <{0}> connected!",
                         new Object[]{id}
@@ -130,7 +130,7 @@ public class Acceptor extends Thread {
                 )).start();
 
                 if(this.dispatcher.getEndPointsCount() == this.maxClients) {
-                    Acceptor.logger.log(
+                    Acceptor.LOGGER.log(
                         Level.WARNING,
                         "Max amount of clients <{0}> reached!",
                         new Object[]{id}
@@ -145,8 +145,8 @@ public class Acceptor extends Thread {
                 }
             }
         } catch (InterruptedException | IOException e) {
-            Acceptor.logger.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            Acceptor.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
         }
-        Acceptor.logger.info("acceptor-thread terminated");
+        Acceptor.LOGGER.info("acceptor-thread terminated");
     }
 }

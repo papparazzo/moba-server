@@ -33,7 +33,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import datatypes.base.Version;
-import java.util.Arrays;
 import java.util.Collections;
 import json.JSONEncoder;
 import json.JSONException;
@@ -58,8 +57,7 @@ public class Endpoint extends Thread implements JSONToStringI {
     protected Set<MessageType.MessageGroup>  msgGroups = new HashSet<>();
     protected PriorityBlockingQueue<Message> in = null;
 
-    protected static final Logger logger =
-        Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     public Endpoint(
         long id, Socket socket, PriorityBlockingQueue<Message> in
@@ -87,7 +85,7 @@ public class Endpoint extends Thread implements JSONToStringI {
                 new JSONStreamReaderSocket(this.socket)
             );
             Message msg = decoder.decodeMsg(this);
-            Endpoint.logger.log(
+            Endpoint.LOGGER.log(
                 Level.INFO,
                 "Endpoint #{0}: new message <{1}> arrived",
                 new Object[]{this.id, msg.getMsgType().toString()}
@@ -114,18 +112,18 @@ public class Endpoint extends Thread implements JSONToStringI {
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> app = new HashMap<>();
-        app.put("appName",   this.appName);
-        app.put("version",   this.version);
-        app.put("msgGroups", this.msgGroups);
+        app.put("appName",   appName);
+        app.put("version",   version);
+        app.put("msgGroups", msgGroups);
 
         HashMap<String, Object> map = new HashMap<>();
         SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss.SSSS");
 
         map.put("appInfo",   app);
-        map.put("appID",     this.id);
-        map.put("upTime",    df.format(System.currentTimeMillis() - this.startTime));
-        map.put("addr",      this.socket.getInetAddress());
-        map.put("port",      this.socket.getPort());
+        map.put("appID",     id);
+        map.put("upTime",    df.format(System.currentTimeMillis() - startTime));
+        map.put("addr",      socket.getInetAddress());
+        map.put("port",      socket.getPort());
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
@@ -136,37 +134,25 @@ public class Endpoint extends Thread implements JSONToStringI {
 
     @Override
     public void run() {
-        Endpoint.logger.log(
-            Level.INFO,
-            "Endpoint #{0}: thread started",
-            new Object[]{this.id}
-        );
+        Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: thread started", new Object[]{id});
         try {
             if(!this.init()) {
-                Endpoint.logger.log(
-                    Level.WARNING,
-                    "Endpoint #{0}: init failed!>",
-                    new Object[]{this.id}
-                );
-                this.in.add(new Message(MessageType.CLIENT_CLOSE, null, this));
+                Endpoint.LOGGER.log(Level.WARNING, "Endpoint #{0}: init failed!>", new Object[]{id});
+                in.add(new Message(MessageType.CLIENT_CLOSE, null, this));
                 return;
             }
             while(!isInterrupted()) {
-                this.in.add(this.getNextMessage());
+                in.add(getNextMessage());
             }
         } catch(IOException e) {
-            Endpoint.logger.log(
+            Endpoint.LOGGER.log(
                 Level.WARNING,
                 "Endpoint #{0}: IOException, send <CLIENT_CLOSE> <{1}>",
-                new Object[]{this.id, e.toString()}
+                new Object[]{id, e.toString()}
             );
-            this.in.add(new Message(MessageType.CLIENT_CLOSE, null, this));
+            in.add(new Message(MessageType.CLIENT_CLOSE, null, this));
         }
-        Endpoint.logger.log(
-            Level.INFO,
-            "Endpoint #{0}: thread terminated",
-            new Object[]{this.id}
-        );
+        Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
     }
 
     public Socket getSocket() {
@@ -174,32 +160,29 @@ public class Endpoint extends Thread implements JSONToStringI {
     }
 
     public long getAppId() {
-        return this.id;
+        return id;
     }
 
     public Set<MessageType.MessageGroup> getMsgGroups() {
-        return this.msgGroups;
+        return msgGroups;
     }
 
     public Version getVersion() {
-        return this.version;
+        return version;
     }
 
     public String getAppName() {
-        return this.appName;
+        return appName;
     }
 
     @SuppressWarnings("unchecked")
     private boolean init()
     throws IOException {
-        Message msg = this.getNextMessage();
+        Message msg = getNextMessage();
         MessageType mtype = msg.getMsgType();
 
-        if(
-            mtype != MessageType.CLIENT_START &&
-            mtype != MessageType.CLIENT_CONNECTED
-        ) {
-            Endpoint.logger.log(
+        if(mtype != MessageType.CLIENT_START && mtype != MessageType.CLIENT_CONNECTED) {
+            Endpoint.LOGGER.log(
                 Level.SEVERE,
                 "first msg is neither CLIENT_START nor CLIENT_CONNECTED"
             );
@@ -209,21 +192,21 @@ public class Endpoint extends Thread implements JSONToStringI {
             return true;
         }
         Map<String, Object> map = (Map<String, Object>)msg.getData();
-        this.appName = (String)map.get("appName");
-        this.version = new Version((String)map.get("version"));
+        appName = (String)map.get("appName");
+        version = new Version((String)map.get("version"));
         Object o = map.get("msgGroups");
         if(o instanceof ArrayList) {
             ArrayList<String> arrayList = (ArrayList<String>)o;
             if(arrayList.isEmpty()) {
-                Endpoint.logger.log(Level.INFO, "arrayList is empty. Take all groups");
-                Collections.addAll(this.msgGroups, MessageType.MessageGroup.values());
+                Endpoint.LOGGER.log(Level.INFO, "arrayList is empty. Take all groups");
+                Collections.addAll(msgGroups, MessageType.MessageGroup.values());
             } else {
                 for(String item : arrayList) {
                     try {
                         MessageType.MessageGroup grp = MessageType.MessageGroup.valueOf(item);
-                        this.msgGroups.add(grp);
+                        msgGroups.add(grp);
                     } catch(IllegalArgumentException e) {
-                        Endpoint.logger.log(
+                        Endpoint.LOGGER.log(
                             Level.WARNING,
                             "ignoring unknown message-group <{0}>",
                             new Object[]{item}
