@@ -40,7 +40,7 @@ public class MessageLoop {
     protected Dispatcher dispatcher = null;
 
     public MessageLoop(Dispatcher dispatcher) {
-        dispatcher = dispatcher;
+        this.dispatcher = dispatcher;
     }
 
     public void addHandler(MessageGroup msgGroup, MessageHandlerA msgHandler) {
