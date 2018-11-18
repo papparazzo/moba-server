@@ -20,15 +20,12 @@
 
 package messagehandler;
 
-import java.util.logging.Logger;
-
 import com.SenderI;
 import messages.Message;
 import messages.MessageHandlerA;
 import messages.MessageType;
 
 public class Gui extends MessageHandlerA {
-    protected static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     protected SenderI dispatcher = null;
 
     public Gui(SenderI dispatcher) {

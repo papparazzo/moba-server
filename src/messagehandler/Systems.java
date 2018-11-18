@@ -22,7 +22,6 @@ package messagehandler;
 
 import com.Endpoint;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.logging.Logger;
 
 import com.SenderI;
 import datatypes.enumerations.ErrorId;
@@ -35,7 +34,6 @@ import messages.MessageHandlerA;
 import messages.MessageType;
 
 public class Systems extends MessageHandlerA {
-    protected static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     protected HardwareState status = HardwareState.ERROR;
     protected SenderI dispatcher = null;
     protected PriorityBlockingQueue<Message> msgQueue = null;
