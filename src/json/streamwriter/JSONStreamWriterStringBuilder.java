@@ -44,7 +44,7 @@ public class JSONStreamWriterStringBuilder implements JSONStreamWriterI {
         return sb.toString();
     }
 
-        @Override
+    @Override
     public void close() throws IOException {
 
     }

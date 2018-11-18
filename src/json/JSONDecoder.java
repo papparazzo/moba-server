@@ -131,10 +131,13 @@ public class JSONDecoder {
         switch(c) {
             case '"':
                 return nextString();
+
             case '{':
                 return nextObject();
+
             case '[':
                 return nextArray();
+
             default:
                 lastChar = c;
                 return nextJValue();
@@ -284,19 +287,11 @@ public class JSONDecoder {
         char b = s.charAt(0);
         try {
             if((b >= '0' && b <= '9') || b == '-') {
-                if(
-                    b == '0' &&
-                    s.length() > 2 &&
-                    (s.charAt(1) == 'x' || s.charAt(1) == 'X')
-                ) {
+                if(b == '0' && s.length() > 2 && (s.charAt(1) == 'x' || s.charAt(1) == 'X')) {
                     return Long.parseLong(s.substring(2), 16);
                 }
 
-                if(
-                    s.indexOf('.') > -1 ||
-                    s.indexOf('e') > -1 ||
-                    s.indexOf('E') > -1
-                ) {
+                if(s.indexOf('.') > -1 || s.indexOf('e') > -1 || s.indexOf('E') > -1) {
                     return Double.valueOf(s);
                 }
                 return Long.valueOf(s);
