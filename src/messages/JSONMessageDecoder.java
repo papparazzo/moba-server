@@ -52,10 +52,7 @@ public class JSONMessageDecoder extends JSONDecoder {
                     try {
                         msgtype = MessageType.valueOf(msgkey);
                     } catch(IllegalArgumentException e) {
-                        throw new JSONException(
-                            "unknown message <" + msgkey + "> arrived",
-                            e
-                        );
+                        throw new JSONException("unknown message <" + msgkey + "> arrived", e);
                     }
                     break;
 
@@ -64,9 +61,7 @@ public class JSONMessageDecoder extends JSONDecoder {
                     break;
 
                 default:
-                    throw new JSONException(
-                        "key <" + key + "> is neither msg-header nor data-header!"
-                    );
+                    throw new JSONException("key <" + key + "> is neither msg-header nor data-header!");
             }
             if(i == 0) {
                 checkNext(',');

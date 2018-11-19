@@ -56,10 +56,6 @@ public class Tracklayout {
 
     public boolean validate() {
         return false;
-
-
     }
-
-
 
 }

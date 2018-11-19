@@ -79,7 +79,6 @@ public enum MessageType {
     //---------------------------------------------------
     // Interface
     //---------------------------------------------------
-
     SET_CONNECTIVITY(MessageGroup.INTERFACE, MessageClass.SINGLE),
 
     //---------------------------------------------------
@@ -118,7 +117,6 @@ public enum MessageType {
     // GUI
     //---------------------------------------------------
     SYSTEM_NOTICE(MessageGroup.GUI, MessageClass.BROADCAST);
-
 
     public enum MessageGroup {
         BASE,
@@ -164,7 +162,6 @@ public enum MessageType {
     private final MessageGroup    grp;
     private final MessagePriority pty;
     private final MessageClass    cls;
-
 
     MessageType(MessageGroup grp) {
         this(grp, MessageClass.INTERN, MessagePriority.LOWEST);
