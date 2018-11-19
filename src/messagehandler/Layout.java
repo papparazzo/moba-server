@@ -41,7 +41,7 @@ import messages.MessageType;
 
 public class Layout extends MessageHandlerA {
 
-    protected static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     protected Database database   = null;
     protected SenderI  dispatcher = null;
 
@@ -76,7 +76,7 @@ public class Layout extends MessageHandlerA {
                 "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
             try (PreparedStatement pstmt = con.prepareStatement(q)) {
                 pstmt.setLong(1, id);
-                Layouts.logger.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
+                Layout.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
                 ResultSet rs = pstmt.executeQuery();
                 if(!rs.next()) {
                     throw new NoSuchElementException(String.format("no elements found for layout <%4d>", id));
@@ -92,7 +92,7 @@ public class Layout extends MessageHandlerA {
 
             try (PreparedStatement pstmt = con.prepareStatement(q)) {
                 pstmt.setLong(1, id);
-                Layouts.logger.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
+                Layout.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
 
                 ArrayList<TracklayoutSymbolData> arraylist;
                 ResultSet rs = pstmt.executeQuery();
@@ -112,7 +112,7 @@ public class Layout extends MessageHandlerA {
                 );
             }
         } catch(SQLException e) {
-            Layouts.logger.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            Layout.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
             dispatcher.dispatch(new Message(
                     MessageType.ERROR,
                     new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
