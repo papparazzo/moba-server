@@ -36,20 +36,14 @@ public class Config {
 
     public Config(String fileName)
     throws IOException, JSONException {
-        JSONDecoder decoder = new JSONDecoder(
-            new JSONStreamReaderFile(fileName),
-            false
-        );
+        JSONDecoder decoder = new JSONDecoder(new JSONStreamReaderFile(fileName), false);
         this.fileName = fileName;
         content = decoder.decode();
     }
 
     public void writeFile()
     throws IOException, JSONException {
-        JSONEncoder encoder = new JSONEncoder(
-            new JSONStreamWriterFile(fileName),
-            true
-        );
+        JSONEncoder encoder = new JSONEncoder(new JSONStreamWriterFile(fileName), true);
         encoder.encode(content);
     }
 
