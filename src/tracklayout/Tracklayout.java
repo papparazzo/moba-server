@@ -20,7 +20,7 @@
 
 package tracklayout;
 
-import datatypes.base.Point;
+import datatypes.base.Position;
 
 public class Tracklayout {
 
@@ -43,11 +43,11 @@ public class Tracklayout {
         layout[x][y] = new Symbol();
     }
 
-    public Point getStartPoint() {
+    public Position getStartPoint() {
         for(int y = 0; y < height; ++y) {
             for(int x = 0; x < width; ++x) {
                 if(layout[x][y] != null) {
-                    return new Point(x, y);
+                    return new Position(x, y);
                 }
             }
         }
