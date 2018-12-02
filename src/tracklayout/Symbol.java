@@ -20,35 +20,51 @@
 
 package tracklayout;
 
+import datatypes.base.Direction;
+
 public class Symbol {
-    protected static int UNSET        = 0;
+    protected int symbolFix = 0; // Symbol mit festen Verbindungen
+    protected int symbolDyn = 0; // Symbol mit dynamischen Verbindungen
 
-    protected static int TOP          = 1;
-    protected static int TOP_RIGHT    = 2;
-    protected static int RIGHT        = 4;
-    protected static int BOTTOM_RIGHT = 8;
+    public Symbol() {
 
-    protected static int BOTTOM       = 16;
-    protected static int BOTTOM_LEFT  = 32;
-    protected static int LEFT         = 64;
-    protected static int TOP_LEFT     = 128;
-
-    protected int symbol = 0;
-
-    public boolean isSymbol() {
-        return symbol != 0;
     }
 
-    public byte rotate(int s) {
-        if((s & 0x80) == s) {
-            return (byte)((s << 1) | 0x01);
+    public Symbol(int symbol) {
+        symbolFix = symbol;
+        symbolDyn = symbol;
+
+        if(isSymbol() && !isValidSymbol()) {
+            throw new IllegalArgumentException("invalid symbol given");
         }
-        return (byte)(s << 0x01);
+    }
+
+    public final boolean isSymbol() {
+        if(symbolFix != Direction.UNSET) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isStartSymbol() {
+        if((symbolFix & Direction.LEFT) == Direction.LEFT) {
+            return false;
+        }
+        if((symbolFix & Direction.TOP_LEFT) == Direction.TOP_LEFT) {
+            return false;
+        }
+        if((symbolFix & Direction.TOP) == Direction.TOP) {
+            return false;
+        }
+        if((symbolFix & Direction.TOP_RIGHT) == Direction.TOP_RIGHT) {
+            return false;
+        }
+        return true;
     }
 
     public boolean check(int i, int b) {
         while(i-- > 0) {
-            if(symbol == b) {
+            if(symbolFix == b) {
                 return true;
             }
             b = rotate(b);
@@ -57,19 +73,19 @@ public class Symbol {
     }
 
     public boolean isEnd() {
-        return check(8, TOP);
+        return check(8, Direction.TOP);
     }
 
     public boolean isStraight() {
-        return check(4, TOP | BOTTOM);
+        return check(4, Direction.TOP | Direction.BOTTOM);
     }
 
     public boolean isCrossOver() {
-        return check(2, TOP | BOTTOM | RIGHT | LEFT);
+        return check(2, Direction.TOP | Direction.BOTTOM | Direction.RIGHT | Direction.LEFT);
     }
 
     public boolean isBend() {
-        return check(8, RIGHT | BOTTOM_LEFT);
+        return check(8, Direction.RIGHT | Direction.BOTTOM_LEFT);
     }
 
     public boolean isTrack() {
@@ -89,15 +105,15 @@ public class Symbol {
     }
 
     public boolean isCrossOverSwitch() {
-        return check(4, RIGHT | LEFT | TOP_RIGHT | BOTTOM_LEFT);
+        return check(4, Direction.RIGHT | Direction.LEFT | Direction.TOP_RIGHT | Direction.BOTTOM_LEFT);
     }
 
     public boolean isLeftSwitch() {
-        return check(8, RIGHT | LEFT | TOP_RIGHT);
+        return check(8, Direction.RIGHT | Direction.LEFT | Direction.TOP_RIGHT);
     }
 
     public boolean isRightSwitch() {
-        return check(8, RIGHT | LEFT | BOTTOM_RIGHT);
+        return check(8, Direction.RIGHT | Direction.LEFT | Direction.BOTTOM_RIGHT);
     }
 
     public boolean isJunktionSwitch() {
@@ -111,7 +127,7 @@ public class Symbol {
     }
 
     public boolean isThreeWaySwitch() {
-        return check(8, TOP | BOTTOM | TOP_RIGHT | TOP_LEFT);
+        return check(8, Direction.TOP | Direction.BOTTOM | Direction.TOP_RIGHT | Direction.TOP_LEFT);
     }
 
     public boolean isSwitch() {
@@ -127,7 +143,7 @@ public class Symbol {
         return false;
     }
 
-    public boolean isValidSymbol() {
+    public final boolean isValidSymbol() {
         if(isTrack()) {
             return true;
         }
@@ -138,122 +154,73 @@ public class Symbol {
     }
 
     public int getJunktionsCount() {
-        int c = 0;
-        int b = TOP;
+        return countJunktions(symbolFix);
+    }
+
+    public int getOpenJunktionsCount() {
+        return countJunktions(symbolDyn);
+    }
+
+    public Direction getNextJunktion(Direction start) {
+        return nextJunktion(symbolFix, start);
+    }
+
+    public boolean hasOpenJunctionsLeft() {
+        return symbolDyn > 0;
+    }
+
+    public Direction getNextOpenJunktion(Direction start) {
+        return nextJunktion(symbolDyn, start);
+    }
+
+    public void reset() {
+        symbolDyn = symbolFix;
+    }
+
+    public boolean isJunctionSet(Direction dir) {
+        int i = dir.getDirection();
+        return (symbolDyn & i) == i;
+    }
+
+    public boolean isOpenJunctionSet(Direction dir) {
+        int i = dir.getDirection();
+        return (symbolFix & i) == i;
+    }
+
+    void removeJunktion(Direction dir) {
+        if((symbolDyn & dir.getDirection()) == Direction.UNSET) {
+            throw new IndexOutOfBoundsException("junction not set");
+        }
+        symbolDyn &= ~dir.getDirection();
+    }
+
+    public int rotate(int symbol) {
+        if((symbol & 0x80) == 0x80) { // if last bit (Most significant bit) is set rotate it to bit 0
+            return (symbol << 1) | 0x1;
+        }
+        return symbol << 1;
+    }
+
+    public int countJunktions(int symbol) {
+        int counter = 0;
+        int b = Direction.TOP;
         for(int i = 0; i < 8; ++i) {
-            if((symbol & b) > 0) {
-                ++c;
+            if((symbol & b) == b) {
+                ++counter;
             }
             b = rotate(b);
         }
-        return c;
+        return counter;
     }
 
-    public int getNextJunktion(int start) {
-        int b = start;
-        while(b > 0) {
-            if((symbol & b) > 0) {
-                return b;
+    public Direction nextJunktion(int symbol, Direction start) {
+        int b = start.getDirection();
+        for(int i = 0; i < 8; ++i) {
+            if((symbol & b) == b) {
+                return new Direction(b);
             }
-            b <<= 1;
+            b = rotate(b);
         }
-        return UNSET;
+        return new Direction();
     }
-
-
-
-    /**
-    public boolean hasOpenJunctionsLeft() {
-        return t > 0;
-    }
-
-    void reset() {
-        t = symbol;
-    }
-
-    public boolean isJunctionSet(int d) {
-        return (symbol & d) > 0;
-    }
-
-
-
-
-
-
-    void removeJunktion(Direction curDir, int &symb) {
-         Direction comDir = getComplementaryDirection(curDir);
-
-         if(!(symb & comDir)) {
-             throw std::exception();
-         }
-         symb |= ~comDir;
-    }
-
-
-
-    /*
-    Direction getComplementaryDirection(Direction dir) {
-         switch(dir) {
-             case TOP:
-                 return BOTTOM;
-
-             case TOP_RIGHT:
-                 return BOTTOM_LEFT;
-
-             case RIGHT:
-                 return LEFT;
-
-             case BOTTOM_RIGHT:
-                 return TOP_LEFT;
-
-         case BOTTOM:
-             return TOP;
-
-         case BOTTOM_LEFT:
-             return TOP_RIGHT;
-
-         case LEFT:
-             return RIGHT;
-
-         case TOP_LEFT:
-             return BOTTOM_RIGHT;
-     }
-}
-
-void setNextPosition(Position &cur, Direction dir) {
-     switch(dir) {
-         case TOP_RIGHT:
-             cur.x++;
-
-         case TOP:
-             cur.y--;
-             return;
-
-         case BOTTOM_RIGHT:
-             cur.y++;
-
-         case RIGHT:
-             cur.x++;
-             return;
-
-         case BOTTOM_LEFT:
-             cur.x--;
-
-         case BOTTOM:
-             cur.y++;
-             return;
-
-         case TOP_LEFT:
-             cur.y--;
-
-         case LEFT:
-             cur.x--;
-             return;
-     }
-}
-
-
-
-     */
-
 }
