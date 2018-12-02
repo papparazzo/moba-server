@@ -38,16 +38,19 @@ import java.util.NoSuchElementException;
 import messages.Message;
 import messages.MessageHandlerA;
 import messages.MessageType;
+import tracklayout.utilities.TracklayoutLock;
 
 public class Layout extends MessageHandlerA {
 
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    protected Database database   = null;
-    protected SenderI  dispatcher = null;
+    protected Database  database   = null;
+    protected SenderI   dispatcher = null;
+    protected TracklayoutLock lock = null;
 
-    public Layout(SenderI dispatcher, Database database) {
+    public Layout(SenderI dispatcher, Database database, TracklayoutLock lock) {
         this.database   = database;
         this.dispatcher = dispatcher;
+        this.lock       = lock;
     }
 
     @Override

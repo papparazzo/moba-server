@@ -36,6 +36,7 @@ import messagehandler.Server;
 import messagehandler.Systems;
 import messages.MessageLoop;
 import messages.MessageType;
+import tracklayout.utilities.TracklayoutLock;
 
 public class ServerApplication extends Application {
 
@@ -56,13 +57,14 @@ public class ServerApplication extends Application {
                 );
                 Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
                 MessageLoop loop = new MessageLoop(dispatcher);
+                TracklayoutLock tracklayoutLock = new TracklayoutLock(dispatcher, database);
                 loop.addHandler(MessageType.MessageGroup.CLIENT, new Link(dispatcher, msgQueue));
                 loop.addHandler(MessageType.MessageGroup.SERVER, new Server(dispatcher, this));
                 loop.addHandler(MessageType.MessageGroup.TIMER, new GlobalTimer(dispatcher, config));
                 loop.addHandler(MessageType.MessageGroup.ENV, new Environment(dispatcher, config));
                 loop.addHandler(MessageType.MessageGroup.SYSTEM, new Systems(dispatcher, msgQueue));
-                loop.addHandler(MessageType.MessageGroup.LAYOUT, new Layout(dispatcher, database));
-                loop.addHandler(MessageType.MessageGroup.LAYOUTS, new Layouts(dispatcher, database));
+                loop.addHandler(MessageType.MessageGroup.LAYOUT, new Layout(dispatcher, database, tracklayoutLock));
+                loop.addHandler(MessageType.MessageGroup.LAYOUTS, new Layouts(dispatcher, database, tracklayoutLock));
                 loop.addHandler(MessageType.MessageGroup.INTERFACE, new Interface(dispatcher, msgQueue));
                 acceptor.startAcceptor();
                 restart = loop.loop(msgQueue);
