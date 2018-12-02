@@ -14,9 +14,21 @@ public class Direction {
     public static final int LEFT         = 64;
     public static final int TOP_LEFT     = 128;
 
-    protected int direction;
+    protected int direction = Direction.UNSET;
 
-    public Direction(int dir) throws IllegalArgumentException {
+    public Direction() {
+
+    }
+
+    public Direction(int dir) {
+        setDirection(dir);
+    }
+
+    public int getDirection() {
+        return direction;
+    }
+
+    public final void setDirection(int dir) {
         switch(dir) {
             case TOP:
             case TOP_RIGHT:
@@ -31,28 +43,28 @@ public class Direction {
         throw new IllegalArgumentException();
     }
 
-    public Direction getNextLeftDirection(Direction dir) {
-        if(dir.direction == TOP) {
+    public Direction getNextLeftDirection() {
+        if(direction == TOP) {
             return new Direction(TOP_LEFT);
         }
-        return new Direction(dir.direction / 2);
+        return new Direction(direction / 2);
     }
 
-    public Direction getNextRightDirection(Direction dir) {
-        if(dir.direction == TOP_LEFT) {
+    public Direction getNextRightDirection() {
+        if(direction == TOP_LEFT) {
             return new Direction(TOP);
         }
-        return new Direction(dir.direction * 2);
+        return new Direction(direction * 2);
     }
 
-    public Direction getComplementaryDirection(Direction dir) {
-        if(dir.direction == UNSET) {
+    public Direction getComplementaryDirection() {
+        if(direction == UNSET) {
             return new Direction(UNSET);
         }
-        if(dir.direction < BOTTOM) {
-            return new Direction(dir.direction * 16);
+        if(direction < BOTTOM) {
+            return new Direction(direction * 16);
         }
-        return new Direction(dir.direction / 16);
+        return new Direction(direction / 16);
     }
 
     public enum DistanceType {
@@ -69,31 +81,30 @@ public class Direction {
     * 2. Der komplemntäre Verbindungspunkt + 1 Bit (also gebogenes Gleis)
     * 3. Der komplemntäre Verbindungspunkt - 1 Bit (also gebogenes Gleis)
     *
-    * @param dir1
-    * @param dir2
+    * @param dir
     * @return DistanceType
     */
-    public DistanceType getDistanceType(Direction dir1, Direction dir2) {
-        if(dir1 == dir2) {
+    public DistanceType getDistanceType(Direction dir) {
+        if(dir.direction == direction) {
             return DistanceType.INVALID;
         }
 
-        Direction dirc = getComplementaryDirection(dir1);
+        Direction dirc = dir.getComplementaryDirection();
 
-        if(dir2.direction == dirc.direction) {
+        if(direction == dirc.direction) {
             return DistanceType.STRAIGHT;
         }
 
-        if(dir2.direction == (dirc.direction * 2)) {
+        if(direction == (dirc.direction * 2)) {
             return DistanceType.BEND;
         }
 
         // Sonderfall: TOP == 1 -> 1 / 2 = 0 -> müsste hier jedoch 128 sein!!
-        if(dirc.direction == TOP && dir2.direction == TOP_LEFT) {
+        if(dirc.direction == TOP && direction == TOP_LEFT) {
             return DistanceType.BEND;
         }
 
-        if(dir2.direction == (dirc.direction / 2)) {
+        if(direction == (dirc.direction / 2)) {
             return DistanceType.BEND;
         }
 
