@@ -159,7 +159,7 @@ public class Layouts extends MessageHandlerA {
             }
             dispatcher.dispatch(new Message(MessageType.LAYOUT_DELETED, id));
         } catch(SQLException e) {
-            Layouts.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            Layouts.LOGGER.log(Level.WARNING, e.toString());
             dispatcher.dispatch(new Message(
                 MessageType.ERROR,
                 new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
@@ -185,7 +185,7 @@ public class Layouts extends MessageHandlerA {
                 pstmt.setString(2, tl.getDescription());
                 pstmt.setLong(3, msg.getEndpoint().getAppId());
                 pstmt.executeUpdate();
-                Layouts.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
+                Layouts.LOGGER.log(Level.INFO, pstmt.toString());
                 try(ResultSet rs = pstmt.getGeneratedKeys()) {
                     rs.next();
                     tl.setId(rs.getInt(1));
@@ -194,7 +194,7 @@ public class Layouts extends MessageHandlerA {
             dispatcher.dispatch(new Message(MessageType.LAYOUT_CREATED, tl));
             dispatcher.dispatch(new Message(MessageType.CREATE_LAYOUT_RES, tl.getId(), msg.getEndpoint()));
         } catch(SQLException e) {
-            Layouts.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            Layouts.LOGGER.log(Level.WARNING, e.toString());
             dispatcher.dispatch(new Message(
                 MessageType.ERROR,
                 new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
@@ -248,11 +248,11 @@ public class Layouts extends MessageHandlerA {
                     pstmt.close();
                     return;
                 }
-                Layouts.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
+                Layouts.LOGGER.log(Level.INFO, pstmt.toString());
                 dispatcher.dispatch(new Message(MessageType.LAYOUT_UPDATED, tl));
             }
         } catch(SQLException | NumberFormatException e) {
-            Layouts.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            Layouts.LOGGER.log(Level.WARNING, e.toString());
             dispatcher.dispatch(
                 new Message(MessageType.ERROR, new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()), msg.getEndpoint())
             );
