@@ -169,6 +169,10 @@ public class Symbol {
         return symbolDyn > 0;
     }
 
+    public Direction getNextOpenJunktion() {
+        return getNextOpenJunktion(new Direction(Direction.TOP));
+    }
+
     public Direction getNextOpenJunktion(Direction start) {
         return nextJunktion(symbolDyn, start);
     }
