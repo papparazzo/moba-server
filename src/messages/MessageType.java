@@ -112,6 +112,7 @@ public enum MessageType {
     //---------------------------------------------------
     GET_LAYOUT_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
     GET_LAYOUT_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    SAVE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
 
     //---------------------------------------------------
     // GUI
