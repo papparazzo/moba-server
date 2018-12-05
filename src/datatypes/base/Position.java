@@ -25,6 +25,10 @@ public class Position {
     protected int x = 0;
     protected int y = 0;
 
+    public Position() {
+        this(0, 0);
+    }
+
     public Position(int x, int y) {
         this.x = x;
         this.y = y;
