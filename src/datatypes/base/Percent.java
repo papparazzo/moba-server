@@ -49,6 +49,11 @@ public class Percent implements JSONToStringI {
     }
 
     @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         return String.valueOf(value);
