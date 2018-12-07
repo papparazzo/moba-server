@@ -20,7 +20,6 @@
 
 package datatypes.base;
 
-import datatypes.enumerations.ToggleState;
 import java.io.IOException;
 import java.util.HashMap;
 import json.JSONEncoder;
