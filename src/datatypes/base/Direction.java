@@ -129,4 +129,37 @@ public class Direction {
 
         return DistanceType.INVALID;
     }
+
+    @Override
+    public String toString() {
+        switch(direction) {
+            case UNSET:
+                return "UNSET";
+
+            case TOP:
+                return "TOP";
+
+            case TOP_RIGHT:
+                return "TOP_RIGHT";
+
+            case RIGHT:
+                return "RIGHT";
+
+            case BOTTOM_RIGHT:
+                return "BOTTOM_RIGHT";
+
+            case  BOTTOM:
+                return "BOTTOM";
+
+            case  BOTTOM_LEFT:
+                return "BOTTOM_LEFT";
+
+            case  LEFT:
+                return "LEFT";
+
+            case  TOP_LEFT:
+                return "TOP_LEFT";
+        }
+        throw new UnsupportedOperationException("value <" + String.valueOf(direction) + "> is invalid");
+    }
 }
