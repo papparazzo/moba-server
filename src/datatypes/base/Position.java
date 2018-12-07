@@ -20,7 +20,15 @@
 
 package datatypes.base;
 
-public class Position {
+import datatypes.enumerations.ToggleState;
+import java.io.IOException;
+import java.util.HashMap;
+import json.JSONEncoder;
+import json.JSONException;
+import json.JSONToStringI;
+import json.streamwriter.JSONStreamWriterStringBuilder;
+
+public class Position implements JSONToStringI {
 
     protected int x = 0;
     protected int y = 0;
@@ -77,5 +85,18 @@ public class Position {
                 x--;
                 break;
         }
+    }
+
+    @Override
+    public String toJsonString(boolean formated, int indent) throws JSONException, IOException {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("xPos", x);
+        map.put("yPos", y);
+
+        StringBuilder sb = new StringBuilder();
+        JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
+        JSONEncoder encoder = new JSONEncoder(jsb, formated);
+        encoder.encode(map, indent);
+        return sb.toString();
     }
 }
