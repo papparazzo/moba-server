@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2018 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -18,8 +18,24 @@
  *
  */
 
-package tracklayout;
+package database;
 
-public class Block {
+public class DatabaseException extends Exception {
+
+    public DatabaseException() {
+        super();
+    }
+
+    public DatabaseException(String message) {
+        super(message);
+    }
+
+    public DatabaseException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public DatabaseException(Throwable cause) {
+        super(cause);
+    }
 
 }
