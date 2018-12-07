@@ -50,6 +50,11 @@ public class Hash implements JSONToStringI {
     }
 
     @Override
+    public String toString() {
+        return value;
+    }
+
+    @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
         StringBuilder b = new StringBuilder();
