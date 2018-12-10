@@ -97,7 +97,7 @@ public class LayoutContainer {
     }
 
     public Position getNextBoundPosition() {
-        return getNextFreePosition(new Position());
+        return getNextBoundPosition(new Position());
     }
 
     public Position getNextBoundPosition(Position pos) {
