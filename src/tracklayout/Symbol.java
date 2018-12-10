@@ -20,23 +20,65 @@
 
 package tracklayout;
 
+import tracklayout.overlay.OverlayI;
 import datatypes.base.Direction;
 
 public class Symbol {
     protected int symbolFix = 0; // Symbol mit festen Verbindungen
     protected int symbolDyn = 0; // Symbol mit dynamischen Verbindungen
 
+    protected Actuation actuation1 = null; // Weichenantrieb 1
+    protected Actuation actuation2 = null; // Weichenantrieb 2
+
+    protected OverlayI overlay = null;
+
     public Symbol() {
 
     }
 
+    public Symbol(int symbol, OverlayI overlay) {
+        this(symbol, null, null);
+        this.overlay = overlay;
+    }
+
     public Symbol(int symbol) {
+        this(symbol, null, null);
+    }
+
+    public Symbol(int symbol, Actuation actuationI) {
+        this(symbol, actuationI, null);
+    }
+
+    public Symbol(int symbol, Actuation actuationI, Actuation actuationII) {
         symbolFix = symbol;
         symbolDyn = symbol;
 
         if(isSymbol() && !isValidSymbol()) {
             throw new IllegalArgumentException("invalid symbol given");
         }
+
+        if(actuationI != null && actuationII != null && !(isCrossOverSwitch() || isThreeWaySwitch())) {
+            throw new IllegalArgumentException("symbol has no actuations set");
+        }
+
+        if(actuationI == null && actuationII == null && !isTrack()) {
+            throw new IllegalArgumentException("symbol is swtich without actuations");
+        }
+
+        if(actuationI == null && actuationII != null) {
+            throw new IllegalArgumentException("actuationI not set");
+        }
+
+        if(actuationI != null && actuationII == null && !isJunktionSwitch()) {
+            throw new IllegalArgumentException("symbol is swtich without actuations");
+        }
+
+        actuation1 = actuationI;
+        actuation2 = actuationII;
+    }
+
+    public OverlayI getOverlay() {
+        return overlay;
     }
 
     public final boolean isSymbol() {
@@ -88,7 +130,7 @@ public class Symbol {
         return check(8, Direction.RIGHT | Direction.BOTTOM_LEFT);
     }
 
-    public boolean isTrack() {
+    public final boolean isTrack() {
         if(isStraight()) {
             return true;
         }
@@ -104,7 +146,7 @@ public class Symbol {
         return false;
     }
 
-    public boolean isCrossOverSwitch() {
+    public final boolean isCrossOverSwitch() {
         return check(4, Direction.RIGHT | Direction.LEFT | Direction.TOP_RIGHT | Direction.BOTTOM_LEFT);
     }
 
@@ -116,7 +158,7 @@ public class Symbol {
         return check(8, Direction.RIGHT | Direction.LEFT | Direction.BOTTOM_RIGHT);
     }
 
-    public boolean isJunktionSwitch() {
+    public final boolean isJunktionSwitch() {
         if(isRightSwitch()) {
             return true;
         }
@@ -126,7 +168,7 @@ public class Symbol {
         return false;
     }
 
-    public boolean isThreeWaySwitch() {
+    public final boolean isThreeWaySwitch() {
         return check(8, Direction.TOP | Direction.BOTTOM | Direction.TOP_RIGHT | Direction.TOP_LEFT);
     }
 
@@ -153,18 +195,20 @@ public class Symbol {
         return false;
     }
 
+    /*
     public int getJunktionsCount() {
         return countJunktions(symbolFix);
     }
-
+    */
     public int getOpenJunktionsCount() {
         return countJunktions(symbolDyn);
     }
 
+    /*
     public Direction getNextJunktion(Direction start) {
         return nextJunktion(symbolFix, start);
     }
-
+    */
     public boolean hasOpenJunctionsLeft() {
         return symbolDyn > 0;
     }
@@ -225,6 +269,7 @@ public class Symbol {
             }
             b = rotate(b);
         }
+        // FIXME: Exception???
         return new Direction();
     }
 }
