@@ -87,6 +87,26 @@ public class Position implements JSONToStringI {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Position pos = (Position)o;
+        return this.x == pos.x && this.y == pos.y;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 61 * hash + this.x;
+        hash = 61 * hash + this.y;
+        return hash;
+    }
+
+    @Override
     public String toString() {
         return "x: " + String.valueOf(x) + ", y: " + String.valueOf(y);
     }
