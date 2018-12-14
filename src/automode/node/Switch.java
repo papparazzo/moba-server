@@ -20,8 +20,6 @@
 
 package automode.node;
 
-import automode.NodeException;
-
 public class Switch implements NodeI {
 
     protected NodeI in;

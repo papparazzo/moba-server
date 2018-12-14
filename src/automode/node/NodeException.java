@@ -20,47 +20,22 @@
 
 package automode.node;
 
-import automode.Train;
+public class NodeException extends Exception {
 
-public class Block implements NodeI {
-
-    protected NodeI in;
-    protected NodeI out;
-
-    protected Train train;
-
-    public Block(NodeI in, NodeI out, Train train) {
-        this.in = in;
-        this.out = out;
-        this.train = train;
+    public NodeException() {
+        super();
     }
 
-    public Block(NodeI in, NodeI out) {
-        this(in, out, null);
+    public NodeException(String message) {
+        super(message);
     }
 
-    public Block(NodeI in) {
-        this(in, null, null);
+    public NodeException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public void setInNode(NodeI node) {
-        in = node;
+    public NodeException(Throwable cause) {
+        super(cause);
     }
 
-    public void setOutNode(NodeI node) {
-        out = node;
-    }
-
-    @Override
-    public NodeI getJunctionNode(NodeI node) throws NodeException {
-        if(node == in) {
-            return out;
-        }
-        if(node == out) {
-            return in;
-        }
-        throw new NodeException("invalid node given!");
-    }
 }
-
-

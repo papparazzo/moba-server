@@ -21,7 +21,6 @@
 package automode.node;
 
 import automode.Train;
-import automode.NodeException;
 
 public class Terminator implements NodeI {
 

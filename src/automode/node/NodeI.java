@@ -20,8 +20,6 @@
 
 package automode.node;
 
-import automode.NodeException;
-
 public interface NodeI {
 
     public NodeI getJunctionNode(NodeI node) throws NodeException;
