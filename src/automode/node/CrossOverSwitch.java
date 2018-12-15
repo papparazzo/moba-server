@@ -34,7 +34,6 @@ public class CrossOverSwitch implements NodeI {
         STRAIGHT_1,
         BEND_2,
         STRAIGHT_2,
-
     };
 
     public CrossOverSwitch(SwitchState state) {
@@ -89,32 +88,47 @@ public class CrossOverSwitch implements NodeI {
 
     @Override
     public NodeI getJunctionNode(NodeI node) throws NodeException {
+        if(node != inDiagonal && node != inVertical && node != outDiagonal && node != outVertical) {
+            throw new NodeException("invalid node given!");
+        }
+
+        NodeI activeIn = getInNode();
+        NodeI activeOut = getOutNode();
+
+        if(node == activeIn) {
+            return activeOut;
+        }
+
+        if(node == activeOut) {
+            return activeIn;
+        }
+
+        return null;
+    }
+
+    protected NodeI getInNode() throws NodeException {
         switch(currentState) {
             case BEND_1:
             case BEND_2:
+                return inDiagonal;
+
             case STRAIGHT_1:
             case STRAIGHT_2:
+                return inVertical;
         }
+        throw new NodeException("invalid state given!");
+    }
 
-        
+    protected NodeI getOutNode() throws NodeException {
+        switch(currentState) {
+            case BEND_1:
+            case STRAIGHT_1:
+                return outDiagonal;
 
-
-        /*
-        if(node == outStraight && currentState == SwitchState.STRAIGHT) {
-            return in;
+            case BEND_2:
+            case STRAIGHT_2:
+                return outVertical;
         }
-        if(node == outBend && currentState == SwitchState.BEND) {
-            return in;
-        }
-        if(node == in && currentState == SwitchState.BEND) {
-            return outBend;
-        }
-        if(node == in && currentState == SwitchState.STRAIGHT) {
-            return outStraight;
-        }
-        if(node == outStraight || node == outBend) {
-            return null;
-        }*/
-        throw new NodeException("invalid node given!");
+        throw new NodeException("invalid state given!");
     }
 }
