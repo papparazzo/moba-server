@@ -20,12 +20,69 @@
 
 package automode;
 
+import automode.node.NodeI;
+import datatypes.base.Direction;
+import datatypes.base.Position;
 import tracklayout.LayoutContainer;
+import tracklayout.Symbol;
+import tracklayout.overlay.Block;
+import tracklayout.overlay.OverlayI;
 
 public class Parser {
 
     protected LayoutContainer container;
 
+    protected NodeI startNode = null;
 
+
+    public NodeI parse(LayoutContainer container) throws ParserException {
+        this.container = container;
+
+
+
+        return startNode;
+    }
+
+
+
+
+
+    protected Position getRealStartPosition() throws ParserException {
+        Position start = container.getNextBoundPosition();
+        Position pos = start;
+
+        Symbol currSymbol = container.get(pos);
+
+        if(!currSymbol.isStartSymbol()) {
+            throw new ParserException("first symbol is not a start symbol");
+        }
+
+        while(true) {
+            if(currSymbol.isEnd()) {
+                return pos;
+            }
+
+            if(!currSymbol.isTrack()) {
+                return pos;
+            }
+
+            OverlayI overlay = currSymbol.getOverlay();
+            if(overlay instanceof Block) {
+                return pos;
+            }
+
+            Direction dir = currSymbol.getNextOpenJunktion();
+
+            // Nächsten Koordinaten der Richtung
+            pos.setNewPosition(dir);
+            currSymbol = container.get(pos);
+            if(currSymbol == null) {
+                throw new ParserException("currSymbol == null");
+            }
+            if(pos.equals(start)) {
+                throw new ParserException("back to origin");
+            }
+        }
+    }
 
 }
