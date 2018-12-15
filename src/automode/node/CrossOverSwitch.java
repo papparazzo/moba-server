@@ -22,10 +22,10 @@ package automode.node;
 
 public class CrossOverSwitch implements NodeI {
 
-    protected NodeI in1;
-    protected NodeI in2;
-    protected NodeI out1;
-    protected NodeI out2;
+    protected NodeI inDiagonal;
+    protected NodeI inVertical;
+    protected NodeI outDiagonal;
+    protected NodeI outVertical;
 
     protected SwitchState currentState;
 
@@ -37,25 +37,25 @@ public class CrossOverSwitch implements NodeI {
 
     };
 
-    public CrossOverSwitch(NodeI in, SwitchState state) {
-        this.in1 = in;
+    public CrossOverSwitch(SwitchState state) {
         currentState = state;
     }
 
-    public CrossOverSwitch(SwitchState state) {
-        this(null, state);
-    }
-/*
-    public void setInNode(NodeI node) {
-        in = node;
+    public void setInNodeDiagonal(NodeI node) {
+        inDiagonal = node;
     }
 
-    public void setOutStraightNode(NodeI node) {
-        outStraight = node;
+    public void setInNodeVertical(NodeI node) {
+        inVertical = node;
     }
 
-    public void setOutBendNode(NodeI node) {
-        outBend = node;
+
+    public void setOutNodeDiagonal(NodeI node) {
+        outDiagonal = node;
+    }
+
+    public void setOutNodeVertical(NodeI node) {
+        outVertical = node;
     }
 
     public boolean turnSwitch(SwitchState state) {
@@ -65,9 +65,40 @@ public class CrossOverSwitch implements NodeI {
         currentState = state;
         return true;
     }
-*/
+
+    public SwitchState turnSwitch() {
+        switch(currentState) {
+            case BEND_1:
+                currentState = SwitchState.STRAIGHT_1;
+                break;
+
+            case STRAIGHT_1:
+                currentState = SwitchState.BEND_2;
+                break;
+
+            case BEND_2:
+                currentState = SwitchState.STRAIGHT_2;
+                break;
+
+            case STRAIGHT_2:
+                currentState = SwitchState.BEND_1;
+                break;
+        }
+        return currentState;
+    }
+
     @Override
     public NodeI getJunctionNode(NodeI node) throws NodeException {
+        switch(currentState) {
+            case BEND_1:
+            case BEND_2:
+            case STRAIGHT_1:
+            case STRAIGHT_2:
+        }
+
+        
+
+
         /*
         if(node == outStraight && currentState == SwitchState.STRAIGHT) {
             return in;
