@@ -46,7 +46,7 @@ public class Server extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
-            case SERVER_INFO_REQ:
+            case INFO_REQ:
                 handleServerInfoReq(msg.getEndpoint());
                 return;
 
@@ -70,11 +70,11 @@ public class Server extends MessageHandlerA {
 
         switch(msg.getMsgType()) {
             case RESET_CLIENT:
-                sendToClient(msg, MessageType.CLIENT_RESET);
+                sendToClient(msg, MessageType.RESET);
                 break;
 
             case SELF_TESTING_CLIENT:
-                sendToClient(msg, MessageType.CLIENT_SELF_TESTING);
+                sendToClient(msg, MessageType.SELF_TESTING);
                 break;
 
             default:
@@ -132,6 +132,6 @@ public class Server extends MessageHandlerA {
         map.put("fwType",            java.lang.System.getProperty("java.vm.vendor", ""));
         map.put("fwVersion",         java.lang.System.getProperty("java.version", ""));
 
-        dispatcher.dispatch(new Message(MessageType.SERVER_INFO_RES, map, ep));
+        dispatcher.dispatch(new Message(MessageType.INFO_RES, map, ep));
     }
 }

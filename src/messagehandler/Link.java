@@ -52,11 +52,11 @@ public class Link extends MessageHandlerA {
                 );
                 break;
 
-            case CLIENT_START:
+            case START:
                 handleClientStart(msg);
                 break;
 
-            case CLIENT_CLOSE:
+            case CLOSE:
                 handleClientClose(msg);
                 break;
 
@@ -82,7 +82,7 @@ public class Link extends MessageHandlerA {
             );
             return;
         }
-        dispatcher.dispatch(new Message(MessageType.CLIENT_CONNECTED, ep.getAppId(), ep));
+        dispatcher.dispatch(new Message(MessageType.CONNECTED, ep.getAppId(), ep));
         dispatcher.dispatch(new Message(MessageType.NEW_CLIENT_STARTED, ep));
     }
 
