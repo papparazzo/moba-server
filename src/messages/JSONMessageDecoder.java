@@ -48,11 +48,11 @@ public class JSONMessageDecoder extends JSONDecoder {
             switch(key) {
                 case Message.MSG_HEADER_NAME:
                     checkNext('"');
-                    String msgkey = nextKey();
+                    String msgName = nextKey();
                     try {
-                        msgtype = MessageType.valueOf(msgkey);
+                        msgtype = MessageType.valueOf(msgName);
                     } catch(IllegalArgumentException e) {
-                        throw new JSONException("unknown message <" + msgkey + "> arrived", e);
+                        throw new JSONException("unknown message-name <" + msgName + "> arrived", e);
                     }
                     break;
 
@@ -61,7 +61,7 @@ public class JSONMessageDecoder extends JSONDecoder {
                     break;
 
                 default:
-                    throw new JSONException("key <" + key + "> is neither msg-header nor data-header!");
+                    throw new JSONException("key <" + key + "> is neither msg-header for name nor msg-header for data!");
             }
             if(i == 0) {
                 checkNext(',');
