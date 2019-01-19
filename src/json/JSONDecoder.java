@@ -71,10 +71,7 @@ public class JSONDecoder {
             }
             sb.append(c);
         }
-        throw new JSONException(
-            "maximum string-length of <" +
-            JSONDecoder.MAX_STRING_LENGTH + "> reached!"
-        );
+        throw new JSONException("maximum string-length of <" + JSONDecoder.MAX_STRING_LENGTH + "> reached!");
     }
 
     protected Map<String, Object> nextObject()
@@ -119,10 +116,7 @@ public class JSONDecoder {
                     throw new JSONException("expected a ',' or '}'");
             }
         }
-        throw new JSONException(
-            "maximum string-length of <" +
-            JSONDecoder.MAX_STRING_LENGTH + "> reached!"
-        );
+        throw new JSONException("maximum string-length of <" + JSONDecoder.MAX_STRING_LENGTH + "> reached!");
     }
 
     protected Object nextValue()
