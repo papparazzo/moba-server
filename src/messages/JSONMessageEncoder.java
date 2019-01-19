@@ -41,8 +41,8 @@ public class JSONMessageEncoder extends JSONEncoder {
     public void encodeMsg(Message msg)
     throws IOException, JSONException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put(Message.MSG_HEADER, String.valueOf(msg.getMsgType()));
-        map.put(Message.DATA_HEADER, msg.getData());
+        map.put(Message.MSG_HEADER_NAME, String.valueOf(msg.getMsgType()));
+        map.put(Message.MSG_HEADER_DATA, msg.getData());
         encode(map);
     }
 }

@@ -46,7 +46,7 @@ public class JSONMessageDecoder extends JSONDecoder {
             String key = nextKey();
             checkNext(':');
             switch(key) {
-                case Message.MSG_HEADER:
+                case Message.MSG_HEADER_NAME:
                     checkNext('"');
                     String msgkey = nextKey();
                     try {
@@ -56,7 +56,7 @@ public class JSONMessageDecoder extends JSONDecoder {
                     }
                     break;
 
-                case Message.DATA_HEADER:
+                case Message.MSG_HEADER_DATA:
                     o = nextValue();
                     break;
 

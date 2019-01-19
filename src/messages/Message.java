@@ -29,8 +29,8 @@ public class Message implements Comparable {
     protected Object      data     = null;
     protected MessageType msgType;
 
-    public static final String MSG_HEADER  = "msgType";
-    public static final String DATA_HEADER = "msgData";
+    public static final String MSG_HEADER_NAME  = "msgName";
+    public static final String MSG_HEADER_DATA  = "msgData";
 
     public Message(MessageType msgType, Object data, Endpoint ep) {
         this(msgType, data);
