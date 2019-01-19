@@ -36,7 +36,7 @@ import messages.MessageType;
 import utilities.MessageLogger;
 
 public class Dispatcher implements SenderI {
-    protected final Set<Endpoint> broadcastEP = new HashSet<>();
+    protected final Set<Endpoint> allEndpoints = new HashSet<>();
 
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
@@ -50,15 +50,11 @@ public class Dispatcher implements SenderI {
             new Object[]{ep.getSocket(), ep.getAppName(), ep.getVersion().toString()}
         );
 
-        Iterator<Endpoint> iter = broadcastEP.iterator();
+        Iterator<Endpoint> iter = allEndpoints.iterator();
 
         while(iter.hasNext()) {
             if(iter.next() == ep) {
-                Dispatcher.LOGGER.log(
-                    Level.WARNING,
-                    "Enpoint <{0}> allready set",
-                    new Object[]{ep.toString()}
-                );
+                Dispatcher.LOGGER.log(Level.WARNING, "Enpoint <{0}> allready set", new Object[]{ep.toString()});
                 return false;
             }
         }
@@ -74,14 +70,14 @@ public class Dispatcher implements SenderI {
             groupEP.put(msgGroup, set);
         }
 
-        broadcastEP.add(ep);
+        allEndpoints.add(ep);
         return true;
     }
 
     public void removeEndpoint(Endpoint ep) {
         this.shutDownEndpoint(ep);
 
-        Iterator<Endpoint> iter = broadcastEP.iterator();
+        Iterator<Endpoint> iter = allEndpoints.iterator();
 
         boolean removed = false;
 
@@ -145,11 +141,11 @@ public class Dispatcher implements SenderI {
     }
 
     public int getEndPointsCount() {
-        return broadcastEP.size();
+        return allEndpoints.size();
     }
 
     public void resetDispatcher() {
-        Iterator<Endpoint> iter = broadcastEP.iterator();
+        Iterator<Endpoint> iter = allEndpoints.iterator();
 
         while(iter.hasNext()) {
             shutDownEndpoint(iter.next());
@@ -157,11 +153,11 @@ public class Dispatcher implements SenderI {
     }
 
     public Set<Endpoint> getEndpoints() {
-        return broadcastEP;
+        return allEndpoints;
     }
 
     public Endpoint getEndpointByAppId(long appID) {
-        for(Endpoint item : broadcastEP) {
+        for(Endpoint item : allEndpoints) {
             if(item.getAppId() == appID) {
                 return item;
             }
