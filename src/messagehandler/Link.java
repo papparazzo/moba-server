@@ -73,10 +73,7 @@ public class Link extends MessageHandlerA {
             dispatcher.dispatch(
                 new Message(
                     MessageType.ERROR,
-                    new ErrorData(
-                        ErrorId.INVALID_DATA_SEND,
-                        "Endpoint <" + ep.toString() + "> allready exists"
-                    ),
+                    new ErrorData(ErrorId.INVALID_DATA_SEND, "Endpoint <" + ep.toString() + "> allready exists"),
                     msg.getEndpoint()
                 )
             );
