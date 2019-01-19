@@ -144,7 +144,7 @@ public enum MessageType {
         HIGHEST(250),
         VERY_HIGHT(500),
         HIGHT(1000),
-        MIDDLE(2500),
+        NORMAL(2500),
         LOW(5000),
         VERY_LOW(10000),
         LOWEST(25000);
@@ -165,11 +165,11 @@ public enum MessageType {
     private final MessageClass    cls;
 
     MessageType(MessageGroup grp) {
-        this(grp, MessageClass.INTERN, MessagePriority.LOWEST);
+        this(grp, MessageClass.INTERN, MessagePriority.NORMAL);
     }
 
     MessageType(MessageGroup grp, MessageClass cls) {
-        this(grp, cls, MessagePriority.LOWEST);
+        this(grp, cls, MessagePriority.NORMAL);
     }
 
     MessageType(MessageGroup grp, MessageClass cls, MessagePriority pty) {
