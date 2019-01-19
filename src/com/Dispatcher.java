@@ -90,11 +90,7 @@ public class Dispatcher implements SenderI {
         }
 
         if(!removed) {
-            Dispatcher.LOGGER.log(
-                Level.WARNING,
-                "could not remove endpoint <{0}> from set!",
-                new Object[]{ep.getSocket()}
-            );
+            Dispatcher.LOGGER.log(Level.WARNING, "could not remove endpoint <{0}> from set!", new Object[]{ep.getSocket()});
         }
 
         for(MessageType.MessageGroup msgGroup : ep.getMsgGroups()) {
@@ -109,11 +105,7 @@ public class Dispatcher implements SenderI {
                 }
             }
         }
-        Dispatcher.LOGGER.log(
-            Level.INFO,
-            "endpoint <{0}> succesfully removed!",
-            new Object[]{ep.getSocket()}
-        );
+        Dispatcher.LOGGER.log(Level.INFO, "endpoint <{0}> succesfully removed!", new Object[]{ep.getSocket()});
     }
 
     protected void shutDownEndpoint(Endpoint ep) {
@@ -122,21 +114,13 @@ public class Dispatcher implements SenderI {
                 ep.interrupt();
                 ep.join(250);
             } catch(InterruptedException e) {
-                Dispatcher.LOGGER.log(
-                    Level.WARNING,
-                    "InterruptedException occured! <{0}>",
-                    new Object[]{e.toString()}
-                );
+                Dispatcher.LOGGER.log(Level.WARNING, "InterruptedException occured! <{0}>", new Object[]{e.toString()});
             }
         }
         try {
             ep.closeEndpoint();
         } catch(Exception e) {
-            Dispatcher.LOGGER.log(
-                Level.WARNING,
-                "Exception occured! <{0}> Closing socket failed!",
-                new Object[]{e.toString()}
-            );
+            Dispatcher.LOGGER.log(Level.WARNING, "Exception occured! <{0}> Closing socket failed!", new Object[]{e.toString()});
         }
     }
 
@@ -173,11 +157,7 @@ public class Dispatcher implements SenderI {
                 return false;
             }
             MessageLogger.out(msg);
-            Dispatcher.LOGGER.log(
-                Level.INFO,
-                "try to send message <{0}>",
-                new Object[]{msg.getMsgType().toString()}
-            );
+            Dispatcher.LOGGER.log(Level.INFO, "try to send message <{0}>", new Object[]{msg.getMsgType().toString()});
 
             JSONMessageEncoder encoder = new JSONMessageEncoder();
 
@@ -197,9 +177,7 @@ public class Dispatcher implements SenderI {
                         Dispatcher.LOGGER.log(Level.WARNING, "msg contains not endpoint");
                         return false;
                     }
-                    encoder.addAdditionalWriter(
-                        new JSONStreamWriterSocket(msg.getEndpoint().getSocket())
-                    );
+                    encoder.addAdditionalWriter(new JSONStreamWriterSocket(msg.getEndpoint().getSocket()));
                     break;
 
                 case GROUP:
@@ -210,9 +188,7 @@ public class Dispatcher implements SenderI {
                     }
 
                     for(Endpoint item : this.groupEP.get(grp)) {
-                        encoder.addAdditionalWriter(
-                            new JSONStreamWriterSocket(item.getSocket())
-                        );
+                        encoder.addAdditionalWriter(new JSONStreamWriterSocket(item.getSocket()));
                     }
                     break;
             }
