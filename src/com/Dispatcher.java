@@ -219,14 +219,6 @@ public class Dispatcher implements SenderI {
                         );
                     }
                     break;
-
-                case BROADCAST:
-                    for(Endpoint item : this.broadcastEP) {
-                        encoder.addAdditionalWriter(
-                            new JSONStreamWriterSocket(item.getSocket())
-                        );
-                    }
-                    break;
             }
             encoder.encodeMsg(msg);
             return true;
