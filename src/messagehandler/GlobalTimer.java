@@ -92,33 +92,32 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
     public void handleMsg(Message msg) {
         try {
             switch(msg.getMsgType()) {
-                case GET_GLOBAL_TIMER:
+                case TIMER_GET_GLOBAL_TIMER:
                     dispatcher.dispatch(
-                        new Message(MessageType.SET_GLOBAL_TIMER, timerData, msg.getEndpoint())
+                        new Message(MessageType.TIMER_SET_GLOBAL_TIMER, timerData, msg.getEndpoint())
                     );
                     break;
 
-                case SET_GLOBAL_TIMER:
+                case TIMER_SET_GLOBAL_TIMER:
                     timerData.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(
-                        new Message(MessageType.SET_GLOBAL_TIMER, timerData)
+                    dispatcher.dispatch(new Message(MessageType.TIMER_SET_GLOBAL_TIMER, timerData)
                     );
                     break;
 
-                case GET_COLOR_THEME:
+                case TIMER_GET_COLOR_THEME:
                     dispatcher.dispatch(
-                        new Message(MessageType.SET_COLOR_THEME, themeData, msg.getEndpoint())
+                        new Message(MessageType.TIMER_SET_COLOR_THEME, themeData, msg.getEndpoint())
                     );
                     dispatcher.dispatch(
-                        new Message(MessageType.COLOR_THEME_EVENT, curTheme, msg.getEndpoint())
+                        new Message(MessageType.TIMER_COLOR_THEME_EVENT, curTheme, msg.getEndpoint())
                     );
                     break;
 
-                case SET_COLOR_THEME:
+                case TIMER_SET_COLOR_THEME:
                     themeData.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(new Message(MessageType.SET_COLOR_THEME, themeData));
+                    dispatcher.dispatch(new Message(MessageType.TIMER_SET_COLOR_THEME, themeData));
                     break;
 
 
@@ -161,7 +160,7 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
 
                 if(timerData.setTick()) {
                     // FIXME: Is this really thread-save??
-                    dispatcher.dispatch(new Message(MessageType.GLOBAL_TIMER_EVENT, timerData));
+                    dispatcher.dispatch(new Message(MessageType.TIMER_GLOBAL_TIMER_EVENT, timerData));
                 }
 
                 if(themeData.getColorThemeCondition() != ThreeState.AUTO) {
@@ -188,7 +187,7 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
                 }
 
                 // FIXME: Is this really thread-save??
-                dispatcher.dispatch(new Message(MessageType.COLOR_THEME_EVENT, curTheme));
+                dispatcher.dispatch(new Message(MessageType.TIMER_COLOR_THEME_EVENT, curTheme));
             }
         } catch(InterruptedException e) {
 

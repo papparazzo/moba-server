@@ -57,14 +57,14 @@ public enum MessageType {
     SERVER_SELF_TESTING_CLIENT(MessageGroup.SERVER, MessageClass.SINGLE),
 
     //---------------------------------------------------
-    // GlobalTimer
+    // Timer
     //---------------------------------------------------
-    GLOBAL_TIMER_EVENT(MessageGroup.TIMER, MessageClass.GROUP, MessagePriority.REAL_TIME),
-    GET_GLOBAL_TIMER(MessageGroup.TIMER, MessageClass.SINGLE),
-    SET_GLOBAL_TIMER(MessageGroup.TIMER, MessageClass.GROUP),
-    GET_COLOR_THEME(MessageGroup.TIMER, MessageClass.SINGLE),
-    SET_COLOR_THEME(MessageGroup.TIMER, MessageClass.GROUP),
-    COLOR_THEME_EVENT(MessageGroup.TIMER, MessageClass.GROUP),
+    TIMER_GLOBAL_TIMER_EVENT(MessageGroup.TIMER, MessageClass.GROUP, MessagePriority.REAL_TIME),
+    TIMER_GET_GLOBAL_TIMER(MessageGroup.TIMER, MessageClass.SINGLE),
+    TIMER_SET_GLOBAL_TIMER(MessageGroup.TIMER, MessageClass.GROUP),
+    TIMER_GET_COLOR_THEME(MessageGroup.TIMER, MessageClass.SINGLE),
+    TIMER_SET_COLOR_THEME(MessageGroup.TIMER, MessageClass.GROUP),
+    TIMER_COLOR_THEME_EVENT(MessageGroup.TIMER, MessageClass.GROUP),
 
     //---------------------------------------------------
     // Environment
