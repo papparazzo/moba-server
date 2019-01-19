@@ -116,7 +116,7 @@ public class Acceptor extends Thread {
                         new Object[]{id}
                     );
 
-                    in.add(new Message(MessageType.MAX_CLIENT_COUNT, maxClients));
+                    in.add(new Message(MessageType.SERVER_MAX_CLIENT_COUNT, maxClients));
                 }
             }
         } catch (InterruptedException | IOException e) {
