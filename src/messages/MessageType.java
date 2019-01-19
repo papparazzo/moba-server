@@ -59,12 +59,12 @@ public enum MessageType {
     //---------------------------------------------------
     // GlobalTimer
     //---------------------------------------------------
-    GLOBAL_TIMER_EVENT(MessageGroup.TIMER, MessageClass.BROADCAST, MessagePriority.REAL_TIME),
+    GLOBAL_TIMER_EVENT(MessageGroup.TIMER, MessageClass.GROUP, MessagePriority.REAL_TIME),
     GET_GLOBAL_TIMER(MessageGroup.TIMER, MessageClass.SINGLE),
     SET_GLOBAL_TIMER(MessageGroup.TIMER, MessageClass.GROUP),
     GET_COLOR_THEME(MessageGroup.TIMER, MessageClass.SINGLE),
     SET_COLOR_THEME(MessageGroup.TIMER, MessageClass.GROUP),
-    COLOR_THEME_EVENT(MessageGroup.TIMER, MessageClass.BROADCAST),
+    COLOR_THEME_EVENT(MessageGroup.TIMER, MessageClass.GROUP),
 
     //---------------------------------------------------
     // Environment
@@ -88,7 +88,7 @@ public enum MessageType {
     SET_EMERGENCY_STOP(MessageGroup.SYSTEM, MessageClass.SINGLE, MessagePriority.REAL_TIME),
     SET_STANDBY_MODE(MessageGroup.SYSTEM, MessageClass.SINGLE),
     GET_HARDWARE_STATE(MessageGroup.SYSTEM),
-    HARDWARE_STATE_CHANGED(MessageGroup.SYSTEM, MessageClass.BROADCAST),
+    HARDWARE_STATE_CHANGED(MessageGroup.SYSTEM, MessageClass.GROUP),
     HARDWARE_SHUTDOWN(MessageGroup.SYSTEM, MessageClass.SINGLE),
     HARDWARE_RESET(MessageGroup.SYSTEM, MessageClass.SINGLE),
 
@@ -117,7 +117,7 @@ public enum MessageType {
     //---------------------------------------------------
     // GUI
     //---------------------------------------------------
-    SYSTEM_NOTICE(MessageGroup.GUI, MessageClass.BROADCAST);
+    SYSTEM_NOTICE(MessageGroup.GUI, MessageClass.GROUP);
 
     public enum MessageGroup {
         BASE,
@@ -135,8 +135,7 @@ public enum MessageType {
     public enum MessageClass {
         INTERN,
         SINGLE,
-        GROUP,
-        BROADCAST
+        GROUP
     }
 
     public enum MessagePriority {
