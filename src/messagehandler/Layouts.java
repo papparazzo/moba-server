@@ -125,7 +125,7 @@ public class Layouts extends MessageHandlerA {
         } catch(SQLException e) {
             Layouts.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
             dispatcher.dispatch(new Message(
-                MessageType.ERROR,
+                MessageType.CLIENT_ERROR,
                 new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
                 msg.getEndpoint()
             ));
@@ -149,7 +149,7 @@ public class Layouts extends MessageHandlerA {
                 Layouts.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
                 if(pstmt.executeUpdate() == 0) {
                     dispatcher.dispatch(new Message(
-                        MessageType.ERROR,
+                        MessageType.CLIENT_ERROR,
                         new ErrorData(ErrorId.DATASET_MISSING, ""),
                         msg.getEndpoint()
                     ));
@@ -161,7 +161,7 @@ public class Layouts extends MessageHandlerA {
         } catch(SQLException e) {
             Layouts.LOGGER.log(Level.WARNING, e.toString());
             dispatcher.dispatch(new Message(
-                MessageType.ERROR,
+                MessageType.CLIENT_ERROR,
                 new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
                 msg.getEndpoint()
             ));
@@ -196,7 +196,7 @@ public class Layouts extends MessageHandlerA {
         } catch(SQLException e) {
             Layouts.LOGGER.log(Level.WARNING, e.toString());
             dispatcher.dispatch(new Message(
-                MessageType.ERROR,
+                MessageType.CLIENT_ERROR,
                 new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
                 msg.getEndpoint()
             ));
@@ -241,7 +241,7 @@ public class Layouts extends MessageHandlerA {
                 pstmt.setLong(8, id);
                 if(pstmt.executeUpdate() == 0) {
                     dispatcher.dispatch(new Message(
-                        MessageType.ERROR,
+                        MessageType.CLIENT_ERROR,
                         new ErrorData(ErrorId.DATASET_MISSING, "Could not update <" + String.valueOf(id) + ">"),
                         msg.getEndpoint()
                     ));
@@ -254,7 +254,7 @@ public class Layouts extends MessageHandlerA {
         } catch(SQLException | NumberFormatException e) {
             Layouts.LOGGER.log(Level.WARNING, e.toString());
             dispatcher.dispatch(
-                new Message(MessageType.ERROR, new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()), msg.getEndpoint())
+                new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()), msg.getEndpoint())
             );
         }
     }

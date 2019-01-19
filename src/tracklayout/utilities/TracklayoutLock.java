@@ -78,7 +78,7 @@ public class TracklayoutLock {
         }
         TracklayoutLock.LOGGER.log(Level.WARNING, "layout <{0}> is locked", new Object[]{id});
         dispatcher.dispatch(new Message(
-            MessageType.ERROR,
+            MessageType.CLIENT_ERROR,
             new ErrorData(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">"),
             ep
         ));
@@ -120,7 +120,7 @@ public class TracklayoutLock {
 
                 if(pstmt.executeUpdate() == 0) {
                     dispatcher.dispatch(
-                        new Message(MessageType.ERROR, new ErrorData(ErrorId.DATASET_MISSING), msg.getEndpoint())
+                        new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATASET_MISSING), msg.getEndpoint())
                     );
                     pstmt.close();
                     return;
@@ -130,7 +130,7 @@ public class TracklayoutLock {
         } catch(SQLException e) {
             TracklayoutLock.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
             dispatcher.dispatch(
-                new Message(MessageType.ERROR, new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()), msg.getEndpoint())
+                new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()), msg.getEndpoint())
             );
         }
     }

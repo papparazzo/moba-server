@@ -117,7 +117,7 @@ public class Environment extends MessageHandlerA {
         ) {
             dispatcher.dispatch(
                 new Message(
-                    MessageType.ERROR,
+                    MessageType.CLIENT_ERROR,
                     new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()),
                     msg.getEndpoint()
                 )

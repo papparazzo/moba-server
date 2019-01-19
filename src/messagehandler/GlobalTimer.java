@@ -134,7 +134,7 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
         ) {
             dispatcher.dispatch(
                 new Message(
-                    MessageType.ERROR,
+                    MessageType.CLIENT_ERROR,
                     new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()),
                     msg.getEndpoint()
                 )
@@ -142,7 +142,7 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
         } catch(IllegalArgumentException e) {
             dispatcher.dispatch(
                 new Message(
-                    MessageType.ERROR,
+                    MessageType.CLIENT_ERROR,
                     new ErrorData(ErrorId.INVALID_DATA_SEND, e.getMessage()),
                     msg.getEndpoint()
                 )

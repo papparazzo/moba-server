@@ -43,20 +43,20 @@ public class Link extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
-            case VOID:
+            case CLIENT_VOID:
                 break;
 
-            case ECHO_REQ:
+            case CLIENT_ECHO_REQ:
                 dispatcher.dispatch(
-                    new Message(MessageType.ECHO_RES, msg.getData(), msg.getEndpoint())
+                    new Message(MessageType.CLIENT_ECHO_RES, msg.getData(), msg.getEndpoint())
                 );
                 break;
 
-            case START:
+            case CLIENT_START:
                 handleClientStart(msg);
                 break;
 
-            case CLOSE:
+            case CLIENT_CLOSE:
                 handleClientClose(msg);
                 break;
 
@@ -72,14 +72,14 @@ public class Link extends MessageHandlerA {
         if(!dispatcher.addEndpoint(ep)) {
             dispatcher.dispatch(
                 new Message(
-                    MessageType.ERROR,
+                    MessageType.CLIENT_ERROR,
                     new ErrorData(ErrorId.INVALID_DATA_SEND, "Endpoint <" + ep.toString() + "> allready exists"),
                     msg.getEndpoint()
                 )
             );
             return;
         }
-        dispatcher.dispatch(new Message(MessageType.CONNECTED, ep.getAppId(), ep));
+        dispatcher.dispatch(new Message(MessageType.CLIENT_CONNECTED, ep.getAppId(), ep));
         dispatcher.dispatch(new Message(MessageType.NEW_CLIENT_STARTED, ep));
     }
 

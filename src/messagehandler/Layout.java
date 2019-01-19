@@ -123,7 +123,7 @@ public class Layout extends MessageHandlerA {
         } catch(SQLException e) {
             Layout.LOGGER.log(Level.WARNING, e.toString());
             dispatcher.dispatch(new Message(
-                    MessageType.ERROR,
+                    MessageType.CLIENT_ERROR,
                     new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
                     msg.getEndpoint()
                 )

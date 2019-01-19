@@ -32,16 +32,16 @@ public enum MessageType {
     //---------------------------------------------------
     // Client
     //---------------------------------------------------
-    VOID(MessageGroup.CLIENT, MessageClass.SINGLE),
-    ECHO_REQ(MessageGroup.CLIENT, MessageClass.SINGLE),
-    ECHO_RES(MessageGroup.CLIENT, MessageClass.SINGLE),
-    ERROR(MessageGroup.CLIENT, MessageClass.SINGLE),
-    START(MessageGroup.CLIENT, MessageClass.SINGLE),
-    CONNECTED(MessageGroup.CLIENT, MessageClass.SINGLE),
-    CLOSE(MessageGroup.CLIENT, MessageClass.SINGLE),
-    SHUTDOWN(MessageGroup.CLIENT, MessageClass.SINGLE),
-    RESET(MessageGroup.CLIENT, MessageClass.SINGLE),
-    SELF_TESTING(MessageGroup.CLIENT, MessageClass.SINGLE),
+    CLIENT_VOID(MessageGroup.CLIENT, MessageClass.SINGLE),
+    CLIENT_ECHO_REQ(MessageGroup.CLIENT, MessageClass.SINGLE),
+    CLIENT_ECHO_RES(MessageGroup.CLIENT, MessageClass.SINGLE),
+    CLIENT_ERROR(MessageGroup.CLIENT, MessageClass.SINGLE),
+    CLIENT_START(MessageGroup.CLIENT, MessageClass.SINGLE),
+    CLIENT_CONNECTED(MessageGroup.CLIENT, MessageClass.SINGLE),
+    CLIENT_CLOSE(MessageGroup.CLIENT, MessageClass.SINGLE),
+    CLIENT_SHUTDOWN(MessageGroup.CLIENT, MessageClass.SINGLE),
+    CLIENT_RESET(MessageGroup.CLIENT, MessageClass.SINGLE),
+    CLIENT_SELF_TESTING(MessageGroup.CLIENT, MessageClass.SINGLE),
 
     //---------------------------------------------------
     // Server

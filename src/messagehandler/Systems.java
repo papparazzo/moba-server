@@ -198,7 +198,7 @@ public class Systems extends MessageHandlerA {
     protected void sendErrorMessage(Endpoint endpoint) {
         dispatcher.dispatch(
             new Message(
-                MessageType.ERROR,
+                MessageType.CLIENT_ERROR,
                 new ErrorData(
                     ErrorId.INVALID_STATUS_CHANGE,
                     "Current state is <" + status.toString() + ">"

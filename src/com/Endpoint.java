@@ -94,7 +94,7 @@ public class Endpoint extends Thread implements JSONToStringI {
             if(!closing) {
                 throw new IOException(e);
             }
-            return new Message(MessageType.VOID);
+            return new Message(MessageType.CLIENT_VOID);
         }
     }
 
@@ -136,7 +136,7 @@ public class Endpoint extends Thread implements JSONToStringI {
         try {
             if(!init()) {
                 Endpoint.LOGGER.log(Level.WARNING, "Endpoint #{0}: init failed!>", new Object[]{id});
-                in.add(new Message(MessageType.CLOSE, null, this));
+                in.add(new Message(MessageType.CLIENT_CLOSE, null, this));
                 return;
             }
             while(!isInterrupted()) {
@@ -148,7 +148,7 @@ public class Endpoint extends Thread implements JSONToStringI {
                 "Endpoint #{0}: IOException, send <CLIENT_CLOSE> <{1}>",
                 new Object[]{id, e.toString()}
             );
-            in.add(new Message(MessageType.CLOSE, null, this));
+            in.add(new Message(MessageType.CLIENT_CLOSE, null, this));
         }
         Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
     }
@@ -179,14 +179,14 @@ public class Endpoint extends Thread implements JSONToStringI {
         Message msg = getNextMessage();
         MessageType mtype = msg.getMsgType();
 
-        if(mtype != MessageType.START && mtype != MessageType.CONNECTED) {
+        if(mtype != MessageType.CLIENT_START && mtype != MessageType.CLIENT_CONNECTED) {
             Endpoint.LOGGER.log(
                 Level.SEVERE,
                 "first msg is neither CLIENT_START nor CLIENT_CONNECTED"
             );
             return false;
         }
-        if(mtype == MessageType.CONNECTED) {
+        if(mtype == MessageType.CLIENT_CONNECTED) {
             return true;
         }
         Map<String, Object> map = (Map<String, Object>)msg.getData();
