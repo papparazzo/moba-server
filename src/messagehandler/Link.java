@@ -84,7 +84,7 @@ public class Link extends MessageHandlerA {
     }
 
     protected void handleClientClose(Message msg) {
-        msgQueue.add(new Message(MessageType.FREE_RESOURCES, (long)msg.getEndpoint().getAppId()));
+        msgQueue.add(new Message(MessageType.BASE_FREE_RESOURCES, (long)msg.getEndpoint().getAppId()));
         dispatcher.removeEndpoint(msg.getEndpoint());
         dispatcher.dispatch(new Message(MessageType.CLIENT_CLOSED, msg.getEndpoint().getAppId()));
     }

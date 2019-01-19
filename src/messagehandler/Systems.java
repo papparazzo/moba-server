@@ -71,11 +71,11 @@ public class Systems extends MessageHandlerA {
                 break;
 
             case HARDWARE_SHUTDOWN:
-                msgQueue.add(new Message(MessageType.SERVER_SHUTDOWN));
+                msgQueue.add(new Message(MessageType.BASE_SERVER_SHUTDOWN));
                 break;
 
             case HARDWARE_RESET:
-                msgQueue.add(new Message(MessageType.SERVER_RESET));
+                msgQueue.add(new Message(MessageType.BASE_SERVER_RESET));
                 break;
 
             default:
@@ -105,7 +105,7 @@ public class Systems extends MessageHandlerA {
         automaticMode = setAutomaticMode;
 
         if(setAutomaticMode) {
-            msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
+            msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
             dispatcher.dispatch(
                 new Message(
                     MessageType.SYSTEM_NOTICE,
@@ -114,7 +114,7 @@ public class Systems extends MessageHandlerA {
             );
             return;
         }
-        msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.MANUEL));
+        msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.MANUEL));
         dispatcher.dispatch(
             new Message(
                 MessageType.SYSTEM_NOTICE,
@@ -143,7 +143,7 @@ public class Systems extends MessageHandlerA {
                     new NoticeData(NoticeType.WARNING, "Nothalt gedrückt", "Es wurde ein Nothalt ausgelöst")
                 )
             );
-            msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.EMERGENCY_STOP));
+            msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.EMERGENCY_STOP));
             return;
         }
         dispatcher.dispatch(
@@ -153,9 +153,9 @@ public class Systems extends MessageHandlerA {
             )
         );
         if(automaticMode) {
-            msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
+            msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
         } else {
-            msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.MANUEL));
+            msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.MANUEL));
         }
     }
 
@@ -179,7 +179,7 @@ public class Systems extends MessageHandlerA {
                     new NoticeData(NoticeType.WARNING, "Standby", "Anlage wird in den Standby-Modus geschickt")
                 )
             );
-            msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.STANDBY));
+            msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.STANDBY));
             return;
         }
         dispatcher.dispatch(
@@ -189,9 +189,9 @@ public class Systems extends MessageHandlerA {
             )
         );
         if(automaticMode) {
-            msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
+            msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
         } else {
-            msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.MANUEL));
+            msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.MANUEL));
         }
     }
 

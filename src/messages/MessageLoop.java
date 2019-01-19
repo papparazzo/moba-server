@@ -64,20 +64,20 @@ public class MessageLoop {
 
             if(msg.getMsgType().getMessageGroup() == MessageGroup.BASE) {
                 switch(msg.getMsgType()) {
-                    case SERVER_RESET:
+                    case BASE_SERVER_RESET:
                         in.clear();
                         resetHandler();
                         return true;
 
-                    case SERVER_SHUTDOWN:
+                    case BASE_SERVER_SHUTDOWN:
                         shutdownHandler();
                         return false;
 
-                    case FREE_RESOURCES:
+                    case BASE_FREE_RESOURCES:
                         freeResources((long)msg.getData());
                         continue;
 
-                    case SET_HARDWARE_STATE:
+                    case BASE_SET_HARDWARE_STATE:
                         hardwareStateChangedHandler((HardwareState)msg.getData());
                         continue;
                 }
