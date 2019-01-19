@@ -34,6 +34,7 @@ import datatypes.enumerations.ErrorId;
 import datatypes.objects.ErrorData;
 import datatypes.objects.TracklayoutSymbolData;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import messages.Message;
 import messages.MessageHandlerA;
@@ -58,6 +59,10 @@ public class Layout extends MessageHandlerA {
         switch(msg.getMsgType()) {
             case GET_LAYOUT_REQ:
                 getLayout(msg);
+                break;
+
+            case SAVE_LAYOUT:
+                saveLayout(msg);
                 break;
 
             default:
@@ -124,5 +129,72 @@ public class Layout extends MessageHandlerA {
                 )
             );
         }
+    }
+
+    protected void loadLayout(Message msg) {
+
+    }
+
+    protected void saveLayout(Message msg) {
+        /*
+        try {
+            Map<String, Object> map = (Map<String, Object>)msg.getData();
+            long id = (long)map.get("id");
+
+            Connection con = database.getConnection();
+
+            String q =
+                "DELETE FROM `TrackLayoutSymbols` " +
+                "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
+
+            try (PreparedStatement pstmt = con.prepareStatement(q)) {
+                pstmt.setLong(1, id);
+                Layout.LOGGER.log(Level.INFO, pstmt.toString());
+                pstmt.executeQuery();
+            }
+
+            ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
+
+            for(Object o : arrayList) {
+                q =
+                    "INSERT INTO `TrackLayoutSymbols` " +
+                    "(`TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
+                    "VALUES (?, ?, ?, ?)";
+
+                 Map<String, Object> item = (Map<String, Object>)o;
+
+
+            }
+
+            try (PreparedStatement pstmt = con.prepareStatement(q)) {
+                pstmt.setLong(1, id);
+
+                Layout.LOGGER.log(Level.INFO, pstmt.toString());
+
+                ArrayList<TracklayoutSymbolData> arraylist;
+                ResultSet rs = pstmt.executeQuery();
+                arraylist = new ArrayList();
+                while(rs.next()) {
+                    arraylist.add(new TracklayoutSymbolData(
+                        rs.getLong("Id"),
+                        rs.getLong("XPos"),
+                        rs.getLong("YPos"),
+                        rs.getLong("Symbol")
+                    ));
+                }
+                map.put("symbols", arraylist);
+
+                dispatcher.dispatch(new Message(MessageType.LAYOUT_UPDATED, map));
+            }
+
+        } catch(SQLException e) {
+            Layout.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            dispatcher.dispatch(new Message(
+                MessageType.ERROR,
+                new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
+                msg.getEndpoint()
+            ));
+        }
+*/
     }
 }
