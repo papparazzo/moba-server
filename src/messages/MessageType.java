@@ -117,7 +117,7 @@ public enum MessageType {
     //---------------------------------------------------
     // GUI
     //---------------------------------------------------
-    SYSTEM_NOTICE(MessageGroup.GUI, MessageClass.GROUP);
+    GUI_SYSTEM_NOTICE(MessageGroup.GUI, MessageClass.GROUP);
 
     public enum MessageGroup {
         BASE,

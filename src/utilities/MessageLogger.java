@@ -53,7 +53,7 @@ public class MessageLogger {
             return;
         }
 
-        if(msg.getMsgType() == MessageType.SYSTEM_NOTICE) {
+        if(msg.getMsgType() == MessageType.GUI_SYSTEM_NOTICE) {
             MessageLogger.msg(msg);
             return;
         }

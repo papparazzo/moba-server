@@ -108,7 +108,7 @@ public class Systems extends MessageHandlerA {
             msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
             dispatcher.dispatch(
                 new Message(
-                    MessageType.SYSTEM_NOTICE,
+                    MessageType.GUI_SYSTEM_NOTICE,
                     new NoticeData(NoticeType.INFO, "Automatik", "Die Hardware befindet sich im Automatikmodus")
                 )
             );
@@ -117,7 +117,7 @@ public class Systems extends MessageHandlerA {
         msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.MANUEL));
         dispatcher.dispatch(
             new Message(
-                MessageType.SYSTEM_NOTICE,
+                MessageType.GUI_SYSTEM_NOTICE,
                 new NoticeData(NoticeType.INFO, "Automatik", "Automatikmodus wurde deaktiviert")
             )
         );
@@ -139,7 +139,7 @@ public class Systems extends MessageHandlerA {
         if(emergencyStop) {
             dispatcher.dispatch(
                 new Message(
-                    MessageType.SYSTEM_NOTICE,
+                    MessageType.GUI_SYSTEM_NOTICE,
                     new NoticeData(NoticeType.WARNING, "Nothalt gedrückt", "Es wurde ein Nothalt ausgelöst")
                 )
             );
@@ -148,7 +148,7 @@ public class Systems extends MessageHandlerA {
         }
         dispatcher.dispatch(
             new Message(
-                MessageType.SYSTEM_NOTICE,
+                MessageType.GUI_SYSTEM_NOTICE,
                 new NoticeData(NoticeType.INFO, "Nothaltfreigabe", "Der Nothalt wurde wieder freigegeben")
             )
         );
@@ -175,7 +175,7 @@ public class Systems extends MessageHandlerA {
         if(setStandByMode) {
             dispatcher.dispatch(
                 new Message(
-                    MessageType.SYSTEM_NOTICE,
+                    MessageType.GUI_SYSTEM_NOTICE,
                     new NoticeData(NoticeType.WARNING, "Standby", "Anlage wird in den Standby-Modus geschickt")
                 )
             );
@@ -184,7 +184,7 @@ public class Systems extends MessageHandlerA {
         }
         dispatcher.dispatch(
             new Message(
-                MessageType.SYSTEM_NOTICE,
+                MessageType.GUI_SYSTEM_NOTICE,
                 new NoticeData(NoticeType.INFO, "Standby", "Die Anlage wird aus dem Standby-Modus geholt")
             )
         );

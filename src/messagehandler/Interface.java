@@ -67,7 +67,7 @@ public class Interface extends MessageHandlerA {
                 msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.ERROR));
                 dispatcher.dispatch(
                     new Message(
-                        MessageType.SYSTEM_NOTICE,
+                        MessageType.GUI_SYSTEM_NOTICE,
                         new NoticeData(
                             NoticeType.ERROR,
                             "Hardwarefehler",
