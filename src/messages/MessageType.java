@@ -69,12 +69,12 @@ public enum MessageType {
     //---------------------------------------------------
     // Environment
     //---------------------------------------------------
-    GET_ENVIRONMENT(MessageGroup.ENV, MessageClass.SINGLE),
-    SET_ENVIRONMENT(MessageGroup.ENV, MessageClass.GROUP),
-    GET_AMBIENCE(MessageGroup.ENV, MessageClass.SINGLE),
-    SET_AMBIENCE(MessageGroup.ENV, MessageClass.GROUP),
-    GET_AMBIENT_LIGHT(MessageGroup.ENV, MessageClass.SINGLE),
-    SET_AMBIENT_LIGHT(MessageGroup.ENV, MessageClass.GROUP),
+    ENV_GET_ENVIRONMENT(MessageGroup.ENV, MessageClass.SINGLE),
+    ENV_SET_ENVIRONMENT(MessageGroup.ENV, MessageClass.GROUP),
+    ENV_GET_AMBIENCE(MessageGroup.ENV, MessageClass.SINGLE),
+    ENV_SET_AMBIENCE(MessageGroup.ENV, MessageClass.GROUP),
+    ENV_GET_AMBIENT_LIGHT(MessageGroup.ENV, MessageClass.SINGLE),
+    ENV_SET_AMBIENT_LIGHT(MessageGroup.ENV, MessageClass.GROUP),
 
     //---------------------------------------------------
     // Interface
