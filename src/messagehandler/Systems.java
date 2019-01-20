@@ -48,33 +48,33 @@ public class Systems extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
-            case SET_AUTOMATIC_MODE:
+            case SYSTEM_SET_AUTOMATIC_MODE:
                 setAutomaticMode(msg);
                 break;
 
-            case SET_EMERGENCY_STOP:
+            case SYSTEM_SET_EMERGENCY_STOP:
                 setEmergencyStop(msg);
                 break;
 
-            case SET_STANDBY_MODE:
+            case SYSTEM_SET_STANDBY_MODE:
                 setStandByMode(msg);
                 break;
 
-            case GET_HARDWARE_STATE:
+            case SYSTEM_GET_HARDWARE_STATE:
                 dispatcher.dispatch(
                     new Message(
-                        MessageType.HARDWARE_STATE_CHANGED,
+                        MessageType.SYSTEM_HARDWARE_STATE_CHANGED,
                         status.toString(),
                         msg.getEndpoint()
                     )
                 );
                 break;
 
-            case HARDWARE_SHUTDOWN:
+            case SYSTEM_HARDWARE_SHUTDOWN:
                 msgQueue.add(new Message(MessageType.BASE_SERVER_SHUTDOWN));
                 break;
 
-            case HARDWARE_RESET:
+            case SYSTEM_HARDWARE_RESET:
                 msgQueue.add(new Message(MessageType.BASE_SERVER_RESET));
                 break;
 
@@ -212,7 +212,7 @@ public class Systems extends MessageHandlerA {
     public void hardwareStateChanged(HardwareState state) {
         status = state;
         dispatcher.dispatch(
-            new Message(MessageType.HARDWARE_STATE_CHANGED, status.toString())
+            new Message(MessageType.SYSTEM_HARDWARE_STATE_CHANGED, status.toString())
         );
     }
 }

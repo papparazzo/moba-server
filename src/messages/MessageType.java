@@ -84,13 +84,13 @@ public enum MessageType {
     //---------------------------------------------------
     // System
     //---------------------------------------------------
-    SET_AUTOMATIC_MODE(MessageGroup.SYSTEM, MessageClass.SINGLE, MessagePriority.REAL_TIME),
-    SET_EMERGENCY_STOP(MessageGroup.SYSTEM, MessageClass.SINGLE, MessagePriority.REAL_TIME),
-    SET_STANDBY_MODE(MessageGroup.SYSTEM, MessageClass.SINGLE),
-    GET_HARDWARE_STATE(MessageGroup.SYSTEM),
-    HARDWARE_STATE_CHANGED(MessageGroup.SYSTEM, MessageClass.GROUP),
-    HARDWARE_SHUTDOWN(MessageGroup.SYSTEM, MessageClass.SINGLE),
-    HARDWARE_RESET(MessageGroup.SYSTEM, MessageClass.SINGLE),
+    SYSTEM_SET_AUTOMATIC_MODE(MessageGroup.SYSTEM, MessageClass.SINGLE, MessagePriority.REAL_TIME),
+    SYSTEM_SET_EMERGENCY_STOP(MessageGroup.SYSTEM, MessageClass.SINGLE, MessagePriority.REAL_TIME),
+    SYSTEM_SET_STANDBY_MODE(MessageGroup.SYSTEM, MessageClass.SINGLE),
+    SYSTEM_GET_HARDWARE_STATE(MessageGroup.SYSTEM),
+    SYSTEM_HARDWARE_STATE_CHANGED(MessageGroup.SYSTEM, MessageClass.GROUP),
+    SYSTEM_HARDWARE_SHUTDOWN(MessageGroup.SYSTEM, MessageClass.SINGLE),
+    SYSTEM_HARDWARE_RESET(MessageGroup.SYSTEM, MessageClass.SINGLE),
 
     //---------------------------------------------------
     // Layouts
