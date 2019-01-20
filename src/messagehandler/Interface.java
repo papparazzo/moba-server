@@ -46,7 +46,7 @@ public class Interface extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
-            case SET_CONNECTIVITY:
+            case INTERFACE_SET_CONNECTIVITY:
                 setConnectivity(Connectivity.valueOf((String)msg.getData()));
                 return;
 
