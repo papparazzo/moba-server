@@ -34,7 +34,6 @@ import datatypes.enumerations.ErrorId;
 import datatypes.objects.ErrorData;
 import datatypes.objects.TracklayoutSymbolData;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import messages.Message;
 import messages.MessageHandlerA;
