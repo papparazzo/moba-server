@@ -57,11 +57,11 @@ public class Layout extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
-            case GET_LAYOUT_REQ:
+            case LAYOUT_GET_LAYOUT_REQ:
                 getLayout(msg);
                 break;
 
-            case SAVE_LAYOUT:
+            case LAYOUT_SAVE_LAYOUT:
                 saveLayout(msg);
                 break;
 
@@ -117,7 +117,7 @@ public class Layout extends MessageHandlerA {
                 map.put("symbols", arraylist);
 
                 dispatcher.dispatch(
-                    new Message(MessageType.GET_LAYOUT_RES, map, msg.getEndpoint())
+                    new Message(MessageType.LAYOUT_GET_LAYOUT_RES, map, msg.getEndpoint())
                 );
             }
         } catch(SQLException e) {
