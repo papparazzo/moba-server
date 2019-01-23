@@ -95,17 +95,17 @@ public enum MessageType {
     //---------------------------------------------------
     // Layouts
     //---------------------------------------------------
-    GET_LAYOUTS_REQ(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    GET_LAYOUTS_RES(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    DEL_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    LAYOUT_DELETED(MessageGroup.LAYOUTS, MessageClass.GROUP),
-    CREATE_LAYOUT_REQ(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    CREATE_LAYOUT_RES(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    LAYOUT_CREATED(MessageGroup.LAYOUTS, MessageClass.GROUP),
-    UPDATE_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    LAYOUT_UPDATED(MessageGroup.LAYOUTS, MessageClass.GROUP),
-    UNLOCK_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    LAYOUT_UNLOCKED(MessageGroup.LAYOUTS, MessageClass.GROUP),
+    LAYOUTS_GET_LAYOUTS_REQ(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    LAYOUTS_GET_LAYOUTS_RES(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    LAYOUTS_DEL_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    LAYOUTS_LAYOUT_DELETED(MessageGroup.LAYOUTS, MessageClass.GROUP),
+    LAYOUTS_CREATE_LAYOUT_REQ(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    LAYOUTS_CREATE_LAYOUT_RES(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    LAYOUTS_LAYOUT_CREATED(MessageGroup.LAYOUTS, MessageClass.GROUP),
+    LAYOUTS_UPDATE_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    LAYOUTS_LAYOUT_UPDATED(MessageGroup.LAYOUTS, MessageClass.GROUP),
+    LAYOUTS_UNLOCK_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    LAYOUTS_LAYOUT_UNLOCKED(MessageGroup.LAYOUTS, MessageClass.GROUP),
 
     //---------------------------------------------------
     // Layout

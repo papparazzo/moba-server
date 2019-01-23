@@ -56,23 +56,23 @@ public class Layouts extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
-            case GET_LAYOUTS_REQ:
+            case LAYOUTS_GET_LAYOUTS_REQ:
                 getLayouts(msg);
                 break;
 
-            case DEL_LAYOUT:
+            case LAYOUTS_DEL_LAYOUT:
                 deleteLayout(msg);
                 break;
 
-            case CREATE_LAYOUT_REQ:
+            case LAYOUTS_CREATE_LAYOUT_REQ:
                 createLayout(msg);
                 break;
 
-            case UPDATE_LAYOUT:
+            case LAYOUTS_UPDATE_LAYOUT:
                 updateLayout(msg);
                 break;
 
-            case UNLOCK_LAYOUT:
+            case LAYOUTS_UNLOCK_LAYOUT:
                 lock.unlockLayout(msg);
                 break;
 
@@ -121,7 +121,7 @@ public class Layouts extends MessageHandlerA {
                     ));
                 }
             }
-            dispatcher.dispatch(new Message(MessageType.GET_LAYOUTS_RES, arraylist, msg.getEndpoint()));
+            dispatcher.dispatch(new Message(MessageType.LAYOUTS_GET_LAYOUTS_RES, arraylist, msg.getEndpoint()));
         } catch(SQLException e) {
             Layouts.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
             dispatcher.dispatch(new Message(
@@ -157,7 +157,7 @@ public class Layouts extends MessageHandlerA {
                     return;
                 }
             }
-            dispatcher.dispatch(new Message(MessageType.LAYOUT_DELETED, id));
+            dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_DELETED, id));
         } catch(SQLException e) {
             Layouts.LOGGER.log(Level.WARNING, e.toString());
             dispatcher.dispatch(new Message(
@@ -191,8 +191,8 @@ public class Layouts extends MessageHandlerA {
                     tl.setId(rs.getInt(1));
                 }
             }
-            dispatcher.dispatch(new Message(MessageType.LAYOUT_CREATED, tl));
-            dispatcher.dispatch(new Message(MessageType.CREATE_LAYOUT_RES, tl.getId(), msg.getEndpoint()));
+            dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_CREATED, tl));
+            dispatcher.dispatch(new Message(MessageType.LAYOUTS_CREATE_LAYOUT_RES, tl.getId(), msg.getEndpoint()));
         } catch(SQLException e) {
             Layouts.LOGGER.log(Level.WARNING, e.toString());
             dispatcher.dispatch(new Message(
@@ -249,7 +249,7 @@ public class Layouts extends MessageHandlerA {
                     return;
                 }
                 Layouts.LOGGER.log(Level.INFO, pstmt.toString());
-                dispatcher.dispatch(new Message(MessageType.LAYOUT_UPDATED, tl));
+                dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_UPDATED, tl));
             }
         } catch(SQLException | NumberFormatException e) {
             Layouts.LOGGER.log(Level.WARNING, e.toString());
