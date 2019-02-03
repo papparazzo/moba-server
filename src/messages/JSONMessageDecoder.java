@@ -61,7 +61,9 @@ public class JSONMessageDecoder extends JSONDecoder {
                     break;
 
                 default:
-                    throw new JSONException("key <" + key + "> is neither msg-header for name nor msg-header for data!");
+                    throw new JSONException(
+                        "key <" + key + "> is neither <" + Message.MSG_HEADER_NAME + "> for name nor <" + Message.MSG_HEADER_DATA + "> for data!"
+                    );
             }
             if(i == 0) {
                 checkNext(',');
