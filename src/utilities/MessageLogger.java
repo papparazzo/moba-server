@@ -54,7 +54,7 @@ public class MessageLogger {
         }
 
         if(msg.getMsgType() == MessageType.GUI_SYSTEM_NOTICE) {
-            MessageLogger.msg(msg);
+            MessageLogger.printSystemNotice(msg);
             return;
         }
 
@@ -82,7 +82,7 @@ public class MessageLogger {
         System.out.println(sb);
     }
 
-    protected static void msg(Message msg) {
+    protected static void printSystemNotice(Message msg) {
         Object o = msg.getData();
         Map<String, Object> map;
 
