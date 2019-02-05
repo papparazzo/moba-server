@@ -54,7 +54,7 @@ public class MessageLogger {
         }
 
         if(msg.getMsgType() == MessageType.GUI_SYSTEM_NOTICE) {
-            MessageLogger.printSystemNotice(msg);
+            MessageLogger.printSystemNotice((NoticeData)msg.getData());
             return;
         }
 
@@ -82,19 +82,11 @@ public class MessageLogger {
         System.out.println(sb);
     }
 
-    protected static void printSystemNotice(Message msg) {
-        Object o = msg.getData();
-        Map<String, Object> map;
-
-        if(o instanceof NoticeData) {
-            NoticeData n = (NoticeData)o;
-            map = new HashMap<>();
-            map.put("type", n.getType().toString());
-            map.put("caption", n.getCaption());
-            map.put("text", n.getText());
-        } else {
-            map = (Map<String, Object>)o;
-        }
+    protected static void printSystemNotice(NoticeData noticeData) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", noticeData.getType().toString());
+        map.put("caption", noticeData.getCaption());
+        map.put("text", noticeData.getText());
 
         StringBuilder sb = new StringBuilder();
         SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS ");
