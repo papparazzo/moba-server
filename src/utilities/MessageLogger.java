@@ -76,8 +76,6 @@ public class MessageLogger {
         } else {
             sb.append("<-- ");
         }
-        sb.append(msg.getMsgType().getMessageGroup().toString());
-        sb.append(":");
         sb.append(msg.getMsgType().toString());
         sb.append(" [");
         sb.append(msg.getMsgType().getMessageClass().toString());
