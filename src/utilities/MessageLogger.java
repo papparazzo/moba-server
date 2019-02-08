@@ -92,15 +92,12 @@ public class MessageLogger {
     }
 
     protected static void printSystemNotice(NoticeData noticeData) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("type", noticeData.getType().toString());
-        map.put("caption", noticeData.getCaption());
-        map.put("text", noticeData.getText());
+        String type = noticeData.getType().toString();
 
         StringBuilder sb = new StringBuilder();
         SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS ");
 
-        switch((String)map.get("type")) {
+        switch(type) {
             case "INFO":
                 sb.append(ANSI_GREEN);
                 break;
@@ -117,11 +114,11 @@ public class MessageLogger {
         }
         sb.append(df.format(new Date()));
         sb.append("<-> ");
-        sb.append((String)map.get("type"));
+        sb.append(type);
         sb.append(": [");
-        sb.append((String)map.get("caption"));
+        sb.append(noticeData.getCaption());
         sb.append("] ");
-        sb.append((String)map.get("text"));
+        sb.append(noticeData.getText());
         sb.append(MessageLogger.ANSI_RESET);
         System.out.println(sb);
     }
