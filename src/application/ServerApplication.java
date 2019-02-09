@@ -61,7 +61,7 @@ public class ServerApplication extends Application {
                 loop.addHandler(MessageType.MessageGroup.CLIENT, new Link(dispatcher, msgQueue));
                 loop.addHandler(MessageType.MessageGroup.SERVER, new Server(dispatcher, this));
                 loop.addHandler(MessageType.MessageGroup.TIMER, new GlobalTimer(dispatcher, config));
-                loop.addHandler(MessageType.MessageGroup.ENV, new Environment(dispatcher, config));
+                loop.addHandler(MessageType.MessageGroup.ENVIRONMENT, new Environment(dispatcher, config));
                 loop.addHandler(MessageType.MessageGroup.SYSTEM, new Systems(dispatcher, msgQueue));
                 loop.addHandler(MessageType.MessageGroup.LAYOUT, new Layout(dispatcher, database, tracklayoutLock));
                 loop.addHandler(MessageType.MessageGroup.LAYOUTS, new Layouts(dispatcher, database, tracklayoutLock));

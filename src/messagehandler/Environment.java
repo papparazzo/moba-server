@@ -72,38 +72,38 @@ public class Environment extends MessageHandlerA {
         try {
             switch(msg.getMsgType()) {
 
-                case ENV_GET_ENVIRONMENT:
+                case ENVIRONMENT_GET_ENVIRONMENT:
                     dispatcher.dispatch(
-                        new Message(MessageType.ENV_SET_ENVIRONMENT, environment, msg.getEndpoint())
+                        new Message(MessageType.ENVIRONMENT_SET_ENVIRONMENT, environment, msg.getEndpoint())
                     );
                     break;
 
-                case ENV_SET_ENVIRONMENT:
+                case ENVIRONMENT_SET_ENVIRONMENT:
                     environment.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(new Message(MessageType.ENV_SET_ENVIRONMENT, environment));
+                    dispatcher.dispatch(new Message(MessageType.ENVIRONMENT_SET_ENVIRONMENT, environment));
                     break;
 
-                case ENV_GET_AMBIENCE:
-                    dispatcher.dispatch(new Message(MessageType.ENV_SET_AMBIENCE, ambience, msg.getEndpoint()));
+                case ENVIRONMENT_GET_AMBIENCE:
+                    dispatcher.dispatch(new Message(MessageType.ENVIRONMENT_SET_AMBIENCE, ambience, msg.getEndpoint()));
                     break;
 
-                case ENV_SET_AMBIENCE:
+                case ENVIRONMENT_SET_AMBIENCE:
                     ambience.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(new Message(MessageType.ENV_SET_AMBIENCE, ambience));
+                    dispatcher.dispatch(new Message(MessageType.ENVIRONMENT_SET_AMBIENCE, ambience));
                     break;
 
-                case ENV_GET_AMBIENT_LIGHT:
+                case ENVIRONMENT_GET_AMBIENT_LIGHT:
                     dispatcher.dispatch(
-                        new Message(MessageType.ENV_SET_AMBIENT_LIGHT, ambientLight, msg.getEndpoint())
+                        new Message(MessageType.ENVIRONMENT_SET_AMBIENT_LIGHT, ambientLight, msg.getEndpoint())
                     );
                     break;
 
-                case ENV_SET_AMBIENT_LIGHT:
+                case ENVIRONMENT_SET_AMBIENT_LIGHT:
                     setAmbientLight((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(new Message(MessageType.ENV_SET_AMBIENT_LIGHT, ambientLight));
+                    dispatcher.dispatch(new Message(MessageType.ENVIRONMENT_SET_AMBIENT_LIGHT, ambientLight));
                     break;
 
                 default:

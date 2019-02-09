@@ -69,12 +69,12 @@ public enum MessageType {
     //---------------------------------------------------
     // Environment
     //---------------------------------------------------
-    ENV_GET_ENVIRONMENT(MessageGroup.ENV, MessageClass.SINGLE),
-    ENV_SET_ENVIRONMENT(MessageGroup.ENV, MessageClass.GROUP),
-    ENV_GET_AMBIENCE(MessageGroup.ENV, MessageClass.SINGLE),
-    ENV_SET_AMBIENCE(MessageGroup.ENV, MessageClass.GROUP),
-    ENV_GET_AMBIENT_LIGHT(MessageGroup.ENV, MessageClass.SINGLE),
-    ENV_SET_AMBIENT_LIGHT(MessageGroup.ENV, MessageClass.GROUP),
+    ENVIRONMENT_GET_ENVIRONMENT(MessageGroup.ENVIRONMENT, MessageClass.SINGLE),
+    ENVIRONMENT_SET_ENVIRONMENT(MessageGroup.ENVIRONMENT, MessageClass.GROUP),
+    ENVIRONMENT_GET_AMBIENCE(MessageGroup.ENVIRONMENT, MessageClass.SINGLE),
+    ENVIRONMENT_SET_AMBIENCE(MessageGroup.ENVIRONMENT, MessageClass.GROUP),
+    ENVIRONMENT_GET_AMBIENT_LIGHT(MessageGroup.ENVIRONMENT, MessageClass.SINGLE),
+    ENVIRONMENT_SET_AMBIENT_LIGHT(MessageGroup.ENVIRONMENT, MessageClass.GROUP),
 
     //---------------------------------------------------
     // Interface
@@ -124,7 +124,7 @@ public enum MessageType {
         CLIENT,
         SERVER,
         TIMER,
-        ENV,
+        ENVIRONMENT,
         INTERFACE,
         SYSTEM,
         LAYOUTS,
