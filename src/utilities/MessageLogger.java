@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import datatypes.objects.NoticeData;
+import datatypes.objects.ErrorData;
 import messages.Message;
 import messages.MessageType;
 
@@ -62,13 +63,7 @@ public class MessageLogger {
             return;
         }
 
-        if(msg.getMsgType() == MessageType.GUI_SYSTEM_NOTICE) {
-            MessageLogger.printSystemNotice((NoticeData)msg.getData());
-            return;
-        }
-
         StringBuilder sb = new StringBuilder();
-        sb.append(ANSI_CYAN_BACKGROUND + ANSI_BLUE);
         SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS ");
         sb.append(df.format(new Date()));
         if(in) {
@@ -77,6 +72,7 @@ public class MessageLogger {
             sb.append("<-- ");
         }
         sb.append(msg.getMsgType().toString());
+        appendText(sb, msg);
         sb.append(" [");
         sb.append(msg.getMsgType().getMessageClass().toString());
         sb.append("] EP-");
@@ -89,35 +85,27 @@ public class MessageLogger {
         System.out.println(sb);
     }
 
-    protected static void printSystemNotice(NoticeData noticeData) {
-        String type = noticeData.getType().toString();
-
-        StringBuilder sb = new StringBuilder();
-        SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS ");
-
-        switch(type) {
-            case "INFO":
-                sb.append(ANSI_GREEN);
+    protected static void appendText(StringBuilder sb, Message msg) {
+        switch(msg.getMsgType()) {
+            case GUI_SYSTEM_NOTICE:
+                printSystemNotice(sb, (NoticeData)msg.getData());
                 break;
 
-            case "WARNING":
-                sb.append(ANSI_YELLOW);
+            case CLIENT_ERROR:
+                sb.append(((ErrorData)msg.getData()).toString());
                 break;
-
-            case "ERROR":
-                sb.append(ANSI_RED);
-                break;
-
             default:
+
         }
-        sb.append(df.format(new Date()));
-        sb.append("<-> ");
+    }
+
+    protected static void printSystemNotice(StringBuilder sb, NoticeData noticeData) {
+        String type = noticeData.getType().toString();
+        sb.append(":");
         sb.append(type);
         sb.append(": [");
         sb.append(noticeData.getCaption());
         sb.append("] ");
         sb.append(noticeData.getText());
-        sb.append(MessageLogger.ANSI_RESET);
-        System.out.println(sb);
     }
 }
