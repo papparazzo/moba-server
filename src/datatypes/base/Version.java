@@ -46,9 +46,7 @@ public class Version implements Comparable, JSONToStringI {
         String str = version;
 
         if(str == null || str.length() == 0) {
-            throw new IllegalArgumentException(
-                "version-string is empty or not set"
-            );
+            throw new IllegalArgumentException("version-string is empty or not set");
         }
 
         String sa[] = str.split("-");
