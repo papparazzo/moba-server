@@ -22,13 +22,10 @@ package utilities;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import datatypes.objects.NoticeData;
 import datatypes.objects.ErrorData;
 import messages.Message;
-import messages.MessageType;
 
 public class MessageLogger {
     protected static final String ANSI_RESET  = "\u001B[0m";
@@ -81,31 +78,35 @@ public class MessageLogger {
         } else {
             sb.append(msg.getEndpoint().toString());
         }
-        sb.append(MessageLogger.ANSI_RESET);
         System.out.println(sb);
     }
 
     protected static void appendText(StringBuilder sb, Message msg) {
         switch(msg.getMsgType()) {
             case GUI_SYSTEM_NOTICE:
+                sb.append(ANSI_CYAN);
+                sb.append(" >> ");
                 printSystemNotice(sb, (NoticeData)msg.getData());
+                sb.append(" <<");
+                sb.append(ANSI_RESET);
                 break;
 
             case CLIENT_ERROR:
+                sb.append(ANSI_CYAN);
+                sb.append(" >> ");
                 sb.append(((ErrorData)msg.getData()).toString());
+                sb.append(" <<");
+                sb.append(ANSI_RESET);
                 break;
-            default:
-
         }
     }
 
     protected static void printSystemNotice(StringBuilder sb, NoticeData noticeData) {
-        String type = noticeData.getType().toString();
-        sb.append(":");
-        sb.append(type);
-        sb.append(": [");
-        sb.append(noticeData.getCaption());
+        sb.append("[");
+        sb.append(noticeData.getType().toString());
         sb.append("] ");
+        sb.append(noticeData.getCaption());
+        sb.append(": ");
         sb.append(noticeData.getText());
     }
 }
