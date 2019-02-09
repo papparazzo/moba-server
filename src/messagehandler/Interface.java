@@ -69,9 +69,7 @@ public class Interface extends MessageHandlerA {
                     new Message(
                         MessageType.GUI_SYSTEM_NOTICE,
                         new NoticeData(
-                            NoticeType.ERROR,
-                            "Hardwarefehler",
-                            "Die Verbindung zur Harware wurde unterbrochen"
+                            NoticeType.ERROR, "Hardwarefehler", "Die Verbindung zur Harware wurde unterbrochen"
                         )
                     )
                 );
