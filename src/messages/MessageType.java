@@ -97,7 +97,7 @@ public enum MessageType {
     //---------------------------------------------------
     LAYOUTS_GET_LAYOUTS_REQ(MessageGroup.LAYOUTS, MessageClass.SINGLE),
     LAYOUTS_GET_LAYOUTS_RES(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    LAYOUTS_DEL_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
+    LAYOUTS_DELETE_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
     LAYOUTS_LAYOUT_DELETED(MessageGroup.LAYOUTS, MessageClass.GROUP),
     LAYOUTS_CREATE_LAYOUT_REQ(MessageGroup.LAYOUTS, MessageClass.SINGLE),
     LAYOUTS_CREATE_LAYOUT_RES(MessageGroup.LAYOUTS, MessageClass.SINGLE),

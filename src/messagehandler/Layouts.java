@@ -60,7 +60,7 @@ public class Layouts extends MessageHandlerA {
                 getLayouts(msg);
                 break;
 
-            case LAYOUTS_DEL_LAYOUT:
+            case LAYOUTS_DELETE_LAYOUT:
                 deleteLayout(msg);
                 break;
 
