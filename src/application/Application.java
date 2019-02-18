@@ -40,7 +40,7 @@ abstract public class Application {
     protected long       startTime;
 
     protected Config config = null;
-    protected PriorityBlockingQueue<Message> msgQueue = null;
+    protected PriorityBlockingQueue<Message> msgQueueIn = null;
 
     public void run(String appName, Version appVer, Date date, Config config)
     throws IOException, Exception {
@@ -49,7 +49,7 @@ abstract public class Application {
         this.startTime = System.currentTimeMillis();
         this.buildDate = date;
         this.config    = config;
-        this.msgQueue  = new PriorityBlockingQueue<>();
+        this.msgQueueIn  = new PriorityBlockingQueue<>();
 
         setUpLogger();
         loop();
@@ -72,10 +72,6 @@ abstract public class Application {
 
     public Date getBuildDate() {
         return buildDate;
-    }
-
-    public PriorityBlockingQueue<Message> getQueue() {
-        return msgQueue;
     }
 
     protected void setUpLogger()

@@ -49,25 +49,20 @@ public class ServerApplication extends Application {
             maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
             do {
                 Dispatcher dispatcher = new Dispatcher();
-                Acceptor acceptor = new Acceptor(
-                    msgQueue,
-                    dispatcher,
-                    (int)(long)config.getSection("common.serverConfig.port"),
-                    maxClients
-                );
+                Acceptor acceptor = new Acceptor(msgQueueIn, dispatcher, (int)(long)config.getSection("common.serverConfig.port"), maxClients);
                 Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
                 MessageLoop loop = new MessageLoop(dispatcher);
                 TracklayoutLock tracklayoutLock = new TracklayoutLock(dispatcher, database);
-                loop.addHandler(MessageType.MessageGroup.CLIENT, new Link(dispatcher, msgQueue));
+                loop.addHandler(MessageType.MessageGroup.CLIENT, new Link(dispatcher, msgQueueIn));
                 loop.addHandler(MessageType.MessageGroup.SERVER, new Server(dispatcher, this));
                 loop.addHandler(MessageType.MessageGroup.TIMER, new GlobalTimer(dispatcher, config));
                 loop.addHandler(MessageType.MessageGroup.ENVIRONMENT, new Environment(dispatcher, config));
-                loop.addHandler(MessageType.MessageGroup.SYSTEM, new Systems(dispatcher, msgQueue));
+                loop.addHandler(MessageType.MessageGroup.SYSTEM, new Systems(dispatcher, msgQueueIn));
                 loop.addHandler(MessageType.MessageGroup.LAYOUT, new Layout(dispatcher, database, tracklayoutLock));
                 loop.addHandler(MessageType.MessageGroup.LAYOUTS, new Layouts(dispatcher, database, tracklayoutLock));
-                loop.addHandler(MessageType.MessageGroup.INTERFACE, new Interface(dispatcher, msgQueue));
+                loop.addHandler(MessageType.MessageGroup.INTERFACE, new Interface(dispatcher, msgQueueIn));
                 acceptor.startAcceptor();
-                restart = loop.loop(msgQueue);
+                restart = loop.loop(msgQueueIn);
                 dispatcher.resetDispatcher();
                 acceptor.stopAcceptor();
             } while(restart);
