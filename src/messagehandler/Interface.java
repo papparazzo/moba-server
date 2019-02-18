@@ -26,34 +26,52 @@ import datatypes.enumerations.Connectivity;
 import datatypes.enumerations.HardwareState;
 import datatypes.enumerations.NoticeType;
 import datatypes.objects.NoticeData;
+import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import messages.Message;
 import messages.MessageHandlerA;
 import messages.MessageType;
 
-public class Interface extends MessageHandlerA {
+public class Interface extends MessageHandlerA implements Runnable {
+    protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     protected SenderI dispatcher = null;
     protected ServerApplication app = null;
 
     protected PriorityBlockingQueue<Message> msgQueue = null;
 
+    protected final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
     public Interface(SenderI dispatcher, PriorityBlockingQueue<Message> msgQueue) {
         this.dispatcher = dispatcher;
         this.msgQueue   = msgQueue;
+        this.scheduler.scheduleWithFixedDelay(this, 1, 30, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void run() {
+        try {
+            // FIXME: Is this really thread-save??
+            dispatcher.dispatch(new Message(MessageType.INTERFACE_CONNECTIVITY_REQ));
+        } catch(Exception e) {
+            LOGGER.log(Level.WARNING, "exception in scheduler occured! <{0}>", new Object[]{e.toString()});
+        }
     }
 
     @Override
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
-            case INTERFACE_SET_CONNECTIVITY:
+            case INTERFACE_CONNECTIVITY_RES:
                 setConnectivity(Connectivity.valueOf((String)msg.getData()));
                 return;
 
             default:
-                throw new UnsupportedOperationException(
-                    "unknow msg <" + msg.getMsgType().toString() + ">."
-                );
+                throw new UnsupportedOperationException("unknow msg <" + msg.getMsgType().toString() + ">.");
         }
     }
 
@@ -68,9 +86,7 @@ public class Interface extends MessageHandlerA {
                 dispatcher.dispatch(
                     new Message(
                         MessageType.GUI_SYSTEM_NOTICE,
-                        new NoticeData(
-                            NoticeType.ERROR, "Hardwarefehler", "Die Verbindung zur Harware wurde unterbrochen"
-                        )
+                        new NoticeData(NoticeType.ERROR, "Hardwarefehler", "Die Verbindung zur Harware wurde unterbrochen")
                     )
                 );
                 break;

@@ -79,7 +79,8 @@ public enum MessageType {
     //---------------------------------------------------
     // Interface
     //---------------------------------------------------
-    INTERFACE_SET_CONNECTIVITY(MessageGroup.INTERFACE, MessageClass.SINGLE),
+    INTERFACE_CONNECTIVITY_REQ(MessageGroup.INTERFACE, MessageClass.GROUP),
+    INTERFACE_CONNECTIVITY_RES(MessageGroup.INTERFACE, MessageClass.SINGLE),
 
     //---------------------------------------------------
     // System
