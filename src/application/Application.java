@@ -80,8 +80,6 @@ abstract public class Application {
 
     protected void setUpLogger()
     throws IOException {
-        //Level level    = Level.ALL;
-
         String logfile = (String)config.getSection("common.logging.logfilepath");
         Level level = Level.parse((String)config.getSection("common.logging.level"));
 
