@@ -23,7 +23,6 @@ package messagehandler;
 import com.Endpoint;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import com.SenderI;
 import datatypes.enumerations.ErrorId;
 import datatypes.enumerations.HardwareState;
 import datatypes.enumerations.NoticeType;
@@ -35,13 +34,13 @@ import messages.MessageType;
 
 public class Systems extends MessageHandlerA {
     protected HardwareState status = HardwareState.ERROR;
-    protected SenderI dispatcher = null;
+    protected PriorityBlockingQueue<Message> msgQueueOut = null;
     protected PriorityBlockingQueue<Message> msgQueue = null;
 
     protected boolean automaticMode = false;
 
-    public Systems(SenderI dispatcher, PriorityBlockingQueue<Message> msgQueue) {
-        this.dispatcher = dispatcher;
+    public Systems(PriorityBlockingQueue<Message> msgQueueOut, PriorityBlockingQueue<Message> msgQueue) {
+        this.msgQueueOut = msgQueueOut;
         this.msgQueue   = msgQueue;
     }
 
@@ -61,7 +60,7 @@ public class Systems extends MessageHandlerA {
                 break;
 
             case SYSTEM_GET_HARDWARE_STATE:
-                dispatcher.dispatch(
+                msgQueueOut.add(
                     new Message(
                         MessageType.SYSTEM_HARDWARE_STATE_CHANGED,
                         status.toString(),
@@ -106,7 +105,7 @@ public class Systems extends MessageHandlerA {
 
         if(setAutomaticMode) {
             msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
-            dispatcher.dispatch(
+            msgQueueOut.add(
                 new Message(
                     MessageType.GUI_SYSTEM_NOTICE,
                     new NoticeData(NoticeType.INFO, "Automatik", "Die Hardware befindet sich im Automatikmodus")
@@ -115,7 +114,7 @@ public class Systems extends MessageHandlerA {
             return;
         }
         msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.MANUEL));
-        dispatcher.dispatch(
+        msgQueueOut.add(
             new Message(
                 MessageType.GUI_SYSTEM_NOTICE,
                 new NoticeData(NoticeType.INFO, "Automatik", "Automatikmodus wurde deaktiviert")
@@ -137,7 +136,7 @@ public class Systems extends MessageHandlerA {
         }
 
         if(emergencyStop) {
-            dispatcher.dispatch(
+            msgQueueOut.add(
                 new Message(
                     MessageType.GUI_SYSTEM_NOTICE,
                     new NoticeData(NoticeType.WARNING, "Nothalt gedrückt", "Es wurde ein Nothalt ausgelöst")
@@ -146,7 +145,7 @@ public class Systems extends MessageHandlerA {
             msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.EMERGENCY_STOP));
             return;
         }
-        dispatcher.dispatch(
+        msgQueueOut.add(
             new Message(
                 MessageType.GUI_SYSTEM_NOTICE,
                 new NoticeData(NoticeType.INFO, "Nothaltfreigabe", "Der Nothalt wurde wieder freigegeben")
@@ -173,7 +172,7 @@ public class Systems extends MessageHandlerA {
         }
 
         if(setStandByMode) {
-            dispatcher.dispatch(
+            msgQueueOut.add(
                 new Message(
                     MessageType.GUI_SYSTEM_NOTICE,
                     new NoticeData(NoticeType.WARNING, "Standby", "Anlage wird in den Standby-Modus geschickt")
@@ -182,7 +181,7 @@ public class Systems extends MessageHandlerA {
             msgQueue.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.STANDBY));
             return;
         }
-        dispatcher.dispatch(
+        msgQueueOut.add(
             new Message(
                 MessageType.GUI_SYSTEM_NOTICE,
                 new NoticeData(NoticeType.INFO, "Standby", "Die Anlage wird aus dem Standby-Modus geholt")
@@ -196,7 +195,7 @@ public class Systems extends MessageHandlerA {
     }
 
     protected void sendErrorMessage(Endpoint endpoint) {
-        dispatcher.dispatch(
+        msgQueueOut.add(
             new Message(
                 MessageType.CLIENT_ERROR,
                 new ErrorData(
@@ -211,7 +210,7 @@ public class Systems extends MessageHandlerA {
     @Override
     public void hardwareStateChanged(HardwareState state) {
         status = state;
-        dispatcher.dispatch(
+        msgQueueOut.add(
             new Message(MessageType.SYSTEM_HARDWARE_STATE_CHANGED, status.toString())
         );
     }

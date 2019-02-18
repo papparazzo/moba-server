@@ -20,16 +20,16 @@
 
 package messagehandler;
 
-import com.SenderI;
+import java.util.concurrent.PriorityBlockingQueue;
 import messages.Message;
 import messages.MessageHandlerA;
 import messages.MessageType;
 
 public class Gui extends MessageHandlerA {
-    protected SenderI dispatcher = null;
+    protected PriorityBlockingQueue<Message> msgQueueOut = null;
 
-    public Gui(SenderI dispatcher) {
-        this.dispatcher = dispatcher;
+    public Gui(PriorityBlockingQueue<Message> msgQueueOut) {
+        this.msgQueueOut = msgQueueOut;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class Gui extends MessageHandlerA {
     }
 
     public void sendSystemNotice(Message msg) {
-        dispatcher.dispatch(
+        msgQueueOut.add(
             new Message(
                 MessageType.GUI_SYSTEM_NOTICE,
                 msg.getData()

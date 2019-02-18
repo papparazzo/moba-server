@@ -24,12 +24,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.SenderI;
 import datatypes.enumerations.ErrorId;
 import datatypes.objects.AmbienceData;
 import datatypes.objects.AmbientLightData;
 import datatypes.objects.ErrorData;
 import datatypes.objects.EnvironmentData;
+import java.util.concurrent.PriorityBlockingQueue;
 import json.JSONException;
 import messages.Message;
 import messages.MessageHandlerA;
@@ -38,15 +38,15 @@ import utilities.config.Config;
 import utilities.config.ConfigException;
 
 public class Environment extends MessageHandlerA {
-    protected SenderI dispatcher = null;
+    protected PriorityBlockingQueue<Message> msgQueueOut = null;
     protected Config  config = null;
 
     protected EnvironmentData  environment  = new EnvironmentData();
     protected AmbienceData     ambience     = new AmbienceData();
     protected AmbientLightData ambientLight = new AmbientLightData();
 
-    public Environment(SenderI dispatcher, Config config) {
-        this.dispatcher = dispatcher;
+    public Environment(PriorityBlockingQueue<Message> msgQueueOut, Config config) {
+        this.msgQueueOut = msgQueueOut;
         this.config = config;
     }
 
@@ -73,7 +73,7 @@ public class Environment extends MessageHandlerA {
             switch(msg.getMsgType()) {
 
                 case ENVIRONMENT_GET_ENVIRONMENT:
-                    dispatcher.dispatch(
+                    msgQueueOut.add(
                         new Message(MessageType.ENVIRONMENT_SET_ENVIRONMENT, environment, msg.getEndpoint())
                     );
                     break;
@@ -81,21 +81,21 @@ public class Environment extends MessageHandlerA {
                 case ENVIRONMENT_SET_ENVIRONMENT:
                     environment.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(new Message(MessageType.ENVIRONMENT_SET_ENVIRONMENT, environment));
+                    msgQueueOut.add(new Message(MessageType.ENVIRONMENT_SET_ENVIRONMENT, environment));
                     break;
 
                 case ENVIRONMENT_GET_AMBIENCE:
-                    dispatcher.dispatch(new Message(MessageType.ENVIRONMENT_SET_AMBIENCE, ambience, msg.getEndpoint()));
+                    msgQueueOut.add(new Message(MessageType.ENVIRONMENT_SET_AMBIENCE, ambience, msg.getEndpoint()));
                     break;
 
                 case ENVIRONMENT_SET_AMBIENCE:
                     ambience.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(new Message(MessageType.ENVIRONMENT_SET_AMBIENCE, ambience));
+                    msgQueueOut.add(new Message(MessageType.ENVIRONMENT_SET_AMBIENCE, ambience));
                     break;
 
                 case ENVIRONMENT_GET_AMBIENT_LIGHT:
-                    dispatcher.dispatch(
+                    msgQueueOut.add(
                         new Message(MessageType.ENVIRONMENT_SET_AMBIENT_LIGHT, ambientLight, msg.getEndpoint())
                     );
                     break;
@@ -103,7 +103,7 @@ public class Environment extends MessageHandlerA {
                 case ENVIRONMENT_SET_AMBIENT_LIGHT:
                     setAmbientLight((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(new Message(MessageType.ENVIRONMENT_SET_AMBIENT_LIGHT, ambientLight));
+                    msgQueueOut.add(new Message(MessageType.ENVIRONMENT_SET_AMBIENT_LIGHT, ambientLight));
                     break;
 
                 default:
@@ -115,7 +115,7 @@ public class Environment extends MessageHandlerA {
             java.lang.ClassCastException | IOException | JSONException |
             ConfigException | NullPointerException | IllegalArgumentException e
         ) {
-            dispatcher.dispatch(
+            msgQueueOut.add(
                 new Message(
                     MessageType.CLIENT_ERROR,
                     new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()),

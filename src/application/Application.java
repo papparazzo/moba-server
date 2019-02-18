@@ -41,6 +41,7 @@ abstract public class Application {
 
     protected Config config = null;
     protected PriorityBlockingQueue<Message> msgQueueIn = null;
+    protected PriorityBlockingQueue<Message> msgQueueOut = null;
 
     public void run(String appName, Version appVer, Date date, Config config)
     throws IOException, Exception {
@@ -50,7 +51,7 @@ abstract public class Application {
         this.buildDate = date;
         this.config    = config;
         this.msgQueueIn  = new PriorityBlockingQueue<>();
-
+        this.msgQueueOut = new PriorityBlockingQueue<>();
         setUpLogger();
         loop();
     }

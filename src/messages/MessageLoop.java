@@ -37,10 +37,12 @@ public class MessageLoop {
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     protected Map<MessageGroup, MessageHandlerA> handlers = new HashMap<>();
+    protected PriorityBlockingQueue<Message> msgQueueOut = null;
     protected Dispatcher dispatcher = null;
 
-    public MessageLoop(Dispatcher dispatcher) {
+    public MessageLoop(Dispatcher dispatcher, PriorityBlockingQueue<Message> msgQueueOut) {
         this.dispatcher = dispatcher;
+        this.msgQueueOut = msgQueueOut;
     }
 
     public void addHandler(MessageGroup msgGroup, MessageHandlerA msgHandler) {
@@ -106,9 +108,7 @@ public class MessageLoop {
 
     protected void resetHandler() {
         for(Endpoint ep : dispatcher.getEndpoints()) {
-            dispatcher.dispatch(
-                new Message(MessageType.CLIENT_RESET, null, ep)
-            );
+            msgQueueOut.add(new Message(MessageType.CLIENT_RESET, null, ep));
         }
         Iterator<MessageGroup> iter = handlers.keySet().iterator();
         while(iter.hasNext()) {
@@ -118,9 +118,7 @@ public class MessageLoop {
 
     protected void shutdownHandler() {
         for(Endpoint ep : dispatcher.getEndpoints()) {
-            dispatcher.dispatch(
-                    new Message(MessageType.CLIENT_SHUTDOWN, null, ep)
-            );
+            msgQueueOut.add(new Message(MessageType.CLIENT_SHUTDOWN, null, ep));
         }
         Iterator<MessageGroup> iter = handlers.keySet().iterator();
         while(iter.hasNext()) {

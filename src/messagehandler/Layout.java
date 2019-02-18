@@ -28,13 +28,13 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.SenderI;
 import database.Database;
 import datatypes.enumerations.ErrorId;
 import datatypes.objects.ErrorData;
 import datatypes.objects.TracklayoutSymbolData;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
+import java.util.concurrent.PriorityBlockingQueue;
 import messages.Message;
 import messages.MessageHandlerA;
 import messages.MessageType;
@@ -43,14 +43,14 @@ import tracklayout.utilities.TracklayoutLock;
 public class Layout extends MessageHandlerA {
 
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    protected Database  database   = null;
-    protected SenderI   dispatcher = null;
+    protected Database database = null;
+    protected PriorityBlockingQueue<Message> msgQueueOut = null;
     protected TracklayoutLock lock = null;
 
-    public Layout(SenderI dispatcher, Database database, TracklayoutLock lock) {
-        this.database   = database;
-        this.dispatcher = dispatcher;
-        this.lock       = lock;
+    public Layout(PriorityBlockingQueue<Message> msgQueueOut, Database database, TracklayoutLock lock) {
+        this.database = database;
+        this.msgQueueOut = msgQueueOut;
+        this.lock = lock;
     }
 
     @Override
@@ -115,13 +115,13 @@ public class Layout extends MessageHandlerA {
                 }
                 map.put("symbols", arraylist);
 
-                dispatcher.dispatch(
+                msgQueueOut.add(
                     new Message(MessageType.LAYOUT_GET_LAYOUT_RES, map, msg.getEndpoint())
                 );
             }
         } catch(SQLException e) {
             Layout.LOGGER.log(Level.WARNING, e.toString());
-            dispatcher.dispatch(new Message(
+            msgQueueOut.add(new Message(
                     MessageType.CLIENT_ERROR,
                     new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
                     msg.getEndpoint()

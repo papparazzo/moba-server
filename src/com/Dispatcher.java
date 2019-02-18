@@ -25,6 +25,7 @@ import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,13 +36,19 @@ import messages.Message;
 import messages.MessageType;
 import utilities.MessageLogger;
 
-public class Dispatcher implements SenderI {
+public class Dispatcher {
     protected final Set<Endpoint> allEndpoints = new HashSet<>();
 
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     protected final EnumMap<MessageType.MessageGroup, Set<Endpoint>>
         groupEP = new EnumMap<>(MessageType.MessageGroup.class);
+
+    protected PriorityBlockingQueue<Message> msgQueueOut = null;
+
+    public Dispatcher(PriorityBlockingQueue<Message> msgQueueOut) {
+        this.msgQueueOut = msgQueueOut;
+    }
 
     public boolean addEndpoint(Endpoint ep) {
         Dispatcher.LOGGER.log(
@@ -149,13 +156,9 @@ public class Dispatcher implements SenderI {
         return null;
     }
 
-    @Override
-    public boolean dispatch(Message msg) {
+    public boolean dispatch() throws InterruptedException {
         try {
-            if(msg == null) {
-                Dispatcher.LOGGER.log(Level.SEVERE, "msg is null!");
-                return false;
-            }
+            Message msg = msgQueueOut.take();
             MessageLogger.out(msg);
             Dispatcher.LOGGER.log(Level.INFO, "try to send message <{0}>", new Object[]{msg.getMsgType().toString()});
 

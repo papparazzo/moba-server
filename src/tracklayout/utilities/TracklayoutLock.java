@@ -21,7 +21,6 @@
 package tracklayout.utilities;
 
 import com.Endpoint;
-import com.SenderI;
 import database.Database;
 import datatypes.enumerations.ErrorId;
 import datatypes.objects.ErrorData;
@@ -30,6 +29,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import messages.Message;
@@ -39,11 +39,11 @@ public class TracklayoutLock {
 
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     protected Database database   = null;
-    protected SenderI  dispatcher = null;
+    protected PriorityBlockingQueue<Message> msgQueueOut = null;
 
-    public TracklayoutLock(SenderI dispatcher, Database database) {
+    public TracklayoutLock(PriorityBlockingQueue<Message> msgQueueOut, Database database) {
         this.database   = database;
-        this.dispatcher = dispatcher;
+        this.msgQueueOut = msgQueueOut;
     }
 
     public void freeLocks(long id) {
@@ -77,7 +77,7 @@ public class TracklayoutLock {
             return false;
         }
         TracklayoutLock.LOGGER.log(Level.WARNING, "layout <{0}> is locked", new Object[]{id});
-        dispatcher.dispatch(new Message(
+        msgQueueOut.add(new Message(
             MessageType.CLIENT_ERROR,
             new ErrorData(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">"),
             ep
@@ -119,17 +119,17 @@ public class TracklayoutLock {
                 TracklayoutLock.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
 
                 if(pstmt.executeUpdate() == 0) {
-                    dispatcher.dispatch(
+                    msgQueueOut.add(
                         new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATASET_MISSING), msg.getEndpoint())
                     );
                     pstmt.close();
                     return;
                 }
             }
-            dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_UNLOCKED, id));
+            msgQueueOut.add(new Message(MessageType.LAYOUTS_LAYOUT_UNLOCKED, id));
         } catch(SQLException e) {
             TracklayoutLock.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
-            dispatcher.dispatch(
+            msgQueueOut.add(
                 new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()), msg.getEndpoint())
             );
         }
