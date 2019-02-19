@@ -115,11 +115,11 @@ public class Endpoint extends Thread implements JSONToStringI {
         app.put("msgGroups", msgGroups);
 
         HashMap<String, Object> map = new HashMap<>();
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss.SSSS");
+        SimpleDateFormat dfs = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
         map.put("appInfo",   app);
         map.put("appID",     id);
-        map.put("upTime",    df.format(System.currentTimeMillis() - startTime));
+        map.put("startTime", dfs.format(startTime));
         map.put("addr",      socket.getInetAddress());
         map.put("port",      socket.getPort());
 
