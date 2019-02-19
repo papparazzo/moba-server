@@ -102,7 +102,6 @@ public class Server extends MessageHandlerA {
 
     private void handleServerInfoReq(Endpoint ep) {
         HashMap<String, Object> map = new HashMap<>();
-        SimpleDateFormat dfu        = new SimpleDateFormat("HH:mm:ss");
         SimpleDateFormat dfs        = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         SimpleDateFormat dfb        = new SimpleDateFormat("dd.MM.yyyy");
 
@@ -110,7 +109,6 @@ public class Server extends MessageHandlerA {
         map.put("version",           app.getVersion());
         map.put("buildDate",         dfb.format(app.getBuildDate()));
         map.put("startTime",         dfs.format(app.getStartTime()));
-        map.put("upTime",            dfu.format(java.lang.System.currentTimeMillis() - app.getStartTime()));
 
         map.put("maxClients",        app.getMaxClients());
         map.put("connectedClients",  dispatcher.getEndPointsCount());
