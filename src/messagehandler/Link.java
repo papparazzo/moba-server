@@ -33,12 +33,10 @@ import messages.MessageType;
 public class Link extends MessageHandlerA {
 
     protected Dispatcher dispatcher = null;
-    protected PriorityBlockingQueue<Message> msgQueueOut = null;
     protected PriorityBlockingQueue<Message> msgQueueIn = null;
 
-    public Link(Dispatcher dispatcher, PriorityBlockingQueue<Message> msgQueueOut, PriorityBlockingQueue<Message> msgQueue) {
+    public Link(Dispatcher dispatcher, PriorityBlockingQueue<Message> msgQueue) {
         this.dispatcher = dispatcher;
-        this.msgQueueOut = msgQueueOut;
         this.msgQueueIn  = msgQueue;
     }
 
@@ -49,7 +47,7 @@ public class Link extends MessageHandlerA {
                 break;
 
             case CLIENT_ECHO_REQ:
-                msgQueueOut.add(new Message(MessageType.CLIENT_ECHO_RES, msg.getData(), msg.getEndpoint()));
+                dispatcher.dispatch(new Message(MessageType.CLIENT_ECHO_RES, msg.getData(), msg.getEndpoint()));
                 break;
 
             case CLIENT_START:
@@ -70,7 +68,7 @@ public class Link extends MessageHandlerA {
     protected void handleClientStart(Message msg) {
         Endpoint ep = msg.getEndpoint();
         if(!dispatcher.addEndpoint(ep)) {
-            msgQueueOut.add(
+            dispatcher.dispatch(
                 new Message(
                     MessageType.CLIENT_ERROR,
                     new ErrorData(ErrorId.INVALID_DATA_SEND, "Endpoint <" + ep.toString() + "> allready exists"),
@@ -79,14 +77,14 @@ public class Link extends MessageHandlerA {
             );
             return;
         }
-        msgQueueOut.add(new Message(MessageType.CLIENT_CONNECTED, ep.getAppId(), ep));
-        msgQueueOut.add(new Message(MessageType.SERVER_NEW_CLIENT_STARTED, ep));
+        dispatcher.dispatch(new Message(MessageType.CLIENT_CONNECTED, ep.getAppId(), ep));
+        dispatcher.dispatch(new Message(MessageType.SERVER_NEW_CLIENT_STARTED, ep));
     }
 
     protected void handleClientClose(Message msg) {
         msgQueueIn.add(new Message(MessageType.BASE_FREE_RESOURCES, (long)msg.getEndpoint().getAppId()));
         dispatcher.removeEndpoint(msg.getEndpoint());
-        msgQueueOut.add(new Message(MessageType.SERVER_CLIENT_CLOSED, msg.getEndpoint().getAppId()));
+        dispatcher.dispatch(new Message(MessageType.SERVER_CLIENT_CLOSED, msg.getEndpoint().getAppId()));
     }
 }
 

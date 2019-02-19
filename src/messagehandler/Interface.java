@@ -21,6 +21,7 @@
 package messagehandler;
 
 import application.ServerApplication;
+import com.SenderI;
 import datatypes.enumerations.Connectivity;
 import datatypes.enumerations.HardwareState;
 import datatypes.enumerations.NoticeType;
@@ -39,15 +40,15 @@ import messages.MessageType;
 public class Interface extends MessageHandlerA implements Runnable {
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
+    protected SenderI dispatcher = null;
     protected ServerApplication app = null;
 
     protected PriorityBlockingQueue<Message> msgQueueIn = null;
-    protected PriorityBlockingQueue<Message> msgQueueOut = null;
 
     protected final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    public Interface(PriorityBlockingQueue<Message> msgQueueOut, PriorityBlockingQueue<Message> msgQueueIn) {
-        this.msgQueueOut = msgQueueOut;
+    public Interface(SenderI dispatcher, PriorityBlockingQueue<Message> msgQueueIn) {
+        this.dispatcher = dispatcher;
         this.msgQueueIn   = msgQueueIn;
         this.scheduler.scheduleWithFixedDelay(this, 1, 30, TimeUnit.SECONDS);
     }
@@ -55,7 +56,7 @@ public class Interface extends MessageHandlerA implements Runnable {
     @Override
     public void run() {
         try {
-            msgQueueOut.add(new Message(MessageType.INTERFACE_CONNECTIVITY_REQ));
+            dispatcher.dispatch(new Message(MessageType.INTERFACE_CONNECTIVITY_REQ));
         } catch(Exception e) {
             LOGGER.log(Level.WARNING, "exception in scheduler occured! <{0}>", new Object[]{e.toString()});
         }
@@ -81,7 +82,7 @@ public class Interface extends MessageHandlerA implements Runnable {
 
             case ERROR:
                 msgQueueIn.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.ERROR));
-                msgQueueOut.add(
+                dispatcher.dispatch(
                     new Message(
                         MessageType.GUI_SYSTEM_NOTICE,
                         new NoticeData(NoticeType.ERROR, "Hardwarefehler", "Die Verbindung zur Harware wurde unterbrochen")

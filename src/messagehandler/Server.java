@@ -28,7 +28,6 @@ import com.Dispatcher;
 import com.Endpoint;
 import datatypes.objects.ErrorData;
 import datatypes.enumerations.ErrorId;
-import java.util.concurrent.PriorityBlockingQueue;
 import messages.Message;
 import messages.MessageHandlerA;
 import messages.MessageType;
@@ -36,12 +35,10 @@ import messages.MessageType;
 
 public class Server extends MessageHandlerA {
 
-    protected PriorityBlockingQueue<Message> msgQueueOut = null;
     protected Dispatcher dispatcher = null;
     protected ServerApplication app = null;
 
-    public Server(Dispatcher dispatcher, PriorityBlockingQueue<Message> msgQueueOut, ServerApplication app) {
-        this.msgQueueOut = msgQueueOut;
+    public Server(Dispatcher dispatcher, ServerApplication app) {
         this.dispatcher = dispatcher;
         this.app = app;
     }
@@ -54,12 +51,12 @@ public class Server extends MessageHandlerA {
                 return;
 
             case SERVER_CON_CLIENTS_REQ:
-                msgQueueOut.add(new Message(MessageType.SERVER_CON_CLIENTS_RES, dispatcher.getEndpoints(), msg.getEndpoint()));
+                dispatcher.dispatch(new Message(MessageType.SERVER_CON_CLIENTS_RES, dispatcher.getEndpoints(), msg.getEndpoint()));
                 return;
         }
 
         if(!checkForSameOrigin(msg.getEndpoint())) {
-            msgQueueOut.add(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.SAME_ORIGIN_NEEDED), msg.getEndpoint()));
+            dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.SAME_ORIGIN_NEEDED), msg.getEndpoint()));
             return;
         }
 
@@ -82,10 +79,10 @@ public class Server extends MessageHandlerA {
     protected void sendToClient(Message msg, MessageType mType) {
         Endpoint ep = dispatcher.getEndpointByAppId((long)msg.getData());
         if(ep != null) {
-            msgQueueOut.add(new Message(mType, null, ep));
+            dispatcher.dispatch(new Message(mType, null, ep));
             return;
         }
-        msgQueueOut.add(new Message(
+        dispatcher.dispatch(new Message(
                 MessageType.CLIENT_ERROR,
                 new ErrorData(ErrorId.INVALID_APP_ID, "app-id <" + msg.getData().toString() + "> is invalid"),
                 msg.getEndpoint()
@@ -127,6 +124,6 @@ public class Server extends MessageHandlerA {
         map.put("fwType",            java.lang.System.getProperty("java.vm.vendor", ""));
         map.put("fwVersion",         java.lang.System.getProperty("java.version", ""));
 
-        msgQueueOut.add(new Message(MessageType.SERVER_INFO_RES, map, ep));
+        dispatcher.dispatch(new Message(MessageType.SERVER_INFO_RES, map, ep));
     }
 }

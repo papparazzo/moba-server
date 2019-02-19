@@ -20,6 +20,7 @@
 
 package messagehandler;
 
+import com.SenderI;
 import datatypes.enumerations.ColorTheme;
 import datatypes.enumerations.ErrorId;
 import datatypes.enumerations.HardwareState;
@@ -30,7 +31,6 @@ import datatypes.objects.GlobalTimerData;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.PriorityBlockingQueue;
 import json.JSONException;
 import messages.Message;
 import messages.MessageHandlerA;
@@ -39,7 +39,7 @@ import utilities.config.Config;
 import utilities.config.ConfigException;
 
 public class GlobalTimer extends MessageHandlerA implements Runnable {
-    protected PriorityBlockingQueue<Message> msgQueueOut = null;
+    protected SenderI         dispatcher = null;
     protected Config          config = null;
     protected Thread          thread = null;
     protected GlobalTimerData timerData = null;
@@ -48,8 +48,8 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
     protected ColorTheme       curTheme = null;
     protected volatile boolean isRunning = false;
 
-    public GlobalTimer(PriorityBlockingQueue<Message> msgQueueOut, Config config) {
-        this.msgQueueOut = msgQueueOut;
+    public GlobalTimer(SenderI dispatcher, Config config) {
+        this.dispatcher = dispatcher;
         this.config = config;
         timerData = new GlobalTimerData();
         themeData = new ColorThemeData();
@@ -93,7 +93,7 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
         try {
             switch(msg.getMsgType()) {
                 case TIMER_GET_GLOBAL_TIMER:
-                    msgQueueOut.add(
+                    dispatcher.dispatch(
                         new Message(MessageType.TIMER_SET_GLOBAL_TIMER, timerData, msg.getEndpoint())
                     );
                     break;
@@ -101,15 +101,15 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
                 case TIMER_SET_GLOBAL_TIMER:
                     timerData.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
-                    msgQueueOut.add(new Message(MessageType.TIMER_SET_GLOBAL_TIMER, timerData)
+                    dispatcher.dispatch(new Message(MessageType.TIMER_SET_GLOBAL_TIMER, timerData)
                     );
                     break;
 
                 case TIMER_GET_COLOR_THEME:
-                    msgQueueOut.add(
+                    dispatcher.dispatch(
                         new Message(MessageType.TIMER_SET_COLOR_THEME, themeData, msg.getEndpoint())
                     );
-                    msgQueueOut.add(
+                    dispatcher.dispatch(
                         new Message(MessageType.TIMER_COLOR_THEME_EVENT, curTheme, msg.getEndpoint())
                     );
                     break;
@@ -117,7 +117,7 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
                 case TIMER_SET_COLOR_THEME:
                     themeData.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
-                    msgQueueOut.add(new Message(MessageType.TIMER_SET_COLOR_THEME, themeData));
+                    dispatcher.dispatch(new Message(MessageType.TIMER_SET_COLOR_THEME, themeData));
                     break;
 
 
@@ -131,7 +131,7 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
             java.lang.ClassCastException | IOException | JSONException |
             ConfigException | NullPointerException e
         ) {
-            msgQueueOut.add(
+            dispatcher.dispatch(
                 new Message(
                     MessageType.CLIENT_ERROR,
                     new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()),
@@ -139,7 +139,7 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
                 )
             );
         } catch(IllegalArgumentException e) {
-            msgQueueOut.add(
+            dispatcher.dispatch(
                 new Message(
                     MessageType.CLIENT_ERROR,
                     new ErrorData(ErrorId.INVALID_DATA_SEND, e.getMessage()),
@@ -159,7 +159,7 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
                 }
 
                 if(timerData.setTick()) {
-                    msgQueueOut.add(new Message(MessageType.TIMER_GLOBAL_TIMER_EVENT, timerData));
+                    dispatcher.dispatch(new Message(MessageType.TIMER_GLOBAL_TIMER_EVENT, timerData));
                 }
 
                 if(themeData.getColorThemeCondition() != ThreeState.AUTO) {
@@ -185,7 +185,7 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
                     curTheme = ColorTheme.BRIGHT;
                 }
 
-                msgQueueOut.add(new Message(MessageType.TIMER_COLOR_THEME_EVENT, curTheme));
+                dispatcher.dispatch(new Message(MessageType.TIMER_COLOR_THEME_EVENT, curTheme));
             }
         } catch(InterruptedException e) {
 

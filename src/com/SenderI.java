@@ -18,35 +18,10 @@
  *
  */
 
-package messagehandler;
+package com;
 
-import com.SenderI;
 import messages.Message;
-import messages.MessageHandlerA;
-import messages.MessageType;
 
-public class Gui extends MessageHandlerA {
-    protected SenderI dispatcher = null;
-
-    public Gui(SenderI dispatcher) {
-        this.dispatcher = dispatcher;
-    }
-
-    @Override
-    public void handleMsg(Message msg) {
-        switch(msg.getMsgType()) {
-            case GUI_SYSTEM_NOTICE:
-                sendSystemNotice(msg);
-                break;
-        }
-    }
-
-    public void sendSystemNotice(Message msg) {
-        dispatcher.dispatch(
-            new Message(
-                MessageType.GUI_SYSTEM_NOTICE,
-                msg.getData()
-            )
-        );
-    }
+public interface SenderI {
+    public boolean dispatch(Message msg);
 }

@@ -30,11 +30,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.SenderI;
 import database.Database;
 import datatypes.enumerations.ErrorId;
 import datatypes.objects.TracklayoutData;
 import datatypes.objects.ErrorData;
-import java.util.concurrent.PriorityBlockingQueue;
 import messages.Message;
 import messages.MessageHandlerA;
 import messages.MessageType;
@@ -44,13 +44,13 @@ public class Layouts extends MessageHandlerA {
 
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     protected Database database    = null;
-    protected PriorityBlockingQueue<Message> msgQueueOut  = null;
+    protected SenderI  dispatcher  = null;
     protected TracklayoutLock lock = null;
 
-    public Layouts(PriorityBlockingQueue<Message> msgQueueOut, Database database, TracklayoutLock lock) {
-        this.database = database;
-        this.msgQueueOut = msgQueueOut;
-        this.lock = lock;
+    public Layouts(SenderI dispatcher, Database database, TracklayoutLock lock) {
+        this.database   = database;
+        this.dispatcher = dispatcher;
+        this.lock       = lock;
     }
 
     @Override
@@ -121,10 +121,10 @@ public class Layouts extends MessageHandlerA {
                     ));
                 }
             }
-            msgQueueOut.add(new Message(MessageType.LAYOUTS_GET_LAYOUTS_RES, arraylist, msg.getEndpoint()));
+            dispatcher.dispatch(new Message(MessageType.LAYOUTS_GET_LAYOUTS_RES, arraylist, msg.getEndpoint()));
         } catch(SQLException e) {
             Layouts.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
-            msgQueueOut.add(new Message(
+            dispatcher.dispatch(new Message(
                 MessageType.CLIENT_ERROR,
                 new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
                 msg.getEndpoint()
@@ -148,7 +148,7 @@ public class Layouts extends MessageHandlerA {
                 pstmt.setLong(3, id);
                 Layouts.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
                 if(pstmt.executeUpdate() == 0) {
-                    msgQueueOut.add(new Message(
+                    dispatcher.dispatch(new Message(
                         MessageType.CLIENT_ERROR,
                         new ErrorData(ErrorId.DATASET_MISSING, ""),
                         msg.getEndpoint()
@@ -157,10 +157,10 @@ public class Layouts extends MessageHandlerA {
                     return;
                 }
             }
-            msgQueueOut.add(new Message(MessageType.LAYOUTS_LAYOUT_DELETED, id));
+            dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_DELETED, id));
         } catch(SQLException e) {
             Layouts.LOGGER.log(Level.WARNING, e.toString());
-            msgQueueOut.add(new Message(
+            dispatcher.dispatch(new Message(
                 MessageType.CLIENT_ERROR,
                 new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
                 msg.getEndpoint()
@@ -191,11 +191,11 @@ public class Layouts extends MessageHandlerA {
                     tl.setId(rs.getInt(1));
                 }
             }
-            msgQueueOut.add(new Message(MessageType.LAYOUTS_LAYOUT_CREATED, tl));
-            msgQueueOut.add(new Message(MessageType.LAYOUTS_CREATE_LAYOUT_RES, tl.getId(), msg.getEndpoint()));
+            dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_CREATED, tl));
+            dispatcher.dispatch(new Message(MessageType.LAYOUTS_CREATE_LAYOUT_RES, tl.getId(), msg.getEndpoint()));
         } catch(SQLException e) {
             Layouts.LOGGER.log(Level.WARNING, e.toString());
-            msgQueueOut.add(new Message(
+            dispatcher.dispatch(new Message(
                 MessageType.CLIENT_ERROR,
                 new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
                 msg.getEndpoint()
@@ -240,7 +240,7 @@ public class Layouts extends MessageHandlerA {
                 pstmt.setLong(7, msg.getEndpoint().getAppId());
                 pstmt.setLong(8, id);
                 if(pstmt.executeUpdate() == 0) {
-                    msgQueueOut.add(new Message(
+                    dispatcher.dispatch(new Message(
                         MessageType.CLIENT_ERROR,
                         new ErrorData(ErrorId.DATASET_MISSING, "Could not update <" + String.valueOf(id) + ">"),
                         msg.getEndpoint()
@@ -249,11 +249,11 @@ public class Layouts extends MessageHandlerA {
                     return;
                 }
                 Layouts.LOGGER.log(Level.INFO, pstmt.toString());
-                msgQueueOut.add(new Message(MessageType.LAYOUTS_LAYOUT_UPDATED, tl));
+                dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_UPDATED, tl));
             }
         } catch(SQLException | NumberFormatException e) {
             Layouts.LOGGER.log(Level.WARNING, e.toString());
-            msgQueueOut.add(
+            dispatcher.dispatch(
                 new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()), msg.getEndpoint())
             );
         }
