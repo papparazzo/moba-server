@@ -42,14 +42,10 @@ public class GlobalTimerData implements JSONToStringI {
     public void setMultiplicator(int multiplicator)
     throws IllegalArgumentException {
         if(multiplicator < 60 || multiplicator > 3600) {
-            throw new IllegalArgumentException(
-                "multiplicator out of range (< 60 || > 3600)"
-            );
+            throw new IllegalArgumentException("multiplicator out of range (< 60 || > 3600)");
         }
         if(3600 % multiplicator != 0) {
-            throw new IllegalArgumentException(
-                "modulo 3600 check failed in multiplicator-setting"
-            );
+            throw new IllegalArgumentException("modulo 3600 check failed in multiplicator-setting");
         }
         this.multiplicator = multiplicator;
     }
