@@ -42,8 +42,8 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
     protected SenderI         dispatcher = null;
     protected Config          config = null;
     protected Thread          thread = null;
-    protected GlobalTimerData timerData = null;
-    protected ColorThemeData  themeData = null;
+    protected GlobalTimerData timerData = new GlobalTimerData();
+    protected ColorThemeData  themeData = new ColorThemeData();
 
     protected ColorTheme       curTheme = null;
     protected volatile boolean isRunning = false;
@@ -51,8 +51,6 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
     public GlobalTimer(SenderI dispatcher, Config config) {
         this.dispatcher = dispatcher;
         this.config = config;
-        timerData = new GlobalTimerData();
-        themeData = new ColorThemeData();
     }
 
     @Override
@@ -120,12 +118,8 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
                     dispatcher.dispatch(new Message(MessageType.TIMER_SET_COLOR_THEME, themeData));
                     break;
 
-
-
                 default:
-                    throw new UnsupportedOperationException(
-                        "unknow msg <" + msg.getMsgType().toString() + ">."
-                    );
+                    throw new UnsupportedOperationException("unknow msg <" + msg.getMsgType().toString() + ">.");
             }
         } catch(
             java.lang.ClassCastException | IOException | JSONException |
