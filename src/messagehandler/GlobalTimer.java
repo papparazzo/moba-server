@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2019 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -31,6 +31,9 @@ import datatypes.objects.GlobalTimerData;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import json.JSONException;
 import messages.Message;
 import messages.MessageHandlerA;
@@ -41,7 +44,7 @@ import utilities.config.ConfigException;
 public class GlobalTimer extends MessageHandlerA implements Runnable {
     protected SenderI         dispatcher = null;
     protected Config          config = null;
-    protected Thread          thread = null;
+    protected final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     protected GlobalTimerData timerData = new GlobalTimerData();
     protected ColorThemeData  themeData = new ColorThemeData();
 
@@ -51,6 +54,7 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
     public GlobalTimer(SenderI dispatcher, Config config) {
         this.dispatcher = dispatcher;
         this.config = config;
+        this.scheduler.scheduleWithFixedDelay(this, 1, 1, TimeUnit.SECONDS);
     }
 
     @Override
@@ -146,42 +150,35 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
     @Override
     public void run() {
         try {
-            while(!thread.isInterrupted()) {
-                Thread.sleep(1000);
-                if(!isRunning) {
-                    continue;
-                }
-
-                if(timerData.setTick()) {
-                    dispatcher.dispatch(new Message(MessageType.TIMER_GLOBAL_TIMER_EVENT, timerData));
-                }
-
-                if(themeData.getColorThemeCondition() != ThreeState.AUTO) {
-                    continue;
-                }
-
-                boolean isBetween = timerData.isTimeBetween(
-                    themeData.getBrightTime(),
-                    themeData.getDimTime()
-                );
-
-                if(isBetween && curTheme == ColorTheme.BRIGHT) {
-                    continue;
-                }
-
-                if(!isBetween && curTheme == ColorTheme.DIM) {
-                    continue;
-                }
-
-                if(curTheme == ColorTheme.BRIGHT) {
-                    curTheme = ColorTheme.DIM;
-                } else {
-                    curTheme = ColorTheme.BRIGHT;
-                }
-
-                dispatcher.dispatch(new Message(MessageType.TIMER_COLOR_THEME_EVENT, curTheme));
+            if(!isRunning) {
+                return;
             }
-        } catch(InterruptedException e) {
+            if(timerData.setTick()) {
+                dispatcher.dispatch(new Message(MessageType.TIMER_GLOBAL_TIMER_EVENT, timerData));
+            }
+
+            if(themeData.getColorThemeCondition() != ThreeState.AUTO) {
+                return;
+            }
+
+            boolean isBetween = timerData.isTimeBetween(themeData.getBrightTime(), themeData.getDimTime());
+
+            if(isBetween && curTheme == ColorTheme.BRIGHT) {
+                return;
+            }
+
+            if(!isBetween && curTheme == ColorTheme.DIM) {
+                return;
+            }
+
+            if(curTheme == ColorTheme.BRIGHT) {
+                curTheme = ColorTheme.DIM;
+            } else {
+                curTheme = ColorTheme.BRIGHT;
+            }
+
+            dispatcher.dispatch(new Message(MessageType.TIMER_COLOR_THEME_EVENT, curTheme));
+        } catch(Exception e) {
 
         }
     }
@@ -202,19 +199,5 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
             return;
         }
         isRunning = active;
-
-        if(thread != null && thread.isAlive()) {
-            return;
-        }
-
-        if(!this.isRunning) {
-            return;
-        }
-
-        thread = new Thread(this);
-        thread.setName("globaltimer");
-        thread.start();
     }
 }
-
-
