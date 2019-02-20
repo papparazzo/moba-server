@@ -26,46 +26,27 @@ import datatypes.enumerations.Connectivity;
 import datatypes.enumerations.HardwareState;
 import datatypes.enumerations.NoticeType;
 import datatypes.objects.NoticeData;
-import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import messages.Message;
 import messages.MessageHandlerA;
 import messages.MessageType;
 
-public class Interface extends MessageHandlerA implements Runnable {
-    protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+public class Interface extends MessageHandlerA {
 
     protected SenderI dispatcher = null;
     protected ServerApplication app = null;
 
     protected PriorityBlockingQueue<Message> msgQueueIn = null;
 
-    protected final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
     public Interface(SenderI dispatcher, PriorityBlockingQueue<Message> msgQueueIn) {
         this.dispatcher = dispatcher;
         this.msgQueueIn   = msgQueueIn;
-        this.scheduler.scheduleWithFixedDelay(this, 1, 30, TimeUnit.SECONDS);
-    }
-
-    @Override
-    public void run() {
-        try {
-            dispatcher.dispatch(new Message(MessageType.INTERFACE_CONNECTIVITY_REQ));
-        } catch(Exception e) {
-            LOGGER.log(Level.WARNING, "exception in scheduler occured! <{0}>", new Object[]{e.toString()});
-        }
     }
 
     @Override
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
-            case INTERFACE_CONNECTIVITY_RES:
+            case INTERFACE_CONNECTIVITY_STATE_CHANGED:
                 setConnectivity(Connectivity.valueOf((String)msg.getData()));
                 return;
 
