@@ -85,11 +85,7 @@ public class Acceptor extends Thread {
                     serverSocket = new ServerSocket(serverport);
                     isinit = true;
                 } catch(IOException e) {
-                    Acceptor.LOGGER.log(
-                        Level.WARNING,
-                        "binding on port <{0}> failed! <{1}>",
-                        new Object[]{this.serverport, e.toString()}
-                    );
+                    Acceptor.LOGGER.log(Level.WARNING, "binding on port <{0}> failed! <{1}>", new Object[]{this.serverport, e.toString()});
                     Thread.sleep(2500);
                 }
             } while(!isinit && !isInterrupted());
@@ -100,22 +96,13 @@ public class Acceptor extends Thread {
                 Socket socket = serverSocket.accept();
                 Acceptor.LOGGER.log(Level.INFO, "new client <{0}> socket <{1}>", new Object[]{id, socket.toString()});
                 if(dispatcher.getEndPointsCount() == maxClients) {
-                    Acceptor.LOGGER.log(
-                        Level.SEVERE,
-                        "Max amount of clients <{0}> connected!",
-                        new Object[]{id}
-                    );
+                    Acceptor.LOGGER.log(Level.SEVERE, "Max amount of clients <{0}> connected!", new Object[]{id});
                     break;
                 }
                 (new Endpoint(++id, socket, in)).start();
 
                 if(dispatcher.getEndPointsCount() == maxClients) {
-                    Acceptor.LOGGER.log(
-                        Level.WARNING,
-                        "Max amount of clients <{0}> reached!",
-                        new Object[]{id}
-                    );
-
+                    Acceptor.LOGGER.log(Level.WARNING, "Max amount of clients <{0}> reached!", new Object[]{id});
                     in.add(new Message(MessageType.SERVER_MAX_CLIENT_COUNT, maxClients));
                 }
             }
