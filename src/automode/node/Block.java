@@ -21,30 +21,23 @@
 package automode.node;
 
 import automode.Train;
+import datatypes.objects.Contact;
 
 public class Block implements NodeI {
-
     protected NodeI in;
     protected NodeI out;
 
     protected Train train;
+    protected Contact contact;
 
-    public Block(NodeI in, NodeI out, Train train) {
+    public Block(NodeI in, Contact contact, Train train) {
         this.in = in;
-        this.out = out;
+        this.contact = contact;
         this.train = train;
     }
 
-    public Block(NodeI in, NodeI out) {
-        this(in, out, null);
-    }
-
-    public Block(NodeI in) {
-        this(in, null, null);
-    }
-
-    public void setInNode(NodeI node) {
-        in = node;
+    public Block(NodeI in, Contact contact) {
+        this(in, contact, null);
     }
 
     public void setOutNode(NodeI node) {
