@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2018 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2019 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -25,7 +25,6 @@ import automode.Train;
 public class Terminator implements NodeI {
 
     protected NodeI in;
-
     protected Train train;
 
     public Terminator(NodeI in, Train train) {
