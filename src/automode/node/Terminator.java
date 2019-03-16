@@ -21,27 +21,22 @@
 package automode.node;
 
 import automode.Train;
+import datatypes.objects.Contact;
 
 public class Terminator implements NodeI {
-
     protected NodeI in;
-    protected Train train;
 
-    public Terminator(NodeI in, Train train) {
+    protected Train train;
+    protected Contact contact;
+
+    public Terminator(NodeI in, Contact contact, Train train) {
         this.in = in;
+        this.contact = contact;
         this.train = train;
     }
 
-    public Terminator(NodeI in) {
-        this(in, null);
-    }
-
-    public Terminator() {
-        this(null, null);
-    }
-
-    public void setInNode(NodeI node) {
-        in = node;
+    public Terminator(NodeI in, Contact contact) {
+        this(in, contact, null);
     }
 
     @Override
