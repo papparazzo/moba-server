@@ -37,5 +37,4 @@ public class NodeException extends Exception {
     public NodeException(Throwable cause) {
         super(cause);
     }
-
 }
