@@ -54,6 +54,35 @@ public class Block implements NodeI {
         }
         throw new NodeException("invalid node given!");
     }
+
+    protected Block getNextBlock() throws NodeException {
+
+        do {
+        NodeI node = in.getJunctionNode(this);
+
+        if() {
+            return null;
+        }
+
+        } while(node == null);
+
+
+
+
+        return null;
+    }
+
+
+
+    public boolean pushTrain() {
+        return false;
+    }
+
+
+    public void moveTrain() {
+
+    }
+
 }
 
 
