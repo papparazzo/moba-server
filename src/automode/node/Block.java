@@ -56,19 +56,14 @@ public class Block implements NodeI {
     }
 
     protected Block getNextBlock() throws NodeException {
-
+        NodeI node;
         do {
-        NodeI node = in.getJunctionNode(this);
-
-        if() {
-            return null;
-        }
+            node = in.getJunctionNode(this);
+            if(node instanceof Block) {
+                return (Block)node;
+            }
 
         } while(node == null);
-
-
-
-
         return null;
     }
 
