@@ -21,7 +21,8 @@
 package tracklayout;
 
 public class Actuation {
-    int address;
+
+    protected int address;
 
     public Actuation(int address) {
         this.address = address;
