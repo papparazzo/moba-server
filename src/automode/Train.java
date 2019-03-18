@@ -27,5 +27,21 @@ public class Train {
 
     protected int address;
 
+    protected boolean hasStopped;
+
+    public Train(int address) {
+        this.address = address;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public int getAddress() {
+        return address;
+    }
+
+
+
 }
 
