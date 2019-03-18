@@ -38,8 +38,6 @@ public class Parser {
     public NodeI parse(LayoutContainer container) throws ParserException {
         this.container = container;
 
-
-
         return startNode;
     }
 
@@ -84,5 +82,4 @@ public class Parser {
             }
         }
     }
-
 }
