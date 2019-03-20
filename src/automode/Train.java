@@ -20,8 +20,12 @@
 
 package automode;
 
+import datatypes.enumerations.DrivingDirection;
+
 public class Train {
-	protected int direction;
+	protected DrivingDirection virtualDirection;
+
+    protected DrivingDirection realDirection;
 
     protected int speed;
 
@@ -29,8 +33,20 @@ public class Train {
 
     protected boolean hasStopped;
 
-    public Train(int address) {
+    public Train(int address, int speed, DrivingDirection virtual, DrivingDirection real) {
         this.address = address;
+        this.speed = speed;
+        this.realDirection = real;
+        this.virtualDirection = virtual;
+    }
+
+    public void switchVirtualDirection() {
+        virtualDirection = DrivingDirection.flip(virtualDirection);
+    }
+
+    public void switchRealDirection() {
+        realDirection = DrivingDirection.flip(realDirection);
+        switchVirtualDirection();
     }
 
     public int getSpeed() {
