@@ -21,23 +21,32 @@
 package automode.node;
 
 import automode.Train;
+import datatypes.base.Direction;
+import datatypes.enumerations.BlockDirection;
 import datatypes.objects.Contact;
 
 public class Block implements NodeI {
+
+    protected BlockDirection direction;
+
+
+
+    protected Direction currDirection;
+
     protected NodeI in;
     protected NodeI out;
 
     protected Train train;
     protected Contact contact;
 
-    public Block(NodeI in, Contact contact, Train train) {
+    public Block(NodeI in, Contact contact, Train train, BlockDirection direction) {
         this.in = in;
         this.contact = contact;
         this.train = train;
     }
 
     public Block(NodeI in, Contact contact) {
-        this(in, contact, null);
+        this(in, contact, null, null);
     }
 
     public void setOutNode(NodeI node) {
