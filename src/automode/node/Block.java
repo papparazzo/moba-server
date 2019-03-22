@@ -29,8 +29,6 @@ public class Block implements NodeI {
 
     protected BlockDirection direction;
 
-
-
     protected Direction currDirection;
 
     protected NodeI in;
@@ -76,17 +74,13 @@ public class Block implements NodeI {
         return null;
     }
 
-
-
     public boolean pushTrain() {
         return false;
     }
 
-
     public void moveTrain() {
 
     }
-
 }
 
 
