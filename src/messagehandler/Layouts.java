@@ -99,8 +99,8 @@ public class Layouts extends MessageHandlerA {
     }
 
     @Override
-    public void freeResources(long id) {
-        lock.freeLocks(id);
+    public void freeResources(long appId) {
+        lock.freeLocks(appId);
     }
 
     protected void getLayouts(Message msg) {

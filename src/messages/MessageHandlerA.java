@@ -25,7 +25,7 @@ import datatypes.enumerations.HardwareState;
 public abstract class MessageHandlerA {
     public abstract void handleMsg(Message msg);
 
-    public void freeResources(long id) {
+    public void freeResources(long appId) {
     }
 
     public void init() throws ExceptionInInitializerError {

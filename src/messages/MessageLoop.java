@@ -96,11 +96,11 @@ public class MessageLoop {
         }
     }
 
-    protected void freeResources(long id) {
+    protected void freeResources(long appId) {
         Iterator<MessageGroup> iter = handlers.keySet().iterator();
 
         while(iter.hasNext()) {
-            handlers.get(iter.next()).freeResources(id);
+            handlers.get(iter.next()).freeResources(appId);
         }
     }
 
