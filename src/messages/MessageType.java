@@ -80,6 +80,7 @@ public enum MessageType {
     // Interface
     //---------------------------------------------------
     INTERFACE_CONNECTIVITY_STATE_CHANGED(MessageGroup.INTERFACE, MessageClass.SINGLE),
+    INTERFACE_CONTACT_TRIGGERED(MessageGroup.INTERFACE, MessageClass.SINGLE),
     INTERFACE_SET_BRAKE_VECTOR(MessageGroup.INTERFACE, MessageClass.SINGLE),
 
     //---------------------------------------------------
