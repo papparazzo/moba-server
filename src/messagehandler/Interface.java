@@ -21,6 +21,7 @@
 package messagehandler;
 
 import application.ServerApplication;
+import automode.ContactToBlock;
 import com.SenderI;
 import datatypes.enumerations.Connectivity;
 import datatypes.enumerations.HardwareState;
@@ -38,10 +39,35 @@ public class Interface extends MessageHandlerA {
 
     protected PriorityBlockingQueue<Message> msgQueueIn = null;
 
+    protected ContactToBlock contactToBlock = null;
+
     public Interface(SenderI dispatcher, PriorityBlockingQueue<Message> msgQueueIn) {
         this.dispatcher = dispatcher;
-        this.msgQueueIn   = msgQueueIn;
+        this.msgQueueIn = msgQueueIn;
     }
+
+    public void init() throws ExceptionInInitializerError {
+        contactToBlock = new ContactToBlock();
+
+        contactToBlock.add
+
+    }
+
+
+
+    public void freeResources(long appId) {
+    }
+
+
+    public void shutdown() {
+    }
+
+    public void hardwareStateChanged(HardwareState state) {
+    }
+
+
+
+
 
     @Override
     public void handleMsg(Message msg) {
@@ -49,6 +75,8 @@ public class Interface extends MessageHandlerA {
             case INTERFACE_CONNECTIVITY_STATE_CHANGED:
                 setConnectivity(Connectivity.valueOf((String)msg.getData()));
                 return;
+
+            case INTERFACE_CONTACT_TRIGGERED:
 
             default:
                 throw new UnsupportedOperationException("unknow msg <" + msg.getMsgType().toString() + ">.");
