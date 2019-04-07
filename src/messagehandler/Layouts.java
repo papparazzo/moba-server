@@ -116,6 +116,7 @@ public class Layouts extends MessageHandlerA {
                         rs.getString("Name"),
                         rs.getString("Description"),
                         rs.getInt("Locked"),
+                        rs.getBoolean("Active"),
                         rs.getDate("ModificationDate"),
                         rs.getDate("CreationDate")
                     ));
@@ -218,6 +219,7 @@ public class Layouts extends MessageHandlerA {
                 (String)map.get("name"),
                 (String)map.get("description"),
                 (int)(long)msg.getEndpoint().getAppId(),
+                (boolean)map.get("active"),
                 new java.util.Date(),
                 new java.util.Date() // FIXME: Wo kriegen wir hier das richtig Datum her? Aus der Datenbank
               //  (java.util.Date)formatter.parse((String)map.get("created"))
@@ -227,7 +229,7 @@ public class Layouts extends MessageHandlerA {
 
             String q =
                 "UPDATE `TrackLayouts` " +
-                "SET `Name` = ?, `Description` = ?, `ModificationDate` = ? " +
+                "SET `Name` = ?, `Description` = ?, `ModificationDate` = ?, `Active` = ? " +
                 "WHERE (`locked` = ? " +
                 "OR `locked` = ?) " +
                 "AND `id` = ? ";
@@ -236,6 +238,7 @@ public class Layouts extends MessageHandlerA {
                 pstmt.setString(1, tl.getName());
                 pstmt.setString(2, tl.getDescription());
                 pstmt.setDate(3, new java.sql.Date(tl.getModificationDate().getTime()));
+                pstmt.setBoolean(4, tl.getActive());
                 pstmt.setLong(6, 0);
                 pstmt.setLong(7, msg.getEndpoint().getAppId());
                 pstmt.setLong(8, id);
