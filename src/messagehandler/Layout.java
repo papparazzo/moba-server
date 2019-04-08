@@ -65,9 +65,7 @@ public class Layout extends MessageHandlerA {
                 break;
 
             default:
-                throw new UnsupportedOperationException(
-                    "unknow msg <" + msg.getMsgType().toString() + ">."
-                );
+                throw new UnsupportedOperationException("unknow msg <" + msg.getMsgType().toString() + ">.");
         }
     }
 
@@ -115,9 +113,7 @@ public class Layout extends MessageHandlerA {
                 }
                 map.put("symbols", arraylist);
 
-                dispatcher.dispatch(
-                    new Message(MessageType.LAYOUT_GET_LAYOUT_RES, map, msg.getEndpoint())
-                );
+                dispatcher.dispatch(new Message(MessageType.LAYOUT_GET_LAYOUT_RES, map, msg.getEndpoint()));
             }
         } catch(SQLException e) {
             Layout.LOGGER.log(Level.WARNING, e.toString());
