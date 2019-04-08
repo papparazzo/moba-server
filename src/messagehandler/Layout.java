@@ -34,6 +34,7 @@ import datatypes.enumerations.ErrorId;
 import datatypes.objects.ErrorData;
 import datatypes.objects.TracklayoutSymbolData;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import messages.Message;
 import messages.MessageHandlerA;
@@ -131,7 +132,6 @@ public class Layout extends MessageHandlerA {
     }
 
     protected void saveLayout(Message msg) {
-        /*
         try {
             Map<String, Object> map = (Map<String, Object>)msg.getData();
             long id = (long)map.get("id");
@@ -178,18 +178,16 @@ public class Layout extends MessageHandlerA {
                     ));
                 }
                 map.put("symbols", arraylist);
-
-                dispatcher.dispatch(new Message(MessageType.LAYOUT_UPDATED, map));
+                dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_UPDATED, map));
             }
 
         } catch(SQLException e) {
             Layout.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
             dispatcher.dispatch(new Message(
-                MessageType.ERROR,
+                MessageType.CLIENT_ERROR,
                 new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
                 msg.getEndpoint()
             ));
         }
-*/
     }
 }
