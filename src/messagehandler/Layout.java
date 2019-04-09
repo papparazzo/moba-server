@@ -80,6 +80,7 @@ public class Layout extends MessageHandlerA {
                 "SELECT MAX(`XPos`) AS `Width`, MAX(`YPos`) AS `Height` " +
                 "FROM `TrackLayoutSymbols` " +
                 "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
+
             try (PreparedStatement pstmt = con.prepareStatement(q)) {
                 pstmt.setLong(1, id);
                 Layout.LOGGER.log(Level.INFO, pstmt.toString());
@@ -127,10 +128,6 @@ public class Layout extends MessageHandlerA {
         }
     }
 
-    protected void loadLayout(Message msg) {
-
-    }
-
     protected void saveLayout(Message msg) {
         try {
             Map<String, Object> map = (Map<String, Object>)msg.getData();
@@ -138,11 +135,11 @@ public class Layout extends MessageHandlerA {
 
             Connection con = database.getConnection();
 
-            String q =
+            String stmt =
                 "DELETE FROM `TrackLayoutSymbols` " +
                 "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
 
-            try (PreparedStatement pstmt = con.prepareStatement(q)) {
+            try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
                 pstmt.setLong(1, id);
                 Layout.LOGGER.log(Level.INFO, pstmt.toString());
                 pstmt.executeQuery();
@@ -150,18 +147,50 @@ public class Layout extends MessageHandlerA {
 
             ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
 
-            for(Object o : arrayList) {
-                q =
-                    "INSERT INTO `TrackLayoutSymbols` " +
-                    "(`TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
-                    "VALUES (?, ?, ?, ?)";
+            stmt =
+                "INSERT INTO `TrackLayoutSymbols` " +
+                "(`TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
+                "VALUES (?, ?, ?, ?)";
+/*
+            try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
+                con.setAutoCommit(false);
+                for(Object o : arrayList) {
+                    TracklayoutSymbolData t;
 
-                 Map<String, Object> item = (Map<String, Object>)o;
+                    pstmt.setString(1,t.);
+                    pstmt.setString(2,"CodeGeeks");
+                    pstmt.setInt(3,i);
+                    pstmt.setInt(4,i);
+                    pstmt.addBatch();
+
+                    stmt =
+                        "INSERT INTO `TrackLayoutSymbols` " +
+                        "(`TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
+                        "VALUES (?, ?, ?, ?)";
+
+                     Map<String, Object> item = (Map<String, Object>)o;
 
 
-            }
+                }
+        con.commit();
 
-            try (PreparedStatement pstmt = con.prepareStatement(q)) {
+
+
+}catch(Exception e){
+     e.printStackTrace();
+     connection.rollBack();
+} finally{
+     if(pstmt!=null)
+        pstmt.close();
+if(connection!=null)
+     connection.close();
+}
+*/
+
+
+
+
+            try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
                 pstmt.setLong(1, id);
 
                 Layout.LOGGER.log(Level.INFO, pstmt.toString());
