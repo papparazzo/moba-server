@@ -35,7 +35,6 @@ public class NoticeData implements JSONToStringI {
     protected final String caption;
     protected final String text;
 
-
     public NoticeData(String caption) {
         this(caption, caption);
     }
