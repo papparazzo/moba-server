@@ -20,11 +20,25 @@
 
 package datatypes.objects;
 
+import datatypes.enumerations.Switch;
 import java.io.IOException;
+import java.util.Map;
 import json.JSONException;
 import json.JSONToStringI;
 
 public class PositionData implements JSONToStringI {
+    protected int xPos;
+    protected int yPos;
+
+    public PositionData(int x, int y) {
+        xPos = x;
+        yPos = y;
+    }
+
+    public void fromJsonObject(Map<String, Object> map) {
+       xPos = (int)map.get("xPos");
+       yPos = (int)map.get("yPos");
+    }
 
     @Override
     public String toJsonString(boolean formated, int indent) throws JSONException, IOException {
