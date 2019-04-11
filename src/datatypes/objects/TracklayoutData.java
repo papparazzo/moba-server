@@ -36,10 +36,9 @@ public class TracklayoutData implements JSONToStringI {
     protected Date    created;
     protected Date    modified;
     protected int     locked;
-    protected boolean active;
 
     public TracklayoutData(
-        long id, String name, String description, int locked, boolean active, Date modified, Date created
+        long id, String name, String description, int locked, Date modified, Date created
     ) {
         if(name == null || name.isEmpty()) {
             name = "";
@@ -50,7 +49,6 @@ public class TracklayoutData implements JSONToStringI {
 
         this.id          = id;
         this.locked      = locked;
-        this.active      = active;
         this.name        = name;
         this.description = description;
         this.modified    = modified;
@@ -58,7 +56,7 @@ public class TracklayoutData implements JSONToStringI {
     }
 
     public TracklayoutData(String name, String description) {
-        this(-1, name, description, 0, false, new Date(), new Date());
+        this(-1, name, description, 0, new Date(), new Date());
     }
 
     public void setId(int id) {
@@ -85,10 +83,6 @@ public class TracklayoutData implements JSONToStringI {
         return created;
     }
 
-    public boolean getActive() {
-        return active;
-    }
-
     @Override
     public String toJsonString(boolean formated, int indent)
     throws IOException, JSONException {
@@ -101,7 +95,6 @@ public class TracklayoutData implements JSONToStringI {
         map.put("description", description);
         map.put("created",     df.format(created));
         map.put("modified",    df.format(modified));
-        map.put("active",      active);
         map.put("locked",      locked);
 
         StringBuilder sb = new StringBuilder();
