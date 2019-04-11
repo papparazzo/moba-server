@@ -20,7 +20,6 @@
 
 package datatypes.objects;
 
-import datatypes.enumerations.Switch;
 import java.io.IOException;
 import java.util.Map;
 import json.JSONException;
