@@ -173,8 +173,7 @@ public class Layouts extends MessageHandlerA {
                 }
             }
             if(id == activeLayout) {
-                activeLayout = -1;
-                storeData();
+                storeData(-1);
             }
 
             dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_DELETED, id));
@@ -207,8 +206,7 @@ public class Layouts extends MessageHandlerA {
                 pstmt.executeUpdate();
                 Layouts.LOGGER.log(Level.INFO, pstmt.toString());
                 try(ResultSet rs = pstmt.getGeneratedKeys()) {
-                    activeLayout = rs.getInt(1);
-                    storeData();
+                    storeData(rs.getInt(1));
                     rs.next();
                     tl.setId(activeLayout);
                 }
@@ -237,8 +235,7 @@ public class Layouts extends MessageHandlerA {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
             boolean active = (boolean)map.get("active");
             if(active) {
-                activeLayout = id;
-                storeData();
+                storeData(id);
             }
 
             tl = new TracklayoutData(
@@ -286,6 +283,12 @@ public class Layouts extends MessageHandlerA {
                 new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()), msg.getEndpoint())
             );
         }
+    }
+
+    protected void storeData(long id)
+    throws ConfigException, IOException, JSONException {
+        activeLayout = id;
+        storeData();
     }
 
     protected void storeData()
