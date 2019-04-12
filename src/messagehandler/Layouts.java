@@ -35,10 +35,15 @@ import database.Database;
 import datatypes.enumerations.ErrorId;
 import datatypes.objects.TracklayoutData;
 import datatypes.objects.ErrorData;
+import java.io.IOException;
+import java.util.HashMap;
+import json.JSONException;
 import messages.Message;
 import messages.MessageHandlerA;
 import messages.MessageType;
 import tracklayout.utilities.TracklayoutLock;
+import utilities.config.Config;
+import utilities.config.ConfigException;
 
 public class Layouts extends MessageHandlerA {
 
@@ -46,11 +51,14 @@ public class Layouts extends MessageHandlerA {
     protected Database database    = null;
     protected SenderI  dispatcher  = null;
     protected TracklayoutLock lock = null;
+    protected Config        config = null;
+    protected long    activeLayout = 0;
 
-    public Layouts(SenderI dispatcher, Database database, TracklayoutLock lock) {
+    public Layouts(SenderI dispatcher, Database database, TracklayoutLock lock, Config config) {
         this.database   = database;
         this.dispatcher = dispatcher;
         this.lock       = lock;
+        this.config     = config;
     }
 
     @Override
@@ -86,16 +94,21 @@ public class Layouts extends MessageHandlerA {
     @Override
     public void init() {
         freeResources(-1);
-    }
-
-    @Override
-    public void reset() {
-        freeResources(-1);
+        Object o;
+        o = config.getSection("trackLayout.activeTracklayoutId");
+        if(o != null) {
+            activeLayout = (long)o;
+        }
     }
 
     @Override
     public void shutdown() {
         freeResources(-1);
+        try {
+            storeData();
+        } catch(ConfigException | IOException | JSONException e) {
+            Layouts.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+        }
     }
 
     @Override
@@ -111,11 +124,13 @@ public class Layouts extends MessageHandlerA {
             try(ResultSet rs = database.query(q)) {
                 arraylist = new ArrayList();
                 while(rs.next()) {
+                    long id = rs.getLong("Id");
                     arraylist.add(new TracklayoutData(
-                        rs.getInt("Id"),
+                        id,
                         rs.getString("Name"),
                         rs.getString("Description"),
                         rs.getInt("Locked"),
+                        (id == activeLayout),
                         rs.getDate("ModificationDate"),
                         rs.getDate("CreationDate")
                     ));
@@ -157,8 +172,13 @@ public class Layouts extends MessageHandlerA {
                     return;
                 }
             }
+            if(id == activeLayout) {
+                activeLayout = -1;
+                storeData();
+            }
+
             dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_DELETED, id));
-        } catch(SQLException e) {
+        } catch(SQLException | ConfigException | IOException | JSONException e) {
             Layouts.LOGGER.log(Level.WARNING, e.toString());
             dispatcher.dispatch(new Message(
                 MessageType.CLIENT_ERROR,
@@ -187,13 +207,16 @@ public class Layouts extends MessageHandlerA {
                 pstmt.executeUpdate();
                 Layouts.LOGGER.log(Level.INFO, pstmt.toString());
                 try(ResultSet rs = pstmt.getGeneratedKeys()) {
+                    activeLayout = rs.getInt(1);
+                    storeData();
                     rs.next();
-                    tl.setId(rs.getInt(1));
+                    tl.setId(activeLayout);
                 }
             }
+
             dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_CREATED, tl));
             dispatcher.dispatch(new Message(MessageType.LAYOUTS_CREATE_LAYOUT_RES, tl.getId(), msg.getEndpoint()));
-        } catch(SQLException e) {
+        } catch(SQLException | ConfigException | IOException | JSONException e) {
             Layouts.LOGGER.log(Level.WARNING, e.toString());
             dispatcher.dispatch(new Message(
                 MessageType.CLIENT_ERROR,
@@ -212,12 +235,18 @@ public class Layouts extends MessageHandlerA {
             }
             TracklayoutData tl;
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+            boolean active = (boolean)map.get("active");
+            if(active) {
+                activeLayout = id;
+                storeData();
+            }
 
             tl = new TracklayoutData(
                 id,
                 (String)map.get("name"),
                 (String)map.get("description"),
                 (int)(long)msg.getEndpoint().getAppId(),
+                (boolean)map.get("active"),
                 new java.util.Date(),
                 new java.util.Date() // FIXME: Wo kriegen wir hier das richtig Datum her? Aus der Datenbank
               //  (java.util.Date)formatter.parse((String)map.get("created"))
@@ -251,11 +280,19 @@ public class Layouts extends MessageHandlerA {
                 Layouts.LOGGER.log(Level.INFO, pstmt.toString());
                 dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_UPDATED, tl));
             }
-        } catch(SQLException | NumberFormatException e) {
+        } catch(SQLException | NumberFormatException | ConfigException | IOException | JSONException e) {
             Layouts.LOGGER.log(Level.WARNING, e.toString());
             dispatcher.dispatch(
                 new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()), msg.getEndpoint())
             );
         }
+    }
+
+    protected void storeData()
+    throws ConfigException, IOException, JSONException {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("activeTracklayoutId", activeLayout);
+        config.setSection("trackLayout", map);
+        config.writeFile();
     }
 }
