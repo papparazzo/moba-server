@@ -61,7 +61,7 @@ public class TracklayoutData implements JSONToStringI {
         this(-1, name, description, 0, false, new Date(), new Date());
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
