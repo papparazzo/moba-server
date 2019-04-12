@@ -40,6 +40,7 @@ import messages.Message;
 import messages.MessageHandlerA;
 import messages.MessageType;
 import tracklayout.utilities.TracklayoutLock;
+import utilities.config.Config;
 
 public class Layout extends MessageHandlerA {
 
@@ -47,11 +48,22 @@ public class Layout extends MessageHandlerA {
     protected Database  database   = null;
     protected SenderI   dispatcher = null;
     protected TracklayoutLock lock = null;
+    protected Config        config = null;
+    protected long     activeLayout = 0;
 
-    public Layout(SenderI dispatcher, Database database, TracklayoutLock lock) {
+    public Layout(SenderI dispatcher, Database database, TracklayoutLock lock, Config config) {
         this.database   = database;
         this.dispatcher = dispatcher;
         this.lock       = lock;
+        this.config     = config;
+    }
+
+    public void init() {
+        Object o;
+        o = config.getSection("trackLayout.activeTracklayoutId");
+        if(o != null) {
+            activeLayout = (long)o;
+        }
     }
 
     @Override
@@ -73,7 +85,18 @@ public class Layout extends MessageHandlerA {
     protected void getLayout(Message msg) {
         try {
             Connection con = database.getConnection();
-            long id = (Long)msg.getData();
+            long id = activeLayout;
+            Object o = msg.getData();
+            if(o != null) {
+                id = (Long)o;
+            } else if(activeLayout < 0) {
+                dispatcher.dispatch(new Message(
+                    MessageType.CLIENT_ERROR,
+                    new ErrorData(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given"),
+                    msg.getEndpoint()
+                ));
+            }
+
             HashMap<String, Object> map = new HashMap<>();
 
             String q =
@@ -131,7 +154,17 @@ public class Layout extends MessageHandlerA {
     protected void saveLayout(Message msg) {
         try {
             Map<String, Object> map = (Map<String, Object>)msg.getData();
-            long id = (long)map.get("id");
+            long id = activeLayout;
+            Object o = map.get("id");
+            if(o != null) {
+                id = (Long)o;
+            } else if(activeLayout < 0) {
+                dispatcher.dispatch(new Message(
+                    MessageType.CLIENT_ERROR,
+                    new ErrorData(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given"),
+                    msg.getEndpoint()
+                ));
+            }
 
             Connection con = database.getConnection();
 
@@ -155,10 +188,10 @@ public class Layout extends MessageHandlerA {
             try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
                 con.setAutoCommit(false);
                 for(Object o : arrayList) {
-                    TracklayoutSymbolData t;
+                    Map<String, Object> symbol = (Map<String, Object>)o;
 
-                    pstmt.setString(1,t.);
-                    pstmt.setString(2,"CodeGeeks");
+                    pstmt.setInt(1, (int)symbol.get("id"));
+                    pstmt.setInt(2, "CodeGeeks");
                     pstmt.setInt(3,i);
                     pstmt.setInt(4,i);
                     pstmt.addBatch();
@@ -173,6 +206,8 @@ public class Layout extends MessageHandlerA {
 
                 }
         con.commit();
+
+            }
 
 
 
