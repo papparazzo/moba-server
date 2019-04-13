@@ -277,7 +277,7 @@ public class Layouts extends MessageHandlerA {
                     return;
                 }
                 Layouts.LOGGER.log(Level.INFO, pstmt.toString());
-                dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_UPDATED, tl));
+                dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CHANGED, tl));
             }
         } catch(SQLException | NumberFormatException | ConfigException | IOException | JSONException e) {
             Layouts.LOGGER.log(Level.WARNING, e.toString());
