@@ -290,7 +290,6 @@ public class Layouts extends MessageHandlerA {
     protected Date getCreationDate(long id) throws SQLException {
         String q = "SELECT `CreationDate` FROM `TrackLayouts` WHERE `Id` = ?;";
         Connection con = database.getConnection();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setLong(1, id);
