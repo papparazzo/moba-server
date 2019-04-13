@@ -36,7 +36,9 @@ import datatypes.enumerations.ErrorId;
 import datatypes.objects.TracklayoutData;
 import datatypes.objects.ErrorData;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 import json.JSONException;
 import messages.Message;
 import messages.MessageHandlerA;
@@ -233,7 +235,6 @@ public class Layouts extends MessageHandlerA {
                 return;
             }
             TracklayoutData tl;
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
             boolean active = (boolean)map.get("active");
             if(active) {
                 storeData(id);
@@ -245,9 +246,8 @@ public class Layouts extends MessageHandlerA {
                 (String)map.get("description"),
                 (int)(long)msg.getEndpoint().getAppId(),
                 (boolean)map.get("active"),
-                new java.util.Date(),
-                new java.util.Date() // FIXME: Wo kriegen wir hier das richtig Datum her? Aus der Datenbank
-              //  (java.util.Date)formatter.parse((String)map.get("created"))
+                new Date(),
+                getCreationDate(id)
             );
 
             Connection con = database.getConnection();
@@ -284,6 +284,22 @@ public class Layouts extends MessageHandlerA {
             dispatcher.dispatch(
                 new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()), msg.getEndpoint())
             );
+        }
+    }
+
+    protected Date getCreationDate(long id) throws SQLException {
+        String q = "SELECT `CreationDate` FROM `TrackLayouts` WHERE `Id` = ?;";
+        Connection con = database.getConnection();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+
+        try (PreparedStatement pstmt = con.prepareStatement(q)) {
+            pstmt.setLong(1, id);
+            Layout.LOGGER.log(Level.INFO, pstmt.toString());
+            ResultSet rs = pstmt.executeQuery();
+            if(!rs.next()) {
+                throw new NoSuchElementException(String.format("no elements found for layout <%4d>", id));
+            }
+            return rs.getDate("CreationDate");
         }
     }
 
