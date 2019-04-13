@@ -121,6 +121,7 @@ public class Layouts extends MessageHandlerA {
             String q = "SELECT * FROM `TrackLayouts`;";
 
             ArrayList<TracklayoutData> arraylist;
+            Layout.LOGGER.log(Level.INFO, q);
             try(ResultSet rs = database.query(q)) {
                 arraylist = new ArrayList();
                 while(rs.next()) {
@@ -265,6 +266,7 @@ public class Layouts extends MessageHandlerA {
                 pstmt.setLong(6, 0);
                 pstmt.setLong(7, msg.getEndpoint().getAppId());
                 pstmt.setLong(8, id);
+                Layout.LOGGER.log(Level.INFO, pstmt.toString());
                 if(pstmt.executeUpdate() == 0) {
                     dispatcher.dispatch(new Message(
                         MessageType.CLIENT_ERROR,
