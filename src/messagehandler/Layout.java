@@ -58,6 +58,7 @@ public class Layout extends MessageHandlerA {
         this.config     = config;
     }
 
+    @Override
     public void init() {
         Object o;
         o = config.getSection("trackLayout.activeTracklayoutId");
