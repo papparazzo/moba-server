@@ -206,8 +206,8 @@ public class Layouts extends MessageHandlerA {
                 pstmt.executeUpdate();
                 Layouts.LOGGER.log(Level.INFO, pstmt.toString());
                 try(ResultSet rs = pstmt.getGeneratedKeys()) {
-                    storeData(rs.getInt(1));
                     rs.next();
+                    storeData(rs.getInt(1));
                     tl.setId(activeLayout);
                 }
             }
