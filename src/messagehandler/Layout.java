@@ -200,6 +200,13 @@ public class Layout extends MessageHandlerA {
                 con.commit();
             }
 
+            stmt = "UPDATE `TrackLayouts` SET `ModificationDate` = NOW() ";
+
+            try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
+                Layout.LOGGER.log(Level.INFO, pstmt.toString());
+                pstmt.executeUpdate();
+            }
+
             dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CHANGED, map));
 
         } catch(SQLException e) {
