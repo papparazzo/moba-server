@@ -185,66 +185,22 @@ public class Layout extends MessageHandlerA {
                 "INSERT INTO `TrackLayoutSymbols` " +
                 "(`TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
                 "VALUES (?, ?, ?, ?)";
-/*
+
             try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
                 con.setAutoCommit(false);
-                for(Object o : arrayList) {
-                    Map<String, Object> symbol = (Map<String, Object>)o;
 
+                for(Object item : arrayList) {
+                    Map<String, Object> symbol = (Map<String, Object>)item;
                     pstmt.setInt(1, (int)symbol.get("id"));
-                    pstmt.setInt(2, "CodeGeeks");
-                    pstmt.setInt(3,i);
-                    pstmt.setInt(4,i);
+                    pstmt.setInt(2, (int)symbol.get("xPos"));
+                    pstmt.setInt(3, (int)symbol.get("yPos"));
+                    pstmt.setInt(4, (int)symbol.get("symbol"));
                     pstmt.addBatch();
-
-                    stmt =
-                        "INSERT INTO `TrackLayoutSymbols` " +
-                        "(`TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
-                        "VALUES (?, ?, ?, ?)";
-
-                     Map<String, Object> item = (Map<String, Object>)o;
-
-
                 }
-        con.commit();
-
+                con.commit();
             }
 
-
-
-}catch(Exception e){
-     e.printStackTrace();
-     connection.rollBack();
-} finally{
-     if(pstmt!=null)
-        pstmt.close();
-if(connection!=null)
-     connection.close();
-}
-*/
-
-
-
-
-            try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
-                pstmt.setLong(1, id);
-
-                Layout.LOGGER.log(Level.INFO, pstmt.toString());
-
-                ArrayList<TracklayoutSymbolData> arraylist;
-                ResultSet rs = pstmt.executeQuery();
-                arraylist = new ArrayList();
-                while(rs.next()) {
-                    arraylist.add(new TracklayoutSymbolData(
-                        rs.getLong("Id"),
-                        rs.getLong("XPos"),
-                        rs.getLong("YPos"),
-                        rs.getLong("Symbol")
-                    ));
-                }
-                map.put("symbols", arraylist);
-                dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_UPDATED, map));
-            }
+            dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CHANGED, map));
 
         } catch(SQLException e) {
             Layout.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
