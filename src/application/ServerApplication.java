@@ -30,7 +30,6 @@ import messagehandler.Environment;
 import messagehandler.GlobalTimer;
 import messagehandler.Interface;
 import messagehandler.Layout;
-import messagehandler.Layouts;
 import messagehandler.Link;
 import messagehandler.Server;
 import messagehandler.Systems;
@@ -59,7 +58,6 @@ public class ServerApplication extends Application {
                 loop.addHandler(MessageType.MessageGroup.ENVIRONMENT, new Environment(dispatcher, config));
                 loop.addHandler(MessageType.MessageGroup.SYSTEM, new Systems(dispatcher, msgQueueIn));
                 loop.addHandler(MessageType.MessageGroup.LAYOUT, new Layout(dispatcher, database, tracklayoutLock, config));
-                loop.addHandler(MessageType.MessageGroup.LAYOUTS, new Layouts(dispatcher, database, tracklayoutLock, config));
                 loop.addHandler(MessageType.MessageGroup.INTERFACE, new Interface(dispatcher, msgQueueIn));
                 acceptor.startAcceptor();
                 restart = loop.loop(msgQueueIn);

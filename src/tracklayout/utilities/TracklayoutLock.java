@@ -126,7 +126,7 @@ public class TracklayoutLock {
                     return;
                 }
             }
-            dispatcher.dispatch(new Message(MessageType.LAYOUTS_LAYOUT_UNLOCKED, id));
+            dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UNLOCKED, id));
         } catch(SQLException e) {
             TracklayoutLock.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
             dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()), msg.getEndpoint()));

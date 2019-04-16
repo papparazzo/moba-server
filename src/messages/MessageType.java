@@ -95,23 +95,19 @@ public enum MessageType {
     SYSTEM_HARDWARE_RESET(MessageGroup.SYSTEM, MessageClass.SINGLE),
 
     //---------------------------------------------------
-    // Layouts
-    //---------------------------------------------------
-    LAYOUTS_GET_LAYOUTS_REQ(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    LAYOUTS_GET_LAYOUTS_RES(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    LAYOUTS_DELETE_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    LAYOUTS_LAYOUT_DELETED(MessageGroup.LAYOUTS, MessageClass.GROUP),
-    LAYOUTS_CREATE_LAYOUT_REQ(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    LAYOUTS_CREATE_LAYOUT_RES(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    LAYOUTS_LAYOUT_CREATED(MessageGroup.LAYOUTS, MessageClass.GROUP),
-    LAYOUTS_UPDATE_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    LAYOUTS_LAYOUT_UPDATED(MessageGroup.LAYOUTS, MessageClass.GROUP),
-    LAYOUTS_UNLOCK_LAYOUT(MessageGroup.LAYOUTS, MessageClass.SINGLE),
-    LAYOUTS_LAYOUT_UNLOCKED(MessageGroup.LAYOUTS, MessageClass.GROUP),
-
-    //---------------------------------------------------
     // Layout
     //---------------------------------------------------
+    LAYOUT_GET_LAYOUTS_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_GET_LAYOUTS_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_DELETE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_LAYOUT_DELETED(MessageGroup.LAYOUT, MessageClass.GROUP),
+    LAYOUT_CREATE_LAYOUT_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_CREATE_LAYOUT_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_LAYOUT_CREATED(MessageGroup.LAYOUT, MessageClass.GROUP),
+    LAYOUT_UPDATE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_LAYOUT_UPDATED(MessageGroup.LAYOUT, MessageClass.GROUP),
+    LAYOUT_UNLOCK_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_LAYOUT_UNLOCKED(MessageGroup.LAYOUT, MessageClass.GROUP),
     LAYOUT_GET_LAYOUT_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_GET_LAYOUT_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_SAVE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
@@ -130,7 +126,6 @@ public enum MessageType {
         ENVIRONMENT,
         INTERFACE,
         SYSTEM,
-        LAYOUTS,
         LAYOUT,
         GUI
     }
