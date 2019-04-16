@@ -109,10 +109,9 @@ public class TracklayoutLock {
                 return;
             }
             Connection con = database.getConnection();
-            String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` = ? AND `id` = ? ";
+            String q = "UPDATE `TrackLayouts` SET `locked` = 0 WHERE `locked` = ? AND `id` = ? ";
 
             try(PreparedStatement pstmt = con.prepareStatement(q)) {
-                pstmt.setLong(1, 0);
                 pstmt.setLong(2, msg.getEndpoint().getAppId());
                 pstmt.setLong(3, id);
 
