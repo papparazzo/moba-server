@@ -46,6 +46,26 @@ public class TracklayoutLock {
         this.dispatcher = dispatcher;
     }
 
+    public boolean tryLock(long id, Endpoint ep) throws SQLException {
+        if(isLocked(id, ep)) {
+            return true;
+        }
+        Connection con = database.getConnection();
+        String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` = NULL AND `id` = ? ";
+
+        try(PreparedStatement pstmt = con.prepareStatement(q)) {
+            pstmt.setLong(2, ep.getAppId());
+            pstmt.setLong(3, id);
+
+            TracklayoutLock.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
+
+            if(pstmt.executeUpdate() == 0) {
+                return false;
+            }
+            return true;
+        }
+    }
+
     public void freeLocks(long id) {
         try {
             Connection con = database.getConnection();
@@ -109,7 +129,7 @@ public class TracklayoutLock {
                 return;
             }
             Connection con = database.getConnection();
-            String q = "UPDATE `TrackLayouts` SET `locked` = 0 WHERE `locked` = ? AND `id` = ? ";
+            String q = "UPDATE `TrackLayouts` SET `locked` = NULL WHERE `locked` = ? AND `id` = ? ";
 
             try(PreparedStatement pstmt = con.prepareStatement(q)) {
                 pstmt.setLong(2, msg.getEndpoint().getAppId());
