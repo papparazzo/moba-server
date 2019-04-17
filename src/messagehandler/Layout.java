@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 import com.SenderI;
 import database.Database;
 import datatypes.enumerations.ErrorId;
-import datatypes.objects.TracklayoutData;
+import datatypes.objects.TrackLayoutInfoData;
 import datatypes.objects.ErrorData;
 import datatypes.objects.TracklayoutSymbolData;
 import java.io.IOException;
@@ -127,13 +127,13 @@ public class Layout extends MessageHandlerA {
         try {
             String q = "SELECT * FROM `TrackLayouts`;";
 
-            ArrayList<TracklayoutData> arraylist;
+            ArrayList<TrackLayoutInfoData> arraylist;
             Layout.LOGGER.log(Level.INFO, q);
             try(ResultSet rs = database.query(q)) {
                 arraylist = new ArrayList();
                 while(rs.next()) {
                     long id = rs.getLong("Id");
-                    arraylist.add(new TracklayoutData(
+                    arraylist.add(new TrackLayoutInfoData(
                         id,
                         rs.getString("Name"),
                         rs.getString("Description"),

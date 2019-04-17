@@ -29,7 +29,7 @@ import json.JSONException;
 import json.JSONToStringI;
 import json.streamwriter.JSONStreamWriterStringBuilder;
 
-public class TracklayoutData implements JSONToStringI {
+public class TrackLayoutInfoData implements JSONToStringI {
     protected long    id;
     protected String  name;
     protected String  description;
@@ -38,7 +38,7 @@ public class TracklayoutData implements JSONToStringI {
     protected int     locked;
     protected boolean active;
 
-    public TracklayoutData(
+    public TrackLayoutInfoData(
         long id, String name, String description, int locked, boolean active, Date modified, Date created
     ) {
         if(name == null || name.isEmpty()) {
@@ -57,7 +57,7 @@ public class TracklayoutData implements JSONToStringI {
         this.created     = created;
     }
 
-    public TracklayoutData(String name, String description) {
+    public TrackLayoutInfoData(String name, String description) {
         this(-1, name, description, 0, false, new Date(), new Date());
     }
 
