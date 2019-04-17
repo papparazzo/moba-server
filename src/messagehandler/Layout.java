@@ -163,10 +163,9 @@ public class Layout extends MessageHandlerA {
             }
 
             Connection con = database.getConnection();
-            String q = "DELETE FROM `TrackLayouts` WHERE (`locked` = ? OR `locked` = ?) AND `id` = ? ";
+            String q = "DELETE FROM `TrackLayouts` WHERE (`locked` = 0 OR `locked` = ?) AND `id` = ? ";
 
             try (PreparedStatement pstmt = con.prepareStatement(q)) {
-                pstmt.setLong(1, 0);
                 pstmt.setLong(2, msg.getEndpoint().getAppId());
                 pstmt.setLong(3, id);
                 Layout.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
