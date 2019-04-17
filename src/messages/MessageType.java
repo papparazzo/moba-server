@@ -101,9 +101,10 @@ public enum MessageType {
     LAYOUT_GET_LAYOUTS_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_DELETE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_LAYOUT_DELETED(MessageGroup.LAYOUT, MessageClass.GROUP),
-    LAYOUT_CREATE_LAYOUT_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_CREATE_LAYOUT_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_CREATE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_LAYOUT_CREATED(MessageGroup.LAYOUT, MessageClass.GROUP),
+
+
     LAYOUT_UPDATE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_LAYOUT_UPDATED(MessageGroup.LAYOUT, MessageClass.GROUP),
     LAYOUT_UNLOCK_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),

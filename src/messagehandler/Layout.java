@@ -118,7 +118,7 @@ public class Layout extends MessageHandlerA {
                 deleteLayout(msg);
                 break;
 
-            case LAYOUT_CREATE_LAYOUT_REQ:
+            case LAYOUT_CREATE_LAYOUT:
                 createLayout(msg);
                 break;
 
@@ -196,9 +196,99 @@ public class Layout extends MessageHandlerA {
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_DELETED, id));
     }
 
+    protected void createLayout(Message msg) throws SQLException, ConfigException, IOException, JSONException {
+        Map<String, Object> map = (Map)msg.getData();
+
+        TrackLayoutInfoData tl = new TrackLayoutInfoData((String)map.get("name"), (String)map.get("description"));
+        Connection con = database.getConnection();
+
+        String q =
+            "INSERT INTO `TrackLayouts` " +
+            "(`Name`, `Description`, `CreationDate`, `ModificationDate`, `Locked`) " +
+            "VALUES (?, ?, NOW(), NOW(), ?)";
+
+        try(PreparedStatement pstmt = con.prepareStatement(q, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, tl.getName());
+            pstmt.setString(2, tl.getDescription());
+            pstmt.setLong(3, msg.getEndpoint().getAppId());
+            pstmt.executeUpdate();
+            Layout.LOGGER.log(Level.INFO, pstmt.toString());
+            try(ResultSet rs = pstmt.getGeneratedKeys()) {
+                rs.next();
+                storeData(rs.getInt(1));
+                tl.setId(activeLayout);
+            }
+        }
+
+        dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CREATED, tl));
+    }
+
+
+
+
+
+
+    
+
+
+
+    protected void updateLayout(Message msg) throws SQLException, ConfigException, IOException, JSONException {
+        Map<String, Object> map = (Map)msg.getData();
+
+        long id = (Long)map.get("id");
+        if(lock.isLocked(id, msg.getEndpoint())) {
+            return;
+        }
+        TrackLayoutInfoData tl;
+        boolean active = (boolean)map.get("active");
+        if(active) {
+            storeData(id);
+        }
+
+        tl = new TrackLayoutInfoData(
+            id,
+            (String)map.get("name"),
+            (String)map.get("description"),
+            (int)(long)msg.getEndpoint().getAppId(),
+            (boolean)map.get("active"),
+            new Date(),
+            getCreationDate(id)
+        );
+
+        Connection con = database.getConnection();
+
+        String q =
+            "UPDATE `TrackLayouts` " +
+            "SET `Name` = ?, `Description` = ?, `ModificationDate` = ? " +
+            "WHERE (`locked` = ? " +
+            "OR `locked` = ?) " +
+            "AND `id` = ? ";
+
+        try (PreparedStatement pstmt = con.prepareStatement(q)) {
+            pstmt.setString(1, tl.getName());
+            pstmt.setString(2, tl.getDescription());
+            pstmt.setDate(3, new java.sql.Date(tl.getModificationDate().getTime()));
+            pstmt.setLong(6, 0);
+            pstmt.setLong(7, msg.getEndpoint().getAppId());
+            pstmt.setLong(8, id);
+            Layout.LOGGER.log(Level.INFO, pstmt.toString());
+            if(pstmt.executeUpdate() == 0) {
+                dispatcher.dispatch(new Message(
+                    MessageType.CLIENT_ERROR,
+                    new ErrorData(ErrorId.DATASET_MISSING, "Could not update <" + String.valueOf(id) + ">"),
+                    msg.getEndpoint()
+                ));
+                pstmt.close();
+                return;
+            }
+            dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UPDATED, tl));
+        }
+    }
+
+
+
 /*
     protected void getLayout(Message msg) {
-        try {
             Connection con = database.getConnection();
             long id = activeLayout;
             Object o = msg.getData();
@@ -255,19 +345,9 @@ public class Layout extends MessageHandlerA {
 
                 dispatcher.dispatch(new Message(MessageType.LAYOUT_GET_LAYOUT_RES, map, msg.getEndpoint()));
             }
-        } catch(SQLException e) {
-            Layout.LOGGER.log(Level.WARNING, e.toString());
-            dispatcher.dispatch(new Message(
-                    MessageType.CLIENT_ERROR,
-                    new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
-                    msg.getEndpoint()
-                )
-            );
-        }
     }
 
     protected void saveLayout(Message msg) {
-        try {
             Map<String, Object> map = (Map<String, Object>)msg.getData();
             long id = activeLayout;
             Object o = map.get("id");
@@ -322,112 +402,9 @@ public class Layout extends MessageHandlerA {
             }
 
             dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CHANGED, map));
-
-        } catch(SQLException e) {
-            Layout.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
-            dispatcher.dispatch(new Message(
-                MessageType.CLIENT_ERROR,
-                new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
-                msg.getEndpoint()
-            ));
-        }
     }
 
-    protected void createLayout(Message msg) {
-        try {
-            Map<String, Object> map = (Map)msg.getData();
-
-            TracklayoutData tl = new TracklayoutData((String)map.get("name"), (String)map.get("description"));
-            Connection con = database.getConnection();
-
-            String q =
-                "INSERT INTO `TrackLayouts` " +
-                "(`Name`, `Description`, `CreationDate`, `ModificationDate`, `Locked`) " +
-                "VALUES (?, ?, NOW(), NOW(), ?)";
-
-            try(PreparedStatement pstmt = con.prepareStatement(q, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                pstmt.setString(1, tl.getName());
-                pstmt.setString(2, tl.getDescription());
-                pstmt.setLong(3, msg.getEndpoint().getAppId());
-                pstmt.executeUpdate();
-                Layout.LOGGER.log(Level.INFO, pstmt.toString());
-                try(ResultSet rs = pstmt.getGeneratedKeys()) {
-                    rs.next();
-                    storeData(rs.getInt(1));
-                    tl.setId(activeLayout);
-                }
-            }
-
-            dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CREATED, tl));
-            dispatcher.dispatch(new Message(MessageType.LAYOUT_CREATE_LAYOUT_RES, tl.getId(), msg.getEndpoint()));
-        } catch(SQLException | ConfigException | IOException | JSONException e) {
-            Layout.LOGGER.log(Level.WARNING, e.toString());
-            dispatcher.dispatch(new Message(
-                MessageType.CLIENT_ERROR,
-                new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
-                msg.getEndpoint()
-            ));
-        }
-    }
-
-    protected void updateLayout(Message msg) {
-        Map<String, Object> map = (Map)msg.getData();
-        try {
-            long id = (Long)map.get("id");
-            if(lock.isLocked(id, msg.getEndpoint())) {
-                return;
-            }
-            TracklayoutData tl;
-            boolean active = (boolean)map.get("active");
-            if(active) {
-                storeData(id);
-            }
-
-            tl = new TracklayoutData(
-                id,
-                (String)map.get("name"),
-                (String)map.get("description"),
-                (int)(long)msg.getEndpoint().getAppId(),
-                (boolean)map.get("active"),
-                new Date(),
-                getCreationDate(id)
-            );
-
-            Connection con = database.getConnection();
-
-            String q =
-                "UPDATE `TrackLayouts` " +
-                "SET `Name` = ?, `Description` = ?, `ModificationDate` = ? " +
-                "WHERE (`locked` = ? " +
-                "OR `locked` = ?) " +
-                "AND `id` = ? ";
-
-            try (PreparedStatement pstmt = con.prepareStatement(q)) {
-                pstmt.setString(1, tl.getName());
-                pstmt.setString(2, tl.getDescription());
-                pstmt.setDate(3, new java.sql.Date(tl.getModificationDate().getTime()));
-                pstmt.setLong(6, 0);
-                pstmt.setLong(7, msg.getEndpoint().getAppId());
-                pstmt.setLong(8, id);
-                Layout.LOGGER.log(Level.INFO, pstmt.toString());
-                if(pstmt.executeUpdate() == 0) {
-                    dispatcher.dispatch(new Message(
-                        MessageType.CLIENT_ERROR,
-                        new ErrorData(ErrorId.DATASET_MISSING, "Could not update <" + String.valueOf(id) + ">"),
-                        msg.getEndpoint()
-                    ));
-                    pstmt.close();
-                    return;
-                }
-                dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UPDATED, tl));
-            }
-        } catch(SQLException | NumberFormatException | ConfigException | IOException | JSONException e) {
-            Layout.LOGGER.log(Level.WARNING, e.toString());
-            dispatcher.dispatch(
-                new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()), msg.getEndpoint())
-            );
-        }
-    }
+*/
 
     protected Date getCreationDate(long id) throws SQLException {
         String q = "SELECT `CreationDate` FROM `TrackLayouts` WHERE `Id` = ?;";
@@ -443,7 +420,7 @@ public class Layout extends MessageHandlerA {
             return rs.getDate("CreationDate");
         }
     }
-*/
+
     protected void storeData(long id)
     throws ConfigException, IOException, JSONException {
         activeLayout = id;
