@@ -91,7 +91,7 @@ public class TracklayoutLock {
     public boolean isLocked(long id, Endpoint ep)
     throws SQLException, NoSuchElementException {
         long appId = ep.getAppId();
-        long lockedBy = isLocked(id);
+        long lockedBy = getIdOfLockingApp(id);
 
         if(lockedBy == 0 || lockedBy == appId) {
             return false;
@@ -105,7 +105,7 @@ public class TracklayoutLock {
         return true;
     }
 
-    protected long isLocked(long id)
+    protected long getIdOfLockingApp(long id)
     throws SQLException, NoSuchElementException {
         Connection con = database.getConnection();
 
