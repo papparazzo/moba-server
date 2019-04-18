@@ -37,14 +37,15 @@ import messages.MessageType;
 
 public class TracklayoutLock {
 
+    protected static final int APP_SERVER_ID = 1;
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     protected Database database   = null;
     protected SenderI  dispatcher = null;
 
     public enum LockState {
-       LOCKED_BY_OWN_APP,
-       LOCKED_BY_OTHER_APP,
-       UNLOCKED
+        LOCKED_BY_OWN_APP,
+        LOCKED_BY_OTHER_APP,
+        UNLOCKED
     }
 
     public TracklayoutLock(SenderI dispatcher, Database database) {
@@ -61,7 +62,7 @@ public class TracklayoutLock {
         String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` = NULL AND `id` = ? ";
 
         try(PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(2, ep.getAppId());
+            pstmt.setLong(2, getAppId(ep));
             pstmt.setLong(3, id);
 
             TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
@@ -97,7 +98,7 @@ public class TracklayoutLock {
 
     public LockState getLockState(long id, Endpoint ep)
     throws SQLException, NoSuchElementException {
-        long appId = ep.getAppId();
+        long appId = getAppId(ep);
         long lockedBy = getIdOfLockingApp(id);
 
         if(lockedBy == 0) {
@@ -141,7 +142,7 @@ public class TracklayoutLock {
         String q = "UPDATE `TrackLayouts` SET `locked` = NULL WHERE `locked` = ? AND `id` = ? ";
 
         try(PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(2, msg.getEndpoint().getAppId());
+            pstmt.setLong(2, getAppId(msg.getEndpoint()));
             pstmt.setLong(3, id);
 
             TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
@@ -163,7 +164,7 @@ public class TracklayoutLock {
         String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` = NULL AND `id` = ? ";
 
         try(PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(2, msg.getEndpoint().getAppId());
+            pstmt.setLong(2, getAppId(msg.getEndpoint()));
             pstmt.setLong(3, id);
 
             TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
@@ -174,5 +175,12 @@ public class TracklayoutLock {
             }
         }
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UNLOCKED, id));
+    }
+
+    protected long getAppId(Endpoint ep) {
+        if(ep == null) {
+            return TracklayoutLock.APP_SERVER_ID;
+        }
+        return ep.getAppId();
     }
 }
