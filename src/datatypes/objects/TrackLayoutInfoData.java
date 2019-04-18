@@ -35,11 +35,11 @@ public class TrackLayoutInfoData implements JSONToStringI {
     protected String  description;
     protected Date    created;
     protected Date    modified;
-    protected int     locked;
+    protected long    locked;
     protected boolean active;
 
     public TrackLayoutInfoData(
-        long id, String name, String description, int locked, boolean active, Date modified, Date created
+        long id, String name, String description, long locked, boolean active, Date modified, Date created
     ) {
         if(name == null || name.isEmpty()) {
             name = "";
@@ -57,8 +57,8 @@ public class TrackLayoutInfoData implements JSONToStringI {
         this.created     = created;
     }
 
-    public TrackLayoutInfoData(String name, String description) {
-        this(-1, name, description, 0, false, new Date(), new Date());
+    public TrackLayoutInfoData(String name, String description, long appId, boolean active) {
+        this(-1, name, description, appId, active, new Date(), new Date());
     }
 
     public void setId(long id) {
