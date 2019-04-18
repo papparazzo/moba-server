@@ -41,13 +41,20 @@ public class TracklayoutLock {
     protected Database database   = null;
     protected SenderI  dispatcher = null;
 
+    public enum LockState {
+       LOCKED_BY_OWN_APP,
+       LOCKED_BY_OTHER_APP,
+       UNLOCKED
+    }
+
     public TracklayoutLock(SenderI dispatcher, Database database) {
         this.database   = database;
         this.dispatcher = dispatcher;
     }
 
     public boolean tryLock(long id, Endpoint ep) throws SQLException {
-        if(isLocked(id, ep)) {
+        if(getLockState(id, ep) == LockState.LOCKED_BY_OTHER_APP) {
+//        if(isLocked(id, ep)) {
             return true;
         }
         Connection con = database.getConnection();
@@ -88,21 +95,25 @@ public class TracklayoutLock {
         }
     }
 
-    public boolean isLocked(long id, Endpoint ep)
+    public LockState getLockState(long id, Endpoint ep)
     throws SQLException, NoSuchElementException {
         long appId = ep.getAppId();
         long lockedBy = getIdOfLockingApp(id);
 
-        if(lockedBy == 0 || lockedBy == appId) {
-            return false;
+        if(lockedBy == 0) {
+            return LockState.UNLOCKED;
         }
+        if(lockedBy == appId) {
+            return LockState.LOCKED_BY_OWN_APP;
+        }
+
         TracklayoutLock.LOGGER.log(Level.WARNING, "layout <{0}> is locked by <{1}>", new Object[]{id, lockedBy});
         dispatcher.dispatch(new Message(
             MessageType.CLIENT_ERROR,
             new ErrorData(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">"),
             ep
         ));
-        return true;
+        return LockState.LOCKED_BY_OTHER_APP;
     }
 
     protected long getIdOfLockingApp(long id) throws SQLException, NoSuchElementException {
@@ -121,10 +132,10 @@ public class TracklayoutLock {
         }
     }
 
-    public boolean unlockLayout(Message msg) throws SQLException {
+    public void unlockLayout(Message msg) throws SQLException {
         long id = (Long)msg.getData();
-        if(isLocked(id, msg.getEndpoint())) {
-            return false;
+        if(getLockState(id, msg.getEndpoint()) != LockState.LOCKED_BY_OWN_APP) {
+            return;
         }
         Connection con = database.getConnection();
         String q = "UPDATE `TrackLayouts` SET `locked` = NULL WHERE `locked` = ? AND `id` = ? ";
@@ -137,17 +148,16 @@ public class TracklayoutLock {
 
             if(pstmt.executeUpdate() == 0) {
                 dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATASET_MISSING), msg.getEndpoint()));
-                return false;
+                return;
             }
         }
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UNLOCKED, id));
-        return true;
     }
 
-    public boolean lockLayout(Message msg) throws SQLException {
+    public void lockLayout(Message msg) throws SQLException {
         long id = (Long)msg.getData();
-        if(isLocked(id, msg.getEndpoint())) {
-            return false;
+        if(getLockState(id, msg.getEndpoint()) != LockState.UNLOCKED) {
+            return;
         }
         Connection con = database.getConnection();
         String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` = NULL AND `id` = ? ";
@@ -160,10 +170,9 @@ public class TracklayoutLock {
 
             if(pstmt.executeUpdate() == 0) {
                 dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATASET_MISSING), msg.getEndpoint()));
-                return false;
+                return;
             }
         }
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UNLOCKED, id));
-        return true;
     }
 }
