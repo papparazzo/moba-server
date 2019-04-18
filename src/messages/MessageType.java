@@ -103,12 +103,12 @@ public enum MessageType {
     LAYOUT_LAYOUT_DELETED(MessageGroup.LAYOUT, MessageClass.GROUP),
     LAYOUT_CREATE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_LAYOUT_CREATED(MessageGroup.LAYOUT, MessageClass.GROUP),
-
-
     LAYOUT_UPDATE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_LAYOUT_UPDATED(MessageGroup.LAYOUT, MessageClass.GROUP),
     LAYOUT_UNLOCK_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_LAYOUT_UNLOCKED(MessageGroup.LAYOUT, MessageClass.GROUP),
+    LAYOUT_LOCK_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_LAYOUT_LOCKED(MessageGroup.LAYOUT, MessageClass.GROUP),
     LAYOUT_GET_LAYOUT_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_GET_LAYOUT_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_SAVE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
@@ -117,7 +117,12 @@ public enum MessageType {
     //---------------------------------------------------
     // GUI
     //---------------------------------------------------
-    GUI_SYSTEM_NOTICE(MessageGroup.GUI, MessageClass.GROUP);
+    GUI_SYSTEM_NOTICE(MessageGroup.GUI, MessageClass.GROUP),
+
+    //---------------------------------------------------
+    // Block-System
+    //---------------------------------------------------
+    BLOCKSYSTEM(MessageGroup.CONTROL);
 
     public enum MessageGroup {
         BASE,
@@ -128,7 +133,8 @@ public enum MessageType {
         INTERFACE,
         SYSTEM,
         LAYOUT,
-        GUI
+        GUI,
+        CONTROL
     }
 
     public enum MessageClass {
