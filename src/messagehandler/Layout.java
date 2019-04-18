@@ -114,6 +114,10 @@ public class Layout extends MessageHandlerA {
                 getLayouts(msg);
                 break;
 
+            case LAYOUT_GET_LAYOUT_REQ:
+                getLayout(msg);
+                break;
+
             case LAYOUT_DELETE_LAYOUT:
                 deleteLayout(msg);
                 break;
@@ -128,10 +132,6 @@ public class Layout extends MessageHandlerA {
 
             case LAYOUT_UNLOCK_LAYOUT:
                 lock.unlockLayout(msg);
-                break;
-
-            case LAYOUT_GET_LAYOUT_REQ:
-                getLayout(msg);
                 break;
 
             case LAYOUT_SAVE_LAYOUT:
@@ -198,8 +198,15 @@ public class Layout extends MessageHandlerA {
 
     protected void createLayout(Message msg) throws SQLException, ConfigException, IOException, JSONException {
         Map<String, Object> map = (Map)msg.getData();
+        boolean isActive = (boolean)map.get("active");
+        long    currAppId = msg.getEndpoint().getAppId();
 
-        TrackLayoutInfoData tl = new TrackLayoutInfoData((String)map.get("name"), (String)map.get("description"));
+        TrackLayoutInfoData tl = new TrackLayoutInfoData(
+            (String)map.get("name"),
+            (String)map.get("description"),
+            currAppId,
+            isActive
+        );
         Connection con = database.getConnection();
 
         String q =
@@ -210,27 +217,20 @@ public class Layout extends MessageHandlerA {
         try(PreparedStatement pstmt = con.prepareStatement(q, PreparedStatement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, tl.getName());
             pstmt.setString(2, tl.getDescription());
-            pstmt.setLong(3, msg.getEndpoint().getAppId());
+            pstmt.setLong(3, currAppId);
             pstmt.executeUpdate();
             Layout.LOGGER.log(Level.INFO, pstmt.toString());
             try(ResultSet rs = pstmt.getGeneratedKeys()) {
                 rs.next();
-                storeData(rs.getInt(1));
-                tl.setId(activeLayout);
+                int id = rs.getInt(1);
+                if(isActive) {
+                    storeData(id);
+                }
+                tl.setId(id);
             }
         }
-
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CREATED, tl));
     }
-
-
-
-
-
-
-    
-
-
 
     protected void updateLayout(Message msg) throws SQLException, ConfigException, IOException, JSONException {
         Map<String, Object> map = (Map)msg.getData();
@@ -241,16 +241,13 @@ public class Layout extends MessageHandlerA {
         }
         TrackLayoutInfoData tl;
         boolean active = (boolean)map.get("active");
-        if(active) {
-            storeData(id);
-        }
-
+        long appId = msg.getEndpoint().getAppId();
         tl = new TrackLayoutInfoData(
             id,
             (String)map.get("name"),
             (String)map.get("description"),
-            (int)(long)msg.getEndpoint().getAppId(),
-            (boolean)map.get("active"),
+            appId,
+            active,
             new Date(),
             getCreationDate(id)
         );
@@ -260,17 +257,14 @@ public class Layout extends MessageHandlerA {
         String q =
             "UPDATE `TrackLayouts` " +
             "SET `Name` = ?, `Description` = ?, `ModificationDate` = ? " +
-            "WHERE (`locked` = ? " +
-            "OR `locked` = ?) " +
-            "AND `id` = ? ";
+            "WHERE (`locked` = '0' OR `locked` = ?) AND `id` = ? ";
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setString(1, tl.getName());
             pstmt.setString(2, tl.getDescription());
             pstmt.setDate(3, new java.sql.Date(tl.getModificationDate().getTime()));
-            pstmt.setLong(6, 0);
-            pstmt.setLong(7, msg.getEndpoint().getAppId());
-            pstmt.setLong(8, id);
+            pstmt.setLong(4, appId);
+            pstmt.setLong(5, id);
             Layout.LOGGER.log(Level.INFO, pstmt.toString());
             if(pstmt.executeUpdate() == 0) {
                 dispatcher.dispatch(new Message(
@@ -281,130 +275,130 @@ public class Layout extends MessageHandlerA {
                 pstmt.close();
                 return;
             }
+            if(active) {
+                storeData(id);
+            }
             dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UPDATED, tl));
         }
     }
 
 
 
-/*
-    protected void getLayout(Message msg) {
-            Connection con = database.getConnection();
-            long id = activeLayout;
-            Object o = msg.getData();
-            if(o != null) {
-                id = (Long)o;
-            } else if(activeLayout < 0) {
-                dispatcher.dispatch(new Message(
-                    MessageType.CLIENT_ERROR,
-                    new ErrorData(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given"),
-                    msg.getEndpoint()
+
+    protected void getLayout(Message msg) throws SQLException {
+
+
+
+        Connection con = database.getConnection();
+        long id = activeLayout;
+        Object o = msg.getData();
+        if(o != null) {
+            id = (Long)o;
+        } else if(activeLayout < 0) {
+            dispatcher.dispatch(new Message(
+                MessageType.CLIENT_ERROR,
+                new ErrorData(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given"),
+                msg.getEndpoint()
+            ));
+        }
+
+        HashMap<String, Object> map = new HashMap<>();
+
+        String q =
+            "SELECT MAX(`XPos`) AS `Width`, MAX(`YPos`) AS `Height` " +
+            "FROM `TrackLayoutSymbols` " +
+            "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
+
+        try (PreparedStatement pstmt = con.prepareStatement(q)) {
+            pstmt.setLong(1, id);
+            Layout.LOGGER.log(Level.INFO, pstmt.toString());
+            ResultSet rs = pstmt.executeQuery();
+            if(!rs.next()) {
+                throw new NoSuchElementException(String.format("no elements found for layout <%4d>", id));
+            }
+            map.put("id", id);
+            map.put("width", rs.getLong("Width"));
+            map.put("height", rs.getLong("Height"));
+        }
+
+        q = "SELECT `Id`, `XPos`, `YPos`, `Symbol` FROM `TrackLayoutSymbols` WHERE `TrackLayoutId` = ?";
+
+        try (PreparedStatement pstmt = con.prepareStatement(q)) {
+            pstmt.setLong(1, id);
+            Layout.LOGGER.log(Level.INFO, pstmt.toString());
+
+            ArrayList<TracklayoutSymbolData> arraylist;
+            ResultSet rs = pstmt.executeQuery();
+            arraylist = new ArrayList();
+            while(rs.next()) {
+                arraylist.add(new TracklayoutSymbolData(
+                    rs.getLong("Id"),
+                    rs.getLong("XPos"),
+                    rs.getLong("YPos"),
+                    rs.getLong("Symbol")
                 ));
             }
-
-            HashMap<String, Object> map = new HashMap<>();
-
-            String q =
-                "SELECT MAX(`XPos`) AS `Width`, MAX(`YPos`) AS `Height` " +
-                "FROM `TrackLayoutSymbols` " +
-                "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
-
-            try (PreparedStatement pstmt = con.prepareStatement(q)) {
-                pstmt.setLong(1, id);
-                Layout.LOGGER.log(Level.INFO, pstmt.toString());
-                ResultSet rs = pstmt.executeQuery();
-                if(!rs.next()) {
-                    throw new NoSuchElementException(String.format("no elements found for layout <%4d>", id));
-                }
-                map.put("id", id);
-                map.put("width", rs.getLong("Width"));
-                map.put("height", rs.getLong("Height"));
-            }
-
-            q =
-                "SELECT `Id`, `XPos`, `YPos`, `Symbol` " +
-                "FROM `TrackLayoutSymbols` " +
-                "WHERE `TrackLayoutId` = ?";
-
-            try (PreparedStatement pstmt = con.prepareStatement(q)) {
-                pstmt.setLong(1, id);
-                Layout.LOGGER.log(Level.INFO, pstmt.toString());
-
-                ArrayList<TracklayoutSymbolData> arraylist;
-                ResultSet rs = pstmt.executeQuery();
-                arraylist = new ArrayList();
-                while(rs.next()) {
-                    arraylist.add(new TracklayoutSymbolData(
-                        rs.getLong("Id"),
-                        rs.getLong("XPos"),
-                        rs.getLong("YPos"),
-                        rs.getLong("Symbol")
-                    ));
-                }
-                map.put("symbols", arraylist);
-
-                dispatcher.dispatch(new Message(MessageType.LAYOUT_GET_LAYOUT_RES, map, msg.getEndpoint()));
-            }
+            map.put("symbols", arraylist);
+            dispatcher.dispatch(new Message(MessageType.LAYOUT_GET_LAYOUT_RES, map, msg.getEndpoint()));
+        }
     }
 
-    protected void saveLayout(Message msg) {
-            Map<String, Object> map = (Map<String, Object>)msg.getData();
-            long id = activeLayout;
-            Object o = map.get("id");
-            if(o != null) {
-                id = (Long)o;
-            } else if(activeLayout < 0) {
-                dispatcher.dispatch(new Message(
-                    MessageType.CLIENT_ERROR,
-                    new ErrorData(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given"),
-                    msg.getEndpoint()
-                ));
+    protected void saveLayout(Message msg) throws SQLException {
+        Map<String, Object> map = (Map<String, Object>)msg.getData();
+        long id = activeLayout;
+        Object o = map.get("id");
+        if(o != null) {
+            id = (Long)o;
+        } else if(activeLayout < 0) {
+            dispatcher.dispatch(new Message(
+                MessageType.CLIENT_ERROR,
+                new ErrorData(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given"),
+                msg.getEndpoint()
+            ));
+        }
+
+        Connection con = database.getConnection();
+
+        String stmt =
+            "DELETE FROM `TrackLayoutSymbols` " +
+            "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
+
+        try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
+            pstmt.setLong(1, id);
+            Layout.LOGGER.log(Level.INFO, pstmt.toString());
+            pstmt.executeQuery();
+        }
+
+        ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
+
+        stmt =
+            "INSERT INTO `TrackLayoutSymbols` " +
+            "(`TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
+            "VALUES (?, ?, ?, ?)";
+
+        try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
+            con.setAutoCommit(false);
+
+            for(Object item : arrayList) {
+                Map<String, Object> symbol = (Map<String, Object>)item;
+                pstmt.setInt(1, (int)symbol.get("id"));
+                pstmt.setInt(2, (int)symbol.get("xPos"));
+                pstmt.setInt(3, (int)symbol.get("yPos"));
+                pstmt.setInt(4, (int)symbol.get("symbol"));
+                pstmt.addBatch();
             }
+            con.commit();
+        }
 
-            Connection con = database.getConnection();
+        stmt = "UPDATE `TrackLayouts` SET `ModificationDate` = NOW() ";
 
-            String stmt =
-                "DELETE FROM `TrackLayoutSymbols` " +
-                "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
+        try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
+            Layout.LOGGER.log(Level.INFO, pstmt.toString());
+            pstmt.executeUpdate();
+        }
 
-            try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-                pstmt.setLong(1, id);
-                Layout.LOGGER.log(Level.INFO, pstmt.toString());
-                pstmt.executeQuery();
-            }
-
-            ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
-
-            stmt =
-                "INSERT INTO `TrackLayoutSymbols` " +
-                "(`TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
-                "VALUES (?, ?, ?, ?)";
-
-            try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-                con.setAutoCommit(false);
-
-                for(Object item : arrayList) {
-                    Map<String, Object> symbol = (Map<String, Object>)item;
-                    pstmt.setInt(1, (int)symbol.get("id"));
-                    pstmt.setInt(2, (int)symbol.get("xPos"));
-                    pstmt.setInt(3, (int)symbol.get("yPos"));
-                    pstmt.setInt(4, (int)symbol.get("symbol"));
-                    pstmt.addBatch();
-                }
-                con.commit();
-            }
-
-            stmt = "UPDATE `TrackLayouts` SET `ModificationDate` = NOW() ";
-
-            try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
-                Layout.LOGGER.log(Level.INFO, pstmt.toString());
-                pstmt.executeUpdate();
-            }
-
-            dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CHANGED, map));
+        dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CHANGED, map));
     }
-
-*/
 
     protected Date getCreationDate(long id) throws SQLException {
         String q = "SELECT `CreationDate` FROM `TrackLayouts` WHERE `Id` = ?;";
