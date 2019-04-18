@@ -93,18 +93,10 @@ public class Layout extends MessageHandlerA {
             handleMsgUnsafe(msg);
         } catch(SQLException e) {
             Layout.LOGGER.log(Level.WARNING, e.toString());
-            dispatcher.dispatch(new Message(
-                MessageType.CLIENT_ERROR,
-                new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()),
-                msg.getEndpoint()
-            ));
+            dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()), msg.getEndpoint()));
         } catch(ConfigException | IOException | JSONException e) {
             Layout.LOGGER.log(Level.WARNING, e.toString());
-            dispatcher.dispatch(new Message(
-                MessageType.CLIENT_ERROR,
-                new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()),
-                msg.getEndpoint()
-            ));
+            dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()), msg.getEndpoint()));
         }
     }
 
@@ -132,6 +124,10 @@ public class Layout extends MessageHandlerA {
 
             case LAYOUT_UNLOCK_LAYOUT:
                 lock.unlockLayout(msg);
+                break;
+
+            case LAYOUT_LOCK_LAYOUT:
+                lock.lockLayout(msg);
                 break;
 
             case LAYOUT_SAVE_LAYOUT:
@@ -180,19 +176,13 @@ public class Layout extends MessageHandlerA {
             pstmt.setLong(3, id);
             Layout.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
             if(pstmt.executeUpdate() == 0) {
-                dispatcher.dispatch(new Message(
-                    MessageType.CLIENT_ERROR,
-                    new ErrorData(ErrorId.DATASET_MISSING, ""),
-                    msg.getEndpoint()
-                ));
-                pstmt.close();
+                dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATASET_MISSING, ""), msg.getEndpoint()));
                 return;
             }
         }
         if(id == activeLayout) {
             storeData(-1);
         }
-
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_DELETED, id));
     }
 
@@ -201,12 +191,7 @@ public class Layout extends MessageHandlerA {
         boolean isActive = (boolean)map.get("active");
         long    currAppId = msg.getEndpoint().getAppId();
 
-        TrackLayoutInfoData tl = new TrackLayoutInfoData(
-            (String)map.get("name"),
-            (String)map.get("description"),
-            currAppId,
-            isActive
-        );
+        TrackLayoutInfoData tl = new TrackLayoutInfoData((String)map.get("name"), (String)map.get("description"), currAppId, isActive);
         Connection con = database.getConnection();
 
         String q =
@@ -242,15 +227,7 @@ public class Layout extends MessageHandlerA {
         TrackLayoutInfoData tl;
         boolean active = (boolean)map.get("active");
         long appId = msg.getEndpoint().getAppId();
-        tl = new TrackLayoutInfoData(
-            id,
-            (String)map.get("name"),
-            (String)map.get("description"),
-            appId,
-            active,
-            new Date(),
-            getCreationDate(id)
-        );
+        tl = new TrackLayoutInfoData(id, (String)map.get("name"), (String)map.get("description"), appId, active, new Date(), getCreationDate(id));
 
         Connection con = database.getConnection();
 
@@ -272,7 +249,6 @@ public class Layout extends MessageHandlerA {
                     new ErrorData(ErrorId.DATASET_MISSING, "Could not update <" + String.valueOf(id) + ">"),
                     msg.getEndpoint()
                 ));
-                pstmt.close();
                 return;
             }
             if(active) {
@@ -281,6 +257,9 @@ public class Layout extends MessageHandlerA {
             dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UPDATED, tl));
         }
     }
+
+
+
 
 
 
