@@ -121,10 +121,10 @@ public class TracklayoutLock {
         }
     }
 
-    public void unlockLayout(Message msg) throws SQLException {
+    public boolean unlockLayout(Message msg) throws SQLException {
         long id = (Long)msg.getData();
         if(isLocked(id, msg.getEndpoint())) {
-            return;
+            return false;
         }
         Connection con = database.getConnection();
         String q = "UPDATE `TrackLayouts` SET `locked` = NULL WHERE `locked` = ? AND `id` = ? ";
@@ -137,10 +137,33 @@ public class TracklayoutLock {
 
             if(pstmt.executeUpdate() == 0) {
                 dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATASET_MISSING), msg.getEndpoint()));
-                pstmt.close();
-                return;
+                return false;
             }
         }
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UNLOCKED, id));
+        return true;
+    }
+
+    public boolean lockLayout(Message msg) throws SQLException {
+        long id = (Long)msg.getData();
+        if(isLocked(id, msg.getEndpoint())) {
+            return false;
+        }
+        Connection con = database.getConnection();
+        String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` = NULL AND `id` = ? ";
+
+        try(PreparedStatement pstmt = con.prepareStatement(q)) {
+            pstmt.setLong(2, msg.getEndpoint().getAppId());
+            pstmt.setLong(3, id);
+
+            TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
+
+            if(pstmt.executeUpdate() == 0) {
+                dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATASET_MISSING), msg.getEndpoint()));
+                return false;
+            }
+        }
+        dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UNLOCKED, id));
+        return true;
     }
 }
