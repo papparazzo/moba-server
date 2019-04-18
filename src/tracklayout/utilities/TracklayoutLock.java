@@ -57,7 +57,7 @@ public class TracklayoutLock {
             pstmt.setLong(2, ep.getAppId());
             pstmt.setLong(3, id);
 
-            TracklayoutLock.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
+            TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
 
             if(pstmt.executeUpdate() == 0) {
                 return false;
@@ -81,10 +81,10 @@ public class TracklayoutLock {
                     pstmt.setLong(1, id);
                 }
                 pstmt.executeUpdate();
-                TracklayoutLock.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
+                TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
             }
         } catch(SQLException e) {
-            TracklayoutLock.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            TracklayoutLock.LOGGER.log(Level.WARNING, e.toString());
         }
     }
 
@@ -96,7 +96,7 @@ public class TracklayoutLock {
         if(lockedBy == 0 || lockedBy == appId) {
             return false;
         }
-        TracklayoutLock.LOGGER.log(Level.WARNING, "layout <{0}> is locked", new Object[]{id});
+        TracklayoutLock.LOGGER.log(Level.WARNING, "layout <{0}> is locked by <{1}>", new Object[]{id, lockedBy});
         dispatcher.dispatch(new Message(
             MessageType.CLIENT_ERROR,
             new ErrorData(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">"),
@@ -105,16 +105,15 @@ public class TracklayoutLock {
         return true;
     }
 
-    protected long getIdOfLockingApp(long id)
-    throws SQLException, NoSuchElementException {
+    protected long getIdOfLockingApp(long id) throws SQLException, NoSuchElementException {
         Connection con = database.getConnection();
 
         String q = "SELECT `locked` FROM `TrackLayouts` WHERE `Id` = ?";
 
         try(PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setLong(1, id);
+            TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
             ResultSet rs = pstmt.executeQuery();
-
             if(!rs.next()) {
                 throw new NoSuchElementException("no layout found with id <" + Long.toString(id) + ">");
             }
@@ -122,33 +121,26 @@ public class TracklayoutLock {
         }
     }
 
-    public void unlockLayout(Message msg) {
-        try {
-            long id = (Long)msg.getData();
-            if(isLocked(id, msg.getEndpoint())) {
+    public void unlockLayout(Message msg) throws SQLException {
+        long id = (Long)msg.getData();
+        if(isLocked(id, msg.getEndpoint())) {
+            return;
+        }
+        Connection con = database.getConnection();
+        String q = "UPDATE `TrackLayouts` SET `locked` = NULL WHERE `locked` = ? AND `id` = ? ";
+
+        try(PreparedStatement pstmt = con.prepareStatement(q)) {
+            pstmt.setLong(2, msg.getEndpoint().getAppId());
+            pstmt.setLong(3, id);
+
+            TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
+
+            if(pstmt.executeUpdate() == 0) {
+                dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATASET_MISSING), msg.getEndpoint()));
+                pstmt.close();
                 return;
             }
-            Connection con = database.getConnection();
-            String q = "UPDATE `TrackLayouts` SET `locked` = NULL WHERE `locked` = ? AND `id` = ? ";
-
-            try(PreparedStatement pstmt = con.prepareStatement(q)) {
-                pstmt.setLong(2, msg.getEndpoint().getAppId());
-                pstmt.setLong(3, id);
-
-                TracklayoutLock.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
-
-                if(pstmt.executeUpdate() == 0) {
-                    dispatcher.dispatch(
-                        new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATASET_MISSING), msg.getEndpoint())
-                    );
-                    pstmt.close();
-                    return;
-                }
-            }
-            dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UNLOCKED, id));
-        } catch(SQLException e) {
-            TracklayoutLock.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
-            dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()), msg.getEndpoint()));
         }
+        dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UNLOCKED, id));
     }
 }
