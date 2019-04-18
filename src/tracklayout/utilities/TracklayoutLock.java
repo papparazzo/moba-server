@@ -54,15 +54,16 @@ public class TracklayoutLock {
     }
 
     public boolean tryLock(long id, Endpoint ep) throws SQLException {
-        if(getLockState(id, ep) == LockState.LOCKED_BY_OTHER_APP) {
-//        if(isLocked(id, ep)) {
-            return true;
-        }
         Connection con = database.getConnection();
-        String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` = NULL AND `id` = ? ";
+        long appId = getAppId(ep);
+        // ModificationDate = NOW damit affected-Rows auch 1 zurück liefert wenn bereits durch eigene App gelocket!
+        String q =
+            "UPDATE `TrackLayouts` SET `locked` = ?, `ModificationDate` = NOW() " +
+            "WHERE (`locked` = NULL OR `locked` = ?) AND `id` = ? ";
 
         try(PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(2, getAppId(ep));
+            pstmt.setLong(1, appId);
+            pstmt.setLong(2, appId);
             pstmt.setLong(3, id);
 
             TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
@@ -174,7 +175,7 @@ public class TracklayoutLock {
                 return;
             }
         }
-        dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UNLOCKED, id));
+        dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_LOCKED, id));
     }
 
     protected long getAppId(Endpoint ep) {
