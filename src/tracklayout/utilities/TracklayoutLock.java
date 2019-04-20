@@ -29,11 +29,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import messages.Message;
 import messages.MessageType;
+import utilities.exceptions.ErrorException;
 
 public class TracklayoutLock {
 
@@ -98,7 +98,7 @@ public class TracklayoutLock {
     }
 
     public LockState getLockState(long id, Endpoint ep)
-    throws SQLException, NoSuchElementException {
+    throws SQLException, ErrorException {
         long appId = getAppId(ep);
         long lockedBy = getIdOfLockingApp(id);
 
@@ -110,6 +110,7 @@ public class TracklayoutLock {
         }
 
         TracklayoutLock.LOGGER.log(Level.WARNING, "layout <{0}> is locked by <{1}>", new Object[]{id, lockedBy});
+        // FIXME: Hier Excpetion werfen...
         dispatcher.dispatch(new Message(
             MessageType.CLIENT_ERROR,
             new ErrorData(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">"),
@@ -118,7 +119,7 @@ public class TracklayoutLock {
         return LockState.LOCKED_BY_OTHER_APP;
     }
 
-    protected long getIdOfLockingApp(long id) throws SQLException, NoSuchElementException {
+    protected long getIdOfLockingApp(long id) throws SQLException, ErrorException {
         Connection con = database.getConnection();
 
         String q = "SELECT `locked` FROM `TrackLayouts` WHERE `Id` = ?";
@@ -128,53 +129,52 @@ public class TracklayoutLock {
             TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
             ResultSet rs = pstmt.executeQuery();
             if(!rs.next()) {
-                throw new NoSuchElementException("no layout found with id <" + Long.toString(id) + ">");
+                throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + Long.toString(id) + ">");
             }
             return rs.getLong("locked");
         }
     }
 
-    public void unlockLayout(Message msg) throws SQLException {
-        long id = (Long)msg.getData();
-        if(getLockState(id, msg.getEndpoint()) != LockState.LOCKED_BY_OWN_APP) {
+    public void unlockLayout(long id, Endpoint ep) throws SQLException, ErrorException {
+        if(getLockState(id, ep) != LockState.LOCKED_BY_OWN_APP) {
+            // FIXME: Hier wird nachticht verschickt das Gleisplan gesperrt
             return;
         }
         Connection con = database.getConnection();
         String q = "UPDATE `TrackLayouts` SET `locked` = NULL WHERE `locked` = ? AND `id` = ? ";
 
         try(PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(2, getAppId(msg.getEndpoint()));
+            pstmt.setLong(2, getAppId(ep));
             pstmt.setLong(3, id);
 
             TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
 
             if(pstmt.executeUpdate() == 0) {
-                dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATASET_MISSING), msg.getEndpoint()));
-                return;
+                throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + Long.toString(id) + ">");
             }
         }
+        // FIXME: Die Nachricht in Layout verschicken...
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UNLOCKED, id));
     }
 
-    public void lockLayout(Message msg) throws SQLException {
-        long id = (Long)msg.getData();
-        if(getLockState(id, msg.getEndpoint()) != LockState.UNLOCKED) {
+    public void lockLayout(long id, Endpoint ep) throws SQLException, ErrorException {
+        if(getLockState(id, ep) != LockState.UNLOCKED) {
             return;
         }
         Connection con = database.getConnection();
         String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` = NULL AND `id` = ? ";
 
         try(PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(2, getAppId(msg.getEndpoint()));
+            pstmt.setLong(2, getAppId(ep));
             pstmt.setLong(3, id);
 
             TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
 
             if(pstmt.executeUpdate() == 0) {
-                dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATASET_MISSING), msg.getEndpoint()));
-                return;
+                throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + Long.toString(id) + ">");
             }
         }
+        // FIXME: Die Nachricht in Layout verschicken...
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_LOCKED, id));
     }
 
