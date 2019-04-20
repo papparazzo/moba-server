@@ -46,6 +46,7 @@ import messages.MessageType;
 import tracklayout.utilities.TracklayoutLock;
 import utilities.config.Config;
 import utilities.config.ConfigException;
+import utilities.exceptions.ErrorException;
 
 public class Layout extends MessageHandlerA {
 
@@ -54,7 +55,7 @@ public class Layout extends MessageHandlerA {
     protected SenderI   dispatcher = null;
     protected TracklayoutLock lock = null;
     protected Config        config = null;
-    protected long     activeLayout = 0;
+    protected long    activeLayout = 0;
 
     public Layout(SenderI dispatcher, Database database, TracklayoutLock lock, Config config) {
         this.database   = database;
@@ -97,10 +98,14 @@ public class Layout extends MessageHandlerA {
         } catch(ConfigException | IOException | JSONException e) {
             Layout.LOGGER.log(Level.WARNING, e.toString());
             dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()), msg.getEndpoint()));
+        } catch(ErrorException e) {
+            Layout.LOGGER.log(Level.WARNING, e.toString());
+            dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(e.getErrorId(), e.getMessage()), msg.getEndpoint()));
         }
     }
 
-    protected void handleMsgUnsafe(Message msg) throws SQLException, IOException, JSONException, ConfigException {
+    protected void handleMsgUnsafe(Message msg)
+    throws SQLException, IOException, JSONException, ConfigException, ErrorException {
         switch(msg.getMsgType()) {
             case LAYOUT_GET_LAYOUTS_REQ:
                 getLayouts(msg);
@@ -123,11 +128,11 @@ public class Layout extends MessageHandlerA {
                 break;
 
             case LAYOUT_UNLOCK_LAYOUT:
-                lock.unlockLayout(msg);
+                unlockLayout(msg);
                 break;
 
             case LAYOUT_LOCK_LAYOUT:
-                lock.lockLayout(msg);
+                lockLayout(msg);
                 break;
 
             case LAYOUT_SAVE_LAYOUT:
@@ -162,9 +167,9 @@ public class Layout extends MessageHandlerA {
         dispatcher.dispatch(new Message(MessageType.LAYOUT_GET_LAYOUTS_RES, arraylist, msg.getEndpoint()));
     }
 
-    protected void deleteLayout(Message msg) throws SQLException, IOException, ConfigException, JSONException {
+    protected void deleteLayout(Message msg) throws SQLException, IOException, ConfigException, JSONException, ErrorException {
         long id = (Long)msg.getData();
-        if(lock.isLocked(id, msg.getEndpoint())) {
+        if(lock.getLockState(id, msg.getEndpoint()) == TracklayoutLock.LockState.LOCKED_BY_OTHER_APP) {
             return;
         }
 
@@ -217,11 +222,11 @@ public class Layout extends MessageHandlerA {
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CREATED, tl));
     }
 
-    protected void updateLayout(Message msg) throws SQLException, ConfigException, IOException, JSONException {
+    protected void updateLayout(Message msg) throws SQLException, ConfigException, IOException, JSONException, ErrorException {
         Map<String, Object> map = (Map)msg.getData();
 
         long id = (Long)map.get("id");
-        if(lock.isLocked(id, msg.getEndpoint())) {
+        if(lock.getLockState(id, msg.getEndpoint()) == TracklayoutLock.LockState.LOCKED_BY_OTHER_APP) {
             return;
         }
         TrackLayoutInfoData tl;
@@ -258,28 +263,33 @@ public class Layout extends MessageHandlerA {
         }
     }
 
+    protected void unlockLayout(Message msg) throws SQLException, ErrorException {
+        long id = getId(msg.getData());
+        lock.unlockLayout(id, msg.getEndpoint());
+    }
+
+    protected void lockLayout(Message msg) throws SQLException, ErrorException {
+        long id = getId(msg.getData());
+        lock.lockLayout(id, msg.getEndpoint());
+    }
 
 
 
 
 
 
-    protected void getLayout(Message msg) throws SQLException {
 
+
+
+
+
+
+
+    protected void getLayout(Message msg) throws SQLException, ErrorException {
+        long id = getId(msg.getData());
 
 
         Connection con = database.getConnection();
-        long id = activeLayout;
-        Object o = msg.getData();
-        if(o != null) {
-            id = (Long)o;
-        } else if(activeLayout < 0) {
-            dispatcher.dispatch(new Message(
-                MessageType.CLIENT_ERROR,
-                new ErrorData(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given"),
-                msg.getEndpoint()
-            ));
-        }
 
         HashMap<String, Object> map = new HashMap<>();
 
@@ -322,19 +332,9 @@ public class Layout extends MessageHandlerA {
         }
     }
 
-    protected void saveLayout(Message msg) throws SQLException {
+    protected void saveLayout(Message msg) throws SQLException, ErrorException {
         Map<String, Object> map = (Map<String, Object>)msg.getData();
-        long id = activeLayout;
-        Object o = map.get("id");
-        if(o != null) {
-            id = (Long)o;
-        } else if(activeLayout < 0) {
-            dispatcher.dispatch(new Message(
-                MessageType.CLIENT_ERROR,
-                new ErrorData(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given"),
-                msg.getEndpoint()
-            ));
-        }
+        long id = getId(map.get("id"));
 
         Connection con = database.getConnection();
 
@@ -406,5 +406,15 @@ public class Layout extends MessageHandlerA {
         map.put("activeTracklayoutId", activeLayout);
         config.setSection("trackLayout", map);
         config.writeFile();
+    }
+
+    protected long getId(Object o) throws ErrorException {
+        if(o != null) {
+            return (long)o;
+        }
+        if(activeLayout >= 0) {
+            return activeLayout;
+        }
+        throw new ErrorException(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given");
     }
 }
