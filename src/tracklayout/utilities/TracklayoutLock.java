@@ -110,7 +110,8 @@ public class TracklayoutLock {
         }
 
         TracklayoutLock.LOGGER.log(Level.WARNING, "layout <{0}> is locked by <{1}>", new Object[]{id, lockedBy});
-        // FIXME: Hier Excpetion werfen...
+        throw new ErrorException(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">");
+
         dispatcher.dispatch(new Message(
             MessageType.CLIENT_ERROR,
             new ErrorData(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">"),
