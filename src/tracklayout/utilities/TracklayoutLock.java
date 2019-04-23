@@ -97,6 +97,20 @@ public class TracklayoutLock {
         }
     }
 
+    public void checkLockState(long id, long appId) throws SQLException, ErrorException{
+        long lockedBy = getIdOfLockingApp(id);
+
+        if(lockedBy == 0) {
+            return;
+        }
+        if(lockedBy == appId) {
+            return;
+        }
+        throw new ErrorException(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">");
+    }
+
+
+
     public LockState getLockState(long id, Endpoint ep)
     throws SQLException, ErrorException {
         long appId = getAppId(ep);
@@ -110,8 +124,6 @@ public class TracklayoutLock {
         }
 
         TracklayoutLock.LOGGER.log(Level.WARNING, "layout <{0}> is locked by <{1}>", new Object[]{id, lockedBy});
-        throw new ErrorException(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">");
-
         dispatcher.dispatch(new Message(
             MessageType.CLIENT_ERROR,
             new ErrorData(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">"),
