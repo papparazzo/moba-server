@@ -169,9 +169,7 @@ public class Layout extends MessageHandlerA {
 
     protected void deleteLayout(Message msg) throws SQLException, IOException, ConfigException, JSONException, ErrorException {
         long id = (Long)msg.getData();
-        if(lock.getLockState(id, msg.getEndpoint()) == TracklayoutLock.LockState.LOCKED_BY_OTHER_APP) {
-            return;
-        }
+        lock.checkLockState(id, msg.getEndpoint().getAppId());
 
         Connection con = database.getConnection();
         String q = "DELETE FROM `TrackLayouts` WHERE (`locked` = 0 OR `locked` = ?) AND `id` = ? ";
@@ -226,9 +224,8 @@ public class Layout extends MessageHandlerA {
         Map<String, Object> map = (Map)msg.getData();
 
         long id = (Long)map.get("id");
-        if(lock.getLockState(id, msg.getEndpoint()) == TracklayoutLock.LockState.LOCKED_BY_OTHER_APP) {
-            return;
-        }
+        lock.checkLockState(id, msg.getEndpoint().getAppId());
+
         TrackLayoutInfoData tl;
         boolean active = (boolean)map.get("active");
         long appId = msg.getEndpoint().getAppId();
