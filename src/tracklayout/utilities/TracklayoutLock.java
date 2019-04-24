@@ -97,18 +97,6 @@ public class TracklayoutLock {
         }
     }
 
-    public void checkLockState(long id, long appId) throws SQLException, ErrorException{
-        long lockedBy = getIdOfLockingApp(id);
-
-        if(lockedBy == 0) {
-            return;
-        }
-        if(lockedBy == appId) {
-            return;
-        }
-        throw new ErrorException(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">");
-    }
-
     public boolean isLockedByApp(long id, Endpoint ep) throws SQLException, ErrorException {
         long appId = getAppId(ep);
         long lockedBy = getIdOfLockingApp(id);
