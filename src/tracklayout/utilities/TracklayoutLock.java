@@ -109,27 +109,19 @@ public class TracklayoutLock {
         throw new ErrorException(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">");
     }
 
-
-
-    public LockState getLockState(long id, Endpoint ep)
-    throws SQLException, ErrorException {
+    public boolean isLockedByApp(long id, Endpoint ep) throws SQLException, ErrorException {
         long appId = getAppId(ep);
         long lockedBy = getIdOfLockingApp(id);
 
+        TracklayoutLock.LOGGER.log(Level.INFO, "layout <{0}> is locked by <{1}>", new Object[]{id, lockedBy});
+
         if(lockedBy == 0) {
-            return LockState.UNLOCKED;
+            return false;
         }
         if(lockedBy == appId) {
-            return LockState.LOCKED_BY_OWN_APP;
+            return true;
         }
-
-        TracklayoutLock.LOGGER.log(Level.WARNING, "layout <{0}> is locked by <{1}>", new Object[]{id, lockedBy});
-        dispatcher.dispatch(new Message(
-            MessageType.CLIENT_ERROR,
-            new ErrorData(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">"),
-            ep
-        ));
-        return LockState.LOCKED_BY_OTHER_APP;
+        throw new ErrorException(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">");
     }
 
     protected long getIdOfLockingApp(long id) throws SQLException, ErrorException {
@@ -149,10 +141,10 @@ public class TracklayoutLock {
     }
 
     public void unlockLayout(long id, Endpoint ep) throws SQLException, ErrorException {
-        if(getLockState(id, ep) != LockState.LOCKED_BY_OWN_APP) {
-            // FIXME: Hier wird nachticht verschickt das Gleisplan gesperrt
+        if(!isLockedByApp(id, ep)) {
             return;
         }
+
         Connection con = database.getConnection();
         String q = "UPDATE `TrackLayouts` SET `locked` = NULL WHERE `locked` = ? AND `id` = ? ";
 
@@ -166,12 +158,10 @@ public class TracklayoutLock {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + Long.toString(id) + ">");
             }
         }
-        // FIXME: Die Nachricht in Layout verschicken...
-        dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UNLOCKED, id));
     }
 
     public void lockLayout(long id, Endpoint ep) throws SQLException, ErrorException {
-        if(getLockState(id, ep) != LockState.UNLOCKED) {
+        if(isLockedByApp(id, ep)) {
             return;
         }
         Connection con = database.getConnection();
@@ -187,8 +177,6 @@ public class TracklayoutLock {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + Long.toString(id) + ">");
             }
         }
-        // FIXME: Die Nachricht in Layout verschicken...
-        dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_LOCKED, id));
     }
 
     protected long getAppId(Endpoint ep) {
