@@ -125,25 +125,10 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
                 default:
                     throw new UnsupportedOperationException("unknow msg <" + msg.getMsgType().toString() + ">.");
             }
-        } catch(
-            java.lang.ClassCastException | IOException | JSONException |
-            ConfigException | NullPointerException e
-        ) {
-            dispatcher.dispatch(
-                new Message(
-                    MessageType.CLIENT_ERROR,
-                    new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()),
-                    msg.getEndpoint()
-                )
-            );
+        } catch(java.lang.ClassCastException | IOException | JSONException | ConfigException | NullPointerException e) {
+            dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()), msg.getEndpoint()));
         } catch(IllegalArgumentException e) {
-            dispatcher.dispatch(
-                new Message(
-                    MessageType.CLIENT_ERROR,
-                    new ErrorData(ErrorId.INVALID_DATA_SEND, e.getMessage()),
-                    msg.getEndpoint()
-                )
-            );
+            dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.INVALID_DATA_SEND, e.getMessage()), msg.getEndpoint()));
         }
     }
 
