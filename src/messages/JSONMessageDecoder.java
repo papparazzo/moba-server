@@ -35,7 +35,7 @@ public class JSONMessageDecoder extends JSONDecoder {
     }
 
     public Message decodeMsg(Endpoint ep)
-    throws IOException, JSONException {
+    throws IOException, JSONException, JSONMessageDecoderException {
         checkNext('{');
         checkNext('"');
 
@@ -52,7 +52,7 @@ public class JSONMessageDecoder extends JSONDecoder {
                     try {
                         msgtype = MessageType.valueOf(msgName);
                     } catch(IllegalArgumentException e) {
-                        throw new JSONException("unknown message-name <" + msgName + "> arrived", e);
+                        throw new JSONMessageDecoderException("unknown message-name <" + msgName + "> arrived", e);
                     }
                     break;
 
@@ -61,7 +61,7 @@ public class JSONMessageDecoder extends JSONDecoder {
                     break;
 
                 default:
-                    throw new JSONException(
+                    throw new JSONMessageDecoderException(
                         "key <" + key + "> is neither <" + Message.MSG_HEADER_NAME + "> for name nor <" + Message.MSG_HEADER_DATA + "> for data!"
                     );
             }
@@ -73,7 +73,7 @@ public class JSONMessageDecoder extends JSONDecoder {
         checkNext('}');
 
         if(msgtype == null) {
-            throw new JSONException("invalid message arrived");
+            throw new JSONMessageDecoderException("invalid message arrived");
         }
         return new Message(msgtype, o, ep);
     }
