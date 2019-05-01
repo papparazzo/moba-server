@@ -291,10 +291,7 @@ public class JSONDecoder {
                 return Long.valueOf(s);
             }
         } catch(NumberFormatException e) {
-            throw new JSONException(
-                "parsing, error could not determine value: <" + s + ">",
-                e
-            );
+            throw new JSONException("parsing, error could not determine value: <" + s + ">", e);
         }
         throw new JSONException("parsing error, could not determine value" );
     }
