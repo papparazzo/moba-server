@@ -33,6 +33,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import datatypes.base.Version;
+import datatypes.enumerations.ErrorId;
+import datatypes.objects.ErrorData;
 import java.util.Collections;
 import json.JSONEncoder;
 import json.JSONException;
@@ -129,17 +131,16 @@ public class Endpoint extends Thread implements JSONToStringI {
     public void run() {
         Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: thread started", new Object[]{id});
         try {
-            if(!init()) {
-                Endpoint.LOGGER.log(Level.WARNING, "Endpoint #{0}: init failed!>", new Object[]{id});
-                in.add(new Message(MessageType.CLIENT_CLOSE, null, this));
-                return;
-            }
+            init();
             while(!isInterrupted()) {
                 in.add(getNextMessage());
             }
         } catch(IOException e) {
             Endpoint.LOGGER.log(Level.WARNING, "Endpoint #{0}: IOException, send <CLIENT_CLOSE> <{1}>", new Object[]{id, e.toString()});
             in.add(new Message(MessageType.CLIENT_CLOSE, null, this));
+        } catch(JSONMessageDecoderException e) {
+            Endpoint.LOGGER.log(Level.WARNING, "Endpoint #{0}: JSONMessageDecoderException, send <> <{1}>", new Object[]{id, e.toString()});
+            in.add(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()), this));
         }
         Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
     }
@@ -165,17 +166,16 @@ public class Endpoint extends Thread implements JSONToStringI {
     }
 
     @SuppressWarnings("unchecked")
-    private boolean init()
+    private void init()
     throws IOException {
         Message msg = getNextMessage();
         MessageType mtype = msg.getMsgType();
 
         if(mtype != MessageType.CLIENT_START && mtype != MessageType.CLIENT_CONNECTED) {
-            Endpoint.LOGGER.log(Level.SEVERE, "first msg is neither CLIENT_START nor CLIENT_CONNECTED");
-            return false;
+            throw new IOException("first msg is neither CLIENT_START nor CLIENT_CONNECTED");
         }
         if(mtype == MessageType.CLIENT_CONNECTED) {
-            return true;
+            return;
         }
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         appName = (String)map.get("appName");
@@ -198,6 +198,6 @@ public class Endpoint extends Thread implements JSONToStringI {
             }
         }
         in.add(msg);
-        return true;
+        return;
     }
 }
