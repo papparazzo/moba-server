@@ -40,6 +40,7 @@ import json.JSONToStringI;
 import json.streamreader.JSONStreamReaderSocket;
 import json.streamwriter.JSONStreamWriterStringBuilder;
 import messages.JSONMessageDecoder;
+import messages.JSONMessageDecoderException;
 import messages.Message;
 import messages.MessageType;
 import utilities.MessageLogger;
@@ -77,20 +78,14 @@ public class Endpoint extends Thread implements JSONToStringI {
     }
 
     public Message getNextMessage()
-    throws IOException {
+    throws IOException, JSONMessageDecoderException {
         try {
-            JSONMessageDecoder decoder = new JSONMessageDecoder(
-                new JSONStreamReaderSocket(socket)
-            );
+            JSONMessageDecoder decoder = new JSONMessageDecoder(new JSONStreamReaderSocket(socket));
             Message msg = decoder.decodeMsg(this);
-            Endpoint.LOGGER.log(
-                Level.INFO,
-                "Endpoint #{0}: new message <{1}> arrived",
-                new Object[]{id, msg.getMsgType().toString()}
-            );
+            Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: new message <{1}> arrived", new Object[]{id, msg.getMsgType().toString()} );
             MessageLogger.in(msg);
             return msg;
-        } catch (IOException | JSONException e) {
+        } catch(IOException | JSONException e) {
             if(!closing) {
                 throw new IOException(e);
             }
@@ -143,11 +138,7 @@ public class Endpoint extends Thread implements JSONToStringI {
                 in.add(getNextMessage());
             }
         } catch(IOException e) {
-            Endpoint.LOGGER.log(
-                Level.WARNING,
-                "Endpoint #{0}: IOException, send <CLIENT_CLOSE> <{1}>",
-                new Object[]{id, e.toString()}
-            );
+            Endpoint.LOGGER.log(Level.WARNING, "Endpoint #{0}: IOException, send <CLIENT_CLOSE> <{1}>", new Object[]{id, e.toString()});
             in.add(new Message(MessageType.CLIENT_CLOSE, null, this));
         }
         Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
@@ -180,10 +171,7 @@ public class Endpoint extends Thread implements JSONToStringI {
         MessageType mtype = msg.getMsgType();
 
         if(mtype != MessageType.CLIENT_START && mtype != MessageType.CLIENT_CONNECTED) {
-            Endpoint.LOGGER.log(
-                Level.SEVERE,
-                "first msg is neither CLIENT_START nor CLIENT_CONNECTED"
-            );
+            Endpoint.LOGGER.log(Level.SEVERE, "first msg is neither CLIENT_START nor CLIENT_CONNECTED");
             return false;
         }
         if(mtype == MessageType.CLIENT_CONNECTED) {
@@ -204,11 +192,7 @@ public class Endpoint extends Thread implements JSONToStringI {
                         MessageType.MessageGroup grp = MessageType.MessageGroup.valueOf(item);
                         msgGroups.add(grp);
                     } catch(IllegalArgumentException e) {
-                        Endpoint.LOGGER.log(
-                            Level.WARNING,
-                            "ignoring unknown message-group <{0}>",
-                            new Object[]{item}
-                        );
+                        Endpoint.LOGGER.log(Level.WARNING, "ignoring unknown message-group <{0}>", new Object[]{item});
                     }
                 }
             }
