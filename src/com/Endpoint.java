@@ -168,7 +168,12 @@ public class Endpoint extends Thread implements JSONToStringI {
     @SuppressWarnings("unchecked")
     private void init()
     throws IOException {
-        Message msg = getNextMessage();
+        Message msg = null;
+        try {
+            msg = getNextMessage();
+        } catch(JSONMessageDecoderException e) {
+            throw new IOException(e);
+        }
         MessageType mtype = msg.getMsgType();
 
         if(mtype != MessageType.CLIENT_START && mtype != MessageType.CLIENT_CONNECTED) {
@@ -198,6 +203,5 @@ public class Endpoint extends Thread implements JSONToStringI {
             }
         }
         in.add(msg);
-        return;
     }
 }
