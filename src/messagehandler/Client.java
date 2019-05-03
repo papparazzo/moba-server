@@ -30,12 +30,12 @@ import messages.Message;
 import messages.MessageHandlerA;
 import messages.MessageType;
 
-public class Link extends MessageHandlerA {
+public class Client extends MessageHandlerA {
 
     protected Dispatcher dispatcher = null;
     protected PriorityBlockingQueue<Message> msgQueueIn = null;
 
-    public Link(Dispatcher dispatcher, PriorityBlockingQueue<Message> msgQueue) {
+    public Client(Dispatcher dispatcher, PriorityBlockingQueue<Message> msgQueue) {
         this.dispatcher = dispatcher;
         this.msgQueueIn  = msgQueue;
     }
@@ -56,6 +56,10 @@ public class Link extends MessageHandlerA {
 
             case CLIENT_CLOSE:
                 handleClientClose(msg);
+                break;
+
+            case CLIENT_ERROR:
+                dispatcher.dispatch(msg);
                 break;
 
             default:

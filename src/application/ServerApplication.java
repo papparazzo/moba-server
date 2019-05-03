@@ -30,7 +30,7 @@ import messagehandler.Environment;
 import messagehandler.GlobalTimer;
 import messagehandler.Interface;
 import messagehandler.Layout;
-import messagehandler.Link;
+import messagehandler.Client;
 import messagehandler.Server;
 import messagehandler.Systems;
 import messages.MessageLoop;
@@ -42,7 +42,8 @@ public class ServerApplication extends Application {
     protected int maxClients = -1;
 
     @Override
-    protected void loop() throws Exception {
+    protected void loop()
+    throws Exception {
         try {
             boolean restart;
             maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
@@ -52,7 +53,7 @@ public class ServerApplication extends Application {
                 Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
                 MessageLoop loop = new MessageLoop(dispatcher);
                 TracklayoutLock tracklayoutLock = new TracklayoutLock(dispatcher, database);
-                loop.addHandler(MessageType.MessageGroup.CLIENT, new Link(dispatcher, msgQueueIn));
+                loop.addHandler(MessageType.MessageGroup.CLIENT, new Client(dispatcher, msgQueueIn));
                 loop.addHandler(MessageType.MessageGroup.SERVER, new Server(dispatcher, this));
                 loop.addHandler(MessageType.MessageGroup.TIMER, new GlobalTimer(dispatcher, config));
                 loop.addHandler(MessageType.MessageGroup.ENVIRONMENT, new Environment(dispatcher, config));
