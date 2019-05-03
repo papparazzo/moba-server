@@ -172,11 +172,11 @@ public class Layout extends MessageHandlerA {
         lock.isLockedByApp(id, msg.getEndpoint());
 
         Connection con = database.getConnection();
-        String q = "DELETE FROM `TrackLayouts` WHERE (`locked` = 0 OR `locked` = ?) AND `id` = ? ";
+        String q = "DELETE FROM `TrackLayouts` WHERE (`locked` IS NULL OR `locked` = ?) AND `id` = ? ";
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(2, msg.getEndpoint().getAppId());
-            pstmt.setLong(3, id);
+            pstmt.setLong(1, msg.getEndpoint().getAppId());
+            pstmt.setLong(2, id);
             Layout.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
             if(pstmt.executeUpdate() == 0) {
                 dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATASET_MISSING, ""), msg.getEndpoint()));
@@ -236,7 +236,7 @@ public class Layout extends MessageHandlerA {
         String q =
             "UPDATE `TrackLayouts` " +
             "SET `Name` = ?, `Description` = ?, `ModificationDate` = ? " +
-            "WHERE (`locked` = '0' OR `locked` = ?) AND `id` = ? ";
+            "WHERE (`locked` IS NULL OR `locked` = ?) AND `id` = ? ";
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setString(1, tl.getName());
