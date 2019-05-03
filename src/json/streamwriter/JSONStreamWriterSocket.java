@@ -45,7 +45,8 @@ public class JSONStreamWriterSocket implements JSONStreamWriterI {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close()
+    throws IOException {
 
     }
 }

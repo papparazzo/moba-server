@@ -144,7 +144,8 @@ public class Layout extends MessageHandlerA {
         }
     }
 
-    protected void getLayouts(Message msg) throws SQLException {
+    protected void getLayouts(Message msg)
+    throws SQLException {
         String q = "SELECT * FROM `TrackLayouts`;";
 
         ArrayList<TrackLayoutInfoData> arraylist;
@@ -167,7 +168,8 @@ public class Layout extends MessageHandlerA {
         dispatcher.dispatch(new Message(MessageType.LAYOUT_GET_LAYOUTS_RES, arraylist, msg.getEndpoint()));
     }
 
-    protected void deleteLayout(Message msg) throws SQLException, IOException, ConfigException, JSONException, ErrorException {
+    protected void deleteLayout(Message msg)
+    throws SQLException, IOException, ConfigException, JSONException, ErrorException {
         long id = (Long)msg.getData();
         lock.isLockedByApp(id, msg.getEndpoint());
 
@@ -189,7 +191,8 @@ public class Layout extends MessageHandlerA {
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_DELETED, id));
     }
 
-    protected void createLayout(Message msg) throws SQLException, ConfigException, IOException, JSONException {
+    protected void createLayout(Message msg)
+    throws SQLException, ConfigException, IOException, JSONException {
         Map<String, Object> map = (Map)msg.getData();
         boolean isActive = (boolean)map.get("active");
         long    currAppId = msg.getEndpoint().getAppId();
@@ -220,7 +223,8 @@ public class Layout extends MessageHandlerA {
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CREATED, tl));
     }
 
-    protected void updateLayout(Message msg) throws SQLException, ConfigException, IOException, JSONException, ErrorException {
+    protected void updateLayout(Message msg)
+    throws SQLException, ConfigException, IOException, JSONException, ErrorException {
         Map<String, Object> map = (Map)msg.getData();
 
         long id = (Long)map.get("id");
@@ -260,31 +264,22 @@ public class Layout extends MessageHandlerA {
         }
     }
 
-    protected void unlockLayout(Message msg) throws SQLException, ErrorException {
+    protected void unlockLayout(Message msg)
+    throws SQLException, ErrorException {
         long id = getId(msg.getData());
         lock.unlockLayout(id, msg.getEndpoint());
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UNLOCKED, id));
     }
 
-    protected void lockLayout(Message msg) throws SQLException, ErrorException {
+    protected void lockLayout(Message msg)
+    throws SQLException, ErrorException {
         long id = getId(msg.getData());
         lock.lockLayout(id, msg.getEndpoint());
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_LOCKED, id));
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-    protected void getLayout(Message msg) throws SQLException, ErrorException {
+    protected void getLayout(Message msg)
+    throws SQLException, ErrorException {
         long id = getId(msg.getData());
 
         Connection con = database.getConnection();
@@ -330,7 +325,8 @@ public class Layout extends MessageHandlerA {
         }
     }
 
-    protected void saveLayout(Message msg) throws SQLException, ErrorException {
+    protected void saveLayout(Message msg)
+    throws SQLException, ErrorException {
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         long id = getId(map.get("id"));
 
@@ -377,7 +373,8 @@ public class Layout extends MessageHandlerA {
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CHANGED, map));
     }
 
-    protected Date getCreationDate(long id) throws SQLException {
+    protected Date getCreationDate(long id)
+    throws SQLException {
         String q = "SELECT `CreationDate` FROM `TrackLayouts` WHERE `Id` = ?;";
         Connection con = database.getConnection();
 
@@ -406,7 +403,8 @@ public class Layout extends MessageHandlerA {
         config.writeFile();
     }
 
-    protected long getId(Object o) throws ErrorException {
+    protected long getId(Object o)
+    throws ErrorException {
         if(o != null) {
             return (long)o;
         }

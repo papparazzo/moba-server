@@ -60,7 +60,8 @@ public class TimeTest {
     }
 
     @Test
-    public void testToJsonString() throws Exception {
+    public void testToJsonString()
+    throws Exception {
         boolean formated = false;
         int indent = 0;
         Time instance = new Time();

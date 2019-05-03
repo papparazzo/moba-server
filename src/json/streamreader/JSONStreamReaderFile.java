@@ -34,7 +34,8 @@ public class JSONStreamReaderFile implements JSONStreamReaderI {
     }
 
     @Override
-    public int read() throws IOException {
+    public int read()
+    throws IOException {
         return fh.read();
     }
 }

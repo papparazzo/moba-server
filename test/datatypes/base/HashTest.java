@@ -43,7 +43,8 @@ public class HashTest {
     }
 
     @Test
-    public void testToJsonString() throws Exception {
+    public void testToJsonString()
+    throws Exception {
         boolean formated = false;
         int indent = 0;
         Hash instance = new Hash();

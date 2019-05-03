@@ -67,14 +67,16 @@ public class Config {
         return o;
     }
 
-    public void setSection(String section, Object val) throws ConfigException {
+    public void setSection(String section, Object val)
+    throws ConfigException {
         if(content == null) {
             content = new HashMap<>();
         }
         content.put(section, val);
     }
 
-    public boolean removeSection(String section) throws ConfigException {
+    public boolean removeSection(String section)
+    throws ConfigException {
         if(content == null) {
             throw new ConfigException("object is null");
         }

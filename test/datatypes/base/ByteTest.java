@@ -26,7 +26,8 @@ import org.junit.Test;
 
 public class ByteTest {
     @Test
-    public void testConstructor() throws Exception {
+    public void testConstructor()
+    throws Exception {
         Byte instance = new Byte();
         assertEquals(0, instance.getValue());
         instance = new Byte(5);
@@ -69,7 +70,8 @@ public class ByteTest {
     }
 
     @Test
-    public void testToJsonString() throws Exception {
+    public void testToJsonString()
+    throws Exception {
         boolean formated = false;
         int indent = 0;
         Byte instance = new Byte(5);

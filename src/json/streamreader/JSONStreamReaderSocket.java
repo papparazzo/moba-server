@@ -27,12 +27,14 @@ import java.net.Socket;
 public class JSONStreamReaderSocket implements JSONStreamReaderI {
     private final InputStream is;
 
-    public JSONStreamReaderSocket(Socket socket) throws IOException {
+    public JSONStreamReaderSocket(Socket socket)
+    throws IOException {
         is = socket.getInputStream();
     }
 
     @Override
-    public int read() throws IOException {
+    public int read()
+    throws IOException {
         return is.read();
     }
 }

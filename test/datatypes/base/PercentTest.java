@@ -43,7 +43,8 @@ public class PercentTest {
     }
 
     @Test
-    public void testToJsonString() throws Exception {
+    public void testToJsonString()
+    throws Exception {
         boolean formated = false;
         int indent = 0;
         Percent instance = new Percent();

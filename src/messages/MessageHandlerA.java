@@ -28,7 +28,8 @@ public abstract class MessageHandlerA {
     public void freeResources(long appId) {
     }
 
-    public void init() throws ExceptionInInitializerError {
+    public void init()
+    throws ExceptionInInitializerError {
     }
 
     public void shutdown() {

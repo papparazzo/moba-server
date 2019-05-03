@@ -24,15 +24,12 @@ import com.Endpoint;
 import com.SenderI;
 import database.Database;
 import datatypes.enumerations.ErrorId;
-import datatypes.objects.ErrorData;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import messages.Message;
-import messages.MessageType;
 import utilities.exceptions.ErrorException;
 
 public class TracklayoutLock {
@@ -53,7 +50,8 @@ public class TracklayoutLock {
         this.dispatcher = dispatcher;
     }
 
-    public boolean tryLock(long id, Endpoint ep) throws SQLException {
+    public boolean tryLock(long id, Endpoint ep)
+    throws SQLException {
         Connection con = database.getConnection();
         long appId = getAppId(ep);
         // ModificationDate = NOW damit affected-Rows auch 1 zurück liefert wenn bereits durch eigene App gelocket!
@@ -97,7 +95,8 @@ public class TracklayoutLock {
         }
     }
 
-    public boolean isLockedByApp(long id, Endpoint ep) throws SQLException, ErrorException {
+    public boolean isLockedByApp(long id, Endpoint ep)
+    throws SQLException, ErrorException {
         long appId = getAppId(ep);
         long lockedBy = getIdOfLockingApp(id);
 
@@ -112,7 +111,8 @@ public class TracklayoutLock {
         throw new ErrorException(ErrorId.DATASET_LOCKED, "layout is locked by <" + Long.toString(lockedBy) + ">");
     }
 
-    protected long getIdOfLockingApp(long id) throws SQLException, ErrorException {
+    protected long getIdOfLockingApp(long id)
+    throws SQLException, ErrorException {
         Connection con = database.getConnection();
 
         String q = "SELECT `locked` FROM `TrackLayouts` WHERE `Id` = ?";
@@ -128,7 +128,8 @@ public class TracklayoutLock {
         }
     }
 
-    public void unlockLayout(long id, Endpoint ep) throws SQLException, ErrorException {
+    public void unlockLayout(long id, Endpoint ep)
+    throws SQLException, ErrorException {
         if(!isLockedByApp(id, ep)) {
             return;
         }
@@ -137,8 +138,8 @@ public class TracklayoutLock {
         String q = "UPDATE `TrackLayouts` SET `locked` = NULL WHERE `locked` = ? AND `id` = ? ";
 
         try(PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(2, getAppId(ep));
-            pstmt.setLong(3, id);
+            pstmt.setLong(1, getAppId(ep));
+            pstmt.setLong(2, id);
 
             TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
 
@@ -148,16 +149,17 @@ public class TracklayoutLock {
         }
     }
 
-    public void lockLayout(long id, Endpoint ep) throws SQLException, ErrorException {
+    public void lockLayout(long id, Endpoint ep)
+    throws SQLException, ErrorException {
         if(isLockedByApp(id, ep)) {
             return;
         }
         Connection con = database.getConnection();
-        String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` = NULL AND `id` = ? ";
+        String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` IS NULL AND `id` = ? ";
 
         try(PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(2, getAppId(ep));
-            pstmt.setLong(3, id);
+            pstmt.setLong(1, getAppId(ep));
+            pstmt.setLong(2, id);
 
             TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
 

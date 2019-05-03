@@ -112,7 +112,8 @@ public class Position implements JSONToStringI {
     }
 
     @Override
-    public String toJsonString(boolean formated, int indent) throws JSONException, IOException {
+    public String toJsonString(boolean formated, int indent)
+    throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
         map.put("xPos", x);
         map.put("yPos", y);

@@ -33,17 +33,20 @@ public class JSONStreamWriterFile implements JSONStreamWriterI {
     }
 
     @Override
-    public void write(char c) throws IOException {
+    public void write(char c)
+    throws IOException {
         bw.append(c);
     }
 
     @Override
-    public void write(String s) throws IOException {
+    public void write(String s)
+    throws IOException {
         bw.append(s);
     }
 
     @Override
-    public void close() throws IOException {
+    public void close()
+    throws IOException {
         bw.close();
     }
 }

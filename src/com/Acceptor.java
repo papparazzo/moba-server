@@ -40,12 +40,7 @@ public class Acceptor extends Thread {
     private int          serverport   = 0;
     private int          maxClients   = 0;
 
-    public Acceptor(
-        PriorityBlockingQueue<Message> in,
-        Dispatcher dispatcher,
-        int serverport,
-        int maxClients
-    ) {
+    public Acceptor(PriorityBlockingQueue<Message> in, Dispatcher dispatcher, int serverport, int maxClients) {
         this.in         = in;
         this.dispatcher = dispatcher;
         this.serverport = serverport;

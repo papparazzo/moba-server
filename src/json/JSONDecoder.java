@@ -195,10 +195,7 @@ public class JSONDecoder {
                     break;
             }
         }
-        throw new JSONException(
-            "maximum string-length of <" +
-            JSONDecoder.MAX_STRING_LENGTH + "> reached!"
-        );
+        throw new JSONException("maximum string-length of <" + JSONDecoder.MAX_STRING_LENGTH + "> reached!");
     }
 
     protected ArrayList nextArray()
@@ -230,7 +227,8 @@ public class JSONDecoder {
         }
     }
 
-    protected Object nextJValue() throws JSONException, IOException {
+    protected Object nextJValue()
+    throws JSONException, IOException {
         char c;
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
@@ -245,21 +243,13 @@ public class JSONDecoder {
                 return parseValue(sb.toString());
             }
 
-            if(
-                (c >= 'A' && c <= 'Z') ||
-                (c >= 'a' && c <= 'z') ||
-                (c >= '0' && c <= '9') ||
-                c == '-'
-            ) {
+            if((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '-') {
                 sb.append(c);
                 continue;
             }
             throw new JSONException("parsing error");
         }
-        throw new JSONException(
-            "maximum string-length of <" +
-            JSONDecoder.MAX_STRING_LENGTH + "> reached!"
-        );
+        throw new JSONException("maximum string-length of <" + JSONDecoder.MAX_STRING_LENGTH + "> reached!");
     }
 
     protected Object parseValue(String s)
@@ -304,7 +294,8 @@ public class JSONDecoder {
         }
     }
 
-    protected char next() throws IOException {
+    protected char next()
+    throws IOException {
         return next(false);
     }
 
