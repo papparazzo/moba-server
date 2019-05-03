@@ -110,6 +110,7 @@ public enum MessageType {
     LAYOUT_LOCK_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_LAYOUT_LOCKED(MessageGroup.LAYOUT, MessageClass.GROUP),
     LAYOUT_GET_LAYOUT_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_GET_LAYOUT_READ_ONLY_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_GET_LAYOUT_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_SAVE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
     LAYOUT_LAYOUT_CHANGED(MessageGroup.LAYOUT, MessageClass.GROUP),
