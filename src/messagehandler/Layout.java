@@ -112,7 +112,11 @@ public class Layout extends MessageHandlerA {
                 break;
 
             case LAYOUT_GET_LAYOUT_REQ:
-                getLayout(msg);
+                getLayout(msg, true);
+                break;
+
+            case LAYOUT_GET_LAYOUT_READ_ONLY_REQ:
+                getLayout(msg, false);
                 break;
 
             case LAYOUT_DELETE_LAYOUT:
@@ -278,9 +282,13 @@ public class Layout extends MessageHandlerA {
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_LOCKED, id));
     }
 
-    protected void getLayout(Message msg)
+    protected void getLayout(Message msg, boolean tryLock)
     throws SQLException, ErrorException {
         long id = getId(msg.getData());
+        
+        if(tryLock) {
+            lock.lockLayout(id, msg.getEndpoint());
+        }
 
         Connection con = database.getConnection();
 
