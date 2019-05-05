@@ -285,7 +285,7 @@ public class Layout extends MessageHandlerA {
     protected void getLayout(Message msg, boolean tryLock)
     throws SQLException, ErrorException {
         long id = getId(msg.getData());
-        
+
         if(tryLock) {
             lock.lockLayout(id, msg.getEndpoint());
         }
@@ -335,6 +335,9 @@ public class Layout extends MessageHandlerA {
 
     protected void saveLayout(Message msg)
     throws SQLException, ErrorException {
+
+
+        
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         long id = getId(map.get("id"));
 
