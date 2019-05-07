@@ -204,10 +204,7 @@ public class Layout extends MessageHandlerA {
         TrackLayoutInfoData tl = new TrackLayoutInfoData((String)map.get("name"), (String)map.get("description"), currAppId, isActive);
         Connection con = database.getConnection();
 
-        String q =
-            "INSERT INTO `TrackLayouts` " +
-            "(`Name`, `Description`, `CreationDate`, `ModificationDate`, `Locked`) " +
-            "VALUES (?, ?, NOW(), NOW(), ?)";
+        String q = "INSERT INTO `TrackLayouts` (`Name`, `Description`, `CreationDate`, `ModificationDate`, `Locked`) VALUES (?, ?, NOW(), NOW(), ?)";
 
         try(PreparedStatement pstmt = con.prepareStatement(q, PreparedStatement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, tl.getName());
@@ -241,10 +238,7 @@ public class Layout extends MessageHandlerA {
 
         Connection con = database.getConnection();
 
-        String q =
-            "UPDATE `TrackLayouts` " +
-            "SET `Name` = ?, `Description` = ?, `ModificationDate` = ? " +
-            "WHERE (`locked` IS NULL OR `locked` = ?) AND `id` = ? ";
+        String q = "UPDATE `TrackLayouts` SET `Name` = ?, `Description` = ?, `ModificationDate` = ? WHERE (`locked` IS NULL OR `locked` = ?) AND `id` = ? ";
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setString(1, tl.getName());
@@ -325,9 +319,7 @@ public class Layout extends MessageHandlerA {
 
         Connection con = database.getConnection();
 
-        String stmt =
-            "DELETE FROM `TrackLayoutSymbols` " +
-            "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
+        String stmt = "DELETE FROM `TrackLayoutSymbols` WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
 
         try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
             pstmt.setLong(1, id);
@@ -337,10 +329,7 @@ public class Layout extends MessageHandlerA {
 
         ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
 
-        stmt =
-            "INSERT INTO `TrackLayoutSymbols` " +
-            "(`Id`, `TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
-            "VALUES (?, ?, ?, ?, ?)";
+        stmt = "INSERT INTO `TrackLayoutSymbols` (`Id`, `TrackLayoutId`, `XPos`, `YPos`, `Symbol`) VALUES (?, ?, ?, ?, ?)";
 
         try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
             con.setAutoCommit(false);
