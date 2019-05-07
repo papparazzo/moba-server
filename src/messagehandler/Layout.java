@@ -293,25 +293,9 @@ public class Layout extends MessageHandlerA {
         Connection con = database.getConnection();
 
         HashMap<String, Object> map = new HashMap<>();
+        map.put("id", id);
 
-        String q =
-            "SELECT MAX(`XPos`) AS `Width`, MAX(`YPos`) AS `Height` " +
-            "FROM `TrackLayoutSymbols` " +
-            "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
-
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, id);
-            Layout.LOGGER.log(Level.INFO, pstmt.toString());
-            ResultSet rs = pstmt.executeQuery();
-            if(!rs.next()) {
-                throw new NoSuchElementException(String.format("no elements found for layout <%4d>", id));
-            }
-            map.put("id", id);
-            map.put("width", rs.getLong("Width"));
-            map.put("height", rs.getLong("Height"));
-        }
-
-        q = "SELECT `Id`, `XPos`, `YPos`, `Symbol` FROM `TrackLayoutSymbols` WHERE `TrackLayoutId` = ?";
+        String q = "SELECT `Id`, `XPos`, `YPos`, `Symbol` FROM `TrackLayoutSymbols` WHERE `TrackLayoutId` = ?";
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setLong(1, id);
@@ -336,8 +320,6 @@ public class Layout extends MessageHandlerA {
     protected void saveLayout(Message msg)
     throws SQLException, ErrorException {
 
-
-        
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         long id = getId(map.get("id"));
 
@@ -357,8 +339,8 @@ public class Layout extends MessageHandlerA {
 
         stmt =
             "INSERT INTO `TrackLayoutSymbols` " +
-            "(`TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
-            "VALUES (?, ?, ?, ?)";
+            "(`Id`, `TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
+            "VALUES (?, ?, ?, ?, ?)";
 
         try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
             con.setAutoCommit(false);
