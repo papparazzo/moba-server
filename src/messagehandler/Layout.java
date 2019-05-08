@@ -360,7 +360,7 @@ public class Layout extends MessageHandlerA {
 
             for(Object item : arrayList) {
                 Map<String, Object> symbol = (Map<String, Object>)item;
-                //Auto unboxing null | int
+                //TODO: Auto unboxing null | int
                 pstmt.setInt(1, (int)symbol.get("id"));
                 pstmt.setLong(2, id);
                 pstmt.setInt(2, (int)symbol.get("xPos"));
