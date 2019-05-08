@@ -319,7 +319,31 @@ public class Layout extends MessageHandlerA {
 
         Connection con = database.getConnection();
 
-        String stmt = "DELETE FROM `TrackLayoutSymbols` WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
+        String stmt = "UPDATE `TrackLayouts` SET `ModificationDate` = NOW() WHERE `Id` = ? ";
+
+        try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
+            pstmt.setLong(1, id);
+            Layout.LOGGER.log(Level.INFO, pstmt.toString());
+            if(pstmt.executeUpdate() == 0) {
+                dispatcher.dispatch(new Message(
+                    MessageType.CLIENT_ERROR,
+                    new ErrorData(ErrorId.DATASET_MISSING, "Could not save <" + String.valueOf(id) + ">"),
+                    msg.getEndpoint()
+                ));
+                return;
+            }
+        }
+
+        if(!lock.isLockedByApp(id, msg.getEndpoint())) {
+            dispatcher.dispatch(new Message(
+                MessageType.CLIENT_ERROR,
+                new ErrorData(ErrorId.DATASET_NOT_LOCKED, "layout <" + String.valueOf(id) + "> not locked"),
+                msg.getEndpoint()
+            ));
+            return;
+        }
+
+        stmt = "DELETE FROM `TrackLayoutSymbols` WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
 
         try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
             pstmt.setLong(1, id);
@@ -336,20 +360,15 @@ public class Layout extends MessageHandlerA {
 
             for(Object item : arrayList) {
                 Map<String, Object> symbol = (Map<String, Object>)item;
+                //Auto unboxing null | int
                 pstmt.setInt(1, (int)symbol.get("id"));
+                pstmt.setLong(2, id);
                 pstmt.setInt(2, (int)symbol.get("xPos"));
                 pstmt.setInt(3, (int)symbol.get("yPos"));
                 pstmt.setInt(4, (int)symbol.get("symbol"));
                 pstmt.addBatch();
             }
             con.commit();
-        }
-
-        stmt = "UPDATE `TrackLayouts` SET `ModificationDate` = NOW() ";
-
-        try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
-            Layout.LOGGER.log(Level.INFO, pstmt.toString());
-            pstmt.executeUpdate();
         }
 
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CHANGED, map));
