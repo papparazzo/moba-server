@@ -327,32 +327,39 @@ public class Layout extends MessageHandlerA {
             throw new ErrorException(ErrorId.DATASET_NOT_LOCKED, "layout <" + String.valueOf(id) + "> not locked");
         }
 
-        stmt = "DELETE FROM `TrackLayoutSymbols` WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
-
-        try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-            pstmt.setLong(1, id);
-            Layout.LOGGER.log(Level.INFO, pstmt.toString());
-            pstmt.executeQuery();
-        }
-
         ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
 
-        stmt = "INSERT INTO `TrackLayoutSymbols` (`Id`, `TrackLayoutId`, `XPos`, `YPos`, `Symbol`) VALUES (?, ?, ?, ?, ?)";
-
         try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-            con.setAutoCommit(false);
-
             for(Object item : arrayList) {
                 Map<String, Object> symbol = (Map<String, Object>)item;
-                //TODO: Auto unboxing null | int
+
+                if(symbol.get("xPos") == null || symbol.get("yPos") == null) {
+                    stmt = "DELETE FROM `TrackLayoutSymbols` WHERE  `Id` = ? AND `TrackLayoutId` = ?";
+                    pstmt.setInt(1, (int)symbol.get("id"));
+                    pstmt.setLong(2, id);
+                    Layout.LOGGER.log(Level.INFO, pstmt.toString());
+                    if(pstmt.executeUpdate() == 0) {
+                        throw new ErrorException(ErrorId.DATASET_MISSING, "could not save <" + String.valueOf(id) + ">");
+                    }
+                    continue;
+                }
+
+                stmt =
+                    "INSERT INTO `TrackLayoutSymbols` (`Id`, `TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
+                    "VALUES (?, ?, ?, ?, ?) " +
+                    "ON DUPLICATE KEY UPDATE `TrackLayoutId` = ?, `XPos` = ?, `YPos` = ?, `Symbol` = ?" ;
                 pstmt.setInt(1, (int)symbol.get("id"));
                 pstmt.setLong(2, id);
-                pstmt.setInt(2, (int)symbol.get("xPos"));
-                pstmt.setInt(3, (int)symbol.get("yPos"));
-                pstmt.setInt(4, (int)symbol.get("symbol"));
-                pstmt.addBatch();
+                pstmt.setInt(3, (int)symbol.get("xPos"));
+                pstmt.setInt(4, (int)symbol.get("yPos"));
+                pstmt.setLong(5, id);
+                pstmt.setInt(6, (int)symbol.get("xPos"));
+                pstmt.setInt(7, (int)symbol.get("yPos"));
+                Layout.LOGGER.log(Level.INFO, pstmt.toString());
+                if(pstmt.executeUpdate() == 0) {
+                    throw new ErrorException(ErrorId.DATASET_MISSING, "could not save <" + String.valueOf(id) + ">");
+                }
             }
-            con.commit();
         }
 
         dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CHANGED, map));
