@@ -185,8 +185,7 @@ public class Layout extends MessageHandlerA {
             pstmt.setLong(2, id);
             Layout.LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
             if(pstmt.executeUpdate() == 0) {
-                dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATASET_MISSING, ""), msg.getEndpoint()));
-                return;
+                throw new ErrorException(ErrorId.DATASET_MISSING, "could not delete <" + String.valueOf(id) + ">");
             }
         }
         if(id == activeLayout) {
@@ -248,12 +247,7 @@ public class Layout extends MessageHandlerA {
             pstmt.setLong(5, id);
             Layout.LOGGER.log(Level.INFO, pstmt.toString());
             if(pstmt.executeUpdate() == 0) {
-                dispatcher.dispatch(new Message(
-                    MessageType.CLIENT_ERROR,
-                    new ErrorData(ErrorId.DATASET_MISSING, "Could not update <" + String.valueOf(id) + ">"),
-                    msg.getEndpoint()
-                ));
-                return;
+                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(id) + ">");
             }
             if(active) {
                 storeData(id);
@@ -325,22 +319,12 @@ public class Layout extends MessageHandlerA {
             pstmt.setLong(1, id);
             Layout.LOGGER.log(Level.INFO, pstmt.toString());
             if(pstmt.executeUpdate() == 0) {
-                dispatcher.dispatch(new Message(
-                    MessageType.CLIENT_ERROR,
-                    new ErrorData(ErrorId.DATASET_MISSING, "Could not save <" + String.valueOf(id) + ">"),
-                    msg.getEndpoint()
-                ));
-                return;
+                throw new ErrorException(ErrorId.DATASET_MISSING, "could not save <" + String.valueOf(id) + ">");
             }
         }
 
         if(!lock.isLockedByApp(id, msg.getEndpoint())) {
-            dispatcher.dispatch(new Message(
-                MessageType.CLIENT_ERROR,
-                new ErrorData(ErrorId.DATASET_NOT_LOCKED, "layout <" + String.valueOf(id) + "> not locked"),
-                msg.getEndpoint()
-            ));
-            return;
+            throw new ErrorException(ErrorId.DATASET_NOT_LOCKED, "layout <" + String.valueOf(id) + "> not locked");
         }
 
         stmt = "DELETE FROM `TrackLayoutSymbols` WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ?";
