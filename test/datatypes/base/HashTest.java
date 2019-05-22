@@ -25,32 +25,34 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 public class HashTest {
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testSetValue() {
         String val = "";
         Hash instance = new Hash();
         instance.setValue(val);
-        fail("The test case is a prototype.");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetValueToShort() {
+        String expResult = "ABC";
+        new Hash(expResult);
     }
 
     @Test
     public void testGetValue() {
-        Hash instance = new Hash();
-        String expResult = "";
+        String expResult = "ABA1234567890DEFDDEABA1234567890DEFDDEABA1234567890DEFDDEABA12FF";
+        Hash instance = new Hash(expResult);
         String result = instance.getValue();
         assertEquals(expResult, result);
-        fail("The test case is a prototype.");
     }
 
     @Test
     public void testToJsonString()
     throws Exception {
-        boolean formated = false;
-        int indent = 0;
-        Hash instance = new Hash();
-        String expResult = "";
-        String result = instance.toJsonString(formated, indent);
+        String value = "ABA1234567890DEFDDEABA1234567890DEFDDEABA1234567890DEFDDEABA12FF";
+        Hash instance = new Hash(value);
+        String expResult = "\"" + value + "\"";
+        String result = instance.toJsonString(false, 0);
         assertEquals(expResult, result);
-        fail("The test case is a prototype.");
     }
 }
