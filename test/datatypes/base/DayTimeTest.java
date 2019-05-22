@@ -75,16 +75,11 @@ public class DayTimeTest {
         instance.setValue(val);
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testSetValue_String() {
         String val = "";
         DayTime instance = new DayTime();
-        try {
-            instance.setValue(val);
-            fail("Expected an IllegalArgumentException to be thrown");
-        }catch(Exception e) {
-
-        }
+        instance.setValue(val);
     }
 
     @Test
