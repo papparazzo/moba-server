@@ -33,6 +33,9 @@ public class JSONStreamReaderString  implements JSONStreamReaderI {
 
     @Override
     public int read() throws IOException {
+        if(index == input.length()) {
+            throw new IOException("End of string reached");
+        }
         return input.charAt(index++);
     }
 
