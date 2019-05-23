@@ -24,4 +24,6 @@ import java.io.IOException;
 
 public interface JSONStreamReaderI {
     int read() throws IOException;
+
+    int peek() throws IOException;
 }
