@@ -41,6 +41,9 @@ public class JSONStreamReaderSocket implements JSONStreamReaderI {
     @Override
     public int peek()
     throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        is.mark(1);
+        int ch = is.read();
+        is.reset();
+        return ch;
     }
 }

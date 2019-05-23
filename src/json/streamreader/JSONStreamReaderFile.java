@@ -42,6 +42,9 @@ public class JSONStreamReaderFile implements JSONStreamReaderI {
     @Override
     public int peek()
     throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        fh.mark(1);
+        int ch = fh.read();
+        fh.reset();
+        return ch;
     }
 }
