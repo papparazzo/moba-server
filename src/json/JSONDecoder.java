@@ -84,6 +84,9 @@ public class JSONDecoder {
             c = next(!strict);
             switch(c) {
                 case '}':
+                    if(!map.isEmpty())  {
+                        throw new JSONException("expected new key");
+                    }
                     return map;
 
                 case '"':
@@ -102,11 +105,6 @@ public class JSONDecoder {
 
             switch(next(!strict)) {
                 case ',':
-                    c = next(!strict);
-                    if(c == '}') {
-                        throw new JSONException("expected new key");
-                    }
-                    lastChar = c;
                     break;
 
                 case '}':
