@@ -25,20 +25,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import json.streamreader.JSONStreamReaderI;
+import json.stringreader.JSONStringReader;
 
 public class JSONDecoder {
-    private JSONStreamReaderI reader = null;
-    private boolean           strict;
-    private static final int  MAX_STRING_LENGTH = 1024;
-    private char              lastChar = 0;
+    protected JSONStringReader reader = null;
+    protected boolean           strict;
+    protected static final int  MAX_STRING_LENGTH = 1024;
 
-    public JSONDecoder(JSONStreamReaderI reader)
+    public JSONDecoder(JSONStringReader reader)
     throws JSONException {
         this(reader, true);
     }
 
-    public JSONDecoder(JSONStreamReaderI reader, boolean strict)
+    public JSONDecoder(JSONStringReader reader, boolean strict)
     throws JSONException {
         this.reader = reader;
         this.strict = strict;
@@ -46,7 +45,6 @@ public class JSONDecoder {
 
     public Map<String, Object> decode()
     throws JSONException, IOException {
-        checkNext('{');
         return nextObject();
     }
 
@@ -56,7 +54,7 @@ public class JSONDecoder {
         StringBuilder sb = new StringBuilder();
 
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
-            c = next();
+            c = reader.next();
 
             if(Character.isWhitespace(c) || !(Character.isLetterOrDigit(c) || c == '_' || c == '"')) {
                 throw new JSONException("key contains invalide char!");
@@ -79,9 +77,10 @@ public class JSONDecoder {
         Map<String, Object> map = new HashMap<>();
         String key;
         char c;
+        reader.checkNext('{', !strict);
 
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
-            c = next(!strict);
+            c = reader.next(!strict);
             switch(c) {
                 case '}':
                     if(!map.isEmpty())  {
@@ -96,14 +95,14 @@ public class JSONDecoder {
                 default:
                     throw new JSONException("invalid key");
             }
-            checkNext(':');
+            reader.checkNext(':', !strict);
 
             if(map.containsKey(key)) {
                 throw new JSONException("duplicate key <" + key + ">");
             }
             map.put(key, nextValue());
 
-            switch(next(!strict)) {
+            switch(reader.next(!strict)) {
                 case ',':
                     break;
 
@@ -119,8 +118,7 @@ public class JSONDecoder {
 
     protected Object nextValue()
     throws JSONException, IOException {
-        char c = next(!strict);
-        switch(c) {
+        switch(reader.peek(!strict)) {
             case 'n':
                 return nextNull();
 
@@ -140,48 +138,42 @@ public class JSONDecoder {
                 return nextArray();
 
             default:
-                lastChar = c;
                 return nextNumber();
         }
     }
 
     protected Object nextNull()
     throws JSONException, IOException {
-        if(next() != 'u' || next() != 'l' || next() != 'l') {
-            throw new JSONException("parsing error, value not 'null'");
-        }
+        reader.checkNext("null", !strict);
         return null;
     }
 
     protected Boolean nextTrue()
     throws JSONException, IOException {
-        if(next() != 'r' || next() != 'u' || next() != 'e') {
-            throw new JSONException("parsing error, value not 'true'");
-        }
+        reader.checkNext("true", !strict);
         return Boolean.TRUE;
     }
 
     protected Boolean nextFalse()
     throws JSONException, IOException {
-        if(next() != 'a' || next() != 'l' || next() != 's' || next() != 'e') {
-            throw new JSONException("parsing error, value not 'false'");
-        }
+        reader.checkNext("false", !strict);
         return Boolean.FALSE;
     }
 
     protected String nextString()
     throws JSONException, IOException {
+        reader.checkNext('"', !strict);
         char c;
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
-            c = next();
+            c = reader.next();
             switch(c) {
                 case '\n':
                 case '\r':
                     throw new JSONException("invalid char");
 
                 case '\\':
-                    c = next();
+                    c = reader.next();
                     switch (c) {
                         case 'b':
                             sb.append('\b');
@@ -204,7 +196,7 @@ public class JSONDecoder {
                             break;
 
                         case 'u':
-                            sb.append((char)Integer.parseInt(next(4), 16));
+                            sb.append((char)Integer.parseInt(reader.next(4), 16));
                             break;
 
                         case '"':
@@ -232,17 +224,17 @@ public class JSONDecoder {
     protected ArrayList nextArray()
     throws JSONException, IOException {
         ArrayList<Object> arrayList = new ArrayList<>();
-
-        char c = next(!strict);
+        reader.checkNext('[', !strict);
+        char c = reader.peek(!strict);
 
         if(c == ']') {
+            reader.next();
             return arrayList;
         }
-        lastChar = c;
         arrayList.add(nextValue());
 
         while(true) {
-            c = next(!strict);
+            c = reader.next(!strict);
 
             switch(c) {
                 case ',':
@@ -263,15 +255,12 @@ public class JSONDecoder {
         char c;
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
-            c = next();
-
-            if("\n\r ".indexOf(c) != -1) {
-                continue;
-            }
+            c = reader.peek(!strict);
 
             if(",]}".indexOf(c) != -1) {
                 return parseNumber(sb.toString());
             }
+            reader.next();
 
             if(Character.isDigit(c) || c == '-' || c == 'e' || c == 'E' || c == '.' || c == 'x' || c == 'X') {
                 sb.append(c);
@@ -307,50 +296,4 @@ public class JSONDecoder {
             throw new JSONException("parsing, error could not determine value: <" + s + ">", e);
         }
     }
-
-    protected void checkNext(char x)
-    throws IOException {
-        char c = next(!strict);
-        if(c != x) {
-            throw new IOException("expected '" + x + "' found '" + c + "'!");
-        }
-    }
-
-    protected char next()
-    throws IOException {
-        return next(false);
-    }
-
-    protected char next(boolean ignoreWhitespace)
-    throws IOException {
-        if(lastChar != 0) {
-            char t = lastChar;
-            lastChar = 0;
-            return t;
-        }
-        int c;
-        do {
-            c = reader.read();
-        } while(Character.isWhitespace(c) && ignoreWhitespace);
-//System.err.print((char)c);
-        if(c == -1 || c == 0) {
-            throw new IOException("input stream corrupted!");
-        }
-        return (char)c;
-    }
-
-    protected String next(int n)
-    throws IOException {
-        StringBuilder sb = new StringBuilder();
-        if(n == 0) {
-            return "";
-        }
-
-        for(int i = 0; i < n; ++i) {
-            char c = next();
-            sb.append(c);
-        }
-        return sb.toString();
-    }
 }
-

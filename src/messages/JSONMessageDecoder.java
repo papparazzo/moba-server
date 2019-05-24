@@ -25,29 +25,29 @@ import java.io.IOException;
 import com.Endpoint;
 import json.JSONDecoder;
 import json.JSONException;
-import json.streamreader.JSONStreamReaderI;
+import json.stringreader.JSONStringReader;
 
 public class JSONMessageDecoder extends JSONDecoder {
 
-    public JSONMessageDecoder(JSONStreamReaderI reader)
+    public JSONMessageDecoder(JSONStringReader reader)
     throws JSONException {
         super(reader);
     }
 
     public Message decodeMsg(Endpoint ep)
     throws IOException, JSONException, JSONMessageDecoderException {
-        checkNext('{');
-        checkNext('"');
+        reader.checkNext('{');
+        reader.checkNext('"');
 
         MessageType msgtype = null;
         Object o = null;
 
         for(int i = 0; i < 2; i++) {
             String key = nextKey();
-            checkNext(':');
+            reader.checkNext(':');
             switch(key) {
                 case Message.MSG_HEADER_NAME:
-                    checkNext('"');
+                    reader.checkNext('"');
                     String msgName = nextKey();
                     try {
                         msgtype = MessageType.valueOf(msgName);
@@ -66,11 +66,11 @@ public class JSONMessageDecoder extends JSONDecoder {
                     );
             }
             if(i == 0) {
-                checkNext(',');
-                checkNext('"');
+                reader.checkNext(',');
+                reader.checkNext('"');
             }
         }
-        checkNext('}');
+        reader.checkNext('}');
 
         if(msgtype == null) {
             throw new JSONMessageDecoderException("invalid message arrived");

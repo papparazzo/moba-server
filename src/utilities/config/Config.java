@@ -29,6 +29,7 @@ import json.JSONEncoder;
 import json.JSONException;
 import json.streamreader.JSONStreamReaderFile;
 import json.streamwriter.JSONStreamWriterFile;
+import json.stringreader.JSONStringReader;
 
 public class Config {
     protected String              fileName;
@@ -36,7 +37,7 @@ public class Config {
 
     public Config(String fileName)
     throws IOException, JSONException {
-        JSONDecoder decoder = new JSONDecoder(new JSONStreamReaderFile(fileName), false);
+        JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderFile(fileName)), false);
         this.fileName = fileName;
         content = decoder.decode();
     }

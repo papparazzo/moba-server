@@ -41,6 +41,7 @@ import json.JSONException;
 import json.JSONToStringI;
 import json.streamreader.JSONStreamReaderSocket;
 import json.streamwriter.JSONStreamWriterStringBuilder;
+import json.stringreader.JSONStringReader;
 import messages.JSONMessageDecoder;
 import messages.JSONMessageDecoderException;
 import messages.Message;
@@ -82,7 +83,7 @@ public class Endpoint extends Thread implements JSONToStringI {
     public Message getNextMessage()
     throws IOException, JSONMessageDecoderException {
         try {
-            JSONMessageDecoder decoder = new JSONMessageDecoder(new JSONStreamReaderSocket(socket));
+            JSONMessageDecoder decoder = new JSONMessageDecoder(new JSONStringReader(new JSONStreamReaderSocket(socket)));
             Message msg = decoder.decodeMsg(this);
             Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: new message <{1}> arrived", new Object[]{id, msg.getMsgType().toString()} );
             MessageLogger.in(msg);
