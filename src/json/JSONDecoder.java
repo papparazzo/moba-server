@@ -121,6 +121,15 @@ public class JSONDecoder {
     throws JSONException, IOException {
         char c = next(!strict);
         switch(c) {
+            case 'n':
+                return nextNull();
+
+            case 't':
+                return nextTrue();
+
+            case 'f':
+                return nextFalse();
+
             case '"':
                 return nextString();
 
@@ -134,6 +143,30 @@ public class JSONDecoder {
                 lastChar = c;
                 return nextJValue();
         }
+    }
+
+    protected Object nextNull()
+    throws JSONException, IOException {
+        if(next() != 'u' || next() != 'l' || next() != 'l') {
+            throw new JSONException("parsing error, value not 'null'");
+        }
+        return null;
+    }
+
+    protected Boolean nextTrue()
+    throws JSONException, IOException {
+        if(next() != 'r' || next() != 'u' || next() != 'e') {
+            throw new JSONException("parsing error, value not 'true'");
+        }
+        return Boolean.TRUE;
+    }
+
+    protected Boolean nextFalse()
+    throws JSONException, IOException {
+        if(next() != 'a' || next() != 'l' || next() != 's' || next() != 'e') {
+            throw new JSONException("parsing error, value not 'false'");
+        }
+        return Boolean.FALSE;
     }
 
     protected String nextString()
@@ -255,15 +288,6 @@ public class JSONDecoder {
         s = s.trim();
         if(s.isEmpty()) {
             throw new JSONException("empty value");
-        }
-        if(s.equalsIgnoreCase("true")) {
-            return Boolean.TRUE;
-        }
-        if(s.equalsIgnoreCase("false")) {
-            return Boolean.FALSE;
-        }
-        if(s.equalsIgnoreCase("null")) {
-            return null;
         }
 
         char b = s.charAt(0);
