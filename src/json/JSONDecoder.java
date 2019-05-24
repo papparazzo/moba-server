@@ -141,7 +141,7 @@ public class JSONDecoder {
 
             default:
                 lastChar = c;
-                return nextJValue();
+                return nextNumber();
         }
     }
 
@@ -258,7 +258,7 @@ public class JSONDecoder {
         }
     }
 
-    protected Object nextJValue()
+    protected Object nextNumber()
     throws JSONException, IOException {
         char c;
         StringBuilder sb = new StringBuilder();
@@ -270,11 +270,10 @@ public class JSONDecoder {
             }
 
             if(",]}".indexOf(c) != -1) {
-                lastChar = c;
-                return parseValue(sb.toString());
+                return parseNumber(sb.toString());
             }
 
-            if((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '-') {
+            if(Character.isDigit(c) || c == '-' || c == 'e' || c == 'E' || c == '.' || c == 'x' || c == 'X') {
                 sb.append(c);
                 continue;
             }
@@ -283,7 +282,7 @@ public class JSONDecoder {
         throw new JSONException("maximum string-length of <" + JSONDecoder.MAX_STRING_LENGTH + "> reached!");
     }
 
-    protected Object parseValue(String s)
+    protected Object parseNumber(String s)
     throws JSONException {
         s = s.trim();
         if(s.isEmpty()) {
