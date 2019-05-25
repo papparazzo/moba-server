@@ -86,7 +86,7 @@ public class Client extends MessageHandlerA {
     }
 
     protected void handleClientClose(Message msg) {
-        msgQueueIn.add(new Message(MessageType.BASE_FREE_RESOURCES, (long)msg.getEndpoint().getAppId()));
+        msgQueueIn.add(new Message(MessageType.FREE_RESOURCES, (long)msg.getEndpoint().getAppId()));
         dispatcher.removeEndpoint(msg.getEndpoint());
         dispatcher.dispatch(new Message(MessageType.SERVER_CLIENT_CLOSED, msg.getEndpoint().getAppId()));
     }

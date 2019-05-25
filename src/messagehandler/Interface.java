@@ -60,11 +60,11 @@ public class Interface extends MessageHandlerA {
     private void setConnectivity(Connectivity connectivity) {
         switch(connectivity) {
             case CONNECTED:
-                msgQueueIn.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.MANUEL));
+                msgQueueIn.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.MANUEL));
                 break;
 
             case ERROR:
-                msgQueueIn.add(new Message(MessageType.BASE_SET_HARDWARE_STATE, HardwareState.ERROR));
+                msgQueueIn.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.ERROR));
                 dispatcher.dispatch(
                     new Message(
                         MessageType.GUI_SYSTEM_NOTICE,

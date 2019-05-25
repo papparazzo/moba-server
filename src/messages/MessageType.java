@@ -24,10 +24,10 @@ public enum MessageType {
     //---------------------------------------------------
     // Base (Intern)
     //---------------------------------------------------
-    BASE_SERVER_SHUTDOWN(MessageGroup.BASE, MessageClass.INTERN),
-    BASE_SERVER_RESET(MessageGroup.BASE, MessageClass.INTERN),
-    BASE_FREE_RESOURCES(MessageGroup.BASE, MessageClass.INTERN),
-    BASE_SET_HARDWARE_STATE(MessageGroup.BASE, MessageClass.INTERN),
+    SERVER_SHUTDOWN(MessageGroup.BASE, MessageClass.INTERN),
+    SERVER_RESET(MessageGroup.BASE, MessageClass.INTERN),
+    FREE_RESOURCES(MessageGroup.BASE, MessageClass.INTERN),
+    SET_HARDWARE_STATE(MessageGroup.BASE, MessageClass.INTERN),
 
     //---------------------------------------------------
     // Client
