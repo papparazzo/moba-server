@@ -29,6 +29,7 @@ public class Message implements Comparable {
     protected Object      data     = null;
     protected MessageType msgType;
 
+    public static final String MSG_HEADER_GROUP = "msgGroup";
     public static final String MSG_HEADER_NAME  = "msgName";
     public static final String MSG_HEADER_DATA  = "msgData";
 
@@ -72,6 +73,10 @@ public class Message implements Comparable {
 
     public MessageType getMsgType() {
         return msgType;
+    }
+
+    public MessageType.MessageGroup getMsgGroup() {
+        return msgType.getMessageGroup();
     }
 
     @Override

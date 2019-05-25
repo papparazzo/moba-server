@@ -39,20 +39,31 @@ public class JSONMessageDecoder extends JSONDecoder {
         reader.checkNext('{');
         reader.checkNext('"');
 
-        MessageType msgtype = null;
+        MessageType msgName = null;
+        MessageType.MessageGroup msgGroup = null;
         Object o = null;
 
-        for(int i = 0; i < 2; i++) {
+        for(int i = 0; i < 3; i++) {
             String key = nextKey();
             reader.checkNext(':');
             switch(key) {
+                case Message.MSG_HEADER_GROUP:
+                    reader.checkNext('"');
+                    String group = nextKey();
+                    try {
+                        msgGroup = MessageType.MessageGroup.valueOf(group);
+                    } catch(IllegalArgumentException e) {
+                        throw new JSONMessageDecoderException("unknown message-group <" + group + "> arrived", e);
+                    }
+                    break;
+
                 case Message.MSG_HEADER_NAME:
                     reader.checkNext('"');
-                    String msgName = nextKey();
+                    String name = nextKey();
                     try {
-                        msgtype = MessageType.valueOf(msgName);
+                        msgName = MessageType.valueOf(name);
                     } catch(IllegalArgumentException e) {
-                        throw new JSONMessageDecoderException("unknown message <" + msgName + "> arrived", e);
+                        throw new JSONMessageDecoderException("unknown message <" + name + "> arrived", e);
                     }
                     break;
 
@@ -61,9 +72,7 @@ public class JSONMessageDecoder extends JSONDecoder {
                     break;
 
                 default:
-                    throw new JSONMessageDecoderException(
-                        "key <" + key + "> is neither <" + Message.MSG_HEADER_NAME + "> for name nor <" + Message.MSG_HEADER_DATA + "> for data!"
-                    );
+                    throw new JSONMessageDecoderException("invalid key <" + key + "> given");
             }
             if(i == 0) {
                 reader.checkNext(',');
@@ -72,9 +81,9 @@ public class JSONMessageDecoder extends JSONDecoder {
         }
         reader.checkNext('}');
 
-        if(msgtype == null) {
+        if(msgName == null || msgGroup == null) {
             throw new JSONMessageDecoderException("invalid message arrived");
         }
-        return new Message(msgtype, o, ep);
+        return new Message(msgName, o, ep);
     }
 }
