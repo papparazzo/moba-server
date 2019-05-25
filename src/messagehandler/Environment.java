@@ -112,7 +112,7 @@ public class Environment extends MessageHandlerA {
                     );
             }
         } catch(java.lang.ClassCastException | IOException | JSONException | ConfigException | NullPointerException | IllegalArgumentException e) {
-            dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()), msg.getEndpoint()));
+            dispatcher.dispatch(new Message(MessageType.ERROR, new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()), msg.getEndpoint()));
         }
     }
 

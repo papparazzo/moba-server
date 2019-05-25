@@ -92,7 +92,7 @@ public class Endpoint extends Thread implements JSONToStringI {
             if(!closing) {
                 throw new IOException(e);
             }
-            return new Message(MessageType.CLIENT_VOID);
+            return new Message(MessageType.VOID);
         }
     }
 
@@ -138,10 +138,10 @@ public class Endpoint extends Thread implements JSONToStringI {
             }
         } catch(IOException e) {
             Endpoint.LOGGER.log(Level.WARNING, "Endpoint #{0}: IOException, send <CLIENT_CLOSE> <{1}>", new Object[]{id, e.toString()});
-            in.add(new Message(MessageType.CLIENT_CLOSE, null, this));
+            in.add(new Message(MessageType.CLOSE, null, this));
         } catch(JSONMessageDecoderException e) {
             Endpoint.LOGGER.log(Level.WARNING, "Endpoint #{0}: JSONMessageDecoderException, send <> <{1}>", new Object[]{id, e.toString()});
-            in.add(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()), this));
+            in.add(new Message(MessageType.ERROR, new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()), this));
         }
         Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
     }
@@ -177,10 +177,10 @@ public class Endpoint extends Thread implements JSONToStringI {
         }
         MessageType mtype = msg.getMsgType();
 
-        if(mtype != MessageType.CLIENT_START && mtype != MessageType.CLIENT_CONNECTED) {
+        if(mtype != MessageType.START && mtype != MessageType.CONNECTED) {
             throw new IOException("first msg is neither CLIENT_START nor CLIENT_CONNECTED");
         }
-        if(mtype == MessageType.CLIENT_CONNECTED) {
+        if(mtype == MessageType.CONNECTED) {
             return;
         }
         Map<String, Object> map = (Map<String, Object>)msg.getData();

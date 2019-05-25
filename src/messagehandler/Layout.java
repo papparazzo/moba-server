@@ -94,13 +94,13 @@ public class Layout extends MessageHandlerA {
             handleMsgUnsafe(msg);
         } catch(SQLException e) {
             Layout.LOGGER.log(Level.WARNING, e.toString());
-            dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()), msg.getEndpoint()));
+            dispatcher.dispatch(new Message(MessageType.ERROR, new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()), msg.getEndpoint()));
         } catch(ConfigException | IOException | JSONException e) {
             Layout.LOGGER.log(Level.WARNING, e.toString());
-            dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()), msg.getEndpoint()));
+            dispatcher.dispatch(new Message(MessageType.ERROR, new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()), msg.getEndpoint()));
         } catch(ErrorException e) {
             Layout.LOGGER.log(Level.WARNING, e.toString());
-            dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(e.getErrorId(), e.getMessage()), msg.getEndpoint()));
+            dispatcher.dispatch(new Message(MessageType.ERROR, new ErrorData(e.getErrorId(), e.getMessage()), msg.getEndpoint()));
         }
     }
 

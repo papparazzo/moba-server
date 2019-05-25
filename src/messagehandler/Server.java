@@ -56,17 +56,17 @@ public class Server extends MessageHandlerA {
         }
 
         if(!checkForSameOrigin(msg.getEndpoint())) {
-            dispatcher.dispatch(new Message(MessageType.CLIENT_ERROR, new ErrorData(ErrorId.SAME_ORIGIN_NEEDED), msg.getEndpoint()));
+            dispatcher.dispatch(new Message(MessageType.ERROR, new ErrorData(ErrorId.SAME_ORIGIN_NEEDED), msg.getEndpoint()));
             return;
         }
 
         switch(msg.getMsgType()) {
             case SERVER_RESET_CLIENT:
-                sendToClient(msg, MessageType.CLIENT_RESET);
+                sendToClient(msg, MessageType.RESET);
                 break;
 
             case SERVER_SELF_TESTING_CLIENT:
-                sendToClient(msg, MessageType.CLIENT_SELF_TESTING);
+                sendToClient(msg, MessageType.SELF_TESTING);
                 break;
 
             default:
@@ -83,7 +83,7 @@ public class Server extends MessageHandlerA {
             return;
         }
         dispatcher.dispatch(new Message(
-                MessageType.CLIENT_ERROR,
+                MessageType.ERROR,
                 new ErrorData(ErrorId.INVALID_APP_ID, "app-id <" + msg.getData().toString() + "> is invalid"),
                 msg.getEndpoint()
             )

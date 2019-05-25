@@ -106,7 +106,7 @@ public class MessageLoop {
 
     protected void resetHandler() {
         for(Endpoint ep : dispatcher.getEndpoints()) {
-            dispatcher.dispatch(new Message(MessageType.CLIENT_RESET, null, ep));
+            dispatcher.dispatch(new Message(MessageType.RESET, null, ep));
         }
         Iterator<MessageGroup> iter = handlers.keySet().iterator();
         while(iter.hasNext()) {
@@ -116,7 +116,7 @@ public class MessageLoop {
 
     protected void shutdownHandler() {
         for(Endpoint ep : dispatcher.getEndpoints()) {
-            dispatcher.dispatch(new Message(MessageType.CLIENT_SHUTDOWN, null, ep));
+            dispatcher.dispatch(new Message(MessageType.SHUTDOWN, null, ep));
         }
         Iterator<MessageGroup> iter = handlers.keySet().iterator();
         while(iter.hasNext()) {

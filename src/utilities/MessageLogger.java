@@ -91,7 +91,7 @@ public class MessageLogger {
                 sb.append(ANSI_RESET);
                 break;
 
-            case CLIENT_ERROR:
+            case ERROR:
                 sb.append(ANSI_CYAN);
                 sb.append(" >> ");
                 sb.append(((ErrorData)msg.getData()).toString());

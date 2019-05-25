@@ -43,22 +43,22 @@ public class Client extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
-            case CLIENT_VOID:
+            case VOID:
                 break;
 
-            case CLIENT_ECHO_REQ:
-                dispatcher.dispatch(new Message(MessageType.CLIENT_ECHO_RES, msg.getData(), msg.getEndpoint()));
+            case ECHO_REQ:
+                dispatcher.dispatch(new Message(MessageType.ECHO_RES, msg.getData(), msg.getEndpoint()));
                 break;
 
-            case CLIENT_START:
+            case START:
                 handleClientStart(msg);
                 break;
 
-            case CLIENT_CLOSE:
+            case CLOSE:
                 handleClientClose(msg);
                 break;
 
-            case CLIENT_ERROR:
+            case ERROR:
                 dispatcher.dispatch(msg);
                 break;
 
@@ -74,14 +74,14 @@ public class Client extends MessageHandlerA {
         if(!dispatcher.addEndpoint(ep)) {
             dispatcher.dispatch(
                 new Message(
-                    MessageType.CLIENT_ERROR,
+                    MessageType.ERROR,
                     new ErrorData(ErrorId.INVALID_DATA_SEND, "Endpoint <" + ep.toString() + "> allready exists"),
                     msg.getEndpoint()
                 )
             );
             return;
         }
-        dispatcher.dispatch(new Message(MessageType.CLIENT_CONNECTED, ep.getAppId(), ep));
+        dispatcher.dispatch(new Message(MessageType.CONNECTED, ep.getAppId(), ep));
         dispatcher.dispatch(new Message(MessageType.SERVER_NEW_CLIENT_STARTED, ep));
     }
 
