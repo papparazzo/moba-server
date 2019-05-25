@@ -35,7 +35,7 @@ public class Gui extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
-            case GUI_SYSTEM_NOTICE:
+            case SYSTEM_NOTICE:
                 sendSystemNotice(msg);
                 break;
         }
@@ -44,7 +44,7 @@ public class Gui extends MessageHandlerA {
     public void sendSystemNotice(Message msg) {
         dispatcher.dispatch(
             new Message(
-                MessageType.GUI_SYSTEM_NOTICE,
+                MessageType.SYSTEM_NOTICE,
                 msg.getData()
             )
         );

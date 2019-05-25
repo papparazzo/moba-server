@@ -83,7 +83,7 @@ public class MessageLogger {
 
     protected static void appendText(StringBuilder sb, Message msg) {
         switch(msg.getMsgType()) {
-            case GUI_SYSTEM_NOTICE:
+            case SYSTEM_NOTICE:
                 sb.append(ANSI_CYAN);
                 sb.append(" >> ");
                 printSystemNotice(sb, (NoticeData)msg.getData());

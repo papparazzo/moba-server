@@ -48,33 +48,33 @@ public class Systems extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
-            case SYSTEM_SET_AUTOMATIC_MODE:
+            case SET_AUTOMATIC_MODE:
                 setAutomaticMode(msg);
                 break;
 
-            case SYSTEM_SET_EMERGENCY_STOP:
+            case SET_EMERGENCY_STOP:
                 setEmergencyStop(msg);
                 break;
 
-            case SYSTEM_SET_STANDBY_MODE:
+            case SET_STANDBY_MODE:
                 setStandByMode(msg);
                 break;
 
-            case SYSTEM_GET_HARDWARE_STATE:
+            case GET_HARDWARE_STATE:
                 dispatcher.dispatch(
                     new Message(
-                        MessageType.SYSTEM_HARDWARE_STATE_CHANGED,
+                        MessageType.HARDWARE_STATE_CHANGED,
                         status.toString(),
                         msg.getEndpoint()
                     )
                 );
                 break;
 
-            case SYSTEM_HARDWARE_SHUTDOWN:
+            case HARDWARE_SHUTDOWN:
                 msgQueue.add(new Message(MessageType.SERVER_SHUTDOWN));
                 break;
 
-            case SYSTEM_HARDWARE_RESET:
+            case HARDWARE_RESET:
                 msgQueue.add(new Message(MessageType.SERVER_RESET));
                 break;
 
@@ -108,7 +108,7 @@ public class Systems extends MessageHandlerA {
             msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
             dispatcher.dispatch(
                 new Message(
-                    MessageType.GUI_SYSTEM_NOTICE,
+                    MessageType.SYSTEM_NOTICE,
                     new NoticeData(NoticeType.INFO, "Automatik", "Die Hardware befindet sich im Automatikmodus")
                 )
             );
@@ -117,7 +117,7 @@ public class Systems extends MessageHandlerA {
         msgQueue.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.MANUEL));
         dispatcher.dispatch(
             new Message(
-                MessageType.GUI_SYSTEM_NOTICE,
+                MessageType.SYSTEM_NOTICE,
                 new NoticeData(NoticeType.INFO, "Automatik", "Automatikmodus wurde deaktiviert")
             )
         );
@@ -139,7 +139,7 @@ public class Systems extends MessageHandlerA {
         if(emergencyStop) {
             dispatcher.dispatch(
                 new Message(
-                    MessageType.GUI_SYSTEM_NOTICE,
+                    MessageType.SYSTEM_NOTICE,
                     new NoticeData(NoticeType.WARNING, "Nothalt gedrückt", "Es wurde ein Nothalt ausgelöst")
                 )
             );
@@ -148,7 +148,7 @@ public class Systems extends MessageHandlerA {
         }
         dispatcher.dispatch(
             new Message(
-                MessageType.GUI_SYSTEM_NOTICE,
+                MessageType.SYSTEM_NOTICE,
                 new NoticeData(NoticeType.INFO, "Nothaltfreigabe", "Der Nothalt wurde wieder freigegeben")
             )
         );
@@ -175,7 +175,7 @@ public class Systems extends MessageHandlerA {
         if(setStandByMode) {
             dispatcher.dispatch(
                 new Message(
-                    MessageType.GUI_SYSTEM_NOTICE,
+                    MessageType.SYSTEM_NOTICE,
                     new NoticeData(NoticeType.WARNING, "Standby", "Anlage wird in den Standby-Modus geschickt")
                 )
             );
@@ -184,7 +184,7 @@ public class Systems extends MessageHandlerA {
         }
         dispatcher.dispatch(
             new Message(
-                MessageType.GUI_SYSTEM_NOTICE,
+                MessageType.SYSTEM_NOTICE,
                 new NoticeData(NoticeType.INFO, "Standby", "Die Anlage wird aus dem Standby-Modus geholt")
             )
         );
@@ -212,7 +212,7 @@ public class Systems extends MessageHandlerA {
     public void hardwareStateChanged(HardwareState state) {
         status = state;
         dispatcher.dispatch(
-            new Message(MessageType.SYSTEM_HARDWARE_STATE_CHANGED, status.toString())
+            new Message(MessageType.HARDWARE_STATE_CHANGED, status.toString())
         );
     }
 }

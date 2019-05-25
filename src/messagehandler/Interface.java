@@ -46,11 +46,11 @@ public class Interface extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg) {
         switch(msg.getMsgType()) {
-            case INTERFACE_CONNECTIVITY_STATE_CHANGED:
+            case CONNECTIVITY_STATE_CHANGED:
                 setConnectivity(Connectivity.valueOf((String)msg.getData()));
                 return;
 
-            case INTERFACE_CONTACT_TRIGGERED:
+            case CONTACT_TRIGGERED:
 
             default:
                 throw new UnsupportedOperationException("unknow msg <" + msg.getMsgType().toString() + ">.");
@@ -67,7 +67,7 @@ public class Interface extends MessageHandlerA {
                 msgQueueIn.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.ERROR));
                 dispatcher.dispatch(
                     new Message(
-                        MessageType.GUI_SYSTEM_NOTICE,
+                        MessageType.SYSTEM_NOTICE,
                         new NoticeData(NoticeType.ERROR, "Hardwarefehler", "Die Verbindung zur Harware wurde unterbrochen")
                     )
                 );

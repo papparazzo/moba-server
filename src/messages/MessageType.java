@@ -59,66 +59,66 @@ public enum MessageType {
     //---------------------------------------------------
     // Timer
     //---------------------------------------------------
-    TIMER_GLOBAL_TIMER_EVENT(MessageGroup.TIMER, MessageClass.GROUP, MessagePriority.REAL_TIME),
-    TIMER_GET_GLOBAL_TIMER(MessageGroup.TIMER, MessageClass.SINGLE),
-    TIMER_SET_GLOBAL_TIMER(MessageGroup.TIMER, MessageClass.GROUP),
-    TIMER_GET_COLOR_THEME(MessageGroup.TIMER, MessageClass.SINGLE),
-    TIMER_SET_COLOR_THEME(MessageGroup.TIMER, MessageClass.GROUP),
-    TIMER_COLOR_THEME_EVENT(MessageGroup.TIMER, MessageClass.GROUP),
+    GLOBAL_TIMER_EVENT(MessageGroup.TIMER, MessageClass.GROUP, MessagePriority.REAL_TIME),
+    GET_GLOBAL_TIMER(MessageGroup.TIMER, MessageClass.SINGLE),
+    SET_GLOBAL_TIMER(MessageGroup.TIMER, MessageClass.GROUP),
+    GET_COLOR_THEME(MessageGroup.TIMER, MessageClass.SINGLE),
+    SET_COLOR_THEME(MessageGroup.TIMER, MessageClass.GROUP),
+    COLOR_THEME_EVENT(MessageGroup.TIMER, MessageClass.GROUP),
 
     //---------------------------------------------------
     // Environment
     //---------------------------------------------------
-    ENVIRONMENT_GET_ENVIRONMENT(MessageGroup.ENVIRONMENT, MessageClass.SINGLE),
-    ENVIRONMENT_SET_ENVIRONMENT(MessageGroup.ENVIRONMENT, MessageClass.GROUP),
-    ENVIRONMENT_GET_AMBIENCE(MessageGroup.ENVIRONMENT, MessageClass.SINGLE),
-    ENVIRONMENT_SET_AMBIENCE(MessageGroup.ENVIRONMENT, MessageClass.GROUP),
-    ENVIRONMENT_GET_AMBIENT_LIGHT(MessageGroup.ENVIRONMENT, MessageClass.SINGLE),
-    ENVIRONMENT_SET_AMBIENT_LIGHT(MessageGroup.ENVIRONMENT, MessageClass.GROUP),
+    GET_ENVIRONMENT(MessageGroup.ENVIRONMENT, MessageClass.SINGLE),
+    SET_ENVIRONMENT(MessageGroup.ENVIRONMENT, MessageClass.GROUP),
+    GET_AMBIENCE(MessageGroup.ENVIRONMENT, MessageClass.SINGLE),
+    SET_AMBIENCE(MessageGroup.ENVIRONMENT, MessageClass.GROUP),
+    GET_AMBIENT_LIGHT(MessageGroup.ENVIRONMENT, MessageClass.SINGLE),
+    SET_AMBIENT_LIGHT(MessageGroup.ENVIRONMENT, MessageClass.GROUP),
 
     //---------------------------------------------------
     // Interface
     //---------------------------------------------------
-    INTERFACE_CONNECTIVITY_STATE_CHANGED(MessageGroup.INTERFACE, MessageClass.SINGLE),
-    INTERFACE_CONTACT_TRIGGERED(MessageGroup.INTERFACE, MessageClass.SINGLE),
-    INTERFACE_SET_BRAKE_VECTOR(MessageGroup.INTERFACE, MessageClass.SINGLE),
+    CONNECTIVITY_STATE_CHANGED(MessageGroup.INTERFACE, MessageClass.SINGLE),
+    CONTACT_TRIGGERED(MessageGroup.INTERFACE, MessageClass.SINGLE),
+    SET_BRAKE_VECTOR(MessageGroup.INTERFACE, MessageClass.SINGLE),
 
     //---------------------------------------------------
     // System
     //---------------------------------------------------
-    SYSTEM_SET_AUTOMATIC_MODE(MessageGroup.SYSTEM, MessageClass.SINGLE, MessagePriority.REAL_TIME),
-    SYSTEM_SET_EMERGENCY_STOP(MessageGroup.SYSTEM, MessageClass.SINGLE, MessagePriority.REAL_TIME),
-    SYSTEM_SET_STANDBY_MODE(MessageGroup.SYSTEM, MessageClass.SINGLE),
-    SYSTEM_GET_HARDWARE_STATE(MessageGroup.SYSTEM),
-    SYSTEM_HARDWARE_STATE_CHANGED(MessageGroup.SYSTEM, MessageClass.GROUP),
-    SYSTEM_HARDWARE_SHUTDOWN(MessageGroup.SYSTEM, MessageClass.SINGLE),
-    SYSTEM_HARDWARE_RESET(MessageGroup.SYSTEM, MessageClass.SINGLE),
+    SET_AUTOMATIC_MODE(MessageGroup.SYSTEM, MessageClass.SINGLE, MessagePriority.REAL_TIME),
+    SET_EMERGENCY_STOP(MessageGroup.SYSTEM, MessageClass.SINGLE, MessagePriority.REAL_TIME),
+    SET_STANDBY_MODE(MessageGroup.SYSTEM, MessageClass.SINGLE),
+    GET_HARDWARE_STATE(MessageGroup.SYSTEM),
+    HARDWARE_STATE_CHANGED(MessageGroup.SYSTEM, MessageClass.GROUP),
+    HARDWARE_SHUTDOWN(MessageGroup.SYSTEM, MessageClass.SINGLE),
+    HARDWARE_RESET(MessageGroup.SYSTEM, MessageClass.SINGLE),
 
     //---------------------------------------------------
     // Layout
     //---------------------------------------------------
-    LAYOUT_GET_LAYOUTS_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_GET_LAYOUTS_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_DELETE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_LAYOUT_DELETED(MessageGroup.LAYOUT, MessageClass.GROUP),
-    LAYOUT_CREATE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_LAYOUT_CREATED(MessageGroup.LAYOUT, MessageClass.GROUP),
-    LAYOUT_UPDATE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_LAYOUT_UPDATED(MessageGroup.LAYOUT, MessageClass.GROUP),
-    LAYOUT_UNLOCK_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_LAYOUT_UNLOCKED(MessageGroup.LAYOUT, MessageClass.GROUP),
-    LAYOUT_LOCK_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_LAYOUT_LOCKED(MessageGroup.LAYOUT, MessageClass.GROUP),
-    LAYOUT_GET_LAYOUT_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_GET_LAYOUT_READ_ONLY_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_GET_LAYOUT_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_SAVE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
-    LAYOUT_LAYOUT_CHANGED(MessageGroup.LAYOUT, MessageClass.GROUP),
+    GET_LAYOUTS_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    GET_LAYOUTS_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    DELETE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_DELETED(MessageGroup.LAYOUT, MessageClass.GROUP),
+    CREATE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_CREATED(MessageGroup.LAYOUT, MessageClass.GROUP),
+    UPDATE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_UPDATED(MessageGroup.LAYOUT, MessageClass.GROUP),
+    UNLOCK_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_UNLOCKED(MessageGroup.LAYOUT, MessageClass.GROUP),
+    LOCK_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_LOCKED(MessageGroup.LAYOUT, MessageClass.GROUP),
+    GET_LAYOUT_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    GET_LAYOUT_READ_ONLY_REQ(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    GET_LAYOUT_RES(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    SAVE_LAYOUT(MessageGroup.LAYOUT, MessageClass.SINGLE),
+    LAYOUT_CHANGED(MessageGroup.LAYOUT, MessageClass.GROUP),
 
     //---------------------------------------------------
     // GUI
     //---------------------------------------------------
-    GUI_SYSTEM_NOTICE(MessageGroup.GUI, MessageClass.GROUP),
+    SYSTEM_NOTICE(MessageGroup.GUI, MessageClass.GROUP),
 
     //---------------------------------------------------
     // Block-System

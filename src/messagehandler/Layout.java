@@ -107,39 +107,39 @@ public class Layout extends MessageHandlerA {
     protected void handleMsgUnsafe(Message msg)
     throws SQLException, IOException, JSONException, ConfigException, ErrorException {
         switch(msg.getMsgType()) {
-            case LAYOUT_GET_LAYOUTS_REQ:
+            case GET_LAYOUTS_REQ:
                 getLayouts(msg);
                 break;
 
-            case LAYOUT_GET_LAYOUT_REQ:
+            case GET_LAYOUT_REQ:
                 getLayout(msg, true);
                 break;
 
-            case LAYOUT_GET_LAYOUT_READ_ONLY_REQ:
+            case GET_LAYOUT_READ_ONLY_REQ:
                 getLayout(msg, false);
                 break;
 
-            case LAYOUT_DELETE_LAYOUT:
+            case DELETE_LAYOUT:
                 deleteLayout(msg);
                 break;
 
-            case LAYOUT_CREATE_LAYOUT:
+            case CREATE_LAYOUT:
                 createLayout(msg);
                 break;
 
-            case LAYOUT_UPDATE_LAYOUT:
+            case UPDATE_LAYOUT:
                 updateLayout(msg);
                 break;
 
-            case LAYOUT_UNLOCK_LAYOUT:
+            case UNLOCK_LAYOUT:
                 unlockLayout(msg);
                 break;
 
-            case LAYOUT_LOCK_LAYOUT:
+            case LOCK_LAYOUT:
                 lockLayout(msg);
                 break;
 
-            case LAYOUT_SAVE_LAYOUT:
+            case SAVE_LAYOUT:
                 saveLayout(msg);
                 break;
 
@@ -169,7 +169,7 @@ public class Layout extends MessageHandlerA {
                 ));
             }
         }
-        dispatcher.dispatch(new Message(MessageType.LAYOUT_GET_LAYOUTS_RES, arraylist, msg.getEndpoint()));
+        dispatcher.dispatch(new Message(MessageType.GET_LAYOUTS_RES, arraylist, msg.getEndpoint()));
     }
 
     protected void deleteLayout(Message msg)
@@ -191,7 +191,7 @@ public class Layout extends MessageHandlerA {
         if(id == activeLayout) {
             storeData(-1);
         }
-        dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_DELETED, id));
+        dispatcher.dispatch(new Message(MessageType.LAYOUT_DELETED, id));
     }
 
     protected void createLayout(Message msg)
@@ -220,7 +220,7 @@ public class Layout extends MessageHandlerA {
                 tl.setId(id);
             }
         }
-        dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CREATED, tl));
+        dispatcher.dispatch(new Message(MessageType.LAYOUT_CREATED, tl));
     }
 
     protected void updateLayout(Message msg)
@@ -252,7 +252,7 @@ public class Layout extends MessageHandlerA {
             if(active) {
                 storeData(id);
             }
-            dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UPDATED, tl));
+            dispatcher.dispatch(new Message(MessageType.LAYOUT_UPDATED, tl));
         }
     }
 
@@ -260,14 +260,14 @@ public class Layout extends MessageHandlerA {
     throws SQLException, ErrorException {
         long id = getId(msg.getData());
         lock.unlockLayout(id, msg.getEndpoint());
-        dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_UNLOCKED, id));
+        dispatcher.dispatch(new Message(MessageType.LAYOUT_UNLOCKED, id));
     }
 
     protected void lockLayout(Message msg)
     throws SQLException, ErrorException {
         long id = getId(msg.getData());
         lock.lockLayout(id, msg.getEndpoint());
-        dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_LOCKED, id));
+        dispatcher.dispatch(new Message(MessageType.LAYOUT_LOCKED, id));
     }
 
     protected void getLayout(Message msg, boolean tryLock)
@@ -301,7 +301,7 @@ public class Layout extends MessageHandlerA {
                 ));
             }
             map.put("symbols", arraylist);
-            dispatcher.dispatch(new Message(MessageType.LAYOUT_GET_LAYOUT_RES, map, msg.getEndpoint()));
+            dispatcher.dispatch(new Message(MessageType.GET_LAYOUT_RES, map, msg.getEndpoint()));
         }
     }
 
@@ -362,7 +362,7 @@ public class Layout extends MessageHandlerA {
             }
         }
 
-        dispatcher.dispatch(new Message(MessageType.LAYOUT_LAYOUT_CHANGED, map));
+        dispatcher.dispatch(new Message(MessageType.LAYOUT_CHANGED, map));
     }
 
     protected Date getCreationDate(long id)
