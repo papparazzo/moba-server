@@ -98,7 +98,7 @@ public class Acceptor extends Thread {
 
                 if(dispatcher.getEndPointsCount() == maxClients) {
                     Acceptor.LOGGER.log(Level.WARNING, "Max amount of clients <{0}> reached!", new Object[]{id});
-                    in.add(new Message(MessageType.SERVER_MAX_CLIENT_COUNT, maxClients));
+                    in.add(new Message(MessageType.MAX_CLIENT_COUNT, maxClients));
                 }
             }
         } catch (InterruptedException | IOException e) {

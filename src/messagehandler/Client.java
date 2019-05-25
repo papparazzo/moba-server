@@ -82,13 +82,13 @@ public class Client extends MessageHandlerA {
             return;
         }
         dispatcher.dispatch(new Message(MessageType.CONNECTED, ep.getAppId(), ep));
-        dispatcher.dispatch(new Message(MessageType.SERVER_NEW_CLIENT_STARTED, ep));
+        dispatcher.dispatch(new Message(MessageType.NEW_CLIENT_STARTED, ep));
     }
 
     protected void handleClientClose(Message msg) {
         msgQueueIn.add(new Message(MessageType.FREE_RESOURCES, (long)msg.getEndpoint().getAppId()));
         dispatcher.removeEndpoint(msg.getEndpoint());
-        dispatcher.dispatch(new Message(MessageType.SERVER_CLIENT_CLOSED, msg.getEndpoint().getAppId()));
+        dispatcher.dispatch(new Message(MessageType.CLIENT_CLOSED, msg.getEndpoint().getAppId()));
     }
 }
 

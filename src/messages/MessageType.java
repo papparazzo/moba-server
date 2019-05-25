@@ -46,15 +46,15 @@ public enum MessageType {
     //---------------------------------------------------
     // Server
     //---------------------------------------------------
-    SERVER_MAX_CLIENT_COUNT(MessageGroup.SERVER, MessageClass.GROUP),
-    SERVER_NEW_CLIENT_STARTED(MessageGroup.SERVER, MessageClass.GROUP),
-    SERVER_CLIENT_CLOSED(MessageGroup.SERVER, MessageClass.GROUP),
-    SERVER_RESET_CLIENT(MessageGroup.SERVER, MessageClass.SINGLE),
-    SERVER_INFO_REQ(MessageGroup.SERVER, MessageClass.SINGLE),
-    SERVER_INFO_RES(MessageGroup.SERVER, MessageClass.SINGLE),
-    SERVER_CON_CLIENTS_REQ(MessageGroup.SERVER, MessageClass.SINGLE),
-    SERVER_CON_CLIENTS_RES(MessageGroup.SERVER, MessageClass.SINGLE),
-    SERVER_SELF_TESTING_CLIENT(MessageGroup.SERVER, MessageClass.SINGLE),
+    MAX_CLIENT_COUNT(MessageGroup.SERVER, MessageClass.GROUP),
+    NEW_CLIENT_STARTED(MessageGroup.SERVER, MessageClass.GROUP),
+    CLIENT_CLOSED(MessageGroup.SERVER, MessageClass.GROUP),
+    RESET_CLIENT(MessageGroup.SERVER, MessageClass.SINGLE),
+    INFO_REQ(MessageGroup.SERVER, MessageClass.SINGLE),
+    INFO_RES(MessageGroup.SERVER, MessageClass.SINGLE),
+    CON_CLIENTS_REQ(MessageGroup.SERVER, MessageClass.SINGLE),
+    CON_CLIENTS_RES(MessageGroup.SERVER, MessageClass.SINGLE),
+    SELF_TESTING_CLIENT(MessageGroup.SERVER, MessageClass.SINGLE),
 
     //---------------------------------------------------
     // Timer
