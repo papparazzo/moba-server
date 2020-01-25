@@ -20,7 +20,6 @@
 
 package json.stringreader;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import json.streamreader.JSONStreamReaderI;
 
