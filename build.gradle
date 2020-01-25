@@ -32,4 +32,4 @@ application {
     // Define the main class for the application.
     mainClassName = 'moba.server.App'
 }
-version = "1.0"
+version = "1.0.0-0000"
