@@ -36,7 +36,6 @@ import moba.server.messagehandler.Systems;
 import moba.server.messages.MessageLoop;
 import moba.server.messages.MessageType;
 import moba.server.tracklayout.utilities.TracklayoutLock;
-import moba.server.tracklayout.utilities.TracklayoutLock;
 
 public class ServerApplication extends Application {
 
