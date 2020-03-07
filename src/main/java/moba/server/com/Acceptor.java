@@ -28,7 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import moba.server.messages.Message;
-import moba.server.messages.MessageType;
 
 public class Acceptor extends Thread {
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -95,11 +94,6 @@ public class Acceptor extends Thread {
                     break;
                 }
                 (new Endpoint(++id, socket, in)).start();
-
-                if(dispatcher.getEndPointsCount() == maxClients) {
-                    Acceptor.LOGGER.log(Level.WARNING, "Max amount of clients <{0}> reached!", new Object[]{id});
-                    in.add(new Message(MessageType.MAX_CLIENT_COUNT, maxClients));
-                }
             }
         } catch (InterruptedException | IOException e) {
             Acceptor.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
