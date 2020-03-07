@@ -36,7 +36,9 @@ public enum ErrorId implements JSONToStringI {
     INVALID_STATUS_CHANGE,
     DATABASE_ERROR,
     UNKNOWN_ERROR,
-    NO_DEFAULT_GIVEN;
+    NO_DEFAULT_GIVEN,
+    UNKNOWN_MESSAGE_ID,
+    UNKNOWN_GROUP_ID;
 
     protected final int value;
 
