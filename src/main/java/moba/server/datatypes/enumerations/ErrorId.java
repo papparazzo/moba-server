@@ -26,19 +26,26 @@ import moba.server.json.JSONException;
 import moba.server.json.JSONToStringI;
 
 public enum ErrorId implements JSONToStringI {
-    SAME_ORIGIN_NEEDED,
-    INVALID_APP_ID,
-    FAULTY_MESSAGE,
-    INVALID_DATA_SEND,
+
+    DATABASE_ERROR,
+
     DATASET_NOT_LOCKED,
     DATASET_LOCKED,
     DATASET_MISSING,
+
+    FAULTY_MESSAGE,
+
+    INVALID_APP_ID,
+    INVALID_DATA_SEND,
     INVALID_STATUS_CHANGE,
-    DATABASE_ERROR,
-    UNKNOWN_ERROR,
+
     NO_DEFAULT_GIVEN,
-    UNKNOWN_MESSAGE_ID,
-    UNKNOWN_GROUP_ID;
+
+    SAME_ORIGIN_NEEDED,
+
+    UNKNOWN_ERROR,
+    UNKNOWN_GROUP_ID,
+    UNKNOWN_MESSAGE_ID;
 
     protected final int value;
 
