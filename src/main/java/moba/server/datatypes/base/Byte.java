@@ -29,7 +29,6 @@ public class Byte implements JSONToStringI {
     protected int value;
 
     public Byte() {
-
     }
 
     public Byte(int val)

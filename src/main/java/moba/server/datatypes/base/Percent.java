@@ -29,7 +29,6 @@ public class Percent implements JSONToStringI {
     protected int value = 0;
 
     public Percent() {
-
     }
 
     public Percent(int val) {

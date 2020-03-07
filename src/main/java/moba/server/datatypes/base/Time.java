@@ -29,7 +29,6 @@ public class Time implements JSONToStringI {
     protected int value;
 
     public Time() {
-
     }
 
     public Time(int val)

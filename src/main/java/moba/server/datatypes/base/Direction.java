@@ -36,7 +36,6 @@ public class Direction {
     protected int direction = Direction.UNSET;
 
     public Direction() {
-
     }
 
     public Direction(int dir) {

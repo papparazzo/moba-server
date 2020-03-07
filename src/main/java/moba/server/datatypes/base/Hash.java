@@ -29,7 +29,6 @@ public class Hash implements JSONToStringI {
     protected String value;
 
     public Hash() {
-
     }
 
     public Hash(String val)
