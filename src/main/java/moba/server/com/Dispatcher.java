@@ -21,9 +21,10 @@
 package moba.server.com;
 
 import java.io.IOException;
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +33,6 @@ import moba.server.json.JSONException;
 import moba.server.json.streamwriter.JSONStreamWriterSocket;
 import moba.server.messages.JSONMessageEncoder;
 import moba.server.messages.Message;
-import moba.server.messages.MessageType;
 import moba.server.utilities.MessageLogger;
 
 public class Dispatcher implements SenderI {
@@ -40,8 +40,7 @@ public class Dispatcher implements SenderI {
 
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-    protected final EnumMap<MessageType.MessageGroup, Set<Endpoint>>
-        groupEP = new EnumMap<>(MessageType.MessageGroup.class);
+    protected final Map<Long, Set<Endpoint>> groupEP = new HashMap<>();
 
     public boolean addEndpoint(Endpoint ep) {
         Dispatcher.LOGGER.log(
@@ -60,7 +59,7 @@ public class Dispatcher implements SenderI {
         }
 
         Set<Endpoint> set;
-        for(MessageType.MessageGroup msgGroup : ep.getMsgGroups()) {
+        for(Long msgGroup : ep.getMsgGroups()) {
             if(groupEP.containsKey(msgGroup)) {
                 set = groupEP.get(msgGroup);
             } else {
@@ -93,7 +92,7 @@ public class Dispatcher implements SenderI {
             Dispatcher.LOGGER.log(Level.WARNING, "could not remove endpoint <{0}> from set!", new Object[]{ep.getSocket()});
         }
 
-        for(MessageType.MessageGroup msgGroup : ep.getMsgGroups()) {
+        for(Long msgGroup : ep.getMsgGroups()) {
             if(groupEP.containsKey(msgGroup)) {
                 Set<Endpoint> set = groupEP.get(msgGroup);
                 iter = set.iterator();
@@ -150,53 +149,39 @@ public class Dispatcher implements SenderI {
     }
 
     @Override
-    public synchronized boolean dispatch(Message msg) {
+    public synchronized void dispatch(Message msg, DispatchType dispatchType) {
         try {
             if(msg == null) {
                 Dispatcher.LOGGER.log(Level.SEVERE, "msg is null!");
-                return false;
+                return;
             }
             MessageLogger.out(msg);
-            Dispatcher.LOGGER.log(Level.INFO, "try to send message <{0}>", new Object[]{msg.getMsgType().toString()});
+            Dispatcher.LOGGER.log(
+                Level.INFO, "try to send message [{0}:{1}]", new Object[]{msg.getGroupId(), msg.getMessageId()}
+            );
 
             JSONMessageEncoder encoder = new JSONMessageEncoder();
 
-            MessageType.MessageClass cls = msg.getMsgType().getMessageClass();
+            if(dispatchType == DispatchType.GROUP) {
+                long grp = msg.getGroupId();
 
-            if(msg.getEndpoint() != null) {
-                cls = MessageType.MessageClass.SINGLE;
-            }
+                if(!this.groupEP.containsKey(grp)) {
+                    return;
+                }
 
-            switch(cls) {
-                case INTERN:
-                    Dispatcher.LOGGER.log(Level.INFO, "msg-class is intern!");
-                    return false;
-
-                case SINGLE:
-                    if(msg.getEndpoint() == null) {
-                        Dispatcher.LOGGER.log(Level.WARNING, "msg contains not endpoint");
-                        return false;
-                    }
-                    encoder.addAdditionalWriter(new JSONStreamWriterSocket(msg.getEndpoint().getSocket()));
-                    break;
-
-                case GROUP:
-                    MessageType.MessageGroup grp = msg.getMsgType().getMessageGroup();
-
-                    if(!this.groupEP.containsKey(grp)) {
-                        return false;
-                    }
-
-                    for(Endpoint item : this.groupEP.get(grp)) {
-                        encoder.addAdditionalWriter(new JSONStreamWriterSocket(item.getSocket()));
-                    }
-                    break;
+                for(Endpoint item : this.groupEP.get(grp)) {
+                    encoder.addAdditionalWriter(new JSONStreamWriterSocket(item.getSocket()));
+                }
+            } else {
+                if(msg.getEndpoint() == null) {
+                    Dispatcher.LOGGER.log(Level.WARNING, "msg contains not endpoint");
+                    return;
+                }
+                encoder.addAdditionalWriter(new JSONStreamWriterSocket(msg.getEndpoint().getSocket()));
             }
             encoder.encodeMsg(msg);
-            return true;
         } catch(IOException | JSONException e) {
             Dispatcher.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
         }
-        return false;
     }
 }

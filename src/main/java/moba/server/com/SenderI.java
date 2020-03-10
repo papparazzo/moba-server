@@ -23,5 +23,10 @@ package moba.server.com;
 import moba.server.messages.Message;
 
 public interface SenderI {
-    public boolean dispatch(Message msg);
+    public enum DispatchType {
+        SINGLE,
+        GROUP
+    }
+
+    public void dispatch(Message msg, DispatchType dispatchType);
 }
