@@ -22,23 +22,21 @@ package moba.server.messages.messageType;
 
 import moba.server.messages.MessageType;
 
-public enum ClientMessage implements MessageType {
-    VOID        (1),
-    ECHO_REQ    (2),
-    ECHO_RES    (3),
-    ERROR       (4),
-    START       (5),
-    CONNECTED   (6),
-    CLOSE       (7),
-    SHUTDOWN    (8),
-    RESET       (9),
-    SELF_TESTING(10);
+public enum ServerMessage implements MessageType {
+    NEW_CLIENT_STARTED (1),
+    CLIENT_CLOSED      (2),
+    RESET_CLIENT       (3),
+    INFO_REQ           (4),
+    INFO_RES           (5),
+    CON_CLIENTS_REQ    (6),
+    CON_CLIENTS_RES    (7),
+    SELF_TESTING_CLIENT(8);
 
-    public final static int GROUP_ID = 2;
+    public final static int GROUP_ID = 3;
 
     protected int messageId;
 
-    ClientMessage(int msgId) {
+    ServerMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -52,8 +50,8 @@ public enum ClientMessage implements MessageType {
         return messageId;
     }
 
-    public static ClientMessage fromId(int id) {
-        for(ClientMessage type : values()) {
+    public static ServerMessage fromId(int id) {
+        for(ServerMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }

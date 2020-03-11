@@ -22,23 +22,19 @@ package moba.server.messages.messageType;
 
 import moba.server.messages.MessageType;
 
-public enum ClientMessage implements MessageType {
-    VOID        (1),
-    ECHO_REQ    (2),
-    ECHO_RES    (3),
-    ERROR       (4),
-    START       (5),
-    CONNECTED   (6),
-    CLOSE       (7),
-    SHUTDOWN    (8),
-    RESET       (9),
-    SELF_TESTING(10);
+public enum EnvironmentMessage implements MessageType {
+    GET_ENVIRONMENT  (1),
+    SET_ENVIRONMENT  (2),
+    GET_AMBIENCE     (3),
+    SET_AMBIENCE     (4),
+    GET_AMBIENT_LIGHT(5),
+    SET_AMBIENT_LIGHT(6);
 
-    public final static int GROUP_ID = 2;
+    public final static int GROUP_ID = 5;
 
     protected int messageId;
 
-    ClientMessage(int msgId) {
+    EnvironmentMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -52,8 +48,8 @@ public enum ClientMessage implements MessageType {
         return messageId;
     }
 
-    public static ClientMessage fromId(int id) {
-        for(ClientMessage type : values()) {
+    public static EnvironmentMessage fromId(int id) {
+        for(EnvironmentMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }

@@ -17,28 +17,24 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
  *
  */
-
 package moba.server.messages.messageType;
 
 import moba.server.messages.MessageType;
 
-public enum ClientMessage implements MessageType {
-    VOID        (1),
-    ECHO_REQ    (2),
-    ECHO_RES    (3),
-    ERROR       (4),
-    START       (5),
-    CONNECTED   (6),
-    CLOSE       (7),
-    SHUTDOWN    (8),
-    RESET       (9),
-    SELF_TESTING(10);
+public enum SystemMessage implements MessageType {
+    SET_AUTOMATIC_MODE      (1),
+    SET_EMERGENCY_STOP      (2),
+    SET_STANDBY_MODE        (3),
+    GET_HARDWARE_STATE      (4),
+    HARDWARE_STATE_CHANGED  (5),
+    HARDWARE_SHUTDOWN       (6),
+    HARDWARE_RESET          (7);
 
-    public final static int GROUP_ID = 2;
+    public final static int GROUP_ID = 4;
 
     protected int messageId;
 
-    ClientMessage(int msgId) {
+    SystemMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -52,12 +48,13 @@ public enum ClientMessage implements MessageType {
         return messageId;
     }
 
-    public static ClientMessage fromId(int id) {
-        for(ClientMessage type : values()) {
+    public static SystemMessage fromId(int id) {
+        for(SystemMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }
         }
         return null;
     }
+
 }

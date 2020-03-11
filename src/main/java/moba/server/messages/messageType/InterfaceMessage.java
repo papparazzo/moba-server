@@ -17,18 +17,40 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
  *
  */
-
 package moba.server.messages.messageType;
 
+import moba.server.messages.MessageType;
 
-public class Environment {
-    protected static final int GROUP_ID = 5;
+public enum InterfaceMessage implements MessageType {
+    CONNECTIVITY_STATE_CHANGED(1),
+    CONTACT_TRIGGERED(2),
+    SET_BRAKE_VECTOR(3),
+    SET_LOC_SPEED(4);
 
-    protected static final int GET_ENVIRONMENT   = 1;
-    protected static final int SET_ENVIRONMENT   = 2;
-    protected static final int GET_AMBIENCE      = 3;
-    protected static final int SET_AMBIENCE      = 4;
-    protected static final int GET_AMBIENT_LIGHT = 5;
-    protected static final int SET_AMBIENT_LIGHT = 6;
+    public final static int GROUP_ID = 5;
 
+    protected int messageId;
+
+    InterfaceMessage(int msgId) {
+        messageId = msgId;
+    }
+
+    @Override
+    public int getGroupId() {
+        return GROUP_ID;
+    }
+
+    @Override
+    public int getMessageId() {
+        return messageId;
+    }
+
+    public static InterfaceMessage fromId(int id) {
+        for(InterfaceMessage type : values()) {
+            if(type.messageId == id) {
+                return type;
+            }
+        }
+        return null;
+    }
 }
