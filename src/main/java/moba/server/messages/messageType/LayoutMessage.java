@@ -21,17 +21,30 @@ package moba.server.messages.messageType;
 
 import moba.server.messages.MessageType;
 
-public enum InterfaceMessage implements MessageType {
-    CONNECTIVITY_STATE_CHANGED(1),
-    CONTACT_TRIGGERED         (2),
-    SET_BRAKE_VECTOR          (3),
-    SET_LOC_SPEED             (4);
+public enum LayoutMessage implements MessageType {
+    GET_LAYOUTS_REQ         (1),
+    GET_LAYOUTS_RES         (2),
+    DELETE_LAYOUT           (3),
+    LAYOUT_DELETED          (4),
+    CREATE_LAYOUT           (5),
+    LAYOUT_CREATED          (6),
+    UPDATE_LAYOUT           (7),
+    LAYOUT_UPDATED          (8),
+    UNLOCK_LAYOUT           (9),
+    LAYOUT_UNLOCKED         (10),
+    LOCK_LAYOUT             (11),
+    LAYOUT_LOCKED           (12),
+    GET_LAYOUT_REQ          (13),
+    GET_LAYOUT_READ_ONLY_REQ(14),
+    GET_LAYOUT_RES          (15),
+    SAVE_LAYOUT             (16),
+    LAYOUT_CHANGED          (17);
 
-    public final static int GROUP_ID = 6;
+    protected static final int GROUP_ID = 8;
 
     protected int messageId;
 
-    InterfaceMessage(int msgId) {
+    LayoutMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -45,12 +58,13 @@ public enum InterfaceMessage implements MessageType {
         return messageId;
     }
 
-    public static InterfaceMessage fromId(int id) {
-        for(InterfaceMessage type : values()) {
+    public static LayoutMessage fromId(int id) {
+        for(LayoutMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }
         }
         return null;
     }
+
 }

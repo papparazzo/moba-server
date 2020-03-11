@@ -30,7 +30,7 @@ public enum SystemMessage implements MessageType {
     HARDWARE_SHUTDOWN       (6),
     HARDWARE_RESET          (7);
 
-    public final static int GROUP_ID = 4;
+    public final static int GROUP_ID = 7;
 
     protected int messageId;
 

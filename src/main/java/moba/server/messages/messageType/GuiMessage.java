@@ -21,17 +21,14 @@ package moba.server.messages.messageType;
 
 import moba.server.messages.MessageType;
 
-public enum InterfaceMessage implements MessageType {
-    CONNECTIVITY_STATE_CHANGED(1),
-    CONTACT_TRIGGERED         (2),
-    SET_BRAKE_VECTOR          (3),
-    SET_LOC_SPEED             (4);
+public enum GuiMessage implements MessageType {
+    SYSTEM_NOTICE(1);
 
-    public final static int GROUP_ID = 6;
+    public final static int GROUP_ID = 9;
 
     protected int messageId;
 
-    InterfaceMessage(int msgId) {
+    GuiMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -45,12 +42,13 @@ public enum InterfaceMessage implements MessageType {
         return messageId;
     }
 
-    public static InterfaceMessage fromId(int id) {
-        for(InterfaceMessage type : values()) {
+    public static GuiMessage fromId(int id) {
+        for(GuiMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }
         }
         return null;
     }
+
 }

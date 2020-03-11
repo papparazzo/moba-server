@@ -22,12 +22,12 @@ package moba.server.messages.messageType;
 import moba.server.messages.MessageType;
 
 public enum InternMessage implements MessageType {
-    SERVER_SHUTDOWN(1),
-    SERVER_RESET(2),
-    FREE_RESOURCES(3),
+    SERVER_SHUTDOWN   (1),
+    SERVER_RESET      (2),
+    FREE_RESOURCES    (3),
     SET_HARDWARE_STATE(4);
 
-    public final static int GROUP_ID = 5;
+    public final static int GROUP_ID = 1;
 
     protected int messageId;
 
