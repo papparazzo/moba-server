@@ -48,6 +48,11 @@ public enum EnvironmentMessage implements MessageType {
         return messageId;
     }
 
+    @Override
+    public DispatchType getDispatchType() {
+        return DispatchType.GROUP;
+    }
+
     public static EnvironmentMessage fromId(int id) {
         for(EnvironmentMessage type : values()) {
             if(type.messageId == id) {

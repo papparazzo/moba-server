@@ -45,6 +45,11 @@ public enum InterfaceMessage implements MessageType {
         return messageId;
     }
 
+    @Override
+    public DispatchType getDispatchType() {
+        return DispatchType.SINGLE;
+    }
+
     public static InterfaceMessage fromId(int id) {
         for(InterfaceMessage type : values()) {
             if(type.messageId == id) {

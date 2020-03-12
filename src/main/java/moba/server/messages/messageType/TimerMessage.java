@@ -48,6 +48,11 @@ public enum TimerMessage implements MessageType {
         return messageId;
     }
 
+    @Override
+    public DispatchType getDispatchType() {
+        return DispatchType.GROUP;
+    }
+
     public static TimerMessage fromId(int id) {
         for(TimerMessage type : values()) {
             if(type.messageId == id) {

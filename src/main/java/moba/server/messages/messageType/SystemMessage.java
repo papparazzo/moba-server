@@ -48,6 +48,11 @@ public enum SystemMessage implements MessageType {
         return messageId;
     }
 
+    @Override
+    public DispatchType getDispatchType() {
+        return DispatchType.GROUP;
+    }
+
     public static SystemMessage fromId(int id) {
         for(SystemMessage type : values()) {
             if(type.messageId == id) {

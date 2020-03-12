@@ -45,6 +45,11 @@ public enum InternMessage implements MessageType {
         return messageId;
     }
 
+    @Override
+    public DispatchType getDispatchType() {
+        return DispatchType.SINGLE;
+    }
+
     public static InternMessage fromId(int id) {
         for(InternMessage type : values()) {
             if(type.messageId == id) {

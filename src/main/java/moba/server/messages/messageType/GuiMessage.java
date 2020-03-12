@@ -42,6 +42,11 @@ public enum GuiMessage implements MessageType {
         return messageId;
     }
 
+    @Override
+    public DispatchType getDispatchType() {
+        return DispatchType.GROUP;
+    }
+
     public static GuiMessage fromId(int id) {
         for(GuiMessage type : values()) {
             if(type.messageId == id) {

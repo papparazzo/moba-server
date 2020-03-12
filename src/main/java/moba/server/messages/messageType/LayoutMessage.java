@@ -22,30 +22,32 @@ package moba.server.messages.messageType;
 import moba.server.messages.MessageType;
 
 public enum LayoutMessage implements MessageType {
-    GET_LAYOUTS_REQ         (1),
-    GET_LAYOUTS_RES         (2),
-    DELETE_LAYOUT           (3),
-    LAYOUT_DELETED          (4),
-    CREATE_LAYOUT           (5),
-    LAYOUT_CREATED          (6),
-    UPDATE_LAYOUT           (7),
-    LAYOUT_UPDATED          (8),
-    UNLOCK_LAYOUT           (9),
-    LAYOUT_UNLOCKED         (10),
-    LOCK_LAYOUT             (11),
-    LAYOUT_LOCKED           (12),
-    GET_LAYOUT_REQ          (13),
-    GET_LAYOUT_READ_ONLY_REQ(14),
-    GET_LAYOUT_RES          (15),
-    SAVE_LAYOUT             (16),
-    LAYOUT_CHANGED          (17);
+    GET_LAYOUTS_REQ         (1, DispatchType.SINGLE),
+    GET_LAYOUTS_RES         (2, DispatchType.SINGLE),
+    DELETE_LAYOUT           (3, DispatchType.SINGLE),
+    LAYOUT_DELETED          (4, DispatchType.GROUP),
+    CREATE_LAYOUT           (5, DispatchType.SINGLE),
+    LAYOUT_CREATED          (6, DispatchType.GROUP),
+    UPDATE_LAYOUT           (7, DispatchType.SINGLE),
+    LAYOUT_UPDATED          (8, DispatchType.GROUP),
+    UNLOCK_LAYOUT           (9, DispatchType.SINGLE),
+    LAYOUT_UNLOCKED         (10, DispatchType.GROUP),
+    LOCK_LAYOUT             (11, DispatchType.SINGLE),
+    LAYOUT_LOCKED           (12, DispatchType.GROUP),
+    GET_LAYOUT_REQ          (13, DispatchType.SINGLE),
+    GET_LAYOUT_READ_ONLY_REQ(14, DispatchType.SINGLE),
+    GET_LAYOUT_RES          (15, DispatchType.SINGLE),
+    SAVE_LAYOUT             (16, DispatchType.SINGLE),
+    LAYOUT_CHANGED          (17, DispatchType.GROUP);
 
-    protected static final int GROUP_ID = 8;
+    public final static int GROUP_ID = 8;
 
     protected int messageId;
+    protected DispatchType dispatchType;
 
-    LayoutMessage(int msgId) {
+    LayoutMessage(int msgId, DispatchType dt) {
         messageId = msgId;
+        dispatchType = dt;
     }
 
     @Override
@@ -56,6 +58,11 @@ public enum LayoutMessage implements MessageType {
     @Override
     public int getMessageId() {
         return messageId;
+    }
+
+    @Override
+    public DispatchType getDispatchType() {
+        return dispatchType;
     }
 
     public static LayoutMessage fromId(int id) {

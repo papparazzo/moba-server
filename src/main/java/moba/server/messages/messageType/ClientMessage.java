@@ -52,6 +52,11 @@ public enum ClientMessage implements MessageType {
         return messageId;
     }
 
+    @Override
+    public DispatchType getDispatchType() {
+        return DispatchType.SINGLE;
+    }
+
     public static ClientMessage fromId(int id) {
         for(ClientMessage type : values()) {
             if(type.messageId == id) {
