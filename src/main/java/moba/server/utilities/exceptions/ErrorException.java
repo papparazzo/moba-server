@@ -21,16 +21,21 @@
 package moba.server.utilities.exceptions;
 
 import moba.server.datatypes.enumerations.ErrorId;
+import moba.server.datatypes.objects.ErrorData;
 
 public class ErrorException extends Exception {
 
     private Throwable cause;
 
-    private ErrorId errorId;
+    private ErrorData errorData;
+
+    public ErrorException(ErrorData error) {
+        super(error.toString());
+        errorData = error;
+    }
 
     public ErrorException(ErrorId errorId, String message) {
-        super(message);
-        this.errorId = errorId;
+        this(new ErrorData(errorId, message));
     }
 
     public ErrorException(Throwable t) {
@@ -48,7 +53,12 @@ public class ErrorException extends Exception {
         return cause;
     }
 
-    public ErrorId getErrorId() {
-        return errorId;
+    @Override
+    public String toString() {
+        return errorData.toString();
+    }
+
+    public ErrorData getErrorData() {
+        return errorData;
     }
 }

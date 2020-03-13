@@ -26,8 +26,15 @@ import java.util.Date;
 import moba.server.datatypes.objects.NoticeData;
 import moba.server.datatypes.objects.ErrorData;
 import moba.server.messages.Message;
+import moba.server.messages.messageType.ClientMessage;
+import moba.server.messages.messageType.GuiMessage;
 
 public class MessageLogger {
+    public enum MessageType {
+        IN_MESSAGE,
+        OUT_MESSAGE
+    }
+
     protected static final String ANSI_RESET  = "\u001B[0m";
     protected static final String ANSI_BLACK  = "\u001B[30m";
     protected static final String ANSI_RED    = "\u001B[31m";
@@ -48,14 +55,14 @@ public class MessageLogger {
     public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
 
     public static void in(Message msg) {
-        MessageLogger.print(msg, true);
+        MessageLogger.print(msg, MessageType.IN_MESSAGE);
     }
 
     public static void out(Message msg) {
-        MessageLogger.print(msg, false);
+        MessageLogger.print(msg, MessageType.OUT_MESSAGE);
     }
 
-    protected static void print(Message msg, boolean in) {
+    protected static void print(Message msg, MessageType type) {
         if(msg == null) {
             return;
         }
@@ -63,16 +70,18 @@ public class MessageLogger {
         StringBuilder sb = new StringBuilder();
         SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS ");
         sb.append(df.format(new Date()));
-        if(in) {
+        if(type == MessageType.IN_MESSAGE) {
             sb.append("--> ");
         } else {
             sb.append("<-- ");
         }
-        sb.append(msg.getMsgType().toString());
+        sb.append("[");
+        sb.append(msg.getGroupId());
+        sb.append(":");
+        sb.append(msg.getMessageId());
+        sb.append("] ");
         appendText(sb, msg);
-        sb.append(" [");
-        sb.append(msg.getMsgType().getMessageClass().toString());
-        sb.append("] EP-");
+        sb.append(" EP-");
         if(msg.getEndpoint() == null) {
             sb.append("0: NULL");
         } else {
@@ -82,22 +91,22 @@ public class MessageLogger {
     }
 
     protected static void appendText(StringBuilder sb, Message msg) {
-        switch(msg.getMsgType()) {
-            case SYSTEM_NOTICE:
-                sb.append(ANSI_CYAN);
-                sb.append(" >> ");
-                printSystemNotice(sb, (NoticeData)msg.getData());
-                sb.append(" <<");
-                sb.append(ANSI_RESET);
-                break;
-
-            case ERROR:
-                sb.append(ANSI_CYAN);
-                sb.append(" >> ");
-                sb.append(((ErrorData)msg.getData()).toString());
-                sb.append(" <<");
-                sb.append(ANSI_RESET);
-                break;
+        int msgId = msg.getMessageId();
+        if(msgId == GuiMessage.SYSTEM_NOTICE.getMessageId()) {
+            sb.append(ANSI_CYAN);
+            sb.append(" >> ");
+            printSystemNotice(sb, (NoticeData)msg.getData());
+            sb.append(" <<");
+            sb.append(ANSI_RESET);
+            return;
+        }
+        if(msgId == ClientMessage.ERROR.getMessageId()) {
+            sb.append(ANSI_CYAN);
+            sb.append(" >> ");
+            sb.append(((ErrorData)msg.getData()).toString());
+            sb.append(" <<");
+            sb.append(ANSI_RESET);
+            return;
         }
     }
 

@@ -26,7 +26,6 @@ import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.enumerations.ThreeState;
 import moba.server.datatypes.objects.ColorThemeData;
-import moba.server.datatypes.objects.ErrorData;
 import moba.server.datatypes.objects.GlobalTimerData;
 import java.io.IOException;
 import java.util.HashMap;
@@ -37,11 +36,12 @@ import java.util.concurrent.TimeUnit;
 import moba.server.json.JSONException;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
-import moba.server.messages.MessageType;
+import moba.server.messages.messageType.TimerMessage;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.config.ConfigException;
+import moba.server.utilities.exceptions.ErrorException;
 
-public class GlobalTimer extends MessageHandlerA implements Runnable {
+public class Timer extends MessageHandlerA implements Runnable {
     protected SenderI         dispatcher = null;
     protected Config          config = null;
     protected final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -51,10 +51,15 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
     protected ColorTheme       curTheme = null;
     protected volatile boolean isRunning = false;
 
-    public GlobalTimer(SenderI dispatcher, Config config) {
+    public Timer(SenderI dispatcher, Config config) {
         this.dispatcher = dispatcher;
         this.config = config;
         this.scheduler.scheduleWithFixedDelay(this, 1, 1, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public int getGroupId() {
+        return TimerMessage.GROUP_ID;
     }
 
     @Override
@@ -91,44 +96,39 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
     }
 
     @Override
-    public void handleMsg(Message msg) {
+    public void handleMsg(Message msg) throws ErrorException {
         try {
-            switch(msg.getMsgType()) {
+            switch(TimerMessage.fromId(msg.getMessageId())) {
                 case GET_GLOBAL_TIMER:
                     dispatcher.dispatch(
-                        new Message(MessageType.SET_GLOBAL_TIMER, timerData, msg.getEndpoint())
+                        new Message(TimerMessage.SET_GLOBAL_TIMER, timerData, msg.getEndpoint())
                     );
                     break;
 
                 case SET_GLOBAL_TIMER:
                     timerData.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(new Message(MessageType.SET_GLOBAL_TIMER, timerData)
-                    );
+                    dispatcher.dispatch(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData));
                     break;
 
                 case GET_COLOR_THEME:
-                    dispatcher.dispatch(
-                        new Message(MessageType.SET_COLOR_THEME, themeData, msg.getEndpoint())
-                    );
-                    dispatcher.dispatch(
-                        new Message(MessageType.COLOR_THEME_EVENT, curTheme, msg.getEndpoint())
-                    );
+                    dispatcher.dispatch(new Message(TimerMessage.SET_COLOR_THEME, themeData, msg.getEndpoint()));
+                    dispatcher.dispatch(new Message(TimerMessage.COLOR_THEME_EVENT, curTheme, msg.getEndpoint()));
                     break;
 
                 case SET_COLOR_THEME:
                     themeData.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(new Message(MessageType.SET_COLOR_THEME, themeData));
+                    dispatcher.dispatch(new Message(TimerMessage.SET_COLOR_THEME, themeData));
                     break;
 
                 default:
-                    throw new UnsupportedOperationException("unknow msg <" + msg.getMsgType().toString() + ">.");
+                    throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
             }
         } catch(java.lang.ClassCastException | IOException | JSONException | ConfigException | NullPointerException e) {
-            dispatcher.dispatch(new Message(MessageType.ERROR, new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()), msg.getEndpoint()));
+            throw new ErrorException(ErrorId.FAULTY_MESSAGE, e.getMessage());
         } catch(IllegalArgumentException e) {
-            dispatcher.dispatch(new Message(MessageType.ERROR, new ErrorData(ErrorId.INVALID_DATA_SEND, e.getMessage()), msg.getEndpoint()));
+            throw new ErrorException(ErrorId.INVALID_DATA_SEND, e.getMessage());
         }
     }
 
@@ -139,7 +139,7 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
                 return;
             }
             if(timerData.setTick()) {
-                dispatcher.dispatch(new Message(MessageType.GLOBAL_TIMER_EVENT, timerData));
+                dispatcher.dispatch(new Message(TimerMessage.GLOBAL_TIMER_EVENT, timerData));
             }
 
             if(themeData.getColorThemeCondition() != ThreeState.AUTO) {
@@ -162,7 +162,7 @@ public class GlobalTimer extends MessageHandlerA implements Runnable {
                 curTheme = ColorTheme.BRIGHT;
             }
 
-            dispatcher.dispatch(new Message(MessageType.COLOR_THEME_EVENT, curTheme));
+            dispatcher.dispatch(new Message(TimerMessage.COLOR_THEME_EVENT, curTheme));
         } catch(Exception e) {
 
         }

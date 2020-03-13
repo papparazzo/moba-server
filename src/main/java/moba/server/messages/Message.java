@@ -27,7 +27,9 @@ public class Message implements Comparable {
 
     protected Endpoint    endpoint = null;
     protected Object      data     = null;
-    protected MessageType msgType;
+    protected int         groupId;
+    protected int         messageId;
+    protected MessageType messageType = null;
 
     public static final String MSG_HEADER_GROUP = "msgGroup";
     public static final String MSG_HEADER_NAME  = "msgName";
@@ -36,17 +38,31 @@ public class Message implements Comparable {
     public Message(MessageType msgType, Object data, Endpoint ep) {
         this(msgType, data);
         endpoint = ep;
+        messageType = msgType;
     }
 
     public Message(MessageType msgType, Object data) {
-        this(msgType);
+        this(msgType.getGroupId(), msgType.getMessageId(), data);
+    }
+
+    public Message(int groupId, int msgId, Object data, Endpoint ep) {
+        this(groupId, msgId, data);
+        endpoint = ep;
+    }
+
+    public Message(int grpId, int msgId, Object data) {
+        this(grpId, msgId);
         this.data = data;
     }
 
-    public Message(MessageType msgType) {
-        // throw Excpetion if msgType == null
-        this.msgType = msgType;
-        trigger = System.currentTimeMillis() + msgType.getMessagePriority().getOffset();
+    public Message(int grpId, int msgId) {
+        if (grpId < 1 || msgId < 1) {
+            throw new ExceptionInInitializerError("invalid data given");
+        }
+
+        groupId = grpId;
+        messageId = msgId;
+        trigger = System.currentTimeMillis();
     }
 
     @Override
@@ -71,12 +87,16 @@ public class Message implements Comparable {
         return data;
     }
 
-    public MessageType getMsgType() {
-        return msgType;
+    public int getMessageId() {
+        return messageId;
     }
 
-    public MessageType.MessageGroup getMsgGroup() {
-        return msgType.getMessageGroup();
+    public int getGroupId() {
+        return groupId;
+    }
+
+    public MessageType getMessageType() {
+        return messageType;
     }
 
     @Override
@@ -86,7 +106,7 @@ public class Message implements Comparable {
         if(endpoint != null) {
             rv = "<" + endpoint.getSocket().toString() + ">";
         }
-        rv += "<" + msgType.toString() + ">";
+        rv += "<" + Long.toString(groupId) + ":" + Long.toString(messageId) + ">";
 
         if(data != null) {
             rv += "<" + data.toString() + ">";

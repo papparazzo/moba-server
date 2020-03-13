@@ -26,15 +26,15 @@ import java.util.HashMap;
 import moba.server.application.ServerApplication;
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
-import moba.server.datatypes.objects.ErrorData;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.MessageType;
-
+import moba.server.messages.messageType.ClientMessage;
+import moba.server.messages.messageType.ServerMessage;
+import moba.server.utilities.exceptions.ErrorException;
 
 public class Server extends MessageHandlerA {
-
     protected Dispatcher dispatcher = null;
     protected ServerApplication app = null;
 
@@ -44,50 +44,49 @@ public class Server extends MessageHandlerA {
     }
 
     @Override
-    public void handleMsg(Message msg) {
-        switch(msg.getMsgType()) {
+    public int getGroupId() {
+        return ServerMessage.GROUP_ID;
+    }
+
+    @Override
+    public void handleMsg(Message msg)
+    throws ErrorException {
+        ServerMessage smsg = ServerMessage.fromId(msg.getMessageId());
+
+        switch(smsg) {
             case INFO_REQ:
                 handleServerInfoReq(msg.getEndpoint());
                 return;
 
             case CON_CLIENTS_REQ:
-                dispatcher.dispatch(new Message(MessageType.CON_CLIENTS_RES, dispatcher.getEndpoints(), msg.getEndpoint()));
+                dispatcher.dispatch(new Message(ServerMessage.CON_CLIENTS_RES, dispatcher.getEndpoints(), msg.getEndpoint()));
                 return;
         }
 
         if(!checkForSameOrigin(msg.getEndpoint())) {
-            dispatcher.dispatch(new Message(MessageType.ERROR, new ErrorData(ErrorId.SAME_ORIGIN_NEEDED), msg.getEndpoint()));
-            return;
+            throw new ErrorException(ErrorId.SAME_ORIGIN_NEEDED, "same origin needed");
         }
 
-        switch(msg.getMsgType()) {
+        switch(smsg) {
             case RESET_CLIENT:
-                sendToClient(msg, MessageType.RESET);
+                sendToClient(msg, ClientMessage.RESET);
                 break;
 
             case SELF_TESTING_CLIENT:
-                sendToClient(msg, MessageType.SELF_TESTING);
+                sendToClient(msg, ClientMessage.SELF_TESTING);
                 break;
 
             default:
-                throw new UnsupportedOperationException(
-                    "unknow msg <" + msg.getMsgType().toString() + ">."
-                );
+                throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
         }
     }
 
-    protected void sendToClient(Message msg, MessageType mType) {
+    protected void sendToClient(Message msg, MessageType mType) throws ErrorException {
         Endpoint ep = dispatcher.getEndpointByAppId((long)msg.getData());
-        if(ep != null) {
-            dispatcher.dispatch(new Message(mType, null, ep));
-            return;
+        if(ep == null) {
+            throw new ErrorException(ErrorId.INVALID_APP_ID, "app-id <" + msg.getData().toString() + "> is invalid");
         }
-        dispatcher.dispatch(new Message(
-                MessageType.ERROR,
-                new ErrorData(ErrorId.INVALID_APP_ID, "app-id <" + msg.getData().toString() + "> is invalid"),
-                msg.getEndpoint()
-            )
-        );
+        dispatcher.dispatch(new Message(mType, null, ep));
     }
 
     private boolean checkForSameOrigin(Endpoint ep) {
@@ -113,8 +112,6 @@ public class Server extends MessageHandlerA {
         map.put("maxClients",        app.getMaxClients());
         map.put("connectedClients",  dispatcher.getEndPointsCount());
 
-        map.put("supportedMessages", MessageType.values());
-
         map.put("osArch",            java.lang.System.getProperty("os.arch", ""));
         map.put("osName",            java.lang.System.getProperty("os.name", ""));
         map.put("osVersion",         java.lang.System.getProperty("os.version", ""));
@@ -122,6 +119,6 @@ public class Server extends MessageHandlerA {
         map.put("fwType",            java.lang.System.getProperty("java.vm.vendor", ""));
         map.put("fwVersion",         java.lang.System.getProperty("java.version", ""));
 
-        dispatcher.dispatch(new Message(MessageType.INFO_RES, map, ep));
+        dispatcher.dispatch(new Message(ServerMessage.INFO_RES, map, ep));
     }
 }

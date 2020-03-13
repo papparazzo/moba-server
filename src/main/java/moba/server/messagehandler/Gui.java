@@ -21,11 +21,16 @@
 package moba.server.messagehandler;
 
 import moba.server.com.SenderI;
+import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
-import moba.server.messages.MessageType;
+import moba.server.utilities.exceptions.ErrorException;
 
 public class Gui extends MessageHandlerA {
+    protected static final int GROUP_ID = 9;
+
+    protected static final int SYSTEM_NOTICE = 1;
+
     protected SenderI dispatcher = null;
 
     public Gui(SenderI dispatcher) {
@@ -33,20 +38,23 @@ public class Gui extends MessageHandlerA {
     }
 
     @Override
-    public void handleMsg(Message msg) {
-        switch(msg.getMsgType()) {
+    public int getGroupId() {
+        return GROUP_ID;
+    }
+
+    @Override
+    public void handleMsg(Message msg) throws ErrorException {
+        switch(msg.getMessageId()) {
             case SYSTEM_NOTICE:
                 sendSystemNotice(msg);
                 break;
+
+            default:
+                throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
         }
     }
 
     public void sendSystemNotice(Message msg) {
-        dispatcher.dispatch(
-            new Message(
-                MessageType.SYSTEM_NOTICE,
-                msg.getData()
-            )
-        );
+        dispatcher.dispatch(new Message(GROUP_ID, SYSTEM_NOTICE, msg.getData()));
     }
 }

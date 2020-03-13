@@ -30,25 +30,29 @@ import java.util.logging.Logger;
 
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
+import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
-import moba.server.messages.MessageType.MessageGroup;
+import moba.server.datatypes.objects.ErrorData;
+import moba.server.messages.messageType.ClientMessage;
+import moba.server.messages.messageType.InternMessage;
+import moba.server.utilities.exceptions.ErrorException;
 
 public class MessageLoop {
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-    protected Map<MessageGroup, MessageHandlerA> handlers = new HashMap<>();
+    protected Map<Integer, MessageHandlerA> handlers = new HashMap<>();
     protected Dispatcher dispatcher = null;
 
     public MessageLoop(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
     }
 
-    public void addHandler(MessageGroup msgGroup, MessageHandlerA msgHandler) {
+    public void addHandler(MessageHandlerA msgHandler) {
         msgHandler.init();
-        handlers.put(msgGroup, msgHandler);
+        handlers.put(msgHandler.getGroupId(), msgHandler);
     }
 
-    public Set<MessageGroup> getRegisteredHandlers() {
+    public Set<Integer> getRegisteredHandlers() {
         return handlers.keySet();
     }
 
@@ -58,12 +62,12 @@ public class MessageLoop {
             Message msg = in.take();
             MessageLoop.LOGGER.log(
                 Level.INFO,
-                "handle msg <{0}> from <{1}>",
-                new Object[]{msg.getMsgType(), msg.getEndpoint()}
+                "handle msg [{0}:{1}] from <{1}>",
+                new Object[]{msg.getGroupId(), msg.getMessageId(), msg.getEndpoint()}
             );
 
-            if(msg.getMsgType().getMessageGroup() == MessageGroup.BASE) {
-                switch(msg.getMsgType()) {
+            if(msg.getGroupId() == InternMessage.GROUP_ID) {
+                switch(InternMessage.fromId(msg.getMessageId())) {
                     case SERVER_RESET:
                         in.clear();
                         resetHandler();
@@ -83,21 +87,26 @@ public class MessageLoop {
                 }
             }
 
-            if(handlers.containsKey(msg.getMsgType().getMessageGroup())) {
-                handlers.get(msg.getMsgType().getMessageGroup()).handleMsg(msg);
+            if(!handlers.containsKey(msg.getGroupId())) {
+                ErrorData err =
+                    new ErrorData(ErrorId.UNKNOWN_GROUP_ID, "handler for msg-group <" + Integer.toString(msg.getGroupId()) + "> was not registered!");
+
+                MessageLoop.LOGGER.log(Level.WARNING, err.toString());
+
+                dispatcher.dispatch(new Message(ClientMessage.ERROR, err, msg.getEndpoint()));
                 continue;
             }
-
-            MessageLoop.LOGGER.log(
-                Level.SEVERE,
-                "handler for msg-group <{0}> was not registered!",
-                new Object[]{msg.getMsgType().getMessageGroup()}
-            );
+            try {
+                handlers.get(msg.getGroupId()).handleMsg(msg);
+            } catch(ErrorException e) {
+                MessageLoop.LOGGER.log(Level.WARNING, e.toString());
+                dispatcher.dispatch(new Message(ClientMessage.ERROR, e.getErrorData(), msg.getEndpoint()));
+            }
         }
     }
 
     protected void freeResources(long appId) {
-        Iterator<MessageGroup> iter = handlers.keySet().iterator();
+        Iterator<Integer> iter = handlers.keySet().iterator();
 
         while(iter.hasNext()) {
             handlers.get(iter.next()).freeResources(appId);
@@ -106,9 +115,9 @@ public class MessageLoop {
 
     protected void resetHandler() {
         for(Endpoint ep : dispatcher.getEndpoints()) {
-            dispatcher.dispatch(new Message(MessageType.RESET, null, ep));
+            dispatcher.dispatch(new Message(ClientMessage.RESET, null, ep));
         }
-        Iterator<MessageGroup> iter = handlers.keySet().iterator();
+        Iterator<Integer> iter = handlers.keySet().iterator();
         while(iter.hasNext()) {
             handlers.get(iter.next()).reset();
         }
@@ -116,16 +125,16 @@ public class MessageLoop {
 
     protected void shutdownHandler() {
         for(Endpoint ep : dispatcher.getEndpoints()) {
-            dispatcher.dispatch(new Message(MessageType.SHUTDOWN, null, ep));
+            dispatcher.dispatch(new Message(ClientMessage.SHUTDOWN, null, ep));
         }
-        Iterator<MessageGroup> iter = handlers.keySet().iterator();
+        Iterator<Integer> iter = handlers.keySet().iterator();
         while(iter.hasNext()) {
             handlers.get(iter.next()).shutdown();
         }
     }
 
     protected void hardwareStateChangedHandler(HardwareState state) {
-        Iterator<MessageGroup> iter = handlers.keySet().iterator();
+        Iterator<Integer> iter = handlers.keySet().iterator();
 
         while(iter.hasNext()) {
             handlers.get(iter.next()).hardwareStateChanged(state);

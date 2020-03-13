@@ -27,12 +27,15 @@ import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.enumerations.NoticeType;
 import moba.server.datatypes.objects.NoticeData;
 import java.util.concurrent.PriorityBlockingQueue;
+import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
-import moba.server.messages.MessageType;
+import moba.server.messages.messageType.GuiMessage;
+import moba.server.messages.messageType.InterfaceMessage;
+import moba.server.messages.messageType.InternMessage;
+import moba.server.utilities.exceptions.ErrorException;
 
 public class Interface extends MessageHandlerA {
-
     protected SenderI dispatcher = null;
     protected ServerApplication app = null;
 
@@ -43,9 +46,15 @@ public class Interface extends MessageHandlerA {
         this.msgQueueIn = msgQueueIn;
     }
 
+
     @Override
-    public void handleMsg(Message msg) {
-        switch(msg.getMsgType()) {
+    public int getGroupId() {
+        return InterfaceMessage.GROUP_ID;
+    }
+
+    @Override
+    public void handleMsg(Message msg) throws ErrorException {
+        switch(InterfaceMessage.fromId(msg.getMessageId())) {
             case CONNECTIVITY_STATE_CHANGED:
                 setConnectivity(Connectivity.valueOf((String)msg.getData()));
                 return;
@@ -53,21 +62,21 @@ public class Interface extends MessageHandlerA {
             case CONTACT_TRIGGERED:
 
             default:
-                throw new UnsupportedOperationException("unknow msg <" + msg.getMsgType().toString() + ">.");
+                throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
         }
     }
 
     private void setConnectivity(Connectivity connectivity) {
         switch(connectivity) {
             case CONNECTED:
-                msgQueueIn.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.MANUEL));
+                msgQueueIn.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
                 break;
 
             case ERROR:
-                msgQueueIn.add(new Message(MessageType.SET_HARDWARE_STATE, HardwareState.ERROR));
+                msgQueueIn.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.ERROR));
                 dispatcher.dispatch(
                     new Message(
-                        MessageType.SYSTEM_NOTICE,
+                        GuiMessage.SYSTEM_NOTICE,
                         new NoticeData(NoticeType.ERROR, "Hardwarefehler", "Die Verbindung zur Harware wurde unterbrochen")
                     )
                 );

@@ -28,14 +28,14 @@ import moba.server.com.SenderI;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.objects.AmbienceData;
 import moba.server.datatypes.objects.AmbientLightData;
-import moba.server.datatypes.objects.ErrorData;
 import moba.server.datatypes.objects.EnvironmentData;
 import moba.server.json.JSONException;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
-import moba.server.messages.MessageType;
+import moba.server.messages.messageType.EnvironmentMessage;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.config.ConfigException;
+import moba.server.utilities.exceptions.ErrorException;
 
 public class Environment extends MessageHandlerA {
     protected SenderI dispatcher = null;
@@ -48,6 +48,11 @@ public class Environment extends MessageHandlerA {
     public Environment(SenderI dispatcher, Config config) {
         this.dispatcher = dispatcher;
         this.config = config;
+    }
+
+    @Override
+    public int getGroupId() {
+        return EnvironmentMessage.GROUP_ID;
     }
 
     @Override
@@ -68,51 +73,49 @@ public class Environment extends MessageHandlerA {
     }
 
     @Override
-    public void handleMsg(Message msg) {
+    public void handleMsg(Message msg) throws ErrorException {
         try {
-            switch(msg.getMsgType()) {
+            switch(EnvironmentMessage.fromId(msg.getMessageId())) {
 
                 case GET_ENVIRONMENT:
                     dispatcher.dispatch(
-                        new Message(MessageType.SET_ENVIRONMENT, environment, msg.getEndpoint())
+                        new Message(EnvironmentMessage.SET_ENVIRONMENT, environment, msg.getEndpoint())
                     );
                     break;
 
                 case SET_ENVIRONMENT:
                     environment.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(new Message(MessageType.SET_ENVIRONMENT, environment));
+                    dispatcher.dispatch(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment));
                     break;
 
                 case GET_AMBIENCE:
-                    dispatcher.dispatch(new Message(MessageType.SET_AMBIENCE, ambience, msg.getEndpoint()));
+                    dispatcher.dispatch(new Message(EnvironmentMessage.SET_AMBIENCE, ambience, msg.getEndpoint()));
                     break;
 
                 case SET_AMBIENCE:
                     ambience.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(new Message(MessageType.SET_AMBIENCE, ambience));
+                    dispatcher.dispatch(new Message(EnvironmentMessage.SET_AMBIENCE, ambience));
                     break;
 
                 case GET_AMBIENT_LIGHT:
                     dispatcher.dispatch(
-                        new Message(MessageType.SET_AMBIENT_LIGHT, ambientLight, msg.getEndpoint())
+                        new Message(EnvironmentMessage.SET_AMBIENT_LIGHT, ambientLight, msg.getEndpoint())
                     );
                     break;
 
                 case SET_AMBIENT_LIGHT:
                     setAmbientLight((Map<String, Object>)msg.getData());
                     storeData();
-                    dispatcher.dispatch(new Message(MessageType.SET_AMBIENT_LIGHT, ambientLight));
+                    dispatcher.dispatch(new Message(EnvironmentMessage.SET_AMBIENT_LIGHT, ambientLight));
                     break;
 
                 default:
-                    throw new UnsupportedOperationException(
-                        "unknow msg <" + msg.getMsgType().toString() + ">."
-                    );
+                    throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
             }
         } catch(java.lang.ClassCastException | IOException | JSONException | ConfigException | NullPointerException | IllegalArgumentException e) {
-            dispatcher.dispatch(new Message(MessageType.ERROR, new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()), msg.getEndpoint()));
+            throw new ErrorException(ErrorId.FAULTY_MESSAGE, e.getMessage());
         }
     }
 

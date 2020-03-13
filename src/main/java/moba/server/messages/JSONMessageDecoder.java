@@ -39,8 +39,8 @@ public class JSONMessageDecoder extends JSONDecoder {
         reader.checkNext('{');
         reader.checkNext('"');
 
-        MessageType msgName = null;
-        MessageType.MessageGroup msgGroup = null;
+        int groupId = 0;
+        int messageId = 0;
         Object o = null;
 
         for(int i = 0; i < 3; i++) {
@@ -49,22 +49,12 @@ public class JSONMessageDecoder extends JSONDecoder {
             switch(key) {
                 case Message.MSG_HEADER_GROUP:
                     reader.checkNext('"');
-                    String group = nextKey();
-                    try {
-                        msgGroup = MessageType.MessageGroup.valueOf(group);
-                    } catch(IllegalArgumentException e) {
-                        throw new JSONMessageDecoderException("unknown message-group <" + group + "> arrived", e);
-                    }
+                    groupId = nextId();
                     break;
 
                 case Message.MSG_HEADER_NAME:
                     reader.checkNext('"');
-                    String name = nextKey();
-                    try {
-                        msgName = MessageType.valueOf(name);
-                    } catch(IllegalArgumentException e) {
-                        throw new JSONMessageDecoderException("unknown message <" + name + "> arrived", e);
-                    }
+                    messageId = nextId();
                     break;
 
                 case Message.MSG_HEADER_DATA:
@@ -81,9 +71,39 @@ public class JSONMessageDecoder extends JSONDecoder {
         }
         reader.checkNext('}');
 
-        if(msgName == null || msgGroup == null) {
+        if(groupId < 1 || messageId < 1) {
             throw new JSONMessageDecoderException("invalid message arrived");
         }
-        return new Message(msgName, o, ep);
+        return new Message(groupId, messageId, o, ep);
+    }
+
+    protected int nextId()
+    throws JSONException, IOException {
+        char c;
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
+            c = reader.peek(!strict);
+
+            if(",}".indexOf(c) != -1) {
+                String s = sb.toString();
+                s = s.trim();
+                if(s.isEmpty()) {
+                    throw new JSONException("empty value");
+                }
+
+                try {
+                    return Integer.valueOf(s);
+                } catch(NumberFormatException e) {
+                    throw new JSONException("parsing, error could not determine value: <" + s + ">", e);
+                }
+            }
+            reader.next();
+
+            if(!Character.isDigit(c)) {
+                throw new JSONException("parsing error");
+            }
+            sb.append(c);
+        }
+        throw new JSONException("maximum string-length of <" + JSONDecoder.MAX_STRING_LENGTH + "> reached!");
     }
 }

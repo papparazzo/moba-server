@@ -32,7 +32,6 @@ import moba.server.com.SenderI;
 import moba.server.database.Database;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.objects.TrackLayoutInfoData;
-import moba.server.datatypes.objects.ErrorData;
 import moba.server.datatypes.objects.TracklayoutSymbolData;
 import java.io.IOException;
 import java.util.Date;
@@ -42,14 +41,13 @@ import java.util.NoSuchElementException;
 import moba.server.json.JSONException;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
-import moba.server.messages.MessageType;
+import moba.server.messages.messageType.LayoutMessage;
 import moba.server.tracklayout.utilities.TracklayoutLock;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.config.ConfigException;
 import moba.server.utilities.exceptions.ErrorException;
 
 public class Layout extends MessageHandlerA {
-
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     protected Database  database   = null;
     protected SenderI   dispatcher = null;
@@ -62,6 +60,11 @@ public class Layout extends MessageHandlerA {
         this.dispatcher = dispatcher;
         this.lock       = lock;
         this.config     = config;
+    }
+
+    @Override
+    public int getGroupId() {
+        return LayoutMessage.GROUP_ID;
     }
 
     @Override
@@ -89,62 +92,52 @@ public class Layout extends MessageHandlerA {
     }
 
     @Override
-    public void handleMsg(Message msg) {
+    public void handleMsg(Message msg) throws ErrorException {
         try {
-            handleMsgUnsafe(msg);
+            switch(LayoutMessage.fromId(msg.getMessageId())) {
+                case GET_LAYOUTS_REQ:
+                    getLayouts(msg);
+                    break;
+
+                case GET_LAYOUT_REQ:
+                    getLayout(msg, true);
+                    break;
+
+                case GET_LAYOUT_READ_ONLY_REQ:
+                    getLayout(msg, false);
+                    break;
+
+                case DELETE_LAYOUT:
+                    deleteLayout(msg);
+                    break;
+
+                case CREATE_LAYOUT:
+                    createLayout(msg);
+                    break;
+
+                case UPDATE_LAYOUT:
+                    updateLayout(msg);
+                    break;
+
+                case UNLOCK_LAYOUT:
+                    unlockLayout(msg);
+                    break;
+
+                case LOCK_LAYOUT:
+                    lockLayout(msg);
+                    break;
+
+                case SAVE_LAYOUT:
+                    saveLayout(msg);
+                    break;
+
+                default:
+                    throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
+            }
         } catch(SQLException e) {
-            Layout.LOGGER.log(Level.WARNING, e.toString());
-            dispatcher.dispatch(new Message(MessageType.ERROR, new ErrorData(ErrorId.DATABASE_ERROR, e.getMessage()), msg.getEndpoint()));
+            throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
         } catch(ConfigException | IOException | JSONException e) {
-            Layout.LOGGER.log(Level.WARNING, e.toString());
-            dispatcher.dispatch(new Message(MessageType.ERROR, new ErrorData(ErrorId.UNKNOWN_ERROR, e.getMessage()), msg.getEndpoint()));
-        } catch(ErrorException e) {
-            Layout.LOGGER.log(Level.WARNING, e.toString());
-            dispatcher.dispatch(new Message(MessageType.ERROR, new ErrorData(e.getErrorId(), e.getMessage()), msg.getEndpoint()));
-        }
-    }
-
-    protected void handleMsgUnsafe(Message msg)
-    throws SQLException, IOException, JSONException, ConfigException, ErrorException {
-        switch(msg.getMsgType()) {
-            case GET_LAYOUTS_REQ:
-                getLayouts(msg);
-                break;
-
-            case GET_LAYOUT_REQ:
-                getLayout(msg, true);
-                break;
-
-            case GET_LAYOUT_READ_ONLY_REQ:
-                getLayout(msg, false);
-                break;
-
-            case DELETE_LAYOUT:
-                deleteLayout(msg);
-                break;
-
-            case CREATE_LAYOUT:
-                createLayout(msg);
-                break;
-
-            case UPDATE_LAYOUT:
-                updateLayout(msg);
-                break;
-
-            case UNLOCK_LAYOUT:
-                unlockLayout(msg);
-                break;
-
-            case LOCK_LAYOUT:
-                lockLayout(msg);
-                break;
-
-            case SAVE_LAYOUT:
-                saveLayout(msg);
-                break;
-
-            default:
-                throw new UnsupportedOperationException("unknow msg <" + msg.getMsgType().toString() + ">.");
+            throw new ErrorException(ErrorId.UNKNOWN_ERROR, e.getMessage());
         }
     }
 
@@ -169,7 +162,7 @@ public class Layout extends MessageHandlerA {
                 ));
             }
         }
-        dispatcher.dispatch(new Message(MessageType.GET_LAYOUTS_RES, arraylist, msg.getEndpoint()));
+        dispatcher.dispatch(new Message(LayoutMessage.GET_LAYOUTS_RES, arraylist, msg.getEndpoint()));
     }
 
     protected void deleteLayout(Message msg)
@@ -191,7 +184,7 @@ public class Layout extends MessageHandlerA {
         if(id == activeLayout) {
             storeData(-1);
         }
-        dispatcher.dispatch(new Message(MessageType.LAYOUT_DELETED, id));
+        dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_DELETED, id));
     }
 
     protected void createLayout(Message msg)
@@ -220,7 +213,7 @@ public class Layout extends MessageHandlerA {
                 tl.setId(id);
             }
         }
-        dispatcher.dispatch(new Message(MessageType.LAYOUT_CREATED, tl));
+        dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_CREATED, tl));
     }
 
     protected void updateLayout(Message msg)
@@ -252,7 +245,7 @@ public class Layout extends MessageHandlerA {
             if(active) {
                 storeData(id);
             }
-            dispatcher.dispatch(new Message(MessageType.LAYOUT_UPDATED, tl));
+            dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_UPDATED, tl));
         }
     }
 
@@ -260,14 +253,14 @@ public class Layout extends MessageHandlerA {
     throws SQLException, ErrorException {
         long id = getId(msg.getData());
         lock.unlockLayout(id, msg.getEndpoint());
-        dispatcher.dispatch(new Message(MessageType.LAYOUT_UNLOCKED, id));
+        dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_UNLOCKED, id));
     }
 
     protected void lockLayout(Message msg)
     throws SQLException, ErrorException {
         long id = getId(msg.getData());
         lock.lockLayout(id, msg.getEndpoint());
-        dispatcher.dispatch(new Message(MessageType.LAYOUT_LOCKED, id));
+        dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_LOCKED, id));
     }
 
     protected void getLayout(Message msg, boolean tryLock)
@@ -301,7 +294,7 @@ public class Layout extends MessageHandlerA {
                 ));
             }
             map.put("symbols", arraylist);
-            dispatcher.dispatch(new Message(MessageType.GET_LAYOUT_RES, map, msg.getEndpoint()));
+            dispatcher.dispatch(new Message(LayoutMessage.GET_LAYOUT_RES, map, msg.getEndpoint()));
         }
     }
 
@@ -362,7 +355,7 @@ public class Layout extends MessageHandlerA {
             }
         }
 
-        dispatcher.dispatch(new Message(MessageType.LAYOUT_CHANGED, map));
+        dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_CHANGED, map));
     }
 
     protected Date getCreationDate(long id)

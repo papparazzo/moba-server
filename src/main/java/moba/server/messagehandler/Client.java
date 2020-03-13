@@ -28,26 +28,36 @@ import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.objects.ErrorData;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
-import moba.server.messages.MessageType;
+import moba.server.messages.messageType.ClientMessage;
+import moba.server.messages.messageType.InternMessage;
+import moba.server.messages.messageType.ServerMessage;
+import moba.server.utilities.exceptions.ErrorException;
 
 public class Client extends MessageHandlerA {
 
     protected Dispatcher dispatcher = null;
-    protected PriorityBlockingQueue<Message> msgQueueIn = null;
+    protected PriorityBlockingQueue<Message> in = null;
 
     public Client(Dispatcher dispatcher, PriorityBlockingQueue<Message> msgQueue) {
         this.dispatcher = dispatcher;
-        this.msgQueueIn  = msgQueue;
+        this.in  = msgQueue;
     }
 
     @Override
-    public void handleMsg(Message msg) {
-        switch(msg.getMsgType()) {
+    public int getGroupId() {
+        return ClientMessage.GROUP_ID;
+    }
+
+    @Override
+    public void handleMsg(Message msg) throws ErrorException {
+        switch(ClientMessage.fromId(msg.getMessageId())) {
             case VOID:
                 break;
 
             case ECHO_REQ:
-                dispatcher.dispatch(new Message(MessageType.ECHO_RES, msg.getData(), msg.getEndpoint()));
+                dispatcher.dispatch(
+                    new Message(ClientMessage.ECHO_RES, msg.getData(), msg.getEndpoint())
+                );
                 break;
 
             case START:
@@ -63,9 +73,7 @@ public class Client extends MessageHandlerA {
                 break;
 
             default:
-                throw new UnsupportedOperationException(
-                    "unknow msg <" + msg.getMsgType().toString() + ">."
-                );
+                throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
         }
     }
 
@@ -74,21 +82,21 @@ public class Client extends MessageHandlerA {
         if(!dispatcher.addEndpoint(ep)) {
             dispatcher.dispatch(
                 new Message(
-                    MessageType.ERROR,
+                    ClientMessage.ERROR,
                     new ErrorData(ErrorId.INVALID_DATA_SEND, "Endpoint <" + ep.toString() + "> allready exists"),
                     msg.getEndpoint()
                 )
             );
             return;
         }
-        dispatcher.dispatch(new Message(MessageType.CONNECTED, ep.getAppId(), ep));
-        dispatcher.dispatch(new Message(MessageType.NEW_CLIENT_STARTED, ep));
+        dispatcher.dispatch(new Message(ClientMessage.CONNECTED, ep.getAppId(), ep));
+        dispatcher.dispatch(new Message(ServerMessage.NEW_CLIENT_STARTED, ep));
     }
 
     protected void handleClientClose(Message msg) {
-        msgQueueIn.add(new Message(MessageType.FREE_RESOURCES, (long)msg.getEndpoint().getAppId()));
+        in.add(new Message(InternMessage.FREE_RESOURCES, (long)msg.getEndpoint().getAppId()));
         dispatcher.removeEndpoint(msg.getEndpoint());
-        dispatcher.dispatch(new Message(MessageType.CLIENT_CLOSED, msg.getEndpoint().getAppId()));
+        dispatcher.dispatch(new Message(ServerMessage.CLIENT_CLOSED, msg.getEndpoint().getAppId()));
     }
 }
 

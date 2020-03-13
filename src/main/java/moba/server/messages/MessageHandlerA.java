@@ -21,12 +21,17 @@
 package moba.server.messages;
 
 import moba.server.datatypes.enumerations.HardwareState;
+import moba.server.utilities.exceptions.ErrorException;
 
 public abstract class MessageHandlerA {
-    public abstract void handleMsg(Message msg);
+
+    public abstract void handleMsg(Message msg)
+    throws ErrorException;
 
     public void freeResources(long appId) {
     }
+
+    public abstract int getGroupId();
 
     public void init()
     throws ExceptionInInitializerError {
