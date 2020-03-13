@@ -33,6 +33,7 @@ import moba.server.json.JSONException;
 import moba.server.json.streamwriter.JSONStreamWriterSocket;
 import moba.server.messages.JSONMessageEncoder;
 import moba.server.messages.Message;
+import moba.server.messages.MessageType;
 import moba.server.utilities.MessageLogger;
 
 public class Dispatcher implements SenderI {
@@ -149,7 +150,7 @@ public class Dispatcher implements SenderI {
     }
 
     @Override
-    public synchronized void dispatch(Message msg, DispatchType dispatchType) {
+    public synchronized void dispatch(Message msg) {
         try {
             if(msg == null) {
                 Dispatcher.LOGGER.log(Level.SEVERE, "msg is null!");
@@ -162,7 +163,15 @@ public class Dispatcher implements SenderI {
 
             JSONMessageEncoder encoder = new JSONMessageEncoder();
 
-            if(dispatchType == DispatchType.GROUP) {
+            MessageType mt = msg.getMessageType();;
+
+            if(mt == null || mt.getDispatchType() == MessageType.DispatchType.SINGLE) {
+                if(msg.getEndpoint() == null) {
+                    Dispatcher.LOGGER.log(Level.WARNING, "msg contains not endpoint");
+                    return;
+                }
+                encoder.addAdditionalWriter(new JSONStreamWriterSocket(msg.getEndpoint().getSocket()));
+            } else {
                 long grp = msg.getGroupId();
 
                 if(!this.groupEP.containsKey(grp)) {
@@ -172,12 +181,6 @@ public class Dispatcher implements SenderI {
                 for(Endpoint item : this.groupEP.get(grp)) {
                     encoder.addAdditionalWriter(new JSONStreamWriterSocket(item.getSocket()));
                 }
-            } else {
-                if(msg.getEndpoint() == null) {
-                    Dispatcher.LOGGER.log(Level.WARNING, "msg contains not endpoint");
-                    return;
-                }
-                encoder.addAdditionalWriter(new JSONStreamWriterSocket(msg.getEndpoint().getSocket()));
             }
             encoder.encodeMsg(msg);
         } catch(IOException | JSONException e) {

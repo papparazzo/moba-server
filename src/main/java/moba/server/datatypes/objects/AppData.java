@@ -30,12 +30,11 @@ import moba.server.json.JSONEncoder;
 import moba.server.json.JSONException;
 import moba.server.json.JSONToStringI;
 import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
-import moba.server.messages.MessageType;
 
 public class AppData implements JSONToStringI {
     protected String appName;
     protected Version version;
-    protected Set<MessageType.MessageGroup> msgGroups = new HashSet<>();
+    protected Set<Integer> msgGroups = new HashSet<>();
 
     // FIXME: fromJsonObject, Constructotr
 

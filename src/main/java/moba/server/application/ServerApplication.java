@@ -28,13 +28,12 @@ import moba.server.database.Database;
 import moba.server.database.DatabaseException;
 import moba.server.messagehandler.Client;
 import moba.server.messagehandler.Environment;
-import moba.server.messagehandler.GlobalTimer;
+import moba.server.messagehandler.Timer;
 import moba.server.messagehandler.Interface;
 import moba.server.messagehandler.Layout;
 import moba.server.messagehandler.Server;
 import moba.server.messagehandler.Systems;
 import moba.server.messages.MessageLoop;
-import moba.server.messages.MessageType;
 import moba.server.tracklayout.utilities.TracklayoutLock;
 
 public class ServerApplication extends Application {
@@ -53,13 +52,13 @@ public class ServerApplication extends Application {
                 Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
                 MessageLoop loop = new MessageLoop(dispatcher);
                 TracklayoutLock tracklayoutLock = new TracklayoutLock(dispatcher, database);
-                loop.addHandler(MessageType.MessageGroup.CLIENT, new Client(dispatcher, msgQueueIn));
-                loop.addHandler(MessageType.MessageGroup.SERVER, new Server(dispatcher, this));
-                loop.addHandler(MessageType.MessageGroup.TIMER, new GlobalTimer(dispatcher, config));
-                loop.addHandler(MessageType.MessageGroup.ENVIRONMENT, new Environment(dispatcher, config));
-                loop.addHandler(MessageType.MessageGroup.SYSTEM, new Systems(dispatcher, msgQueueIn));
-                loop.addHandler(MessageType.MessageGroup.LAYOUT, new Layout(dispatcher, database, tracklayoutLock, config));
-                loop.addHandler(MessageType.MessageGroup.INTERFACE, new Interface(dispatcher, msgQueueIn));
+                loop.addHandler(new Client(dispatcher, msgQueueIn));
+                loop.addHandler(new Server(dispatcher, this));
+                loop.addHandler(new Timer(dispatcher, config));
+                loop.addHandler(new Environment(dispatcher, config));
+                loop.addHandler(new Systems(dispatcher, msgQueueIn));
+                loop.addHandler(new Layout(dispatcher, database, tracklayoutLock, config));
+                loop.addHandler(new Interface(dispatcher, msgQueueIn));
                 acceptor.startAcceptor();
                 restart = loop.loop(msgQueueIn);
                 dispatcher.resetDispatcher();

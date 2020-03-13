@@ -25,13 +25,10 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Collections;
 
 import moba.server.datatypes.base.Version;
 import moba.server.datatypes.enumerations.ErrorId;
@@ -42,10 +39,11 @@ import moba.server.json.JSONToStringI;
 import moba.server.json.streamreader.JSONStreamReaderSocket;
 import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 import moba.server.json.stringreader.JSONStringReader;
+import moba.server.messagehandler.Client;
 import moba.server.messages.JSONMessageDecoder;
 import moba.server.messages.JSONMessageDecoderException;
 import moba.server.messages.Message;
-import moba.server.messages.MessageType;
+import moba.server.messages.messageType.ClientMessage;
 import moba.server.utilities.MessageLogger;
 
 public class Endpoint extends Thread implements JSONToStringI {
@@ -58,7 +56,7 @@ public class Endpoint extends Thread implements JSONToStringI {
     protected Version  version;
     protected String   appName;
 
-    protected Set<MessageType.MessageGroup>  msgGroups = new HashSet<>();
+    protected ArrayList<Long>  msgGroups = new ArrayList<>();
     protected PriorityBlockingQueue<Message> in = null;
 
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -85,14 +83,14 @@ public class Endpoint extends Thread implements JSONToStringI {
         try {
             JSONMessageDecoder decoder = new JSONMessageDecoder(new JSONStringReader(new JSONStreamReaderSocket(socket)));
             Message msg = decoder.decodeMsg(this);
-            Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: new message <{1}> arrived", new Object[]{id, msg.getMsgType().toString()} );
+            Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: new message <{1}> arrived", new Object[]{id, msg.getMessageId()} );
             MessageLogger.in(msg);
             return msg;
         } catch(IOException | JSONException e) {
-            if(!closing) {
-                throw new IOException(e);
+            if(closing) {
+                return null;
             }
-            return new Message(MessageType.VOID);
+            throw new IOException(e);
         }
     }
 
@@ -138,10 +136,12 @@ public class Endpoint extends Thread implements JSONToStringI {
             }
         } catch(IOException e) {
             Endpoint.LOGGER.log(Level.WARNING, "Endpoint #{0}: IOException, send <CLIENT_CLOSE> <{1}>", new Object[]{id, e.toString()});
-            in.add(new Message(MessageType.CLOSE, null, this));
+            in.add(new Message(ClientMessage.CLOSE, null, this));
         } catch(JSONMessageDecoderException e) {
             Endpoint.LOGGER.log(Level.WARNING, "Endpoint #{0}: JSONMessageDecoderException, send <> <{1}>", new Object[]{id, e.toString()});
-            in.add(new Message(MessageType.ERROR, new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()), this));
+            in.add(new Message(ClientMessage.ERROR, new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()), this));
+        } catch(NullPointerException e) {
+            // noop
         }
         Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
     }
@@ -154,7 +154,7 @@ public class Endpoint extends Thread implements JSONToStringI {
         return id;
     }
 
-    public Set<MessageType.MessageGroup> getMsgGroups() {
+    public ArrayList<Long> getMsgGroups() {
         return msgGroups;
     }
 
@@ -175,34 +175,20 @@ public class Endpoint extends Thread implements JSONToStringI {
         } catch(JSONMessageDecoderException e) {
             throw new IOException(e);
         }
-        MessageType mtype = msg.getMsgType();
-
-        if(mtype != MessageType.START && mtype != MessageType.CONNECTED) {
-            throw new IOException("first msg is neither CLIENT_START nor CLIENT_CONNECTED");
-        }
-        if(mtype == MessageType.CONNECTED) {
-            return;
+        if(
+            ClientMessage.GROUP_ID != msg.getGroupId() ||
+            ClientMessage.START.getMessageId() != msg.getMessageId()
+        ) {
+            throw new IOException("first msg is neither CLIENT_START");
         }
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         appName = (String)map.get("appName");
         version = new Version((String)map.get("version"));
         Object o = map.get("msgGroups");
-        if(o instanceof ArrayList) {
-            ArrayList<String> arrayList = (ArrayList<String>)o;
-            if(arrayList.isEmpty()) {
-                Endpoint.LOGGER.log(Level.INFO, "arrayList is empty. Take all groups");
-                Collections.addAll(msgGroups, MessageType.MessageGroup.values());
-            } else {
-                for(String item : arrayList) {
-                    try {
-                        MessageType.MessageGroup grp = MessageType.MessageGroup.valueOf(item);
-                        msgGroups.add(grp);
-                    } catch(IllegalArgumentException e) {
-                        Endpoint.LOGGER.log(Level.WARNING, "ignoring unknown message-group <{0}>", new Object[]{item});
-                    }
-                }
-            }
+        if(!(o instanceof ArrayList)) {
+            throw new IOException("invalid msg groups given");
         }
+        msgGroups = (ArrayList<Long>)o;
         in.add(msg);
     }
 }
