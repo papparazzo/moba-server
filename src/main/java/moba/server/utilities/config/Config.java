@@ -39,7 +39,7 @@ public class Config {
     throws IOException, JSONException {
         JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderFile(fileName)), false);
         this.fileName = fileName;
-        content = decoder.decode();
+        content = (Map<String, Object>)decoder.decode();
     }
 
     public void writeFile()

@@ -43,9 +43,9 @@ public class JSONDecoder {
         this.strict = strict;
     }
 
-    public Map<String, Object> decode()
+    public Object decode()
     throws JSONException, IOException {
-        return nextObject();
+        return nextValue();
     }
 
     protected String nextKey()

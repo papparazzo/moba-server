@@ -71,13 +71,13 @@ public class JSONEncoder {
         writers.add(writer);
     }
 
-    public void encode(Map map)
+    public void encode(Object map)
     throws IOException, JSONException {
-        addObject(map);
+        addJSONValue(map);
         flush();
     }
 
-    public void encode(Map map, int indent)
+    public void encode(Object map, int indent)
     throws IOException, JSONException {
         this.indent = indent;
         encode(map);
