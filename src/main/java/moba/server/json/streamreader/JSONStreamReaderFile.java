@@ -26,7 +26,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class JSONStreamReaderFile implements JSONStreamReaderI {
-    private BufferedReader fh;
+    private final BufferedReader fh;
 
     public JSONStreamReaderFile(String fileName)
     throws FileNotFoundException {
