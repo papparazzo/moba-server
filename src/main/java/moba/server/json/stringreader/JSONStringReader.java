@@ -92,6 +92,11 @@ public class JSONStringReader {
         return (char)c;
     }
 
+    public String next(int n)
+    throws IOException {
+        return next(n, false);
+    }
+
     public String next(int n, boolean ignoreWhitespace)
     throws IOException {
         StringBuilder sb = new StringBuilder();
@@ -104,10 +109,5 @@ public class JSONStringReader {
             sb.append(c);
         }
         return sb.toString();
-    }
-
-    public String next(int n)
-    throws IOException {
-        return next(n, false);
     }
 }
