@@ -35,19 +35,8 @@ import moba.server.json.streamwriter.JSONStreamWriterI;
 public class JSONEncoder {
     protected boolean          formated;
     protected int              indent = 0;
-    protected static final int MAX_STR_LENGTH = 4096;
 
-    protected StringBuilder sb = new StringBuilder(JSONEncoder.MAX_STR_LENGTH);
-
-    protected ArrayList<JSONStreamWriterI> writers = new ArrayList<>();
-
-    public JSONEncoder() {
-        this(false);
-    }
-
-    public JSONEncoder(boolean formated) {
-        this.formated = formated;
-    }
+    protected JSONStreamWriterI writer = null;
 
     public JSONEncoder(JSONStreamWriterI writer)
     throws IOException {
@@ -60,21 +49,13 @@ public class JSONEncoder {
             throw new IOException("stream-writer not set");
         }
         this.formated = formated;
-        writers.add(writer);
-    }
-
-    public void addAdditionalWriter(JSONStreamWriterI writer)
-    throws IOException {
-        if(writer == null) {
-            throw new IOException("stream-writer not set");
-        }
-        writers.add(writer);
+        this.writer = writer;
     }
 
     public void encode(Object map)
     throws IOException, JSONException {
         addJSONValue(map);
-        flush();
+        writer.close();
     }
 
     public void encode(Object map, int indent)
@@ -85,21 +66,21 @@ public class JSONEncoder {
 
     protected void addObject(Map map)
     throws IOException, JSONException {
-        write('{');
+        writer.write('{');
         if(map != null) {
             Iterator iter = map.entrySet().iterator();
             while(iter.hasNext()) {
                 Map.Entry entry = (Map.Entry)iter.next();
-                write('"');
-                write((String)entry.getKey());
-                write("\":");
+                writer.write('"');
+                writer.write((String)entry.getKey());
+                writer.write("\":");
                 addJSONValue(entry.getValue());
                 if(iter.hasNext()) {
-                    write(',');
+                    writer.write(',');
                 }
             }
         }
-        write('}');
+        writer.write('}');
     }
 
     protected void addJSONValue(Object object)
@@ -129,7 +110,7 @@ public class JSONEncoder {
         } else if(object instanceof InetAddress) {
             addInetAddr((InetAddress)object);
         } else if(object instanceof JSONToStringI) {
-            write(((JSONToStringI)object).toJsonString(formated, indent));
+            writer.write(((JSONToStringI)object).toJsonString(formated, indent));
         } else if(object instanceof Set) {
             addSet((Set)object);
         } else {
@@ -140,50 +121,50 @@ public class JSONEncoder {
     protected void addBoolean(boolean value)
     throws IOException {
         if(value) {
-            write("true");
+            writer.write("true");
             return;
         }
-        write("false");
+        writer.write("false");
     }
 
     protected void addArray(ArrayList arraylist)
     throws IOException, JSONException {
-        write('[');
+        writer.write('[');
         for(int i = 0; i < arraylist.size(); ++i) {
             if(i != 0) {
-                write(',');
+                writer.write(',');
             }
             addJSONValue(arraylist.get(i));
         }
-        write(']');
+        writer.write(']');
     }
 
     protected void addSet(Set setlist)
     throws IOException, JSONException {
-        write('[');
+        writer.write('[');
         boolean fr = true;
         for(Object item : setlist) {
             if(!fr) {
-                write(',');
+                writer.write(',');
             }
             addJSONValue(item);
             fr = false;
         }
-        write(']');
+        writer.write(']');
     }
 
     protected void addArray(Object[] array)
     throws IOException, JSONException {
-        write('[');
+        writer.write('[');
         boolean fr = true;
         for(Object item : array) {
             if(!fr) {
-                write(',');
+                writer.write(',');
             }
             addJSONValue(item);
             fr = false;
         }
-        write(']');
+        writer.write(']');
     }
 
     protected void addString(String str)
@@ -191,24 +172,24 @@ public class JSONEncoder {
         // TODO Sonderzeichen maskieren!!
         //str.replace("\n", "\\n");
         //str.replace("\n", "\\n");
-        write('"');
-        write(str);
-        write('"');
+        writer.write('"');
+        writer.write(str);
+        writer.write('"');
     }
 
     protected void addNull()
     throws IOException {
-        write("null");
+        writer.write("null");
     }
 
     protected void addLong(Object obj)
     throws IOException {
-        write(String.valueOf(obj));
+        writer.write(String.valueOf(obj));
     }
 
     protected void addDouble(Object obj)
     throws IOException {
-        write(String.valueOf(obj));
+        writer.write(String.valueOf(obj));
     }
 
     protected void addDate(Date date)
@@ -234,7 +215,7 @@ public class JSONEncoder {
         }
 
         indent += indent * 4;
-        write(System.getProperty("line.separator"));
+        writer.write(System.getProperty("line.separator"));
         for(int i = 0; i < indent; i++) {
             write(' ');
         }
@@ -246,46 +227,23 @@ public class JSONEncoder {
         switch(c) {
             case '{':
             case '[':
-                sb.append(c);
+                writer.write(c);
                 addFormatStr(1);
                 break;
 
             case ',':
-                sb.append(c);
+                writer.write(c);
                 addFormatStr(0);
                 break;
 
             case '}':
             case ']':
                 addFormatStr(-1);
-                sb.append(c);
+                writer.write(c);
                 break;
 
             default:
-                sb.append(c);
+                writer.write(c);
         }
-
-        if(JSONEncoder.MAX_STR_LENGTH == sb.length()) {
-            throw new IndexOutOfBoundsException();
-        }
-    }
-
-    protected void write(String s)
-    throws IOException {
-        if(JSONEncoder.MAX_STR_LENGTH < sb.length() + s.length()) {
-            throw new IndexOutOfBoundsException();
-        }
-        sb.append(s);
-    }
-
-    protected void flush()
-    throws IOException {
-        String s = sb.toString();
-//System.err.print(s);
-        for(JSONStreamWriterI writer : writers) {
-            writer.write(s);
-            writer.close();
-        }
-        sb.delete(0, sb.length());
     }
 }

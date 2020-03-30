@@ -28,10 +28,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import moba.server.json.JSONEncoder;
 
 import moba.server.json.JSONException;
+import moba.server.json.streamwriter.JSONMultiStreamWriter;
+import moba.server.json.streamwriter.JSONStreamWriterI;
 import moba.server.json.streamwriter.JSONStreamWriterSocket;
-import moba.server.messages.JSONMessageEncoder;
 import moba.server.messages.Message;
 import moba.server.messages.MessageType;
 import moba.server.utilities.MessageLogger;
@@ -161,16 +163,14 @@ public class Dispatcher implements SenderI {
                 Level.INFO, "try to send message [{0}:{1}]", new Object[]{msg.getGroupId(), msg.getMessageId()}
             );
 
-            JSONMessageEncoder encoder = new JSONMessageEncoder();
-
-            MessageType mt = msg.getMessageType();;
+            MessageType mt = msg.getMessageType();
 
             if(mt == null || mt.getDispatchType() == MessageType.DispatchType.SINGLE) {
                 if(msg.getEndpoint() == null) {
                     Dispatcher.LOGGER.log(Level.WARNING, "msg contains not endpoint");
                     return;
                 }
-                encoder.addAdditionalWriter(new JSONStreamWriterSocket(msg.getEndpoint().getSocket()));
+                sendMessage(msg, new JSONStreamWriterSocket(msg.getEndpoint().getSocket()));
             } else {
                 long grp = msg.getGroupId();
 
@@ -178,13 +178,24 @@ public class Dispatcher implements SenderI {
                     return;
                 }
 
+                JSONMultiStreamWriter writer = new JSONMultiStreamWriter();
                 for(Endpoint item : this.groupEP.get(grp)) {
-                    encoder.addAdditionalWriter(new JSONStreamWriterSocket(item.getSocket()));
+                    writer.addAdditionalWriter(new JSONStreamWriterSocket(item.getSocket()));
                 }
+                sendMessage(msg, writer);
+
             }
-            encoder.encodeMsg(msg);
         } catch(IOException | JSONException e) {
             Dispatcher.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
         }
+    }
+
+    protected void sendMessage(Message msg, JSONStreamWriterI writer)
+    throws IOException, JSONException {
+        writer.write(msg.getGroupId());
+        writer.write(msg.getMessageId());
+
+        JSONEncoder encoder = new JSONEncoder(writer);
+        encoder.encode(msg.getData());
     }
 }

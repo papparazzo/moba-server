@@ -33,6 +33,11 @@ public class JSONStreamWriterFile implements JSONStreamWriterI {
     }
 
     @Override
+    public void write(int i) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
     public void write(char c)
     throws IOException {
         bw.append(c);

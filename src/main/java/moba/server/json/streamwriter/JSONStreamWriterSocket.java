@@ -21,27 +21,33 @@
 package moba.server.json.streamwriter;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 import java.net.Socket;
 
 public class JSONStreamWriterSocket implements JSONStreamWriterI {
-    private OutputStream os = null;
+    private DataOutputStream dos = null;
 
     public JSONStreamWriterSocket(Socket socket)
     throws IOException {
-        os = socket.getOutputStream();
+        dos = new DataOutputStream(socket.getOutputStream());
+    }
+
+    @Override
+    public void write(int i)
+    throws IOException {
+        dos.write(i);
     }
 
     @Override
     public void write(char c)
     throws IOException {
-        os.write((byte)c);
+        dos.write((byte)c);
     }
 
     @Override
     public void write(String s)
     throws IOException {
-        os.write(s.getBytes());
+        dos.write(s.getBytes());
     }
 
     @Override

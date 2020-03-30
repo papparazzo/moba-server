@@ -20,6 +20,7 @@
 
 package moba.server.com;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
@@ -31,17 +32,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import moba.server.datatypes.base.Version;
-import moba.server.datatypes.enumerations.ErrorId;
-import moba.server.datatypes.objects.ErrorData;
+import moba.server.json.JSONDecoder;
 import moba.server.json.JSONEncoder;
 import moba.server.json.JSONException;
 import moba.server.json.JSONToStringI;
 import moba.server.json.streamreader.JSONStreamReaderSocket;
 import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 import moba.server.json.stringreader.JSONStringReader;
-import moba.server.messagehandler.Client;
-import moba.server.messages.JSONMessageDecoder;
-import moba.server.messages.JSONMessageDecoderException;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.utilities.MessageLogger;
@@ -79,10 +76,15 @@ public class Endpoint extends Thread implements JSONToStringI {
     }
 
     public Message getNextMessage()
-    throws IOException, JSONMessageDecoderException {
+    throws IOException {
         try {
-            JSONMessageDecoder decoder = new JSONMessageDecoder(new JSONStringReader(new JSONStreamReaderSocket(socket)));
-            Message msg = decoder.decodeMsg(this);
+            DataInputStream data = new DataInputStream(socket.getInputStream());
+            int groupId = data.readInt();
+            int msgId = data.readInt();
+
+            JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderSocket(socket)));
+            Message msg = new Message(groupId, msgId, decoder.decode(), this);
+
             Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: new message <{1}> arrived", new Object[]{id, msg.getMessageId()} );
             MessageLogger.in(msg);
             return msg;
@@ -137,9 +139,6 @@ public class Endpoint extends Thread implements JSONToStringI {
         } catch(IOException e) {
             Endpoint.LOGGER.log(Level.WARNING, "Endpoint #{0}: IOException, send <CLIENT_CLOSE> <{1}>", new Object[]{id, e.toString()});
             in.add(new Message(ClientMessage.CLOSE, null, this));
-        } catch(JSONMessageDecoderException e) {
-            Endpoint.LOGGER.log(Level.WARNING, "Endpoint #{0}: JSONMessageDecoderException, send <> <{1}>", new Object[]{id, e.toString()});
-            in.add(new Message(ClientMessage.ERROR, new ErrorData(ErrorId.FAULTY_MESSAGE, e.getMessage()), this));
         } catch(NullPointerException e) {
             // noop
         }
@@ -169,12 +168,7 @@ public class Endpoint extends Thread implements JSONToStringI {
     @SuppressWarnings("unchecked")
     private void init()
     throws IOException {
-        Message msg = null;
-        try {
-            msg = getNextMessage();
-        } catch(JSONMessageDecoderException e) {
-            throw new IOException(e);
-        }
+        Message msg = getNextMessage();
         if(
             ClientMessage.GROUP_ID != msg.getGroupId() ||
             ClientMessage.START.getMessageId() != msg.getMessageId()

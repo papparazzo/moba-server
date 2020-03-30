@@ -20,16 +20,16 @@
 
 package moba.server.json.streamreader;
 
+import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.Socket;
 
 public class JSONStreamReaderSocket implements JSONStreamReaderI {
-    private final InputStream is;
+    private final DataInputStream is;
 
     public JSONStreamReaderSocket(Socket socket)
     throws IOException {
-        is = socket.getInputStream();
+        is = new DataInputStream(socket.getInputStream());
     }
 
     @Override

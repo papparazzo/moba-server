@@ -30,6 +30,12 @@ public class JSONStreamWriterStringBuilder implements JSONStreamWriterI {
     }
 
     @Override
+    public void write(int i)
+    throws IOException {
+        sb.append(i);
+    }
+
+    @Override
     public void write(char c)
     throws IOException {
         sb.append(c);
