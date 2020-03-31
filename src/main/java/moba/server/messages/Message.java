@@ -34,11 +34,11 @@ public class Message implements Comparable {
     public Message(MessageType msgType, Object data, Endpoint ep) {
         this(msgType, data);
         endpoint = ep;
-        messageType = msgType;
     }
 
     public Message(MessageType msgType, Object data) {
         this(msgType.getGroupId(), msgType.getMessageId(), data);
+        messageType = msgType;
     }
 
     public Message(int groupId, int msgId, Object data, Endpoint ep) {
