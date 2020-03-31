@@ -79,7 +79,7 @@ public class MessageLogger {
         sb.append(msg.getGroupId());
         sb.append(":");
         sb.append(msg.getMessageId());
-        sb.append("] ");
+        sb.append("]");
         appendText(sb, msg);
         sb.append(" EP-");
         if(msg.getEndpoint() == null) {
@@ -92,7 +92,8 @@ public class MessageLogger {
 
     protected static void appendText(StringBuilder sb, Message msg) {
         int msgId = msg.getMessageId();
-        if(msgId == GuiMessage.SYSTEM_NOTICE.getMessageId()) {
+        int grpId = msg.getGroupId();
+        if(grpId == GuiMessage.GROUP_ID && msgId == GuiMessage.SYSTEM_NOTICE.getMessageId()) {
             sb.append(ANSI_CYAN);
             sb.append(" >> ");
             printSystemNotice(sb, (NoticeData)msg.getData());
@@ -100,13 +101,12 @@ public class MessageLogger {
             sb.append(ANSI_RESET);
             return;
         }
-        if(msgId == ClientMessage.ERROR.getMessageId()) {
+        if(grpId == ClientMessage.GROUP_ID && msgId == ClientMessage.ERROR.getMessageId()) {
             sb.append(ANSI_CYAN);
             sb.append(" >> ");
             sb.append(((ErrorData)msg.getData()).toString());
             sb.append(" <<");
             sb.append(ANSI_RESET);
-            return;
         }
     }
 
