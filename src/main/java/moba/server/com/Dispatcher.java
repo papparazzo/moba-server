@@ -159,9 +159,6 @@ public class Dispatcher implements SenderI {
                 return;
             }
             MessageLogger.out(msg);
-            Dispatcher.LOGGER.log(
-                Level.INFO, "try to send message [{0}:{1}]", new Object[]{msg.getGroupId(), msg.getMessageId()}
-            );
 
             MessageType mt = msg.getMessageType();
 

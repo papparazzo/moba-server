@@ -85,7 +85,6 @@ public class Endpoint extends Thread implements JSONToStringI {
             JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderSocket(socket)));
             Message msg = new Message(groupId, msgId, decoder.decode(), this);
 
-            Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: new message <{1}> arrived", new Object[]{id, msg.getMessageId()} );
             MessageLogger.in(msg);
             return msg;
         } catch(IOException | JSONException e) {
