@@ -58,7 +58,7 @@ public class JSONDecoderTest {
     @Test
     public void testDecode() throws Exception {
         JSONDecoder instance = new JSONDecoder(new JSONStringReader(new JSONStreamReaderString("{}")));
-        Map<String, Object> result = instance.decode();
+        Map<String, Object> result = (Map<String, Object>)instance.decode();
         assertTrue(result.isEmpty());
     }
 
