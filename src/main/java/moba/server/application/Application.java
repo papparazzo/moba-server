@@ -44,12 +44,12 @@ abstract public class Application {
 
     public void run(String appName, Version appVer, Date date, Config config)
     throws IOException, Exception {
-        this.appVer    = appVer;
-        this.appName   = appName;
-        this.startTime = System.currentTimeMillis();
-        this.buildDate = date;
-        this.config    = config;
-        this.msgQueueIn  = new PriorityBlockingQueue<>();
+        this.appVer     = appVer;
+        this.appName    = appName;
+        this.startTime  = System.currentTimeMillis();
+        this.buildDate  = date;
+        this.config     = config;
+        this.msgQueueIn = new PriorityBlockingQueue<>();
 
         setUpLogger();
         loop();
