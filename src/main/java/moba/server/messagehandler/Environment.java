@@ -120,10 +120,10 @@ public class Environment extends MessageHandlerA {
     }
 
     protected void setAmbientLight(Map<String, Object> map) {
-        ambientLight.setRed((int)(long)map.get("red"));
-        ambientLight.setBlue((int)(long)map.get("blue"));
-        ambientLight.setGreen((int)(long)map.get("green"));
-        ambientLight.setWhite((int)(long)map.get("white"));
+        ambientLight.setRed((Integer)map.get("red"));
+        ambientLight.setBlue((Integer)map.get("blue"));
+        ambientLight.setGreen((Integer)map.get("green"));
+        ambientLight.setWhite((Integer)map.get("white"));
     }
 
     protected void storeData()

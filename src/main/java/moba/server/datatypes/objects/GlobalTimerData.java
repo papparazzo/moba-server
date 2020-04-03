@@ -60,7 +60,7 @@ public class GlobalTimerData implements JSONToStringI {
 
     public void fromJsonObject(Map<String, Object> map) {
         curModelTime = new DayTime((String)map.get("curModelTime"));
-        setMultiplicator((int)(long)map.get("multiplicator"));
+        setMultiplicator((Integer)map.get("multiplicator"));
     }
 
     public boolean setTick() {

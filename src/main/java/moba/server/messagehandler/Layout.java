@@ -48,12 +48,12 @@ import moba.server.utilities.config.ConfigException;
 import moba.server.utilities.exceptions.ErrorException;
 
 public class Layout extends MessageHandlerA {
-    protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    protected Database  database   = null;
-    protected SenderI   dispatcher = null;
-    protected TracklayoutLock lock = null;
-    protected Config        config = null;
-    protected long    activeLayout = 0;
+    protected static final Logger LOGGER       = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    protected Database            database     = null;
+    protected SenderI             dispatcher   = null;
+    protected TracklayoutLock     lock         = null;
+    protected Config              config       = null;
+    protected long                activeLayout = 0;
 
     public Layout(SenderI dispatcher, Database database, TracklayoutLock lock, Config config) {
         this.database   = database;
@@ -72,7 +72,7 @@ public class Layout extends MessageHandlerA {
         Object o;
         o = config.getSection("trackLayout.activeTracklayoutId");
         if(o != null) {
-            activeLayout = (long)o;
+            activeLayout = (Integer)o;
         }
     }
 

@@ -20,16 +20,16 @@
 
 package moba.server.utilities.config;
 
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import moba.server.json.JSONDecoder;
-import moba.server.json.JSONEncoder;
 import moba.server.json.JSONException;
-import moba.server.json.streamreader.JSONStreamReaderFile;
-import moba.server.json.streamwriter.JSONStreamWriterFile;
-import moba.server.json.stringreader.JSONStringReader;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 public class Config {
     protected String              fileName;
@@ -37,15 +37,21 @@ public class Config {
 
     public Config(String fileName)
     throws IOException, JSONException {
-        JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderFile(fileName)), false);
+        InputStream is = new FileInputStream(fileName);
         this.fileName = fileName;
-        content = (Map<String, Object>)decoder.decode();
+
+        Yaml yaml = new Yaml();
+        content = (Map<String, Object>)yaml.load(is);
     }
 
     public void writeFile()
     throws IOException, JSONException {
-        JSONEncoder encoder = new JSONEncoder(new JSONStreamWriterFile(fileName), true);
-        encoder.encode(content);
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        options.setIndent(4);
+
+        Yaml yaml = new Yaml(options);
+        yaml.dump(content, new FileWriter(this.fileName));
     }
 
     public Object getSection(String expr) {
