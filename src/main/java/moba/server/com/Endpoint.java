@@ -75,26 +75,6 @@ public class Endpoint extends Thread implements JSONToStringI {
         }
     }
 
-    public Message getNextMessage()
-    throws IOException {
-        try {
-            DataInputStream data = new DataInputStream(socket.getInputStream());
-            int groupId = data.readInt();
-            int msgId = data.readInt();
-
-            JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderSocket(socket)));
-            Message msg = new Message(groupId, msgId, decoder.decode(), this);
-
-            MessageLogger.in(msg);
-            return msg;
-        } catch(IOException | JSONException e) {
-            if(closing) {
-                return null;
-            }
-            throw new IOException(e);
-        }
-    }
-
     @Override
     public String toString() {
         if(socket == null) {
@@ -162,6 +142,26 @@ public class Endpoint extends Thread implements JSONToStringI {
 
     public String getAppName() {
         return appName;
+    }
+
+    protected Message getNextMessage()
+    throws IOException {
+        try {
+            DataInputStream data = new DataInputStream(socket.getInputStream());
+            int groupId = data.readInt();
+            int msgId = data.readInt();
+            int size = data.readInt(); // ToDo Message size
+
+            JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderSocket(socket)));
+            Message msg = new Message(groupId, msgId, decoder.decode(), this);
+            MessageLogger.in(msg);
+            return msg;
+        } catch(IOException | JSONException e) {
+            if(closing) {
+                return null;
+            }
+            throw new IOException(e);
+        }
     }
 
     @SuppressWarnings("unchecked")
