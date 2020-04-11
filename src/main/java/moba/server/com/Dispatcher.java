@@ -20,7 +20,10 @@
 
 package moba.server.com;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,9 +34,7 @@ import java.util.logging.Logger;
 import moba.server.json.JSONEncoder;
 
 import moba.server.json.JSONException;
-import moba.server.json.streamwriter.JSONMultiStreamWriter;
-import moba.server.json.streamwriter.JSONStreamWriterI;
-import moba.server.json.streamwriter.JSONStreamWriterSocket;
+import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 import moba.server.messages.Message;
 import moba.server.messages.MessageType;
 import moba.server.utilities.MessageLogger;
@@ -159,40 +160,43 @@ public class Dispatcher implements SenderI {
                 return;
             }
             MessageLogger.out(msg);
-
             MessageType mt = msg.getMessageType();
+
+            StringBuilder sb = new StringBuilder();
+            JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
+            JSONEncoder encoder = new JSONEncoder(jsb);
+            encoder.encode(msg.getData());
+
+            int grpId = msg.getGroupId();
+            int msgId = msg.getMessageId();
+            String data = sb.toString();
 
             if(mt == null || mt.getDispatchType() == MessageType.DispatchType.SINGLE) {
                 if(msg.getEndpoint() == null) {
                     Dispatcher.LOGGER.log(Level.WARNING, "msg contains not endpoint");
                     return;
                 }
-                sendMessage(msg, new JSONStreamWriterSocket(msg.getEndpoint().getSocket()));
-            } else {
-                long grp = msg.getGroupId();
-
-                if(!this.groupEP.containsKey(grp)) {
-                    return;
+                sendMessage(grpId, msgId, data, msg.getEndpoint().getSocket());
+                return;
+            }
+            if(this.groupEP.containsKey((long)grpId)) {
+                for(Endpoint item : this.groupEP.get((long)grpId)) {
+                    sendMessage(grpId, msgId, data, item.getSocket());
                 }
-
-                JSONMultiStreamWriter writer = new JSONMultiStreamWriter();
-                for(Endpoint item : this.groupEP.get(grp)) {
-                    writer.addAdditionalWriter(new JSONStreamWriterSocket(item.getSocket()));
-                }
-                sendMessage(msg, writer);
-
             }
         } catch(IOException | JSONException e) {
             Dispatcher.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
         }
     }
 
-    protected void sendMessage(Message msg, JSONStreamWriterI writer)
+    protected void sendMessage(int grpId, int msgId, String data, Socket socket)
     throws IOException, JSONException {
-        writer.write(msg.getGroupId());
-        writer.write(msg.getMessageId());
-
-        JSONEncoder encoder = new JSONEncoder(writer);
-        encoder.encode(msg.getData());
+        OutputStream outputStream = socket.getOutputStream();
+        try (DataOutputStream dataOutputStream = new DataOutputStream(outputStream)) {
+            dataOutputStream.writeInt(grpId);
+            dataOutputStream.writeInt(msgId);
+            dataOutputStream.writeInt(data.length());
+            dataOutputStream.write(data.getBytes());
+        }
     }
 }
