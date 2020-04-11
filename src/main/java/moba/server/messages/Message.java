@@ -100,7 +100,7 @@ public class Message implements Comparable {
         String rv = "";
 
         if(endpoint != null) {
-            rv = "<" + endpoint.getSocket().toString() + ">";
+            rv = "<" + endpoint.toString() + ">";
         }
         rv += "<" + Long.toString(groupId) + ":" + Long.toString(messageId) + ">";
 
