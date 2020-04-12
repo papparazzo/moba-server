@@ -44,8 +44,11 @@ public class CustomFormatter extends Formatter {
 
         SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS ");
         sb.append(df.format(new Date()));
+        sb.append(record.getLevel().getLocalizedName());
+        sb.append(" ");
+
         if(record.getSourceClassName() != null) {
-          sb.append(record.getSourceClassName());
+            sb.append(record.getSourceClassName());
         } else {
             sb.append(record.getLoggerName());
         }
@@ -55,11 +58,7 @@ public class CustomFormatter extends Formatter {
             sb.append(record.getSourceMethodName());
         }
         sb.append(" ");
-
-        String message = formatMessage(record);
-        sb.append(record.getLevel().getLocalizedName());
-        sb.append(" ");
-        sb.append(message);
+        sb.append(formatMessage(record));
         sb.append("\n");
         if(record.getThrown() != null) {
             try {
