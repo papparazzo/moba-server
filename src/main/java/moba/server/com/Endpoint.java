@@ -21,6 +21,7 @@
 package moba.server.com;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
@@ -56,13 +57,21 @@ public class Endpoint extends Thread implements JSONToStringI {
     protected ArrayList<Long>  msgGroups = new ArrayList<>();
     protected PriorityBlockingQueue<Message> in = null;
 
+    protected DataOutputStream dataOutputStream;
+    protected DataInputStream  dataInputStream;
+
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-    public Endpoint(long id, Socket socket, PriorityBlockingQueue<Message> in) {
-        this.id        = id;
-        this.startTime = System.currentTimeMillis();
-        this.socket    = socket;
-        this.in        = in;
+    public Endpoint(long id, Socket socket, PriorityBlockingQueue<Message> in)
+    throws IOException {
+        this.id               = id;
+        this.startTime        = System.currentTimeMillis();
+        this.socket           = socket;
+        this.in               = in;
+
+        this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        this.dataInputStream  = new DataInputStream(socket.getInputStream());
+
         setName("endpoint #" + String.valueOf(id));
     }
 
@@ -124,10 +133,6 @@ public class Endpoint extends Thread implements JSONToStringI {
         Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
     }
 
-    public Socket getSocket() {
-        return socket;
-    }
-
     public long getAppId() {
         return id;
     }
@@ -144,15 +149,18 @@ public class Endpoint extends Thread implements JSONToStringI {
         return appName;
     }
 
+    public DataOutputStream getDataOutputStream() {
+        return dataOutputStream;
+    }
+
     protected Message getNextMessage()
     throws IOException {
         try {
-            DataInputStream data = new DataInputStream(socket.getInputStream());
-            int groupId = data.readInt();
-            int msgId = data.readInt();
-            int size = data.readInt(); // ToDo Message size
+            int groupId = dataInputStream.readInt();
+            int msgId = dataInputStream.readInt();
+            int size = dataInputStream.readInt(); // ToDo Message size
 
-            JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderSocket(socket)));
+            JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderSocket(dataInputStream)));
             Message msg = new Message(groupId, msgId, decoder.decode(), this);
             MessageLogger.in(msg);
             return msg;

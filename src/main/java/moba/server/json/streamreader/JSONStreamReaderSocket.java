@@ -22,28 +22,18 @@ package moba.server.json.streamreader;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.net.Socket;
 
 public class JSONStreamReaderSocket implements JSONStreamReaderI {
     private final DataInputStream is;
 
-    public JSONStreamReaderSocket(Socket socket)
+    public JSONStreamReaderSocket(DataInputStream stream)
     throws IOException {
-        is = new DataInputStream(socket.getInputStream());
+        is = stream;
     }
 
     @Override
     public int read()
     throws IOException {
         return is.read();
-    }
-
-    @Override
-    public int peek()
-    throws IOException {
-        is.mark(1);
-        int ch = is.read();
-        is.reset();
-        return ch;
     }
 }

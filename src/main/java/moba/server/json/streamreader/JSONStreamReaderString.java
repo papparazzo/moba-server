@@ -38,13 +38,4 @@ public class JSONStreamReaderString  implements JSONStreamReaderI {
         }
         return input.charAt(index++);
     }
-
-    @Override
-    public int peek()
-    throws IOException {
-        if(index == input.length()) {
-            throw new IOException("End of string reached");
-        }
-        return input.charAt(index + 1);
-    }
 }

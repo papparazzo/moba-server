@@ -22,8 +22,6 @@ package moba.server.com;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -50,14 +48,14 @@ public class Dispatcher implements SenderI {
         Dispatcher.LOGGER.log(
             Level.INFO,
             "try to add endpoint <{0}> appName <{1}> ver<{2}>",
-            new Object[]{ep.getSocket(), ep.getAppName(), ep.getVersion().toString()}
+            new Object[]{ep, ep.getAppName(), ep.getVersion()}
         );
 
         Iterator<Endpoint> iter = allEndpoints.iterator();
 
         while(iter.hasNext()) {
             if(iter.next() == ep) {
-                Dispatcher.LOGGER.log(Level.WARNING, "Enpoint <{0}> allready set", new Object[]{ep.toString()});
+                Dispatcher.LOGGER.log(Level.WARNING, "Enpoint <{0}> allready set", new Object[]{ep});
                 return false;
             }
         }
@@ -93,7 +91,7 @@ public class Dispatcher implements SenderI {
         }
 
         if(!removed) {
-            Dispatcher.LOGGER.log(Level.WARNING, "could not remove endpoint <{0}> from set!", new Object[]{ep.getSocket()});
+            Dispatcher.LOGGER.log(Level.WARNING, "could not remove endpoint <{0}> from set!", new Object[]{ep});
         }
 
         for(Long msgGroup : ep.getMsgGroups()) {
@@ -108,7 +106,7 @@ public class Dispatcher implements SenderI {
                 }
             }
         }
-        Dispatcher.LOGGER.log(Level.INFO, "endpoint <{0}> succesfully removed!", new Object[]{ep.getSocket()});
+        Dispatcher.LOGGER.log(Level.INFO, "endpoint <{0}> succesfully removed!", new Object[]{ep});
     }
 
     protected void shutDownEndpoint(Endpoint ep) {
@@ -176,12 +174,12 @@ public class Dispatcher implements SenderI {
                     Dispatcher.LOGGER.log(Level.WARNING, "msg contains not endpoint");
                     return;
                 }
-                sendMessage(grpId, msgId, data, msg.getEndpoint().getSocket());
+                sendMessage(grpId, msgId, data, msg.getEndpoint());
                 return;
             }
             if(this.groupEP.containsKey((long)grpId)) {
                 for(Endpoint item : this.groupEP.get((long)grpId)) {
-                    sendMessage(grpId, msgId, data, item.getSocket());
+                    sendMessage(grpId, msgId, data, item);
                 }
             }
         } catch(IOException | JSONException e) {
@@ -189,14 +187,12 @@ public class Dispatcher implements SenderI {
         }
     }
 
-    protected void sendMessage(int grpId, int msgId, String data, Socket socket)
+    protected void sendMessage(int grpId, int msgId, String data, Endpoint endpoint)
     throws IOException, JSONException {
-        OutputStream outputStream = socket.getOutputStream();
-        try (DataOutputStream dataOutputStream = new DataOutputStream(outputStream)) {
-            dataOutputStream.writeInt(grpId);
-            dataOutputStream.writeInt(msgId);
-            dataOutputStream.writeInt(data.length());
-            dataOutputStream.write(data.getBytes());
-        }
+        DataOutputStream dataOutputStream = endpoint.getDataOutputStream();
+        dataOutputStream.writeInt(grpId);
+        dataOutputStream.writeInt(msgId);
+        dataOutputStream.writeInt(data.length());
+        dataOutputStream.write(data.getBytes());
     }
 }
