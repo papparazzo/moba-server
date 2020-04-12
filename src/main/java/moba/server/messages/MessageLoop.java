@@ -29,12 +29,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import moba.server.com.Dispatcher;
-import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.objects.ErrorData;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
+import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.exceptions.ErrorException;
 
 public class MessageLoop {
@@ -60,11 +60,7 @@ public class MessageLoop {
     throws InterruptedException {
         while(true) {
             Message msg = in.take();
-            MessageLoop.LOGGER.log(
-                Level.INFO,
-                "handle msg [{0}:{1}] from <{1}>",
-                new Object[]{msg.getGroupId(), msg.getMessageId(), msg.getEndpoint()}
-            );
+            MessageLoop.LOGGER.log(Level.INFO, "handle msg [{0}:{1}] from <{2}>", new Object[]{msg.getGroupId(), msg.getMessageId(), msg.getEndpoint()});
 
             if(msg.getGroupId() == InternMessage.GROUP_ID) {
                 switch(InternMessage.fromId(msg.getMessageId())) {
@@ -77,19 +73,17 @@ public class MessageLoop {
                         shutdownHandler();
                         return false;
 
-                    case FREE_RESOURCES:
-                        freeResources((long)msg.getData());
-                        continue;
-
                     case SET_HARDWARE_STATE:
                         hardwareStateChangedHandler((HardwareState)msg.getData());
+                        continue;
+
+                    case CLIENT_SHUTDOWN:
                         continue;
                 }
             }
 
             if(!handlers.containsKey(msg.getGroupId())) {
-                ErrorData err =
-                    new ErrorData(ErrorId.UNKNOWN_GROUP_ID, "handler for msg-group <" + Integer.toString(msg.getGroupId()) + "> was not registered!");
+                ErrorData err = new ErrorData(ErrorId.UNKNOWN_GROUP_ID, "handler for group <" + Integer.toString(msg.getGroupId()) + "> was not registered!");
 
                 MessageLoop.LOGGER.log(Level.WARNING, err.toString());
 
@@ -114,9 +108,9 @@ public class MessageLoop {
     }
 
     protected void resetHandler() {
-        for(Endpoint ep : dispatcher.getEndpoints()) {
+        dispatcher.getEndpoints().forEach((ep) -> {
             dispatcher.dispatch(new Message(ClientMessage.RESET, null, ep));
-        }
+        });
         Iterator<Integer> iter = handlers.keySet().iterator();
         while(iter.hasNext()) {
             handlers.get(iter.next()).reset();
@@ -124,9 +118,9 @@ public class MessageLoop {
     }
 
     protected void shutdownHandler() {
-        for(Endpoint ep : dispatcher.getEndpoints()) {
+        dispatcher.getEndpoints().forEach((ep) -> {
             dispatcher.dispatch(new Message(ClientMessage.SHUTDOWN, null, ep));
-        }
+        });
         Iterator<Integer> iter = handlers.keySet().iterator();
         while(iter.hasNext()) {
             handlers.get(iter.next()).shutdown();
@@ -139,5 +133,12 @@ public class MessageLoop {
         while(iter.hasNext()) {
             handlers.get(iter.next()).hardwareStateChanged(state);
         }
+    }
+
+    protected void handleClientClose(Message msg) {
+        long appId = msg.getEndpoint().getAppId();
+        freeResources(appId);
+        dispatcher.removeEndpoint(msg.getEndpoint());
+        dispatcher.dispatch(new Message(ServerMessage.CLIENT_CLOSED, appId));
     }
 }

@@ -29,7 +29,6 @@ import moba.server.datatypes.objects.ErrorData;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.ClientMessage;
-import moba.server.messages.messageType.InternMessage;
 import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.exceptions.ErrorException;
 
@@ -64,10 +63,6 @@ public class Client extends MessageHandlerA {
                 handleClientStart(msg);
                 break;
 
-            case CLOSE:
-                handleClientClose(msg);
-                break;
-
             case ERROR:
                 dispatcher.dispatch(msg);
                 break;
@@ -91,12 +86,6 @@ public class Client extends MessageHandlerA {
         }
         dispatcher.dispatch(new Message(ClientMessage.CONNECTED, ep.getAppId(), ep));
         dispatcher.dispatch(new Message(ServerMessage.NEW_CLIENT_STARTED, ep));
-    }
-
-    protected void handleClientClose(Message msg) {
-        in.add(new Message(InternMessage.FREE_RESOURCES, (long)msg.getEndpoint().getAppId()));
-        dispatcher.removeEndpoint(msg.getEndpoint());
-        dispatcher.dispatch(new Message(ServerMessage.CLIENT_CLOSED, msg.getEndpoint().getAppId()));
     }
 }
 

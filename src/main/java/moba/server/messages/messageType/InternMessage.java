@@ -24,8 +24,8 @@ import moba.server.messages.MessageType;
 public enum InternMessage implements MessageType {
     SERVER_SHUTDOWN   (1),
     SERVER_RESET      (2),
-    FREE_RESOURCES    (3),
-    SET_HARDWARE_STATE(4);
+    SET_HARDWARE_STATE(3),
+    CLIENT_SHUTDOWN   (4);
 
     public final static int GROUP_ID = 1;
 

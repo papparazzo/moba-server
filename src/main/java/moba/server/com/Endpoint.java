@@ -42,6 +42,7 @@ import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 import moba.server.json.stringreader.JSONStringReader;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.ClientMessage;
+import moba.server.messages.messageType.InternMessage;
 import moba.server.utilities.MessageLogger;
 
 public class Endpoint extends Thread implements JSONToStringI {
@@ -125,8 +126,8 @@ public class Endpoint extends Thread implements JSONToStringI {
                 in.add(getNextMessage());
             }
         } catch(IOException e) {
-            Endpoint.LOGGER.log(Level.WARNING, "Endpoint #{0}: IOException, send <CLIENT_CLOSE> <{1}>", new Object[]{id, e.toString()});
-            in.add(new Message(ClientMessage.CLOSE, null, this));
+            Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: IOException, closing client... <{1}>", new Object[]{id, e.toString()});
+            in.add(new Message(InternMessage.CLIENT_SHUTDOWN, null, this));
         } catch(NullPointerException e) {
             // noop
         }
@@ -164,10 +165,13 @@ public class Endpoint extends Thread implements JSONToStringI {
             Message msg = new Message(groupId, msgId, decoder.decode(), this);
             MessageLogger.in(msg);
             return msg;
-        } catch(IOException | JSONException e) {
+        } catch(IOException e) {
             if(closing) {
                 return null;
             }
+            throw new IOException(e);
+        } catch(JSONException e) {
+            Endpoint.LOGGER.log(Level.SEVERE, "Endpoint #{0}: JSONException <{1}>", new Object[]{id, e.toString()});
             throw new IOException(e);
         }
     }

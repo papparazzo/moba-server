@@ -29,7 +29,6 @@ public enum ClientMessage implements MessageType {
     ERROR       (4),
     START       (5),
     CONNECTED   (6),
-    CLOSE       (7),
     SHUTDOWN    (8),
     RESET       (9),
     SELF_TESTING(10);
