@@ -21,13 +21,6 @@
 package moba.server.messages;
 
 public interface MessageType {
-
-    public enum DispatchType {
-        SINGLE,
-        GROUP
-    }
-
     public int getMessageId();
     public int getGroupId();
-    public DispatchType getDispatchType();
 }

@@ -19,7 +19,9 @@
  */
 package moba.server.messages.messageType;
 
+import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.messages.MessageType;
+import moba.server.utilities.exceptions.ErrorException;
 
 public enum SystemMessage implements MessageType {
     SET_AUTOMATIC_MODE      (1),
@@ -48,18 +50,13 @@ public enum SystemMessage implements MessageType {
         return messageId;
     }
 
-    @Override
-    public DispatchType getDispatchType() {
-        return DispatchType.GROUP;
-    }
-
-    public static SystemMessage fromId(int id) {
+    public static SystemMessage fromId(int id)
+    throws ErrorException {
         for(SystemMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }
         }
-        return null;
+        throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg [" + Long.toString(GROUP_ID) + ":" + Long.toString(id) + "].");
     }
-
 }

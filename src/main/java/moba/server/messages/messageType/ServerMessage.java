@@ -20,26 +20,26 @@
 
 package moba.server.messages.messageType;
 
+import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.messages.MessageType;
+import moba.server.utilities.exceptions.ErrorException;
 
 public enum ServerMessage implements MessageType {
-    NEW_CLIENT_STARTED (1, DispatchType.GROUP),
-    CLIENT_CLOSED      (2, DispatchType.GROUP),
-    RESET_CLIENT       (3, DispatchType.SINGLE),
-    INFO_REQ           (4, DispatchType.SINGLE),
-    INFO_RES           (5, DispatchType.SINGLE),
-    CON_CLIENTS_REQ    (6, DispatchType.SINGLE),
-    CON_CLIENTS_RES    (7, DispatchType.SINGLE),
-    SELF_TESTING_CLIENT(8, DispatchType.SINGLE);
+    NEW_CLIENT_STARTED (1),
+    CLIENT_CLOSED      (2),
+    RESET_CLIENT       (3),
+    INFO_REQ           (4),
+    INFO_RES           (5),
+    CON_CLIENTS_REQ    (6),
+    CON_CLIENTS_RES    (7),
+    SELF_TESTING_CLIENT(8);
 
     public final static int GROUP_ID = 3;
 
     protected int messageId;
-    protected DispatchType dispatchType;
 
-    ServerMessage(int msgId, DispatchType dt) {
+    ServerMessage(int msgId) {
         messageId = msgId;
-        dispatchType = dt;
     }
 
     @Override
@@ -52,17 +52,13 @@ public enum ServerMessage implements MessageType {
         return messageId;
     }
 
-    @Override
-    public DispatchType getDispatchType() {
-        return dispatchType;
-    }
-
-    public static ServerMessage fromId(int id) {
+    public static ServerMessage fromId(int id)
+    throws ErrorException {
         for(ServerMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }
         }
-        return null;
+        throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg [" + Long.toString(GROUP_ID) + ":" + Long.toString(id) + "].");
     }
 }

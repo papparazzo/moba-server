@@ -19,7 +19,9 @@
  */
 package moba.server.messages.messageType;
 
+import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.messages.MessageType;
+import moba.server.utilities.exceptions.ErrorException;
 
 public enum GuiMessage implements MessageType {
     SYSTEM_NOTICE(1);
@@ -42,18 +44,13 @@ public enum GuiMessage implements MessageType {
         return messageId;
     }
 
-    @Override
-    public DispatchType getDispatchType() {
-        return DispatchType.GROUP;
-    }
-
-    public static GuiMessage fromId(int id) {
+    public static GuiMessage fromId(int id)
+    throws ErrorException {
         for(GuiMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }
         }
-        return null;
+        throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg [" + Long.toString(GROUP_ID) + ":" + Long.toString(id) + "].");
     }
-
 }

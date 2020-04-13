@@ -22,6 +22,7 @@ package moba.server.com;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,22 +35,16 @@ import moba.server.json.JSONEncoder;
 import moba.server.json.JSONException;
 import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 import moba.server.messages.Message;
-import moba.server.messages.MessageType;
 import moba.server.utilities.MessageLogger;
 
 public class Dispatcher implements SenderI {
     protected final Set<Endpoint> allEndpoints = new HashSet<>();
+    protected final Map<Long, Set<Endpoint>> groupEP = new HashMap<>();
 
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-    protected final Map<Long, Set<Endpoint>> groupEP = new HashMap<>();
-
     public boolean addEndpoint(Endpoint ep) {
-        Dispatcher.LOGGER.log(
-            Level.INFO,
-            "try to add endpoint <{0}> appName <{1}> ver<{2}>",
-            new Object[]{ep, ep.getAppName(), ep.getVersion()}
-        );
+        Dispatcher.LOGGER.log(Level.INFO, "try to add endpoint <{0}> appName <{1}> ver<{2}>", new Object[]{ep, ep.getAppName(), ep.getVersion()});
 
         Iterator<Endpoint> iter = allEndpoints.iterator();
 
@@ -60,15 +55,14 @@ public class Dispatcher implements SenderI {
             }
         }
 
-        Set<Endpoint> set;
-        for(Long msgGroup : ep.getMsgGroups()) {
-            if(groupEP.containsKey(msgGroup)) {
-                set = groupEP.get(msgGroup);
-            } else {
-                set = new HashSet();
-            }
-            set.add(ep);
-            groupEP.put(msgGroup, set);
+        ArrayList<Long> grps = ep.getMsgGroups();
+
+        if(grps.isEmpty()) {
+            addEndpointToGroup((long)-1, ep);
+        }
+
+        for(Long msgGroup : grps) {
+            addEndpointToGroup(msgGroup, ep);
         }
 
         allEndpoints.add(ep);
@@ -83,30 +77,48 @@ public class Dispatcher implements SenderI {
         boolean removed = false;
 
         while(iter.hasNext()) {
-            if(iter.next() == ep) {
-                iter.remove();
-                removed = true;
-                break;
+            if(iter.next() != ep) {
+                continue;
             }
+            iter.remove();
+            removed = true;
+            break;
         }
 
         if(!removed) {
             Dispatcher.LOGGER.log(Level.WARNING, "could not remove endpoint <{0}> from set!", new Object[]{ep});
         }
 
-        for(Long msgGroup : ep.getMsgGroups()) {
-            if(groupEP.containsKey(msgGroup)) {
-                Set<Endpoint> set = groupEP.get(msgGroup);
-                iter = set.iterator();
+        removeEndpointFromGroup((long)-1, ep);
 
-                while(iter.hasNext()) {
-                    if(iter.next() == ep) {
-                        iter.remove();
-                    }
-                }
+        ep.getMsgGroups().forEach((msgGroup) -> {
+            removeEndpointFromGroup(msgGroup, ep);
+        });
+        Dispatcher.LOGGER.log(Level.INFO, "endpoint <{0}> succesfully removed!", new Object[]{ep});
+    }
+
+    protected void addEndpointToGroup(Long grpId, Endpoint ep) {
+        Set<Endpoint> set;
+        if(groupEP.containsKey(grpId)) {
+            set = groupEP.get(grpId);
+        } else {
+            set = new HashSet();
+        }
+        set.add(ep);
+        groupEP.put(grpId, set);
+    }
+
+    protected void removeEndpointFromGroup(Long grpId, Endpoint ep) {
+        if(!groupEP.containsKey(grpId)) {
+            return;
+        }
+        Iterator<Endpoint> iter = groupEP.get(grpId).iterator();
+
+        while(iter.hasNext()) {
+            if(iter.next() == ep) {
+                iter.remove();
             }
         }
-        Dispatcher.LOGGER.log(Level.INFO, "endpoint <{0}> succesfully removed!", new Object[]{ep});
     }
 
     protected void shutDownEndpoint(Endpoint ep) {
@@ -158,7 +170,6 @@ public class Dispatcher implements SenderI {
                 return;
             }
             MessageLogger.out(msg);
-            MessageType mt = msg.getMessageType();
 
             StringBuilder sb = new StringBuilder();
             JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
@@ -169,11 +180,7 @@ public class Dispatcher implements SenderI {
             int msgId = msg.getMessageId();
             String data = sb.toString();
 
-            if(mt == null || mt.getDispatchType() == MessageType.DispatchType.SINGLE) {
-                if(msg.getEndpoint() == null) {
-                    Dispatcher.LOGGER.log(Level.WARNING, "msg contains not endpoint");
-                    return;
-                }
+            if(msg.getEndpoint() != null) {
                 sendMessage(grpId, msgId, data, msg.getEndpoint());
                 return;
             }
@@ -181,6 +188,9 @@ public class Dispatcher implements SenderI {
                 for(Endpoint item : this.groupEP.get((long)grpId)) {
                     sendMessage(grpId, msgId, data, item);
                 }
+            }
+            for(Endpoint item : this.groupEP.get((long)-1)) {
+                sendMessage(grpId, msgId, data, item);
             }
         } catch(IOException | JSONException e) {
             Dispatcher.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});

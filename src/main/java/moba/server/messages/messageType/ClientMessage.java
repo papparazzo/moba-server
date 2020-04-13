@@ -20,7 +20,9 @@
 
 package moba.server.messages.messageType;
 
+import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.messages.MessageType;
+import moba.server.utilities.exceptions.ErrorException;
 
 public enum ClientMessage implements MessageType {
     VOID        (1),
@@ -51,17 +53,13 @@ public enum ClientMessage implements MessageType {
         return messageId;
     }
 
-    @Override
-    public DispatchType getDispatchType() {
-        return DispatchType.SINGLE;
-    }
-
-    public static ClientMessage fromId(int id) {
+    public static ClientMessage fromId(int id)
+    throws ErrorException {
         for(ClientMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }
         }
-        return null;
+        throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg [" + Long.toString(GROUP_ID) + ":" + Long.toString(id) + "].");
     }
 }
