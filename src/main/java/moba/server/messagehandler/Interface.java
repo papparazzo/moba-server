@@ -26,10 +26,10 @@ import moba.server.datatypes.enumerations.Connectivity;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.enumerations.NoticeType;
 import moba.server.datatypes.objects.NoticeData;
-import java.util.concurrent.PriorityBlockingQueue;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
+import moba.server.messages.MessageQueue;
 import moba.server.messages.messageType.GuiMessage;
 import moba.server.messages.messageType.InterfaceMessage;
 import moba.server.messages.messageType.InternMessage;
@@ -39,13 +39,12 @@ public class Interface extends MessageHandlerA {
     protected SenderI dispatcher = null;
     protected ServerApplication app = null;
 
-    protected PriorityBlockingQueue<Message> msgQueueIn = null;
+    protected MessageQueue msgQueueIn = null;
 
-    public Interface(SenderI dispatcher, PriorityBlockingQueue<Message> msgQueueIn) {
+    public Interface(SenderI dispatcher, MessageQueue msgQueueIn) {
         this.dispatcher = dispatcher;
         this.msgQueueIn = msgQueueIn;
     }
-
 
     @Override
     public int getGroupId() {

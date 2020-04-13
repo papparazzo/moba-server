@@ -22,25 +22,24 @@ package moba.server.application;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import moba.server.datatypes.base.Version;
-import moba.server.messages.Message;
+import moba.server.messages.MessageQueue;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.logger.CustomFormatter;
 
 abstract public class Application {
-    protected Version    appVer;
-    protected String     appName;
-    protected Date       buildDate;
-    protected long       startTime;
+    protected Version      appVer;
+    protected String       appName;
+    protected Date         buildDate;
+    protected long         startTime;
 
-    protected Config config = null;
-    protected PriorityBlockingQueue<Message> msgQueueIn = null;
+    protected Config       config = null;
+    protected MessageQueue msgQueueIn = null;
 
     public void run(String appName, Version appVer, Date date, Config config)
     throws IOException, Exception {
@@ -49,7 +48,7 @@ abstract public class Application {
         this.startTime  = System.currentTimeMillis();
         this.buildDate  = date;
         this.config     = config;
-        this.msgQueueIn = new PriorityBlockingQueue<>();
+        this.msgQueueIn = new MessageQueue();
 
         setUpLogger();
         loop();

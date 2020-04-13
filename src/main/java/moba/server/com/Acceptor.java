@@ -23,23 +23,22 @@ package moba.server.com;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import moba.server.messages.Message;
+import moba.server.messages.MessageQueue;
 
 public class Acceptor extends Thread {
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-    private PriorityBlockingQueue<Message> in = null;
+    private MessageQueue in = null;
 
     private ServerSocket serverSocket = null;
     private Dispatcher   dispatcher   = null;
     private int          serverport   = 0;
     private int          maxClients   = 0;
 
-    public Acceptor(PriorityBlockingQueue<Message> in, Dispatcher dispatcher, int serverport, int maxClients) {
+    public Acceptor(MessageQueue in, Dispatcher dispatcher, int serverport, int maxClients) {
         this.in         = in;
         this.dispatcher = dispatcher;
         this.serverport = serverport;

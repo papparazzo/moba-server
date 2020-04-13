@@ -21,8 +21,6 @@
 package moba.server.messagehandler;
 
 import moba.server.com.Endpoint;
-import java.util.concurrent.PriorityBlockingQueue;
-
 import moba.server.com.SenderI;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
@@ -31,6 +29,7 @@ import moba.server.datatypes.objects.ErrorData;
 import moba.server.datatypes.objects.NoticeData;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
+import moba.server.messages.MessageQueue;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.GuiMessage;
 import moba.server.messages.messageType.InternMessage;
@@ -40,11 +39,11 @@ import moba.server.utilities.exceptions.ErrorException;
 public class Systems extends MessageHandlerA {
     protected HardwareState status = HardwareState.ERROR;
     protected SenderI dispatcher = null;
-    protected PriorityBlockingQueue<Message> msgQueue = null;
+    protected MessageQueue msgQueue = null;
 
     protected boolean automaticMode = false;
 
-    public Systems(SenderI dispatcher, PriorityBlockingQueue<Message> msgQueue) {
+    public Systems(SenderI dispatcher, MessageQueue msgQueue) {
         this.dispatcher = dispatcher;
         this.msgQueue   = msgQueue;
     }
@@ -70,13 +69,7 @@ public class Systems extends MessageHandlerA {
                 break;
 
             case GET_HARDWARE_STATE:
-                dispatcher.dispatch(
-                    new Message(
-                        SystemMessage.HARDWARE_STATE_CHANGED,
-                        status.toString(),
-                        msg.getEndpoint()
-                    )
-                );
+                dispatcher.dispatch(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString(), msg.getEndpoint()));
                 break;
 
             case HARDWARE_SHUTDOWN:
@@ -93,11 +86,7 @@ public class Systems extends MessageHandlerA {
     }
 
     protected void setAutomaticMode(Message msg) {
-        if(
-            status == HardwareState.ERROR ||
-            status == HardwareState.EMERGENCY_STOP ||
-            status == HardwareState.STANDBY
-        ) {
+        if(status == HardwareState.ERROR || status == HardwareState.EMERGENCY_STOP || status == HardwareState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
@@ -114,20 +103,12 @@ public class Systems extends MessageHandlerA {
         if(setAutomaticMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
             dispatcher.dispatch(
-                new Message(
-                    GuiMessage.SYSTEM_NOTICE,
-                    new NoticeData(NoticeType.INFO, "Automatik", "Die Hardware befindet sich im Automatikmodus")
-                )
+                new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Automatik", "Die Hardware befindet sich im Automatikmodus"))
             );
             return;
         }
         msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
-        dispatcher.dispatch(
-            new Message(
-                GuiMessage.SYSTEM_NOTICE,
-                new NoticeData(NoticeType.INFO, "Automatik", "Automatikmodus wurde deaktiviert")
-            )
-        );
+        dispatcher.dispatch(new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Automatik", "Automatikmodus wurde deaktiviert")));
     }
 
     protected void setEmergencyStop(Message msg) {
@@ -145,20 +126,12 @@ public class Systems extends MessageHandlerA {
 
         if(emergencyStop) {
             dispatcher.dispatch(
-                new Message(
-                    GuiMessage.SYSTEM_NOTICE,
-                    new NoticeData(NoticeType.WARNING, "Nothalt gedrückt", "Es wurde ein Nothalt ausgelöst")
-                )
+                new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.WARNING, "Nothalt gedrückt", "Es wurde ein Nothalt ausgelöst"))
             );
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.EMERGENCY_STOP));
             return;
         }
-        dispatcher.dispatch(
-            new Message(
-                GuiMessage.SYSTEM_NOTICE,
-                new NoticeData(NoticeType.INFO, "Nothaltfreigabe", "Der Nothalt wurde wieder freigegeben")
-            )
-        );
+        dispatcher.dispatch(new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Nothaltfreigabe", "Der Nothalt wurde wieder freigegeben")));
         if(automaticMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
         } else {
@@ -181,20 +154,12 @@ public class Systems extends MessageHandlerA {
 
         if(setStandByMode) {
             dispatcher.dispatch(
-                new Message(
-                    GuiMessage.SYSTEM_NOTICE,
-                    new NoticeData(NoticeType.WARNING, "Standby", "Anlage wird in den Standby-Modus geschickt")
-                )
+                new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.WARNING, "Standby", "Anlage wird in den Standby-Modus geschickt"))
             );
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.STANDBY));
             return;
         }
-        dispatcher.dispatch(
-            new Message(
-                GuiMessage.SYSTEM_NOTICE,
-                new NoticeData(NoticeType.INFO, "Standby", "Die Anlage wird aus dem Standby-Modus geholt")
-            )
-        );
+        dispatcher.dispatch(new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Standby", "Die Anlage wird aus dem Standby-Modus geholt")));
         if(automaticMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
         } else {
@@ -204,22 +169,13 @@ public class Systems extends MessageHandlerA {
 
     protected void sendErrorMessage(Endpoint endpoint) {
         dispatcher.dispatch(
-            new Message(
-                ClientMessage.ERROR,
-                new ErrorData(
-                    ErrorId.INVALID_STATUS_CHANGE,
-                    "Current state is <" + status.toString() + ">"
-                ),
-                endpoint
-            )
+            new Message(ClientMessage.ERROR, new ErrorData(ErrorId.INVALID_STATUS_CHANGE, "Current state is <" + status.toString() + ">"), endpoint)
         );
     }
 
     @Override
     public void hardwareStateChanged(HardwareState state) {
         status = state;
-        dispatcher.dispatch(
-            new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString())
-        );
+        dispatcher.dispatch(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString()));
     }
 }

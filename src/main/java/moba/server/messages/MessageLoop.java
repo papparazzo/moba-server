@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,11 +55,10 @@ public class MessageLoop {
         return handlers.keySet();
     }
 
-    public boolean loop(PriorityBlockingQueue<Message> in)
+    public boolean loop(MessageQueue in)
     throws InterruptedException {
         while(true) {
             Message msg = in.take();
-            MessageLoop.LOGGER.log(Level.INFO, "handle msg [{0}:{1}] from <{2}>", new Object[]{msg.getGroupId(), msg.getMessageId(), msg.getEndpoint()});
 
             if(msg.getGroupId() == InternMessage.GROUP_ID) {
                 switch(InternMessage.fromId(msg.getMessageId())) {
@@ -93,7 +91,6 @@ public class MessageLoop {
             try {
                 handlers.get(msg.getGroupId()).handleMsg(msg);
             } catch(ErrorException e) {
-                MessageLoop.LOGGER.log(Level.WARNING, e.toString());
                 dispatcher.dispatch(new Message(ClientMessage.ERROR, e.getErrorData(), msg.getEndpoint()));
             }
         }
