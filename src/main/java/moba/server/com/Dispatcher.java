@@ -61,9 +61,9 @@ public class Dispatcher implements SenderI {
             addEndpointToGroup((long)-1, ep);
         }
 
-        for(Long msgGroup : grps) {
+        grps.forEach((msgGroup) -> {
             addEndpointToGroup(msgGroup, ep);
-        }
+        });
 
         allEndpoints.add(ep);
         return true;

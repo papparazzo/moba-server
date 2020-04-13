@@ -43,7 +43,6 @@ import moba.server.json.stringreader.JSONStringReader;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
-import moba.server.utilities.MessageLogger;
 
 public class Endpoint extends Thread implements JSONToStringI {
 
@@ -162,9 +161,7 @@ public class Endpoint extends Thread implements JSONToStringI {
             int size = dataInputStream.readInt(); // ToDo Message size
 
             JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderSocket(dataInputStream)));
-            Message msg = new Message(groupId, msgId, decoder.decode(), this);
-            MessageLogger.in(msg);
-            return msg;
+            return new Message(groupId, msgId, decoder.decode(), this);
         } catch(IOException e) {
             if(closing) {
                 return null;
