@@ -169,11 +169,52 @@ public class JSONEncoder {
 
     protected void addString(String str)
     throws IOException {
-        // TODO Sonderzeichen maskieren!!
-        //str.replace("\n", "\\n");
-        //str.replace("\n", "\\n");
+        if(str == null || str.isEmpty()) {
+            writer.write("\"\"");
+            return;
+        }
+
         writer.write('"');
-        writer.write(str);
+        for(int i = 0; i < str.length(); i += 1) {
+            char c = str.charAt(i);
+
+            switch(c) {
+                case '\\':
+                case '"':
+                case '/':
+                    writer.write('\\');
+                    writer.write(c);
+                    break;
+
+                case '\b':
+                    writer.write("\\b");
+                    break;
+
+                case '\t':
+                    writer.write("\\t");
+                    break;
+
+                case '\n':
+                    writer.write("\\n");
+                    break;
+
+                case '\f':
+                    writer.write("\\f");
+                    break;
+
+                case '\r':
+                    writer.write("\\r");
+                    break;
+
+                default:
+                    if(c < '\u0020' || c >= '\u0080') {
+                        writer.write("\\u");
+                        writer.write(Integer.toHexString(0x10000 | c).substring(1).toUpperCase());
+                    } else {
+                        writer.write(c);
+                    }
+            }
+        }
         writer.write('"');
     }
 
