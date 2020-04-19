@@ -76,6 +76,7 @@ public class MessageLoop {
                         continue;
 
                     case CLIENT_SHUTDOWN:
+                        handleClientClose(msg);
                         continue;
                 }
             }
