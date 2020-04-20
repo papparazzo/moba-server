@@ -137,6 +137,9 @@ public class JSONDecoder {
             case '[':
                 return nextArray();
 
+            case 0:
+                throw new IOException("input stream corrupted!");
+
             default:
                 return nextNumber();
         }
@@ -257,7 +260,7 @@ public class JSONDecoder {
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
             c = reader.peek(!strict);
 
-            if(",]}".indexOf(c) != -1) {
+            if(",]}".indexOf(c) != -1 || c == 0) {
                 return parseNumber(sb.toString());
             }
             reader.next();

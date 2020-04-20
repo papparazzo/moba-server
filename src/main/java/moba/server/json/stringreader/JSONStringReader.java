@@ -32,16 +32,18 @@ public class JSONStringReader {
         this.reader = reader;
     }
 
-    public char peek()
-    throws IOException {
+    public char peek() {
         return peek(false);
     }
 
-    public char peek(boolean ignoreWhitespace)
-    throws IOException {
-        char c = next(ignoreWhitespace);
-        lastChar = c;
-        return c;
+    public char peek(boolean ignoreWhitespace) {
+        try {
+            char c = next(ignoreWhitespace);
+            lastChar = c;
+            return c;
+        } catch(IOException e) {
+            return 0;
+        }
     }
 
     public void checkNext(String s)
