@@ -72,7 +72,7 @@ public class Layout extends MessageHandlerA {
         Object o;
         o = config.getSection("trackLayout.activeTracklayoutId");
         if(o != null) {
-            activeLayout = (Integer)o;
+            activeLayout = (long)o;
         }
     }
 

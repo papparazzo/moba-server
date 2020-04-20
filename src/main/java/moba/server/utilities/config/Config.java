@@ -71,6 +71,10 @@ public class Config {
             o = map.get(s);
         }
 
+        if(o != null && o.getClass() == Integer.class) {
+            o = (long)Long.valueOf((Integer)o);
+        }
+
         return o;
     }
 

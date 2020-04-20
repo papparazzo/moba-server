@@ -45,10 +45,10 @@ public class ServerApplication extends Application {
     throws Exception {
         try {
             boolean restart;
-            maxClients = ((Integer)config.getSection("common.serverConfig.maxClients"));
+            maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
             do {
                 Dispatcher dispatcher = new Dispatcher();
-                Acceptor acceptor = new Acceptor(msgQueueIn, dispatcher, (Integer)config.getSection("common.serverConfig.port"), maxClients);
+                Acceptor acceptor = new Acceptor(msgQueueIn, dispatcher, (int)(long)config.getSection("common.serverConfig.port"), maxClients);
                 Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
                 MessageLoop loop = new MessageLoop(dispatcher);
                 TracklayoutLock tracklayoutLock = new TracklayoutLock(dispatcher, database);
