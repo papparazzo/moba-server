@@ -184,16 +184,19 @@ public class Dispatcher implements SenderI {
                 sendMessage(grpId, msgId, data, msg.getEndpoint());
                 return;
             }
-            if(this.groupEP.containsKey((long)grpId)) {
-                for(Endpoint item : this.groupEP.get((long)grpId)) {
-                    sendMessage(grpId, msgId, data, item);
-                }
-            }
-            for(Endpoint item : this.groupEP.get((long)-1)) {
-                sendMessage(grpId, msgId, data, item);
-            }
+            sendBroadCastMessage(grpId, msgId, data, grpId);
+            sendBroadCastMessage(grpId, msgId, data, -1);
         } catch(IOException | JSONException e) {
             Dispatcher.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+        }
+    }
+
+    protected void sendBroadCastMessage(int grpId, int msgId, String data, int groupKey)
+    throws IOException, JSONException {
+        if(this.groupEP.containsKey((long)groupKey)) {
+            for(Endpoint item : this.groupEP.get((long)groupKey)) {
+                sendMessage(grpId, msgId, data, item);
+            }
         }
     }
 
