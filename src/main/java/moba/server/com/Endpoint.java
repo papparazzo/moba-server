@@ -37,7 +37,7 @@ import moba.server.json.JSONDecoder;
 import moba.server.json.JSONEncoder;
 import moba.server.json.JSONException;
 import moba.server.json.JSONToStringI;
-import moba.server.json.streamreader.JSONStreamReaderSocket;
+import moba.server.json.streamreader.JSONStreamReaderBytes;
 import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 import moba.server.json.stringreader.JSONStringReader;
 import moba.server.messages.Message;
@@ -158,9 +158,12 @@ public class Endpoint extends Thread implements JSONToStringI {
         try {
             int groupId = dataInputStream.readInt();
             int msgId = dataInputStream.readInt();
-            int size = dataInputStream.readInt(); // ToDo Message size
+            int size = dataInputStream.readInt();
 
-            JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderSocket(dataInputStream)));
+            byte[] buffer = new byte[size];
+            int len = dataInputStream.read(buffer, 0, size);
+
+            JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderBytes(buffer, len)));
             return new Message(groupId, msgId, decoder.decode(), this);
         } catch(IOException e) {
             if(closing) {
