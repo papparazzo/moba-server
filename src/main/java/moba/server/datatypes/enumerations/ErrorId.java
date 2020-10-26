@@ -27,6 +27,10 @@ import moba.server.json.JSONToStringI;
 
 public enum ErrorId implements JSONToStringI {
 
+    UNKNOWN_ERROR,
+    UNKNOWN_GROUP_ID,
+    UNKNOWN_MESSAGE_ID,
+
     DATABASE_ERROR,
 
     DATASET_NOT_LOCKED,
@@ -41,11 +45,7 @@ public enum ErrorId implements JSONToStringI {
 
     NO_DEFAULT_GIVEN,
 
-    SAME_ORIGIN_NEEDED,
-
-    UNKNOWN_ERROR,
-    UNKNOWN_GROUP_ID,
-    UNKNOWN_MESSAGE_ID;
+    SAME_ORIGIN_NEEDED;
 
     protected final int value;
 
