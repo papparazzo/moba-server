@@ -131,6 +131,12 @@ public class Systems extends MessageHandlerA {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.EMERGENCY_STOP));
             return;
         }
+
+        if(status != HardwareState.EMERGENCY_STOP) {
+            sendErrorMessage(msg.getEndpoint());
+            return;
+        }
+
         dispatcher.dispatch(new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Nothaltfreigabe", "Der Nothalt wurde wieder freigegeben")));
         if(automaticMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
