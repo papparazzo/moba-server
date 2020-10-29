@@ -107,6 +107,12 @@ public class Systems extends MessageHandlerA {
             );
             return;
         }
+
+        if(status != HardwareState.AUTOMATIC) {
+            sendErrorMessage(msg.getEndpoint());
+            return;
+        }
+
         msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
         dispatcher.dispatch(new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Automatik", "Automatikmodus wurde deaktiviert")));
     }
@@ -165,6 +171,12 @@ public class Systems extends MessageHandlerA {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.STANDBY));
             return;
         }
+
+        if(status != HardwareState.STANDBY) {
+            sendErrorMessage(msg.getEndpoint());
+            return;
+        }
+
         dispatcher.dispatch(new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Standby", "Die Anlage wird aus dem Standby-Modus geholt")));
         if(automaticMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
