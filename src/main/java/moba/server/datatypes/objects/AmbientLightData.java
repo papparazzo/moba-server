@@ -29,43 +29,59 @@ import moba.server.json.JSONException;
 import moba.server.json.JSONToStringI;
 import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 
-public class AmbientLightData implements JSONToStringI {
-    protected int red;
-    protected int blue;
-    protected int green;
-    protected int white;
+public final class AmbientLightData implements JSONToStringI {
+    protected long red;
+    protected long blue;
+    protected long green;
+    protected long white;
 
     public AmbientLightData() {
     }
 
-    public AmbientLightData(int red, int blue, int green, int white) {
+    public AmbientLightData(long red, long blue, long green, long white) {
         setRed(red);
         setBlue(blue);
         setGreen(green);
         setWhite(white);
     }
 
-    public final void setRed(int val) {
+    public void setRed(long val) {
         red = validateValue(val);
     }
 
-    public final void setBlue(int val) {
+    public long getRed() {
+        return red;
+    }
+
+    public void setBlue(long val) {
         blue = validateValue(val);
     }
 
-    public final void setGreen(int val) {
+    public long getBlue() {
+        return blue;
+    }
+
+    public void setGreen(long val) {
         green = validateValue(val);
     }
 
-    public final void setWhite(int val) {
+    public long getGreen() {
+        return green;
+    }
+
+    public void setWhite(long val) {
         white = validateValue(val);
     }
 
+    public long getWhite() {
+        return white;
+    }
+
     public void fromJsonObject(Map<String, Object> map) {
-        setRed((int)map.get("red"));
-        setBlue((int)map.get("blue"));
-        setGreen((int)map.get("green"));
-        setWhite((int)map.get("white"));
+        setRed((long)map.get("red"));
+        setBlue((long)map.get("blue"));
+        setGreen((long)map.get("green"));
+        setWhite((long)map.get("white"));
     }
 
     @Override
@@ -84,7 +100,7 @@ public class AmbientLightData implements JSONToStringI {
         return sb.toString();
     }
 
-    public final int validateValue(int val)
+    public final long validateValue(long val)
     throws IllegalArgumentException {
         if(val > 4095 || val < 0) {
             throw new IllegalArgumentException(String.format("Val <%d> out of range", val));
