@@ -69,6 +69,12 @@ public class Interface extends MessageHandlerA {
         switch(connectivity) {
             case CONNECTED:
                 msgQueueIn.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
+                dispatcher.dispatch(
+                    new Message(
+                        GuiMessage.SYSTEM_NOTICE,
+                        new NoticeData(NoticeType.INFO, "Hardwareverbindung", "Die Verbindung zur Harware wurde hergestellt")
+                    )
+                );
                 break;
 
             case ERROR:
@@ -76,7 +82,7 @@ public class Interface extends MessageHandlerA {
                 dispatcher.dispatch(
                     new Message(
                         GuiMessage.SYSTEM_NOTICE,
-                        new NoticeData(NoticeType.ERROR, "Hardwarefehler", "Die Verbindung zur Harware wurde unterbrochen")
+                        new NoticeData(NoticeType.ERROR, "Hardwareverbindung", "Die Verbindung zur Harware wurde unterbrochen")
                     )
                 );
                 break;
