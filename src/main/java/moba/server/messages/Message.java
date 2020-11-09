@@ -29,7 +29,6 @@ public class Message implements Comparable {
     protected Object      data     = null;
     protected int         groupId;
     protected int         messageId;
-    protected MessageType messageType = null;
 
     public Message(MessageType msgType, Object data, Endpoint ep) {
         this(msgType, data);
@@ -38,7 +37,6 @@ public class Message implements Comparable {
 
     public Message(MessageType msgType, Object data) {
         this(msgType.getGroupId(), msgType.getMessageId(), data);
-        messageType = msgType;
     }
 
     public Message(int groupId, int msgId, Object data, Endpoint ep) {
@@ -89,10 +87,6 @@ public class Message implements Comparable {
 
     public int getGroupId() {
         return groupId;
-    }
-
-    public MessageType getMessageType() {
-        return messageType;
     }
 
     @Override
