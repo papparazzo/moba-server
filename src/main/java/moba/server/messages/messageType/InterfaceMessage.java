@@ -27,7 +27,8 @@ public enum InterfaceMessage implements MessageType {
     CONNECTIVITY_STATE_CHANGED(1),
     CONTACT_TRIGGERED         (2),
     SET_BRAKE_VECTOR          (3),
-    SET_LOC_SPEED             (4);
+    SET_LOCO_SPEED            (4),
+    SET_LOCO_DIRECTION        (5);
 
     public final static int GROUP_ID = 6;
 
