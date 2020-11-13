@@ -69,7 +69,7 @@ public class Systems extends MessageHandlerA {
                 break;
 
             case GET_HARDWARE_STATE:
-                dispatcher.dispatch(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString(), msg.getEndpoint()));
+                dispatcher.dispatch(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString()), msg.getEndpoint());
                 break;
 
             case HARDWARE_SHUTDOWN:
@@ -187,7 +187,7 @@ public class Systems extends MessageHandlerA {
 
     protected void sendErrorMessage(Endpoint endpoint) {
         dispatcher.dispatch(
-            new Message(ClientMessage.ERROR, new ErrorData(ErrorId.INVALID_STATUS_CHANGE, "Current state is <" + status.toString() + ">"), endpoint)
+            new Message(ClientMessage.ERROR, new ErrorData(ErrorId.INVALID_STATUS_CHANGE, "Current state is <" + status.toString() + ">")), endpoint
         );
     }
 

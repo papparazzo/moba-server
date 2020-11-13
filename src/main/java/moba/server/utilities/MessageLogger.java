@@ -22,6 +22,7 @@ package moba.server.utilities;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import moba.server.com.Endpoint;
 
 import moba.server.datatypes.objects.NoticeData;
 import moba.server.datatypes.objects.ErrorData;
@@ -55,14 +56,14 @@ public class MessageLogger {
     public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
 
     public static void in(Message msg) {
-        MessageLogger.print(msg, MessageType.IN_MESSAGE);
+        MessageLogger.print(msg, MessageType.IN_MESSAGE, msg.getEndpoint());
     }
 
-    public static void out(Message msg) {
-        MessageLogger.print(msg, MessageType.OUT_MESSAGE);
+    public static void out(Message msg, Endpoint ep) {
+        MessageLogger.print(msg, MessageType.OUT_MESSAGE, ep);
     }
 
-    protected static void print(Message msg, MessageType type) {
+    protected static void print(Message msg, MessageType type, Endpoint ep) {
         if(msg == null) {
             return;
         }
@@ -71,9 +72,9 @@ public class MessageLogger {
         SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS ");
         sb.append(df.format(new Date()));
         if(type == MessageType.IN_MESSAGE) {
-            sb.append("--> ");
+            sb.append("-->| ");
         } else {
-            sb.append("<-- ");
+            sb.append("<--| ");
         }
         sb.append("[");
         sb.append(msg.getGroupId());
@@ -82,10 +83,10 @@ public class MessageLogger {
         sb.append("]");
         appendText(sb, msg);
         sb.append(" EP-");
-        if(msg.getEndpoint() == null) {
+        if(ep == null) {
             sb.append("0: NULL");
         } else {
-            sb.append(msg.getEndpoint().toString());
+            sb.append(ep.toString());
         }
         System.out.println(sb);
     }

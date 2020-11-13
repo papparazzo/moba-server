@@ -79,7 +79,7 @@ public class Environment extends MessageHandlerA {
 
                 case GET_ENVIRONMENT:
                     dispatcher.dispatch(
-                        new Message(EnvironmentMessage.SET_ENVIRONMENT, environment, msg.getEndpoint())
+                        new Message(EnvironmentMessage.SET_ENVIRONMENT, environment), msg.getEndpoint()
                     );
                     break;
 
@@ -90,7 +90,7 @@ public class Environment extends MessageHandlerA {
                     break;
 
                 case GET_AMBIENCE:
-                    dispatcher.dispatch(new Message(EnvironmentMessage.SET_AMBIENCE, ambience, msg.getEndpoint()));
+                    dispatcher.dispatch(new Message(EnvironmentMessage.SET_AMBIENCE, ambience), msg.getEndpoint());
                     break;
 
                 case SET_AMBIENCE:
@@ -101,7 +101,7 @@ public class Environment extends MessageHandlerA {
 
                 case GET_AMBIENT_LIGHT:
                     dispatcher.dispatch(
-                        new Message(EnvironmentMessage.SET_AMBIENT_LIGHT, ambientLight, msg.getEndpoint())
+                        new Message(EnvironmentMessage.SET_AMBIENT_LIGHT, ambientLight), msg.getEndpoint()
                     );
                     break;
 

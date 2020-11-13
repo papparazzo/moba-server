@@ -101,7 +101,7 @@ public class Timer extends MessageHandlerA implements Runnable {
             switch(TimerMessage.fromId(msg.getMessageId())) {
                 case GET_GLOBAL_TIMER:
                     dispatcher.dispatch(
-                        new Message(TimerMessage.SET_GLOBAL_TIMER, timerData, msg.getEndpoint())
+                        new Message(TimerMessage.SET_GLOBAL_TIMER, timerData), msg.getEndpoint()
                     );
                     break;
 
@@ -112,8 +112,8 @@ public class Timer extends MessageHandlerA implements Runnable {
                     break;
 
                 case GET_COLOR_THEME:
-                    dispatcher.dispatch(new Message(TimerMessage.SET_COLOR_THEME, themeData, msg.getEndpoint()));
-                    dispatcher.dispatch(new Message(TimerMessage.COLOR_THEME_EVENT, curTheme, msg.getEndpoint()));
+                    dispatcher.dispatch(new Message(TimerMessage.SET_COLOR_THEME, themeData), msg.getEndpoint());
+                    dispatcher.dispatch(new Message(TimerMessage.COLOR_THEME_EVENT, curTheme), msg.getEndpoint());
                     break;
 
                 case SET_COLOR_THEME:

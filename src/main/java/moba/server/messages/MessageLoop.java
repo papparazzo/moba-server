@@ -86,13 +86,13 @@ public class MessageLoop {
 
                 MessageLoop.LOGGER.log(Level.WARNING, err.toString());
 
-                dispatcher.dispatch(new Message(ClientMessage.ERROR, err, msg.getEndpoint()));
+                dispatcher.dispatch(new Message(ClientMessage.ERROR, err), msg.getEndpoint());
                 continue;
             }
             try {
                 handlers.get(msg.getGroupId()).handleMsg(msg);
             } catch(ErrorException e) {
-                dispatcher.dispatch(new Message(ClientMessage.ERROR, e.getErrorData(), msg.getEndpoint()));
+                dispatcher.dispatch(new Message(ClientMessage.ERROR, e.getErrorData()), msg.getEndpoint());
             }
         }
     }
@@ -107,7 +107,7 @@ public class MessageLoop {
 
     protected void resetHandler() {
         dispatcher.getEndpoints().forEach((ep) -> {
-            dispatcher.dispatch(new Message(ClientMessage.RESET, null, ep));
+            dispatcher.dispatch(new Message(ClientMessage.RESET, null), ep);
         });
         Iterator<Integer> iter = handlers.keySet().iterator();
         while(iter.hasNext()) {
@@ -117,7 +117,7 @@ public class MessageLoop {
 
     protected void shutdownHandler() {
         dispatcher.getEndpoints().forEach((ep) -> {
-            dispatcher.dispatch(new Message(ClientMessage.SHUTDOWN, null, ep));
+            dispatcher.dispatch(new Message(ClientMessage.SHUTDOWN, null), ep);
         });
         Iterator<Integer> iter = handlers.keySet().iterator();
         while(iter.hasNext()) {

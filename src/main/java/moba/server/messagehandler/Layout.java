@@ -162,7 +162,7 @@ public class Layout extends MessageHandlerA {
                 ));
             }
         }
-        dispatcher.dispatch(new Message(LayoutMessage.GET_LAYOUTS_RES, arraylist, msg.getEndpoint()));
+        dispatcher.dispatch(new Message(LayoutMessage.GET_LAYOUTS_RES, arraylist), msg.getEndpoint());
     }
 
     protected void deleteLayout(Message msg)
@@ -294,7 +294,7 @@ public class Layout extends MessageHandlerA {
                 ));
             }
             map.put("symbols", arraylist);
-            dispatcher.dispatch(new Message(LayoutMessage.GET_LAYOUT_RES, map, msg.getEndpoint()));
+            dispatcher.dispatch(new Message(LayoutMessage.GET_LAYOUT_RES, map), msg.getEndpoint());
         }
     }
 
