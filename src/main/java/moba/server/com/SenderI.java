@@ -24,4 +24,5 @@ import moba.server.messages.Message;
 
 public interface SenderI {
     public void dispatch(Message msg);
+    public void dispatch(Message msg, Endpoint ep);
 }

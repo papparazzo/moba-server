@@ -164,12 +164,17 @@ public class Dispatcher implements SenderI {
 
     @Override
     public synchronized void dispatch(Message msg) {
+        dispatch(msg, null);
+    }
+
+    @Override
+    public void dispatch(Message msg, Endpoint ep) {
         try {
             if(msg == null) {
                 Dispatcher.LOGGER.log(Level.SEVERE, "msg is null!");
                 return;
             }
-            MessageLogger.out(msg);
+            MessageLogger.out(msg, ep);
 
             StringBuilder sb = new StringBuilder();
             JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
@@ -180,22 +185,25 @@ public class Dispatcher implements SenderI {
             int msgId = msg.getMessageId();
             String data = sb.toString();
 
-            if(msg.getEndpoint() != null) {
-                sendMessage(grpId, msgId, data, msg.getEndpoint());
+            if(ep != null) {
+                sendMessage(grpId, msgId, data, ep);
                 return;
             }
-            sendBroadCastMessage(grpId, msgId, data, grpId);
-            sendBroadCastMessage(grpId, msgId, data, -1);
+            sendBroadCastMessage(grpId, msgId, data, grpId, msg.getEndpoint());
+            sendBroadCastMessage(grpId, msgId, data, -1, msg.getEndpoint());
         } catch(IOException | JSONException e) {
             Dispatcher.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
         }
     }
 
-    protected void sendBroadCastMessage(int grpId, int msgId, String data, int groupKey)
+    protected void sendBroadCastMessage(int grpId, int msgId, String data, int groupKey, Endpoint exclEp)
     throws IOException, JSONException {
         if(this.groupEP.containsKey((long)groupKey)) {
-            for(Endpoint item : this.groupEP.get((long)groupKey)) {
-                sendMessage(grpId, msgId, data, item);
+            for(Endpoint ep : this.groupEP.get((long)groupKey)) {
+                if(ep == exclEp) {
+                    continue;
+                }
+                sendMessage(grpId, msgId, data, ep);
             }
         }
     }
