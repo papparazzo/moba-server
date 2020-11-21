@@ -49,6 +49,7 @@ public class TracklayoutLock {
     public TracklayoutLock(SenderI dispatcher, Database database) {
         this.database   = database;
         this.dispatcher = dispatcher;
+        this.reset();
     }
 
     public boolean tryLock(long id, Endpoint ep)
@@ -74,20 +75,25 @@ public class TracklayoutLock {
         }
     }
 
+    public void reset() {
+         try {
+            Connection con = database.getConnection();
+
+            try(PreparedStatement pstmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL ")) {
+                pstmt.executeUpdate();
+                TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
+            }
+        } catch(SQLException e) {
+            TracklayoutLock.LOGGER.log(Level.WARNING, e.toString());
+        }
+    }
+
     public void freeLocks(long id) {
         try {
             Connection con = database.getConnection();
 
-            String q = "UPDATE `TrackLayouts` SET `Locked` = NULL ";
-
-            if(id != -1) {
-                q += "WHERE `Locked` = ?";
-            }
-
-            try(PreparedStatement pstmt = con.prepareStatement(q)) {
-                if(id != -1) {
-                    pstmt.setLong(1, id);
-                }
+            try(PreparedStatement pstmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL WHERE `Locked` = ?")) {
+                pstmt.setLong(1, id);
                 pstmt.executeUpdate();
                 TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
             }
