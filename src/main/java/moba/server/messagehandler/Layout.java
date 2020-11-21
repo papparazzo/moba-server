@@ -304,6 +304,10 @@ public class Layout extends MessageHandlerA {
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         long id = getId(map.get("id"));
 
+        if(!lock.isLockedByApp(id, msg.getEndpoint())) {
+            throw new ErrorException(ErrorId.DATASET_NOT_LOCKED, "layout <" + String.valueOf(id) + "> not locked");
+        }
+
         Connection con = database.getConnection();
 
         String stmt = "UPDATE `TrackLayouts` SET `ModificationDate` = NOW() WHERE `Id` = ? ";
@@ -316,42 +320,35 @@ public class Layout extends MessageHandlerA {
             }
         }
 
-        if(!lock.isLockedByApp(id, msg.getEndpoint())) {
-            throw new ErrorException(ErrorId.DATASET_NOT_LOCKED, "layout <" + String.valueOf(id) + "> not locked");
-        }
-
         ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
 
+        stmt = "DELETE FROM `TrackLayoutSymbols` WHERE `TrackLayoutId` = ?";
         try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-            for(Object item : arrayList) {
-                Map<String, Object> symbol = (Map<String, Object>)item;
+            pstmt.setLong(1, id);
+            Layout.LOGGER.log(Level.INFO, pstmt.toString());
+            pstmt.executeUpdate();
+        }
 
-                if(symbol.get("xPos") == null || symbol.get("yPos") == null) {
-                    stmt = "DELETE FROM `TrackLayoutSymbols` WHERE  `Id` = ? AND `TrackLayoutId` = ?";
+        for(Object item : arrayList) {
+            Map<String, Object> symbol = (Map<String, Object>)item;
+
+            stmt =
+                "INSERT INTO `TrackLayoutSymbols` (`Id`, `TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
+                "VALUES (?, ?, ?, ?, ?)";
+
+            try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
+                if(symbol.get("id") == null) {
+                    pstmt.setNull(1, java.sql.Types.INTEGER);
+                } else {
                     pstmt.setInt(1, (int)symbol.get("id"));
-                    pstmt.setLong(2, id);
-                    Layout.LOGGER.log(Level.INFO, pstmt.toString());
-                    if(pstmt.executeUpdate() == 0) {
-                        throw new ErrorException(ErrorId.DATASET_MISSING, "could not save <" + String.valueOf(id) + ">");
-                    }
-                    continue;
                 }
 
-                stmt =
-                    "INSERT INTO `TrackLayoutSymbols` (`Id`, `TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
-                    "VALUES (?, ?, ?, ?, ?) " +
-                    "ON DUPLICATE KEY UPDATE `TrackLayoutId` = ?, `XPos` = ?, `YPos` = ?, `Symbol` = ?" ;
-                pstmt.setInt(1, (int)symbol.get("id"));
                 pstmt.setLong(2, id);
-                pstmt.setInt(3, (int)symbol.get("xPos"));
-                pstmt.setInt(4, (int)symbol.get("yPos"));
-                pstmt.setLong(5, id);
-                pstmt.setInt(6, (int)symbol.get("xPos"));
-                pstmt.setInt(7, (int)symbol.get("yPos"));
+                pstmt.setLong(3, (long)symbol.get("xPos"));
+                pstmt.setLong(4, (long)symbol.get("yPos"));
+                pstmt.setLong(5, (long)symbol.get("symbol"));
                 Layout.LOGGER.log(Level.INFO, pstmt.toString());
-                if(pstmt.executeUpdate() == 0) {
-                    throw new ErrorException(ErrorId.DATASET_MISSING, "could not save <" + String.valueOf(id) + ">");
-                }
+                pstmt.executeUpdate();
             }
         }
 
