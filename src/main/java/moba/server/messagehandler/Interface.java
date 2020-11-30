@@ -59,6 +59,11 @@ public class Interface extends MessageHandlerA {
                 return;
 
             case CONTACT_TRIGGERED:
+            case SET_BRAKE_VECTOR:
+            case SET_LOCO_SPEED:
+            case SET_LOCO_DIRECTION:
+                dispatcher.dispatch(msg);
+                return;
 
             default:
                 throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
