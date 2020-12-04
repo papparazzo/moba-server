@@ -73,7 +73,7 @@ public class Timer extends MessageHandlerA implements Runnable {
         if(o != null) {
             themeData.fromJsonObject((Map<String, Object>)o);
         }
-        switch(themeData.getColorThemeCondition()) {
+        switch(themeData.getCondition()) {
             case UNSET:
             case AUTO:
                 // FIXME: ...
@@ -142,7 +142,7 @@ public class Timer extends MessageHandlerA implements Runnable {
                 dispatcher.dispatch(new Message(TimerMessage.GLOBAL_TIMER_EVENT, timerData));
             }
 
-            if(themeData.getColorThemeCondition() != ThreeState.AUTO) {
+            if(themeData.getCondition() != ThreeState.AUTO) {
                 return;
             }
 

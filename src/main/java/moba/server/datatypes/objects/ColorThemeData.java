@@ -52,18 +52,26 @@ public class ColorThemeData implements JSONToStringI {
         return brightTime;
     }
 
-    public ThreeState getColorThemeCondition() {
+    public ThreeState getCondition() {
         return condition;
     }
 
-    public void setColorThemeChangeTimes(Time dimTime, Time brightTime, ThreeState condition)
-    throws IllegalArgumentException {
-        if(dimTime == null || brightTime == null) {
+    public void setDimTime(Time value) {
+        if(value == null) {
             throw new IllegalArgumentException();
         }
-        this.dimTime = dimTime;
-        this.brightTime = brightTime;
-        this.condition = condition;
+        dimTime = value;
+    }
+
+    public void setBrightTime(Time value) {
+        if(value == null) {
+            throw new IllegalArgumentException();
+        }
+        brightTime = value;
+    }
+
+    public void setCondition(ThreeState value) {
+        condition = value;
     }
 
     public void fromJsonObject(Map<String, Object> map) {
