@@ -34,6 +34,22 @@ public class AmbienceData implements JSONToStringI {
     protected boolean curtainUp = false;
     protected boolean mainLightOn = false;
 
+    public boolean getCurtainUp() {
+        return curtainUp;
+    }
+
+    public void setCurtainUp(boolean value) {
+        curtainUp = value;
+    }
+
+    public boolean getMainLightOn() {
+        return mainLightOn;
+    }
+
+    public void setMainLightOn(boolean value) {
+        mainLightOn = value;
+    }
+
     public void fromJsonObject(Map<String, Object> map) {
         curtainUp = ToggleState.getValue((String)map.get("curtainUp"), curtainUp);
         mainLightOn = ToggleState.getValue((String)map.get("mainLightOn"), mainLightOn);
