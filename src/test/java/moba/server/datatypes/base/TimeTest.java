@@ -45,7 +45,7 @@ public class TimeTest {
     public void testGetValue() {
         Time instance = new Time();
         int expResult = 0;
-        int result = instance.getValue();
+        int result = instance.getTime();
         assertEquals(expResult, result);
         fail("The test case is a prototype.");
     }

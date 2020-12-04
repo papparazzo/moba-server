@@ -66,7 +66,7 @@ public class Time implements JSONToStringI {
         value += Integer.parseInt(tokens[1]) * 60;
     }
 
-    public int getValue() {
+    public int getTime() {
         return value;
     }
 

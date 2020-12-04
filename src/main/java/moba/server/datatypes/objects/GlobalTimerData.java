@@ -71,7 +71,7 @@ public class GlobalTimerData implements JSONToStringI {
     public boolean isTimeBetween(Time start, Time end) {
         int time = curModelTime.getValue() ;
         time %= (60 * 60 * 24);
-        if(start.getValue() < time && end.getValue() > time) {
+        if(start.getTime() < time && end.getTime() > time) {
             return true;
         }
         return false;
