@@ -26,9 +26,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import moba.server.com.Dispatcher;
 
 import moba.server.com.Endpoint;
-import moba.server.com.SenderI;
 import moba.server.database.Database;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.utilities.exceptions.ErrorException;
@@ -37,8 +37,8 @@ public class TracklayoutLock {
 
     protected static final int APP_SERVER_ID = 1;
     protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    protected Database database   = null;
-    protected SenderI  dispatcher = null;
+    protected Database   database   = null;
+    protected Dispatcher dispatcher = null;
 
     public enum LockState {
         LOCKED_BY_OWN_APP,
@@ -46,7 +46,7 @@ public class TracklayoutLock {
         UNLOCKED
     }
 
-    public TracklayoutLock(SenderI dispatcher, Database database) {
+    public TracklayoutLock(Dispatcher dispatcher, Database database) {
         this.database   = database;
         this.dispatcher = dispatcher;
         this.reset();
