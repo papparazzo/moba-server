@@ -37,7 +37,7 @@ import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 import moba.server.messages.Message;
 import moba.server.utilities.MessageLogger;
 
-public class Dispatcher implements SenderI {
+public class Dispatcher {
     protected final Set<Endpoint> allEndpoints = new HashSet<>();
     protected final Map<Long, Set<Endpoint>> groupEP = new HashMap<>();
 
@@ -162,12 +162,10 @@ public class Dispatcher implements SenderI {
         return null;
     }
 
-    @Override
     public synchronized void dispatch(Message msg) {
         dispatch(msg, null);
     }
 
-    @Override
     public void dispatch(Message msg, Endpoint ep) {
         try {
             if(msg == null) {
