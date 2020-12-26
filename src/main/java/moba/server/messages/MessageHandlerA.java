@@ -20,10 +20,13 @@
 
 package moba.server.messages;
 
+import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.utilities.exceptions.ErrorException;
 
 public abstract class MessageHandlerA {
+
+    protected Dispatcher dispatcher = null;
 
     public abstract void handleMsg(Message msg)
     throws ErrorException;

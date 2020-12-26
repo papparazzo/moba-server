@@ -23,8 +23,8 @@ package moba.server.messagehandler;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import moba.server.com.Dispatcher;
 
-import moba.server.com.SenderI;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.objects.AmbienceData;
 import moba.server.datatypes.objects.AmbientLightData;
@@ -38,14 +38,13 @@ import moba.server.utilities.config.ConfigException;
 import moba.server.utilities.exceptions.ErrorException;
 
 public class Environment extends MessageHandlerA {
-    protected SenderI dispatcher = null;
     protected Config  config = null;
 
     protected EnvironmentData  environment  = new EnvironmentData();
     protected AmbienceData     ambience     = new AmbienceData();
     protected AmbientLightData ambientLight = new AmbientLightData();
 
-    public Environment(SenderI dispatcher, Config config) {
+    public Environment(Dispatcher dispatcher, Config config) {
         this.dispatcher = dispatcher;
         this.config = config;
     }
@@ -68,7 +67,7 @@ public class Environment extends MessageHandlerA {
         }
         o = config.getSection("environment.ambientlight");
         if(o != null) {
-            setAmbientLight((Map<String, Object>)o);
+            ambientLight = (AmbientLightData)o;
         }
     }
 
@@ -120,17 +119,24 @@ public class Environment extends MessageHandlerA {
     }
 
     protected void setAmbientLight(Map<String, Object> map) {
-        ambientLight.setRed((Integer)map.get("red"));
-        ambientLight.setBlue((Integer)map.get("blue"));
-        ambientLight.setGreen((Integer)map.get("green"));
-        ambientLight.setWhite((Integer)map.get("white"));
+        ambientLight.setRed(convertToLong(map.get("red")));
+        ambientLight.setBlue(convertToLong(map.get("blue")));
+        ambientLight.setGreen(convertToLong(map.get("green")));
+        ambientLight.setWhite(convertToLong(map.get("white")));
+    }
+
+    protected long convertToLong(Object o) {
+        if(o != null && o.getClass() == Integer.class) {
+            return (long)Long.valueOf((Integer)o);
+        }
+        return (Long)o;
     }
 
     protected void storeData()
     throws ConfigException, IOException, JSONException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("ambient",      ambience);
-        map.put("environment",  environment);
+        //map.put("ambient",      ambience);
+        //map.put("environment",  environment);
         map.put("ambientlight", ambientLight);
         config.setSection("environment", map);
         config.writeFile();

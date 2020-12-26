@@ -20,7 +20,7 @@
 
 package moba.server.messagehandler;
 
-import moba.server.com.SenderI;
+import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
@@ -31,9 +31,7 @@ public class Gui extends MessageHandlerA {
 
     protected static final int SYSTEM_NOTICE = 1;
 
-    protected SenderI dispatcher = null;
-
-    public Gui(SenderI dispatcher) {
+    public Gui(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
     }
 

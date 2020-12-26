@@ -20,8 +20,8 @@
 
 package moba.server.messagehandler;
 
+import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
-import moba.server.com.SenderI;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.enumerations.NoticeType;
@@ -38,12 +38,11 @@ import moba.server.utilities.exceptions.ErrorException;
 
 public class Systems extends MessageHandlerA {
     protected HardwareState status = HardwareState.ERROR;
-    protected SenderI dispatcher = null;
     protected MessageQueue msgQueue = null;
 
     protected boolean automaticMode = false;
 
-    public Systems(SenderI dispatcher, MessageQueue msgQueue) {
+    public Systems(Dispatcher dispatcher, MessageQueue msgQueue) {
         this.dispatcher = dispatcher;
         this.msgQueue   = msgQueue;
     }

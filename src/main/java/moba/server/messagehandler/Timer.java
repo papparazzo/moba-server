@@ -20,7 +20,6 @@
 
 package moba.server.messagehandler;
 
-import moba.server.com.SenderI;
 import moba.server.datatypes.enumerations.ColorTheme;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
@@ -33,6 +32,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import moba.server.com.Dispatcher;
 import moba.server.json.JSONException;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
@@ -42,7 +42,6 @@ import moba.server.utilities.config.ConfigException;
 import moba.server.utilities.exceptions.ErrorException;
 
 public class Timer extends MessageHandlerA implements Runnable {
-    protected SenderI         dispatcher = null;
     protected Config          config = null;
     protected final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     protected GlobalTimerData timerData = new GlobalTimerData();
@@ -51,7 +50,7 @@ public class Timer extends MessageHandlerA implements Runnable {
     protected ColorTheme       curTheme = null;
     protected volatile boolean isRunning = false;
 
-    public Timer(SenderI dispatcher, Config config) {
+    public Timer(Dispatcher dispatcher, Config config) {
         this.dispatcher = dispatcher;
         this.config = config;
         this.scheduler.scheduleWithFixedDelay(this, 1, 1, TimeUnit.SECONDS);

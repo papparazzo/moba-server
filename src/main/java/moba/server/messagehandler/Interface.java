@@ -21,7 +21,7 @@
 package moba.server.messagehandler;
 
 import moba.server.application.ServerApplication;
-import moba.server.com.SenderI;
+import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.Connectivity;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.enumerations.NoticeType;
@@ -36,12 +36,11 @@ import moba.server.messages.messageType.InternMessage;
 import moba.server.utilities.exceptions.ErrorException;
 
 public class Interface extends MessageHandlerA {
-    protected SenderI dispatcher = null;
     protected ServerApplication app = null;
 
     protected MessageQueue msgQueueIn = null;
 
-    public Interface(SenderI dispatcher, MessageQueue msgQueueIn) {
+    public Interface(Dispatcher dispatcher, MessageQueue msgQueueIn) {
         this.dispatcher = dispatcher;
         this.msgQueueIn = msgQueueIn;
     }

@@ -26,19 +26,14 @@ import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.objects.ErrorData;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
-import moba.server.messages.MessageQueue;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.exceptions.ErrorException;
 
 public class Client extends MessageHandlerA {
 
-    protected Dispatcher dispatcher = null;
-    protected MessageQueue in = null;
-
-    public Client(Dispatcher dispatcher, MessageQueue msgQueue) {
+    public Client(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
-        this.in  = msgQueue;
     }
 
     @Override

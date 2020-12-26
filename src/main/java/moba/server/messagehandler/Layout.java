@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import moba.server.com.SenderI;
 import moba.server.database.Database;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.objects.TrackLayoutInfoData;
@@ -38,6 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import moba.server.com.Dispatcher;
 import moba.server.json.JSONException;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
@@ -50,12 +50,11 @@ import moba.server.utilities.exceptions.ErrorException;
 public class Layout extends MessageHandlerA {
     protected static final Logger LOGGER       = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     protected Database            database     = null;
-    protected SenderI             dispatcher   = null;
     protected TracklayoutLock     lock         = null;
     protected Config              config       = null;
     protected long                activeLayout = 0;
 
-    public Layout(SenderI dispatcher, Database database, TracklayoutLock lock, Config config) {
+    public Layout(Dispatcher dispatcher, Database database, TracklayoutLock lock, Config config) {
         this.database   = database;
         this.dispatcher = dispatcher;
         this.lock       = lock;

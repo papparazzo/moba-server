@@ -35,7 +35,6 @@ import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.exceptions.ErrorException;
 
 public class Server extends MessageHandlerA {
-    protected Dispatcher dispatcher = null;
     protected ServerApplication app = null;
 
     public Server(Dispatcher dispatcher, ServerApplication app) {
