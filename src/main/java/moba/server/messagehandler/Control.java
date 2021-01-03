@@ -25,25 +25,26 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import moba.server.com.Dispatcher;
 import moba.server.database.Database;
 import moba.server.datatypes.enumerations.ErrorId;
+import moba.server.datatypes.objects.BlockContactData;
+import moba.server.datatypes.objects.ContactData;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
-import moba.server.messages.messageType.BlockingMessage;
+import moba.server.messages.messageType.ControlMessage;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.exceptions.ErrorException;
 
-public class Blocking extends MessageHandlerA {
+public class Control extends MessageHandlerA {
     protected static final Logger LOGGER       = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     protected Database            database     = null;
     protected Config              config       = null;
     protected long                activeLayout = 0;
 
-    public Blocking(Dispatcher dispatcher, Database database, Config config) {
+    public Control(Dispatcher dispatcher, Database database, Config config) {
         this.dispatcher = dispatcher;
         this.database   = database;
         this.config     = config;
@@ -51,7 +52,7 @@ public class Blocking extends MessageHandlerA {
 
     @Override
     public int getGroupId() {
-        return BlockingMessage.GROUP_ID;
+        return ControlMessage.GROUP_ID;
     }
 
     @Override
@@ -66,7 +67,7 @@ public class Blocking extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg) throws ErrorException {
         try {
-            switch(BlockingMessage.fromId(msg.getMessageId())) {
+            switch(ControlMessage.fromId(msg.getMessageId())) {
                 case GET_CONTACT_LIST_REQ:
                     getContactList(msg);
                     break;
@@ -82,41 +83,40 @@ public class Blocking extends MessageHandlerA {
 
         Connection con = database.getConnection();
 
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("id", id);
-
         String q =
-            "SELECT `LocalId`, `Symbol` " +
-            "FROM `BlockSectionData` " +
-            "LEFT JOIN FeedbackContacts " +
-            "ON " +
-            "WHERE `Id` = ?";
+            "SELECT `BlockSections`.`Id`, `BlockSections`.`LocalId`, " +
+            "`TrackLayoutSymbols`.`XPos`, `TrackLayoutSymbols`.`YPos`, " +
+            "`TriggerContact`.`ModulAddress` AS `TriggerModulAddress`, " +
+            "`TriggerContact`.`ContactNumber` AS `TriggerModulContactNumber`, " +
+            "`BlockContact`.`ModulAddress` AS `BlockModulAddress`, " +
+            "`BlockContact`.`ContactNumber` AS `BlockModulContactNumber` " +
+            "FROM `BlockSections` " +
+            "LEFT JOIN `FeedbackContacts` AS `TriggerContact` " +
+            "ON `BlockContactId` = `TriggerContact`.`Id` " +
+            "LEFT JOIN `FeedbackContacts` AS `BlockContact` " +
+            "ON `BrakeTriggerContactId` = `BlockContact`.`Id` " +
+            "LEFT JOIN `TrackLayoutSymbols` " +
+            "ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` " +
+            "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setLong(1, id);
             Layout.LOGGER.log(Level.INFO, pstmt.toString());
 
-
-         //   brakeTriggerContact
-//blockContact
-
-
-
-            //ArrayList<TracklayoutSymbolData> arraylist;
+            ArrayList<BlockContactData> arraylist;
             ResultSet rs = pstmt.executeQuery();
-            //arraylist = new ArrayList();
+            arraylist = new ArrayList();
             while(rs.next()) {
-                /*
-                arraylist.add(new TracklayoutSymbolData(
-                    rs.getLong("Id"),
-                    rs.getLong("XPos"),
-                    rs.getLong("YPos"),
-                    rs.getLong("Symbol")
+                arraylist.add(new BlockContactData(
+                    rs.getInt("Id"),
+                    rs.getInt("XPos"),
+                    rs.getInt("YPos"),
+                    new ContactData(rs.getInt("TriggerModulAddress"), rs.getInt("TriggerModulContactNumber")),
+                    new ContactData(rs.getInt("BlockModulAddress"), rs.getInt("BlockModulContactNumber")),
+                    rs.getInt("LocalId")
                 ));
-                */
             }
-            //map.put("symbols", arraylist);
-            dispatcher.dispatch(new Message(BlockingMessage.GET_CONTACT_LIST_RES, map), msg.getEndpoint());
+            dispatcher.dispatch(new Message(ControlMessage.GET_CONTACT_LIST_RES, arraylist), msg.getEndpoint());
         }
     }
 

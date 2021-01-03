@@ -26,8 +26,8 @@ import moba.server.com.Acceptor;
 import moba.server.com.Dispatcher;
 import moba.server.database.Database;
 import moba.server.database.DatabaseException;
-import moba.server.messagehandler.Blocking;
 import moba.server.messagehandler.Client;
+import moba.server.messagehandler.Control;
 import moba.server.messagehandler.Environment;
 import moba.server.messagehandler.Timer;
 import moba.server.messagehandler.Interface;
@@ -60,7 +60,7 @@ public class ServerApplication extends Application {
                 loop.addHandler(new Systems(dispatcher, msgQueueIn));
                 loop.addHandler(new Layout(dispatcher, database, tracklayoutLock, config));
                 loop.addHandler(new Interface(dispatcher, msgQueueIn));
-                loop.addHandler(new Blocking(dispatcher, database, config));
+                loop.addHandler(new Control(dispatcher, database, config));
                 acceptor.startAcceptor();
                 restart = loop.loop(msgQueueIn);
                 dispatcher.resetDispatcher();
