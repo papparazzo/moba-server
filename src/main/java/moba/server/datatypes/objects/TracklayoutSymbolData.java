@@ -19,14 +19,7 @@
  */
 package moba.server.datatypes.objects;
 
-import java.io.IOException;
-import java.util.HashMap;
-import moba.server.json.JSONEncoder;
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
-
-public class TracklayoutSymbolData implements JSONToStringI {
+public class TracklayoutSymbolData {
     protected long    id;
     protected long    symbol;
     protected long    xPos;
@@ -39,19 +32,19 @@ public class TracklayoutSymbolData implements JSONToStringI {
         this.symbol = symbol;
     }
 
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("id",          id);
-        map.put("xPos",        xPos);
-        map.put("yPos",        yPos);
-        map.put("symbol",      symbol);
+    public long getId() {
+        return id;
+    }
 
-        StringBuilder sb = new StringBuilder();
-        JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb, formated);
-        encoder.encode(map);
-        return sb.toString();
+    public long getSymbol() {
+        return symbol;
+    }
+
+    public long getXPos() {
+        return xPos;
+    }
+
+    public long getYPos() {
+        return yPos;
     }
 }

@@ -48,6 +48,14 @@ public class ErrorData implements JSONToStringI {
         return "[" + errorId.toString() + "] " + additonalMsg;
     }
 
+    public ErrorId getErrorId() {
+        return errorId;
+    }
+
+    public String getAdditonalMsg() {
+        return additonalMsg;
+    }
+
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {

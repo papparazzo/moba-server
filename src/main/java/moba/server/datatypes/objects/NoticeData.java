@@ -20,18 +20,11 @@
 
 package moba.server.datatypes.objects;
 
-import java.io.IOException;
-import java.util.HashMap;
-
 import moba.server.datatypes.enumerations.NoticeType;
-import moba.server.json.JSONEncoder;
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 
-public class NoticeData implements JSONToStringI {
+public class NoticeData {
 
-    protected final NoticeType noticeType;
+    protected final NoticeType type;
     protected final String caption;
     protected final String text;
 
@@ -44,13 +37,13 @@ public class NoticeData implements JSONToStringI {
     }
 
     public NoticeData(NoticeType noticeType, String caption, String text) {
-        this.noticeType = noticeType;
+        this.type = noticeType;
         this.caption = caption;
         this.text = text;
     }
 
     public NoticeType getType() {
-        return noticeType;
+        return type;
     }
 
     public String getCaption() {
@@ -59,20 +52,5 @@ public class NoticeData implements JSONToStringI {
 
     public String getText() {
         return text;
-    }
-
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("type",    noticeType);
-        map.put("caption", caption);
-        map.put("text",    text);
-
-        StringBuilder sb = new StringBuilder();
-        JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb, formated);
-        encoder.encode(map, indent);
-        return sb.toString();
     }
 }

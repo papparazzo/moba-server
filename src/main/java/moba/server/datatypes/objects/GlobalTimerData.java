@@ -20,18 +20,11 @@
 
 package moba.server.datatypes.objects;
 
-import java.io.IOException;
-import java.util.HashMap;
-
 import moba.server.datatypes.base.DayTime;
 import moba.server.datatypes.base.Time;
 import java.util.Map;
-import moba.server.json.JSONEncoder;
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 
-public class GlobalTimerData implements JSONToStringI {
+public class GlobalTimerData {
     protected DayTime curModelTime = new DayTime();
     protected int     multiplicator = 240;
 
@@ -75,19 +68,5 @@ public class GlobalTimerData implements JSONToStringI {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("curModelTime",  curModelTime);
-        map.put("multiplicator", multiplicator);
-
-        StringBuilder sb = new StringBuilder();
-        JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb, formated);
-        encoder.encode(map, indent);
-        return sb.toString();
     }
 }
