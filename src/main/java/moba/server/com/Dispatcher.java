@@ -29,28 +29,26 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import moba.server.json.JSONEncoder;
 
 import moba.server.json.JSONException;
 import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 import moba.server.messages.Message;
 import moba.server.utilities.MessageLogger;
+import moba.server.utilities.logger.Loggable;
 
-public class Dispatcher {
+public class Dispatcher implements Loggable {
     protected final Set<Endpoint> allEndpoints = new HashSet<>();
     protected final Map<Long, Set<Endpoint>> groupEP = new HashMap<>();
 
-    protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-
     public boolean addEndpoint(Endpoint ep) {
-        Dispatcher.LOGGER.log(Level.INFO, "try to add endpoint <{0}> appName <{1}> ver<{2}>", new Object[]{ep, ep.getAppName(), ep.getVersion()});
+        getLogger().log(Level.INFO, "try to add endpoint <{0}> appName <{1}> ver<{2}>", new Object[]{ep, ep.getAppName(), ep.getVersion()});
 
         Iterator<Endpoint> iter = allEndpoints.iterator();
 
         while(iter.hasNext()) {
             if(iter.next() == ep) {
-                Dispatcher.LOGGER.log(Level.WARNING, "Enpoint <{0}> allready set", new Object[]{ep});
+                getLogger().log(Level.WARNING, "Enpoint <{0}> allready set", new Object[]{ep});
                 return false;
             }
         }
@@ -86,7 +84,7 @@ public class Dispatcher {
         }
 
         if(!removed) {
-            Dispatcher.LOGGER.log(Level.WARNING, "could not remove endpoint <{0}> from set!", new Object[]{ep});
+            getLogger().log(Level.WARNING, "could not remove endpoint <{0}> from set!", new Object[]{ep});
         }
 
         removeEndpointFromGroup((long)-1, ep);
@@ -94,7 +92,7 @@ public class Dispatcher {
         ep.getMsgGroups().forEach((msgGroup) -> {
             removeEndpointFromGroup(msgGroup, ep);
         });
-        Dispatcher.LOGGER.log(Level.INFO, "endpoint <{0}> succesfully removed!", new Object[]{ep});
+        getLogger().log(Level.INFO, "endpoint <{0}> succesfully removed!", new Object[]{ep});
     }
 
     protected void addEndpointToGroup(Long grpId, Endpoint ep) {
@@ -127,13 +125,13 @@ public class Dispatcher {
                 ep.interrupt();
                 ep.join(250);
             } catch(InterruptedException e) {
-                Dispatcher.LOGGER.log(Level.WARNING, "InterruptedException occured! <{0}>", new Object[]{e.toString()});
+                getLogger().log(Level.WARNING, "InterruptedException occured! <{0}>", new Object[]{e.toString()});
             }
         }
         try {
             ep.closeEndpoint();
         } catch(Exception e) {
-            Dispatcher.LOGGER.log(Level.WARNING, "Exception occured! <{0}> Closing socket failed!", new Object[]{e.toString()});
+            getLogger().log(Level.WARNING, "Exception occured! <{0}> Closing socket failed!", new Object[]{e.toString()});
         }
     }
 
@@ -169,7 +167,7 @@ public class Dispatcher {
     public void dispatch(Message msg, Endpoint ep) {
         try {
             if(msg == null) {
-                Dispatcher.LOGGER.log(Level.SEVERE, "msg is null!");
+                getLogger().log(Level.SEVERE, "msg is null!");
                 return;
             }
             MessageLogger.out(msg, ep);
@@ -190,7 +188,7 @@ public class Dispatcher {
             sendBroadCastMessage(grpId, msgId, data, grpId, msg.getEndpoint());
             sendBroadCastMessage(grpId, msgId, data, -1, msg.getEndpoint());
         } catch(IOException | JSONException e) {
-            Dispatcher.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
         }
     }
 

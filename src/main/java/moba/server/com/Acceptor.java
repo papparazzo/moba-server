@@ -24,12 +24,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import moba.server.messages.MessageQueue;
+import moba.server.utilities.logger.Loggable;
 
-public class Acceptor extends Thread {
-    protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+public class Acceptor extends Thread implements Loggable {
 
     private MessageQueue in = null;
 
@@ -58,11 +57,11 @@ public class Acceptor extends Thread {
             interrupt();
             join(250);
         } catch(IOException e) {
-            Acceptor.LOGGER.log(Level.WARNING, "could not close server socket! <{0}>", new Object[]{e.toString()});
+            getLogger().log(Level.WARNING, "could not close server socket! <{0}>", new Object[]{e.toString()});
         } catch(InterruptedException e) {
-            Acceptor.LOGGER.log(Level.WARNING, "InterruptedException occured! <{0}>", new Object[]{e.toString()});
+            getLogger().log(Level.WARNING, "InterruptedException occured! <{0}>", new Object[]{e.toString()});
         }
-        Acceptor.LOGGER.info("Acceptor sucessfull stoped.");
+        getLogger().info("Acceptor sucessfull stoped.");
     }
 
     @Override
@@ -70,7 +69,7 @@ public class Acceptor extends Thread {
         long    id = 0;
         boolean isinit = false;
 
-        Acceptor.LOGGER.info("acceptor-thread started");
+        getLogger().info("acceptor-thread started");
 
         try {
             do {
@@ -78,25 +77,25 @@ public class Acceptor extends Thread {
                     serverSocket = new ServerSocket(serverport);
                     isinit = true;
                 } catch(IOException e) {
-                    Acceptor.LOGGER.log(Level.WARNING, "binding on port <{0}> failed! <{1}>", new Object[]{this.serverport, e.toString()});
+                    getLogger().log(Level.WARNING, "binding on port <{0}> failed! <{1}>", new Object[]{this.serverport, e.toString()});
                     Thread.sleep(2500);
                 }
             } while(!isinit && !isInterrupted());
 
-            Acceptor.LOGGER.log(Level.INFO, "Succesfull bind on port <{0}>", new Object[]{serverport});
+            getLogger().log(Level.INFO, "Succesfull bind on port <{0}>", new Object[]{serverport});
 
             while(!isInterrupted()) {
                 Socket socket = serverSocket.accept();
-                Acceptor.LOGGER.log(Level.INFO, "new client <{0}> socket <{1}>", new Object[]{id, socket.toString()});
+                getLogger().log(Level.INFO, "new client <{0}> socket <{1}>", new Object[]{id, socket.toString()});
                 if(dispatcher.getEndPointsCount() == maxClients) {
-                    Acceptor.LOGGER.log(Level.SEVERE, "Max amount of clients <{0}> connected!", new Object[]{id});
+                    getLogger().log(Level.SEVERE, "Max amount of clients <{0}> connected!", new Object[]{id});
                     break;
                 }
                 (new Endpoint(++id, socket, in)).start();
             }
         } catch (InterruptedException | IOException e) {
-            Acceptor.LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
         }
-        Acceptor.LOGGER.info("acceptor-thread terminated");
+        getLogger().info("acceptor-thread terminated");
     }
 }

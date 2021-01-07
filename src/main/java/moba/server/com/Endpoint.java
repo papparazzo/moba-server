@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import moba.server.datatypes.base.Version;
 import moba.server.json.JSONDecoder;
@@ -43,8 +42,9 @@ import moba.server.json.stringreader.JSONStringReader;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
+import moba.server.utilities.logger.Loggable;
 
-public class Endpoint extends Thread implements JSONToStringI {
+public class Endpoint extends Thread implements JSONToStringI, Loggable {
 
     protected long     id;
     protected long     startTime;
@@ -59,8 +59,6 @@ public class Endpoint extends Thread implements JSONToStringI {
 
     protected DataOutputStream dataOutputStream;
     protected DataInputStream  dataInputStream;
-
-    protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     public Endpoint(long id, Socket socket, PriorityBlockingQueue<Message> in)
     throws IOException {
@@ -118,19 +116,19 @@ public class Endpoint extends Thread implements JSONToStringI {
 
     @Override
     public void run() {
-        Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: thread started", new Object[]{id});
+        getLogger().log(Level.INFO, "Endpoint #{0}: thread started", new Object[]{id});
         try {
             init();
             while(!isInterrupted()) {
                 in.add(getNextMessage());
             }
         } catch(IOException e) {
-            Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: IOException, closing client... <{1}>", new Object[]{id, e.toString()});
+            getLogger().log(Level.INFO, "Endpoint #{0}: IOException, closing client... <{1}>", new Object[]{id, e.toString()});
             in.add(new Message(InternMessage.CLIENT_SHUTDOWN, null, this));
         } catch(NullPointerException e) {
             // noop
         }
-        Endpoint.LOGGER.log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
+        getLogger().log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
     }
 
     public long getAppId() {
@@ -171,7 +169,7 @@ public class Endpoint extends Thread implements JSONToStringI {
             }
             throw new IOException(e);
         } catch(JSONException e) {
-            Endpoint.LOGGER.log(Level.SEVERE, "Endpoint #{0}: JSONException <{1}>", new Object[]{id, e.toString()});
+            getLogger().log(Level.SEVERE, "Endpoint #{0}: JSONException <{1}>", new Object[]{id, e.toString()});
             throw new IOException(e);
         }
     }
