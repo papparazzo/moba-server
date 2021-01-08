@@ -20,51 +20,21 @@
 
 package moba.server.datatypes.objects;
 
-import java.io.IOException;
-import java.util.HashMap;
-import moba.server.json.JSONEncoder;
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
-
-public final class ContactData implements JSONToStringI {
+public final class ContactData {
 
     protected int modulAddr;
     protected int contactNb;
 
-    public ContactData() {
-    }
-
     public ContactData(int modulAddr, int contactNb) {
-        setModulAddr(modulAddr);
-    }
-
-    public void setModulAddr(int val) {
-        modulAddr = val;
+        this.modulAddr = modulAddr;
+        this.contactNb = contactNb;
     }
 
     public int getModulAddr() {
         return modulAddr;
     }
 
-    public void setContactNb(int val) {
-        contactNb = val;
-    }
-
     public int getContactNb() {
         return contactNb;
-    }
-
-    @Override
-    public String toJsonString(boolean formated, int indent) throws JSONException, IOException {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("modulAddr",   modulAddr);
-        map.put("contactNb",  contactNb);
-
-        StringBuilder sb = new StringBuilder();
-        JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb, formated);
-        encoder.encode(map, indent);
-        return sb.toString();
     }
 }

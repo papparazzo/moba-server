@@ -19,64 +19,45 @@
  */
 package moba.server.datatypes.objects;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-import moba.server.json.JSONEncoder;
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
+public class BlockContactData {
 
-public class BlockContactData implements JSONToStringI, Serializable {
+    private final ContactData brakeTriggerContact;
+    private final ContactData blockContact;
+    private final int         trainId;
+    private final int         id;
+    private final int         xPos;
+    private final int         yPos;
 
-    private ContactData breakTriggerContact;
-    private ContactData blockContact;
-    private int         localId;
-
-    public BlockContactData() {
-    }
-
-    public BlockContactData(ContactData breakTriggerContact, ContactData blockContact, int localId) {
-        this.breakTriggerContact = breakTriggerContact;
+    public BlockContactData(int id, int xPos, int yPos, ContactData brakeTriggerContact, ContactData blockContact, int trainId) {
+        this.id   = id;
+        this.xPos = xPos;
+        this.yPos = yPos;
+        this.brakeTriggerContact = brakeTriggerContact;
         this.blockContact = blockContact;
-        this.localId = localId;
+        this.trainId = trainId;
     }
 
-    @Override
-    public String toJsonString(boolean formated, int indent) throws JSONException, IOException {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("breakTriggerContact",  breakTriggerContact);
-        map.put("blockContact", blockContact);
-        map.put("localId", localId);
-
-        StringBuilder sb = new StringBuilder();
-        JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb, formated);
-        encoder.encode(map, indent);
-        return sb.toString();
+    public int getId() {
+        return id;
     }
 
-    public ContactData getBreakTriggerContact() {
-        return breakTriggerContact;
+    public int getXPos() {
+        return xPos;
+    }
+
+    public int getYPos() {
+        return yPos;
+    }
+
+    public ContactData getBrakeTriggerContact() {
+        return brakeTriggerContact;
     }
 
     public ContactData getBlockContact() {
         return blockContact;
     }
 
-    public int getLocalId() {
-        return localId;
-    }
-
-    public void setBreakTriggerContact(ContactData value) {
-        breakTriggerContact = value;
-    }
-
-    public void setBlockContact(ContactData value) {
-        blockContact = value;
-    }
-
-    public void setLocalId(int value) {
-        localId = value;
+    public int getTrainId() {
+        return trainId;
     }
 }

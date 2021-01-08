@@ -20,18 +20,12 @@
 
 package moba.server.datatypes.objects;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import moba.server.datatypes.base.Time;
 import moba.server.datatypes.enumerations.ThreeState;
-import moba.server.json.JSONEncoder;
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 
-public class ColorThemeData implements JSONToStringI {
+public class ColorThemeData {
 
     protected Time dimTime;
     protected Time brightTime;
@@ -78,20 +72,5 @@ public class ColorThemeData implements JSONToStringI {
         dimTime = new Time((String)map.get("dimTime"));
         brightTime = new Time((String)map.get("brightTime"));
         condition = ThreeState.getValue((String)map.get("condition"), condition);
-    }
-
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("dimTime",    dimTime);
-        map.put("brightTime", brightTime);
-        map.put("condition",  condition);
-
-        StringBuilder sb = new StringBuilder();
-        JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb, formated);
-        encoder.encode(map, indent);
-        return sb.toString();
     }
 }

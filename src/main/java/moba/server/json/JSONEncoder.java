@@ -26,9 +26,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 import moba.server.json.streamwriter.JSONStreamWriterI;
 
@@ -83,6 +87,56 @@ public class JSONEncoder {
         writer.write('}');
     }
 
+    protected void addObject(Object object)
+    throws IOException, JSONException {
+        writer.write('{');
+
+        Class<?> klass = object.getClass();
+
+        boolean firstIteration = true;
+
+        Method[] methods = klass.getDeclaredMethods();
+        for(final Method method : methods) {
+            final int modifiers = method.getModifiers();
+
+            if(!Modifier.isPublic(modifiers) || Modifier.isStatic(modifiers)) {
+                continue;
+            }
+
+            if(method.getParameterTypes().length > 0 || method.getReturnType() == Void.TYPE) {
+                continue;
+            }
+
+            String methodName = method.getName();
+
+            if(methodName.equals("getClass") && methodName.equals("getDeclaringClass")) {
+                continue;
+            }
+
+            if(!methodName.startsWith("get") || methodName.length() <= 3) {
+                continue;
+            }
+
+            String key = methodName.substring(3);
+
+            key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
+
+            try {
+                if(!firstIteration) {
+                    writer.write(',');
+                }
+
+                writer.write('"');
+                writer.write(key);
+                writer.write("\":");
+                addJSONValue(method.invoke(object));
+                firstIteration = false;
+            } catch (IllegalAccessException | InvocationTargetException ignore) {
+            }
+        }
+        writer.write('}');
+    }
+
     protected void addJSONValue(Object object)
     throws IOException, JSONException {
         if(object == null) {
@@ -114,7 +168,7 @@ public class JSONEncoder {
         } else if(object instanceof Set) {
             addSet((Set)object);
         } else {
-            addString(object.toString());
+            addObject(object);
         }
     }
 
