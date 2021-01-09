@@ -26,7 +26,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import moba.server.database.Database;
 import moba.server.datatypes.enumerations.ErrorId;
@@ -46,13 +45,13 @@ import moba.server.tracklayout.utilities.TracklayoutLock;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.config.ConfigException;
 import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.logger.Loggable;
 
-public class Layout extends MessageHandlerA {
-    protected static final Logger LOGGER       = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    protected Database            database     = null;
-    protected TracklayoutLock     lock         = null;
-    protected Config              config       = null;
-    protected long                activeLayout = 0;
+public class Layout extends MessageHandlerA implements Loggable {
+    protected Database        database     = null;
+    protected TracklayoutLock lock         = null;
+    protected Config          config       = null;
+    protected long            activeLayout = 0;
 
     public Layout(Dispatcher dispatcher, Database database, TracklayoutLock lock, Config config) {
         this.database   = database;
@@ -81,7 +80,7 @@ public class Layout extends MessageHandlerA {
         try {
             storeData();
         } catch(ConfigException | IOException | JSONException e) {
-            LOGGER.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
         }
     }
 
@@ -145,7 +144,7 @@ public class Layout extends MessageHandlerA {
         String q = "SELECT * FROM `TrackLayouts`;";
 
         ArrayList<TrackLayoutInfoData> arraylist;
-        LOGGER.log(Level.INFO, q);
+        getLogger().log(Level.INFO, q);
         try(ResultSet rs = database.query(q)) {
             arraylist = new ArrayList();
             while(rs.next()) {
@@ -175,7 +174,7 @@ public class Layout extends MessageHandlerA {
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setLong(1, msg.getEndpoint().getAppId());
             pstmt.setLong(2, id);
-            LOGGER.log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
+            getLogger().log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
             if(pstmt.executeUpdate() == 0) {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "could not delete <" + String.valueOf(id) + ">");
             }
@@ -202,7 +201,7 @@ public class Layout extends MessageHandlerA {
             pstmt.setString(2, tl.getDescription());
             pstmt.setLong(3, currAppId);
             pstmt.executeUpdate();
-            LOGGER.log(Level.INFO, pstmt.toString());
+            getLogger().log(Level.INFO, pstmt.toString());
             try(ResultSet rs = pstmt.getGeneratedKeys()) {
                 rs.next();
                 int id = rs.getInt(1);
@@ -237,7 +236,7 @@ public class Layout extends MessageHandlerA {
             pstmt.setDate(3, new java.sql.Date(tl.getModificationDate().getTime()));
             pstmt.setLong(4, appId);
             pstmt.setLong(5, id);
-            LOGGER.log(Level.INFO, pstmt.toString());
+            getLogger().log(Level.INFO, pstmt.toString());
             if(pstmt.executeUpdate() == 0) {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(id) + ">");
             }
@@ -279,7 +278,7 @@ public class Layout extends MessageHandlerA {
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setLong(1, id);
-            LOGGER.log(Level.INFO, pstmt.toString());
+            getLogger().log(Level.INFO, pstmt.toString());
 
             ArrayList<TracklayoutSymbolData> arraylist;
             ResultSet rs = pstmt.executeQuery();
@@ -313,7 +312,7 @@ public class Layout extends MessageHandlerA {
 
         try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
             pstmt.setLong(1, id);
-            LOGGER.log(Level.INFO, pstmt.toString());
+            getLogger().log(Level.INFO, pstmt.toString());
             if(pstmt.executeUpdate() == 0) {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "could not save <" + String.valueOf(id) + ">");
             }
@@ -324,7 +323,7 @@ public class Layout extends MessageHandlerA {
         stmt = "DELETE FROM `TrackLayoutSymbols` WHERE `TrackLayoutId` = ?";
         try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
             pstmt.setLong(1, id);
-            LOGGER.log(Level.INFO, pstmt.toString());
+            getLogger().log(Level.INFO, pstmt.toString());
             pstmt.executeUpdate();
         }
 
@@ -346,7 +345,7 @@ public class Layout extends MessageHandlerA {
                 pstmt.setLong(3, (long)symbol.get("xPos"));
                 pstmt.setLong(4, (long)symbol.get("yPos"));
                 pstmt.setLong(5, (long)symbol.get("symbol"));
-                LOGGER.log(Level.INFO, pstmt.toString());
+                getLogger().log(Level.INFO, pstmt.toString());
                 pstmt.executeUpdate();
             }
         }
@@ -361,7 +360,7 @@ public class Layout extends MessageHandlerA {
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setLong(1, id);
-            LOGGER.log(Level.INFO, pstmt.toString());
+            getLogger().log(Level.INFO, pstmt.toString());
             ResultSet rs = pstmt.executeQuery();
             if(!rs.next()) {
                 throw new NoSuchElementException(String.format("no elements found for layout <%4d>", id));

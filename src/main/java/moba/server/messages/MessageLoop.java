@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.ErrorId;
@@ -35,9 +34,9 @@ import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
 import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.logger.Loggable;
 
-public class MessageLoop {
-    protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+public class MessageLoop implements Loggable {
 
     protected Map<Integer, MessageHandlerA> handlers = new HashMap<>();
     protected Dispatcher dispatcher = null;
@@ -84,7 +83,7 @@ public class MessageLoop {
             if(!handlers.containsKey(msg.getGroupId())) {
                 ErrorData err = new ErrorData(ErrorId.UNKNOWN_GROUP_ID, "handler for group <" + Integer.toString(msg.getGroupId()) + "> was not registered!");
 
-                MessageLoop.LOGGER.log(Level.WARNING, err.toString());
+                getLogger().log(Level.WARNING, err.toString());
 
                 dispatcher.dispatch(new Message(ClientMessage.ERROR, err), msg.getEndpoint());
                 continue;

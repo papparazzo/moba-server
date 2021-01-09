@@ -25,18 +25,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import moba.server.com.Dispatcher;
 
 import moba.server.com.Endpoint;
 import moba.server.database.Database;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.logger.Loggable;
 
-public class TracklayoutLock {
+public final class TracklayoutLock implements Loggable {
 
     protected static final int APP_SERVER_ID = 1;
-    protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     protected Database   database   = null;
     protected Dispatcher dispatcher = null;
 
@@ -66,7 +65,7 @@ public class TracklayoutLock {
             pstmt.setLong(2, appId);
             pstmt.setLong(3, id);
 
-            TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
+            getLogger().log(Level.INFO, pstmt.toString());
 
             if(pstmt.executeUpdate() == 0) {
                 return false;
@@ -81,10 +80,10 @@ public class TracklayoutLock {
 
             try(PreparedStatement pstmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL ")) {
                 pstmt.executeUpdate();
-                TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
+                getLogger().log(Level.INFO, pstmt.toString());
             }
         } catch(SQLException e) {
-            TracklayoutLock.LOGGER.log(Level.WARNING, e.toString());
+            getLogger().log(Level.WARNING, e.toString());
         }
     }
 
@@ -95,10 +94,10 @@ public class TracklayoutLock {
             try(PreparedStatement pstmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL WHERE `Locked` = ?")) {
                 pstmt.setLong(1, id);
                 pstmt.executeUpdate();
-                TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
+                getLogger().log(Level.INFO, pstmt.toString());
             }
         } catch(SQLException e) {
-            TracklayoutLock.LOGGER.log(Level.WARNING, e.toString());
+            getLogger().log(Level.WARNING, e.toString());
         }
     }
 
@@ -107,7 +106,7 @@ public class TracklayoutLock {
         long appId = getAppId(ep);
         long lockedBy = getIdOfLockingApp(id);
 
-        TracklayoutLock.LOGGER.log(Level.INFO, "layout <{0}> is locked by <{1}>", new Object[]{id, lockedBy});
+        getLogger().log(Level.INFO, "layout <{0}> is locked by <{1}>", new Object[]{id, lockedBy});
 
         if(lockedBy == 0) {
             return false;
@@ -126,7 +125,7 @@ public class TracklayoutLock {
 
         try(PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setLong(1, id);
-            TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
+            getLogger().log(Level.INFO, pstmt.toString());
             ResultSet rs = pstmt.executeQuery();
             if(!rs.next()) {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + Long.toString(id) + ">");
@@ -148,7 +147,7 @@ public class TracklayoutLock {
             pstmt.setLong(1, getAppId(ep));
             pstmt.setLong(2, id);
 
-            TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
+            getLogger().log(Level.INFO, pstmt.toString());
 
             if(pstmt.executeUpdate() == 0) {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + Long.toString(id) + ">");
@@ -168,7 +167,7 @@ public class TracklayoutLock {
             pstmt.setLong(1, getAppId(ep));
             pstmt.setLong(2, id);
 
-            TracklayoutLock.LOGGER.log(Level.INFO, pstmt.toString());
+            getLogger().log(Level.INFO, pstmt.toString());
 
             if(pstmt.executeUpdate() == 0) {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + Long.toString(id) + ">");
