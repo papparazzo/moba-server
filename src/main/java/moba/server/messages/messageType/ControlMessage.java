@@ -26,8 +26,8 @@ import moba.server.utilities.exceptions.ErrorException;
 public enum ControlMessage implements MessageType {
     GET_CONTACT_LIST_REQ      (1),
     GET_CONTACT_LIST_RES      (2),
-    GET_SWITCH_STATE_LIST_REQ (3),
-    GET_SWITCH_STATE_LIST_RES (4),
+    GET_SWITCH_STAND_LIST_REQ (3),
+    GET_SWITCH_STAND_LIST_RES (4),
     GET_TRAIN_LIST_REQ        (5),
     GET_TRAIN_LIST_RES        (6);
 
