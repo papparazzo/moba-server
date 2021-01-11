@@ -25,13 +25,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import moba.server.com.Dispatcher;
 import moba.server.database.Database;
+import moba.server.datatypes.enumerations.DrivingDirection;
 import moba.server.datatypes.enumerations.ErrorId;
+import moba.server.datatypes.enumerations.SwitchStand;
 import moba.server.datatypes.objects.BlockContactData;
 import moba.server.datatypes.objects.ContactData;
+import moba.server.datatypes.objects.SwitchStateData;
+import moba.server.datatypes.objects.TrainData;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.ControlMessage;
@@ -39,7 +42,6 @@ import moba.server.utilities.config.Config;
 import moba.server.utilities.exceptions.ErrorException;
 
 public class Control extends MessageHandlerA {
-    protected static final Logger LOGGER       = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     protected Database            database     = null;
     protected Config              config       = null;
     protected long                activeLayout = 0;
@@ -71,6 +73,14 @@ public class Control extends MessageHandlerA {
                 case GET_CONTACT_LIST_REQ:
                     getContactList(msg);
                     break;
+
+                case GET_SWITCH_STAND_LIST_REQ:
+                    getSwitchStateList(msg);
+                    break;
+
+                case GET_TRAIN_LIST_REQ:
+                    getTrainList(msg);
+                    break;
             }
         } catch(SQLException e) {
             throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
@@ -84,7 +94,7 @@ public class Control extends MessageHandlerA {
         Connection con = database.getConnection();
 
         String q =
-            "SELECT `BlockSections`.`Id`, `BlockSections`.`LocalId`, " +
+            "SELECT `BlockSections`.`Id`, `BlockSections`.`TrainId`, " +
             "`TrackLayoutSymbols`.`XPos`, `TrackLayoutSymbols`.`YPos`, " +
             "`TriggerContact`.`ModulAddress` AS `TriggerModulAddress`, " +
             "`TriggerContact`.`ContactNumber` AS `TriggerModulContactNumber`, " +
@@ -101,7 +111,6 @@ public class Control extends MessageHandlerA {
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setLong(1, id);
-            Layout.LOGGER.log(Level.INFO, pstmt.toString());
 
             ArrayList<BlockContactData> arraylist;
             ResultSet rs = pstmt.executeQuery();
@@ -113,10 +122,66 @@ public class Control extends MessageHandlerA {
                     rs.getInt("YPos"),
                     new ContactData(rs.getInt("TriggerModulAddress"), rs.getInt("TriggerModulContactNumber")),
                     new ContactData(rs.getInt("BlockModulAddress"), rs.getInt("BlockModulContactNumber")),
-                    rs.getInt("LocalId")
+                    rs.getInt("TrainId")
                 ));
             }
             dispatcher.dispatch(new Message(ControlMessage.GET_CONTACT_LIST_RES, arraylist), msg.getEndpoint());
+        }
+    }
+
+    protected void getSwitchStateList(Message msg)
+    throws SQLException, ErrorException {
+        long id = getId(msg.getData());
+
+        Connection con = database.getConnection();
+
+        String q =
+            "SELECT `SwitchStand`.`Id`, `SwitchStand`.`SwitchStand`, " +
+            "`TrackLayoutSymbols`.`XPos`, `TrackLayoutSymbols`.`YPos` " +
+            "FROM SwitchStand " +
+            "LEFT JOIN `TrackLayoutSymbols` " +
+            "ON `TrackLayoutSymbols`.`Id` = `SwitchStand`.`Id` " +
+            "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
+
+        try (PreparedStatement pstmt = con.prepareStatement(q)) {
+            pstmt.setLong(1, id);
+
+            ArrayList<SwitchStateData> arraylist;
+            ResultSet rs = pstmt.executeQuery();
+            arraylist = new ArrayList();
+            while(rs.next()) {
+                arraylist.add(new SwitchStateData(
+                    rs.getInt("Id"),
+                    rs.getInt("XPos"),
+                    rs.getInt("YPos"),
+                    SwitchStand.valueOf(rs.getString("SwitchStand"))
+                ));
+            }
+            dispatcher.dispatch(new Message(ControlMessage.GET_SWITCH_STAND_LIST_RES, arraylist), msg.getEndpoint());
+        }
+    }
+
+    protected void getTrainList(Message msg)
+    throws SQLException, ErrorException {
+
+        Connection con = database.getConnection();
+        String q =
+            "SELECT Id, Address, Speed, DrivingDirection " +
+            "FROM Trains";
+
+        try (PreparedStatement pstmt = con.prepareStatement(q)) {
+            ArrayList<TrainData> arraylist;
+            ResultSet rs = pstmt.executeQuery();
+            arraylist = new ArrayList();
+            while(rs.next()) {
+                arraylist.add(new TrainData(
+                    rs.getInt("Id"),
+                    rs.getInt("Address"),
+                    rs.getInt("Speed"),
+                    DrivingDirection.valueOf(rs.getString("DrivingDirection"))
+                ));
+            }
+            dispatcher.dispatch(new Message(ControlMessage.GET_TRAIN_LIST_RES, arraylist), msg.getEndpoint());
         }
     }
 
