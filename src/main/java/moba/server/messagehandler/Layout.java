@@ -338,7 +338,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                 if(symbol.get("id") == null) {
                     pstmt.setNull(1, java.sql.Types.INTEGER);
                 } else {
-                    pstmt.setInt(1, (int)symbol.get("id"));
+                    pstmt.setLong(1, (long)symbol.get("id"));
                 }
 
                 pstmt.setLong(2, id);
