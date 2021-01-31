@@ -136,11 +136,11 @@ public class Control extends MessageHandlerA {
         Connection con = database.getConnection();
 
         String q =
-            "SELECT `SwitchStand`.`Id`, `SwitchStand`.`SwitchStand`, " +
+            "SELECT `SwitchDrive`.`Id`, `SwitchDrive`.`SwitchStand`, " +
             "`TrackLayoutSymbols`.`XPos`, `TrackLayoutSymbols`.`YPos` " +
-            "FROM SwitchStand " +
+            "FROM SwitchDrive " +
             "LEFT JOIN `TrackLayoutSymbols` " +
-            "ON `TrackLayoutSymbols`.`Id` = `SwitchStand`.`Id` " +
+            "ON `TrackLayoutSymbols`.`Id` = `SwitchDrive`.`Id` " +
             "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
