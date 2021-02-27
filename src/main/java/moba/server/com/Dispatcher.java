@@ -34,7 +34,7 @@ import moba.server.json.JSONEncoder;
 import moba.server.json.JSONException;
 import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 import moba.server.messages.Message;
-import moba.server.utilities.MessageLogger;
+import moba.server.utilities.logger.MessageLogger;
 import moba.server.utilities.logger.Loggable;
 
 public class Dispatcher implements Loggable {

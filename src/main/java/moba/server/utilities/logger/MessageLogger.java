@@ -18,7 +18,7 @@
  *
  */
 
-package moba.server.utilities;
+package moba.server.utilities.logger;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
