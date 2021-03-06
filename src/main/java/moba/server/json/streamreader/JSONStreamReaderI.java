@@ -23,5 +23,6 @@ package moba.server.json.streamreader;
 import java.io.IOException;
 
 public interface JSONStreamReaderI {
-    int read() throws IOException;
+    int read()
+    throws IOException;
 }

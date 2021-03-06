@@ -34,7 +34,8 @@ public class JSONStreamReaderBytes implements JSONStreamReaderI {
     }
 
     @Override
-    public int read() throws IOException {
+    public int read()
+    throws IOException {
         if(index == data.length) {
             throw new IOException("End of string reached");
         }
