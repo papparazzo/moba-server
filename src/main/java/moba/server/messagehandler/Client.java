@@ -42,7 +42,8 @@ public class Client extends MessageHandlerA {
     }
 
     @Override
-    public void handleMsg(Message msg) throws ErrorException {
+    public void handleMsg(Message msg)
+    throws ErrorException {
         switch(ClientMessage.fromId(msg.getMessageId())) {
             case VOID:
                 break;

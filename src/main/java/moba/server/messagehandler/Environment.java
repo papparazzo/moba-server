@@ -72,7 +72,8 @@ public class Environment extends MessageHandlerA {
     }
 
     @Override
-    public void handleMsg(Message msg) throws ErrorException {
+    public void handleMsg(Message msg)
+    throws ErrorException {
         try {
             switch(EnvironmentMessage.fromId(msg.getMessageId())) {
 
