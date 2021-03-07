@@ -53,7 +53,8 @@ public class Systems extends MessageHandlerA {
     }
 
     @Override
-    public void handleMsg(Message msg) throws ErrorException {
+    public void handleMsg(Message msg)
+    throws ErrorException {
         switch(SystemMessage.fromId(msg.getMessageId())) {
             case SET_AUTOMATIC_MODE:
                 setAutomaticMode(msg);

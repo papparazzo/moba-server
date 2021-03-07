@@ -95,7 +95,8 @@ public class Timer extends MessageHandlerA implements Runnable {
     }
 
     @Override
-    public void handleMsg(Message msg) throws ErrorException {
+    public void handleMsg(Message msg)
+    throws ErrorException {
         try {
             switch(TimerMessage.fromId(msg.getMessageId())) {
                 case GET_GLOBAL_TIMER:

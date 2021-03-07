@@ -80,7 +80,8 @@ public class Server extends MessageHandlerA {
         }
     }
 
-    protected void sendToClient(Message msg, MessageType mType) throws ErrorException {
+    protected void sendToClient(Message msg, MessageType mType)
+    throws ErrorException {
         Endpoint ep = dispatcher.getEndpointByAppId((long)msg.getData());
         if(ep == null) {
             throw new ErrorException(ErrorId.INVALID_APP_ID, "app-id <" + msg.getData().toString() + "> is invalid");
