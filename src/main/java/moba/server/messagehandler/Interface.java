@@ -51,7 +51,8 @@ public class Interface extends MessageHandlerA {
     }
 
     @Override
-    public void handleMsg(Message msg) throws ErrorException {
+    public void handleMsg(Message msg)
+    throws ErrorException {
         switch(InterfaceMessage.fromId(msg.getMessageId())) {
             case CONNECTIVITY_STATE_CHANGED:
                 setConnectivity(Connectivity.valueOf((String)msg.getData()));

@@ -41,7 +41,8 @@ public class Gui extends MessageHandlerA {
     }
 
     @Override
-    public void handleMsg(Message msg) throws ErrorException {
+    public void handleMsg(Message msg)
+    throws ErrorException {
         switch(msg.getMessageId()) {
             case SYSTEM_NOTICE:
                 sendSystemNotice(msg);
