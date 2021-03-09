@@ -30,10 +30,11 @@ public enum ControlMessage implements MessageType {
     GET_SWITCH_STAND_LIST_RES (4),
     GET_TRAIN_LIST_REQ        (5),
     GET_TRAIN_LIST_RES        (6),
-    UNLOCK_BLOCK              (7),
-    BLOCK_UNLOCKED            (8),
-    LOCK_BLOCK                (9),
-    BLOCK_LOCKED             (10);
+    LOCK_BLOCK                (7),
+    LOCK_BLOCK_WAITING        (8),
+    BLOCK_LOCKED              (9),
+    BLOCK_LOCKING_FAILED     (10),
+    UNLOCK_BLOCK             (11);
 
     public final static int GROUP_ID = 10;
 
