@@ -41,7 +41,7 @@ import moba.server.json.JSONException;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.LayoutMessage;
-import moba.server.tracklayout.utilities.TracklayoutLock;
+import moba.server.utilities.lock.TracklayoutLock;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.config.ConfigException;
 import moba.server.utilities.exceptions.ErrorException;
@@ -53,11 +53,12 @@ public class Layout extends MessageHandlerA implements Loggable {
     protected Config          config       = null;
     protected long            activeLayout = 0;
 
-    public Layout(Dispatcher dispatcher, Database database, TracklayoutLock lock, Config config) {
+    public Layout(Dispatcher dispatcher, Database database, Config config) {
         this.database   = database;
         this.dispatcher = dispatcher;
-        this.lock       = lock;
+        this.lock       = new TracklayoutLock(database);
         this.config     = config;
+        this.lock.resetAll();
     }
 
     @Override
@@ -86,11 +87,16 @@ public class Layout extends MessageHandlerA implements Loggable {
 
     @Override
     public void freeResources(long appId) {
-        lock.freeLocks(appId);
+        if(appId == -1) {
+            lock.resetAll();
+        } else {
+            lock.resetOwn(appId);
+        }
     }
 
     @Override
-    public void handleMsg(Message msg) throws ErrorException {
+    public void handleMsg(Message msg)
+    throws ErrorException {
         try {
             switch(LayoutMessage.fromId(msg.getMessageId())) {
                 case GET_LAYOUTS_REQ:
@@ -248,16 +254,16 @@ public class Layout extends MessageHandlerA implements Loggable {
     }
 
     protected void unlockLayout(Message msg)
-    throws SQLException, ErrorException {
+    throws ErrorException {
         long id = getId(msg.getData());
-        lock.unlockLayout(id, msg.getEndpoint());
+        lock.unlock(msg.getEndpoint().getAppId(), id);
         dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_UNLOCKED, id));
     }
 
     protected void lockLayout(Message msg)
-    throws SQLException, ErrorException {
+    throws ErrorException {
         long id = getId(msg.getData());
-        lock.lockLayout(id, msg.getEndpoint());
+        lock.tryLock(msg.getEndpoint().getAppId(), id);
         dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_LOCKED, id));
     }
 
@@ -266,7 +272,7 @@ public class Layout extends MessageHandlerA implements Loggable {
         long id = getId(msg.getData());
 
         if(tryLock) {
-            lock.lockLayout(id, msg.getEndpoint());
+            lock.tryLock(msg.getEndpoint().getAppId(), id);
         }
 
         Connection con = database.getConnection();

@@ -25,6 +25,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import moba.server.com.Dispatcher;
 import moba.server.database.Database;
@@ -40,16 +42,22 @@ import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.ControlMessage;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.lock.BlockLock;
 
 public class Control extends MessageHandlerA {
-    protected Database            database     = null;
-    protected Config              config       = null;
-    protected long                activeLayout = 0;
+    protected Database       database     = null;
+    protected BlockLock      lock         = null;
+    protected Config         config       = null;
+    protected Queue<Message> queue        = null;
+    protected long           activeLayout = 0;
 
     public Control(Dispatcher dispatcher, Database database, Config config) {
         this.dispatcher = dispatcher;
         this.database   = database;
+        this.lock       = new BlockLock(database);
+        this.queue      = new LinkedList<>();
         this.config     = config;
+        this.lock.resetAll();
     }
 
     @Override
@@ -67,7 +75,22 @@ public class Control extends MessageHandlerA {
     }
 
     @Override
-    public void handleMsg(Message msg) throws ErrorException {
+    public void shutdown() {
+        freeResources(-1);
+    }
+
+    @Override
+    public void freeResources(long appId) {
+        if(appId == -1) {
+            lock.resetAll();
+        } else {
+            lock.resetOwn(appId);
+        }
+    }
+
+    @Override
+    public void handleMsg(Message msg)
+    throws ErrorException {
         try {
             switch(ControlMessage.fromId(msg.getMessageId())) {
                 case GET_CONTACT_LIST_REQ:
@@ -81,6 +104,19 @@ public class Control extends MessageHandlerA {
                 case GET_TRAIN_LIST_REQ:
                     getTrainList(msg);
                     break;
+
+                case LOCK_BLOCK:
+                    lockBlock(msg, false);
+                    break;
+
+                case LOCK_BLOCK_WAITING:
+                    lockBlock(msg, true);
+                    break;
+
+                case UNLOCK_BLOCK:
+                    unLockBlock(msg);
+                    break;
+
             }
         } catch(SQLException e) {
             throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
@@ -182,6 +218,29 @@ public class Control extends MessageHandlerA {
                 ));
             }
             dispatcher.dispatch(new Message(ControlMessage.GET_TRAIN_LIST_RES, arraylist), msg.getEndpoint());
+        }
+    }
+
+    protected void lockBlock(Message msg, boolean wait)
+    throws ErrorException {
+        try {
+            lock.tryLock(msg.getEndpoint().getAppId(), msg.getData());
+            dispatcher.dispatch(new Message(ControlMessage.BLOCK_LOCKED, msg.getData()), msg.getEndpoint());
+        } catch(ErrorException ex) {
+            if(!wait) {
+                dispatcher.dispatch(new Message(ControlMessage.BLOCK_LOCKING_FAILED, msg.getData()), msg.getEndpoint());
+                return;
+            }
+            queue.add(msg);
+        }
+    }
+
+    protected void unLockBlock(Message msg)
+    throws ErrorException {
+        lock.unlock(msg.getEndpoint().getAppId(), msg.getData());
+
+        if(!queue.isEmpty()) {
+            lockBlock(queue.remove(), true);
         }
     }
 
