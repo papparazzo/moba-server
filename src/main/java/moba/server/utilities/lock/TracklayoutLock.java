@@ -68,7 +68,8 @@ public final class TracklayoutLock extends AbstractLock {
     }
 
     @Override
-    public void tryLock(long appId, Object data) throws ErrorException {
+    public void tryLock(long appId, Object data)
+    throws ErrorException {
         try {
             long id = (long)data;
 
@@ -86,7 +87,7 @@ public final class TracklayoutLock extends AbstractLock {
                 getLogger().log(Level.INFO, pstmt.toString());
 
                 if(pstmt.executeUpdate() == 0) {
-                    throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + Long.toString(id) + ">");
+                    throw new ErrorException(ErrorId.DATASET_LOCKED, "object is already locked");
                 }
             }
         } catch(SQLException e) {
