@@ -30,5 +30,4 @@ public class MessageQueue extends PriorityBlockingQueue<Message> {
         MessageLogger.in(msg);
         return super.add(msg);
     }
-
 }
