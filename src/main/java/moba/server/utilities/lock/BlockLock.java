@@ -72,7 +72,7 @@ public final class BlockLock extends AbstractLock {
     public void tryLock(long appId, Object data)
     throws ErrorException {
         try {
-            ArrayList<Object> list = (ArrayList<Object>)data;
+            ArrayList<Long> list = (ArrayList<Long>)data;
 
             if(isLockedByApp(appId, data)) {
                 return;
@@ -81,11 +81,17 @@ public final class BlockLock extends AbstractLock {
             Connection con = database.getConnection();
             con.setAutoCommit(false);
 
-            String q = "UPDATE `BlockSections` SET `locked` = ? WHERE `locked` IS NULL AND `id` IN (?)";
+            String q =
+                "UPDATE `BlockSections` " +
+                "SET `locked` = ? " +
+                "WHERE `locked` IS NULL AND `id` IN (" + getPlaceHolderString(list.size()) + ")";
 
             try(PreparedStatement pstmt = con.prepareStatement(q)) {
                 pstmt.setLong(1, appId);
-                pstmt.setArray(2, con.createArrayOf("INTEGER", list.toArray()));
+                int i = 1;
+                for(Long v : list) {
+                    pstmt.setLong(++i, v);
+                }
 
                 getLogger().log(Level.INFO, pstmt.toString());
 
@@ -104,7 +110,7 @@ public final class BlockLock extends AbstractLock {
     public void unlock(long appId, Object data)
     throws ErrorException {
        try {
-            ArrayList<Object> list = (ArrayList<Object>)data;
+            ArrayList<Long> list = (ArrayList<Long>)data;
 
             if(!isLockedByApp(appId, data)) {
                 return;
@@ -113,11 +119,17 @@ public final class BlockLock extends AbstractLock {
             Connection con = database.getConnection();
             con.setAutoCommit(false);
 
-            String q = "UPDATE `BlockSections` SET `locked` = NULL WHERE `locked` IS ? AND `id` IN (?)";
+            String q =
+                "UPDATE `BlockSections` " +
+                "SET `locked` = NULL " +
+                "WHERE `locked` = ? AND `id` IN (" + getPlaceHolderString(list.size()) + ")";
 
             try(PreparedStatement pstmt = con.prepareStatement(q)) {
                 pstmt.setLong(1, appId);
-                pstmt.setArray(2, con.createArrayOf("INTEGER", list.toArray()));
+                int i = 1;
+                for(Long v : list) {
+                    pstmt.setLong(++i, v);
+                }
 
                 getLogger().log(Level.INFO, pstmt.toString());
 
@@ -136,13 +148,21 @@ public final class BlockLock extends AbstractLock {
     public boolean isLockedByApp(long appId, Object data)
     throws ErrorException {
         try {
+            ArrayList<Long> list = (ArrayList<Long>)data;
+
             Connection con = database.getConnection();
 
-            String q = "SELECT `locked` FROM `BlockSections` WHERE `Id` IN (?) GROUP BY `locked`";
+            String q =
+                "SELECT `locked` " +
+                "FROM `BlockSections` " +
+                "WHERE `Id` IN (" + getPlaceHolderString(list.size()) + ") GROUP BY `locked`";
 
             try(PreparedStatement pstmt = con.prepareStatement(q)) {
-                Array array = con.createArrayOf("INTEGER", ((ArrayList<Object>)data).toArray());
-                pstmt.setArray(1, array);
+                int i = 0;
+                for(Long v : list) {
+                    pstmt.setLong(++i, v);
+                }
+
                 getLogger().log(Level.INFO, pstmt.toString());
 
                 ResultSet rs = pstmt.executeQuery();
@@ -173,5 +193,19 @@ public final class BlockLock extends AbstractLock {
         } catch(SQLException e) {
             throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
         }
+    }
+
+    protected String getPlaceHolderString(int size) {
+        if(size < 1) {
+            throw new IllegalArgumentException("size < 1");
+        }
+
+        StringBuilder builder = new StringBuilder();
+
+        for(int i = 0; i < size; i++) {
+            builder.append("?,");
+        }
+
+        return builder.deleteCharAt(builder.length() - 1).toString();
     }
 }
