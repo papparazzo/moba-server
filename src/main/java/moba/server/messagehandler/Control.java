@@ -201,9 +201,7 @@ public class Control extends MessageHandlerA {
     throws SQLException, ErrorException {
 
         Connection con = database.getConnection();
-        String q =
-            "SELECT Id, Address, Speed, DrivingDirection " +
-            "FROM Trains";
+        String q = "SELECT Id, Address, Speed, DrivingDirection FROM Trains";
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
             ArrayList<TrainData> arraylist;
