@@ -39,7 +39,7 @@ public enum DrivingDirection implements JSONToStringI {
     throws JSONException, IOException {
         StringBuilder b = new StringBuilder();
         b.append('"');
-        b.append(ErrorId.values()[value].toString());
+        b.append(DrivingDirection.values()[value].toString());
         b.append('"');
         return b.toString();
     }
