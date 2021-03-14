@@ -23,7 +23,6 @@ package moba.server.utilities.lock;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -75,7 +74,7 @@ public final class BlockLock extends AbstractLock {
             ArrayList<Long> list = (ArrayList<Long>)data;
 
             if(isLockedByApp(appId, data)) {
-                return;
+                throw new ErrorException(ErrorId.DATASET_LOCKED, "object is already locked");
             }
 
             Connection con = database.getConnection();
@@ -153,7 +152,7 @@ public final class BlockLock extends AbstractLock {
             Connection con = database.getConnection();
 
             String q =
-                "SELECT `locked` " +
+                "SELECT `locked`, COUNT(*) AS `cnt` " +
                 "FROM `BlockSections` " +
                 "WHERE `Id` IN (" + getPlaceHolderString(list.size()) + ") GROUP BY `locked`";
 
@@ -167,28 +166,26 @@ public final class BlockLock extends AbstractLock {
 
                 ResultSet rs = pstmt.executeQuery();
 
-                long lockedBy = -1;
-
-                while(rs.next()) {
-                    long current = rs.getLong("locked");
-                    if(current != 0 && current != appId) {
-                        throw new ErrorException(ErrorId.DATASET_LOCKED, "object is locked");
-                    }
-
-                    if(current == 0) {
-                        lockedBy = 0;
-                        continue;
-                    }
-                    lockedBy = appId;
+                if(!rs.next()) {
+                    throw new ErrorException(ErrorId.DATASET_MISSING, "no record set found");
                 }
+                long lockedBy = rs.getLong("locked");
+                long cnt = rs.getLong("cnt");
 
+                // more then 1 found: parts are locked and parts are unlocked
+                if(rs.next()) {
+                    throw new ErrorException(ErrorId.DATASET_LOCKED, "object is locked");
+                }
+                if(cnt != list.size()) {
+                    throw new ErrorException(ErrorId.DATASET_MISSING, "no record set found");
+                }
                 if(lockedBy == 0) {
                     return false;
                 }
                 if(lockedBy == appId) {
                     return true;
                 }
-                throw new ErrorException(ErrorId.DATASET_MISSING, "no record set found");
+                throw new ErrorException(ErrorId.DATASET_LOCKED, "object is locked");
             }
         } catch(SQLException e) {
             throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
