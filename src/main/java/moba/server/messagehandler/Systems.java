@@ -133,12 +133,30 @@ public class Systems extends MessageHandlerA {
             return;
         }
 
-        var reason = EmergencyTriggerReason.valueOf((String)msg.getData());
-
         dispatcher.dispatch(
-            new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.WARNING, "Nothalt gedrückt", "Es wurde ein Nothalt ausgelöst <" + reason.toString() + ">"))
+            new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.WARNING, "Nothalt gedrückt", getEmergencyStopReason((String)msg.getData())))
         );
         msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.EMERGENCY_STOP));
+    }
+
+    protected String getEmergencyStopReason(String reason) {
+
+        switch(EmergencyTriggerReason.valueOf(reason)) {
+            case CENTRAL_STATION:
+                return "Auslösegrund: Es wurde ein Nothalt durch die CentralStation ausgelöst";
+
+            case EXTERN:
+                return "Auslösegrund: Externe Hardware";
+
+            case SELF_ACTING_BY_EXTERN_SWITCHING:
+                return "Auslösegrund: Weichenstellung durch CS im automatikmodus";
+
+            case SOFTWARE_MANUELL:
+                return "Auslösegrund: Manuell durch Steuerungssoftware";
+
+            default:
+                return "unbekannter Auslösegrund";
+        }
     }
 
     protected void releaseEmergencyStop(Message msg) {
