@@ -25,12 +25,13 @@ import moba.server.utilities.exceptions.ErrorException;
 
 public enum SystemMessage implements MessageType {
     SET_AUTOMATIC_MODE      (1),
-    SET_EMERGENCY_STOP      (2),
-    SET_STANDBY_MODE        (3),
-    GET_HARDWARE_STATE      (4),
-    HARDWARE_STATE_CHANGED  (5),
-    HARDWARE_SHUTDOWN       (6),
-    HARDWARE_RESET          (7);
+    TRIGGER_EMERGENCY_STOP  (2),
+    RELEASE_EMERGENCY_STOP  (3),
+    SET_STANDBY_MODE        (4),
+    GET_HARDWARE_STATE      (5),
+    HARDWARE_STATE_CHANGED  (6),
+    HARDWARE_SHUTDOWN       (7),
+    HARDWARE_RESET          (8);
 
     public final static int GROUP_ID = 7;
 

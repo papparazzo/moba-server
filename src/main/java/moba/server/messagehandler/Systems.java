@@ -22,6 +22,7 @@ package moba.server.messagehandler;
 
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
+import moba.server.datatypes.enumerations.EmergencyTriggerReason;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.enumerations.NoticeType;
@@ -60,8 +61,12 @@ public class Systems extends MessageHandlerA {
                 setAutomaticMode(msg);
                 break;
 
-            case SET_EMERGENCY_STOP:
-                setEmergencyStop(msg);
+            case TRIGGER_EMERGENCY_STOP:
+                triggerEmergencyStop(msg);
+                break;
+
+            case RELEASE_EMERGENCY_STOP:
+                releaseEmergencyStop(msg);
                 break;
 
             case SET_STANDBY_MODE:
@@ -117,24 +122,28 @@ public class Systems extends MessageHandlerA {
         dispatcher.dispatch(new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Automatik", "Automatikmodus wurde deaktiviert")));
     }
 
-    protected void setEmergencyStop(Message msg) {
+    protected void triggerEmergencyStop(Message msg) {
         if(status == HardwareState.ERROR || status == HardwareState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
 
-        boolean emergencyStop = (boolean)msg.getData();
-
-        if(emergencyStop && status == HardwareState.EMERGENCY_STOP) {
+        if(status == HardwareState.EMERGENCY_STOP) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
 
-        if(emergencyStop) {
-            dispatcher.dispatch(
-                new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.WARNING, "Nothalt gedrückt", "Es wurde ein Nothalt ausgelöst"))
-            );
-            msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.EMERGENCY_STOP));
+        var reason = EmergencyTriggerReason.valueOf((String)msg.getData());
+
+        dispatcher.dispatch(
+            new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.WARNING, "Nothalt gedrückt", "Es wurde ein Nothalt ausgelöst <" + reason.toString() + ">"))
+        );
+        msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.EMERGENCY_STOP));
+    }
+
+    protected void releaseEmergencyStop(Message msg) {
+        if(status == HardwareState.ERROR || status == HardwareState.STANDBY) {
+            sendErrorMessage(msg.getEndpoint());
             return;
         }
 
