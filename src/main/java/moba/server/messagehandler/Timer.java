@@ -66,11 +66,11 @@ public class Timer extends MessageHandlerA implements Runnable {
         Object o;
         o = config.getSection("globaltimer.globaltimer");
         if(o != null) {
-            timerData.fromJsonObject((Map<String, Object>)o);
+            timerData = (GlobalTimerData)o;
         }
         o = config.getSection("globaltimer.colortheme");
         if(o != null) {
-            themeData.fromJsonObject((Map<String, Object>)o);
+            themeData = (ColorThemeData)o;
         }
         switch(themeData.getCondition()) {
             case UNSET:
