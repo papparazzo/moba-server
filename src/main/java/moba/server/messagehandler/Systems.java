@@ -149,7 +149,7 @@ public class Systems extends MessageHandlerA {
                 return "Auslösegrund: Externe Hardware";
 
             case SELF_ACTING_BY_EXTERN_SWITCHING:
-                return "Auslösegrund: Weichenstellung durch CS im automatikmodus";
+                return "Auslösegrund: Weichenstellung durch CS im Automatikmodus";
 
             case SOFTWARE_MANUELL:
                 return "Auslösegrund: Manuell durch Steuerungssoftware";
