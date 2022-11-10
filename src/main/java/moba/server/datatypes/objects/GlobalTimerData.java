@@ -53,7 +53,7 @@ public class GlobalTimerData {
 
     public void fromJsonObject(Map<String, Object> map) {
         curModelTime = new DayTime((String)map.get("curModelTime"));
-        setMultiplicator((Integer)map.get("multiplicator"));
+        setMultiplicator(((Long)map.get("multiplicator")).intValue());
     }
 
     public boolean setTick() {
