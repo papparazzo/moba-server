@@ -31,9 +31,9 @@ public class Time implements JSONToStringI {
     public Time() {
     }
 
-    public Time(int val)
+    public Time(int time)
     throws IllegalArgumentException {
-        setValue(val);
+        setTime(time);
     }
 
    public Time(int hour, int minute)
@@ -45,29 +45,47 @@ public class Time implements JSONToStringI {
         value += minute * 60;
     }
 
-    public Time(String val)
+    public Time(String time)
     throws IllegalArgumentException {
-        setValue(val);
+        setTime(time);
     }
 
-    public final void setValue(int val)
+    public final void setTime(int time)
     throws IllegalArgumentException {
-        if(val < 0 || val > ((60 * 60 * 24) - 1)) {
+        if(time < 0 || time > ((60 * 60 * 24) - 1)) {
             throw new IllegalArgumentException();
         }
-        value = val;
+        value = time;
     }
 
-    public final void setValue(String val)
+    public final void setTime(String time)
     throws IllegalArgumentException {
-        String[] tokens = val.split(":");
+        String[] tokens = time.split(":");
 
         value = Integer.parseInt(tokens[0]) * 60 * 60;
         value += Integer.parseInt(tokens[1]) * 60;
     }
 
+    public final boolean appendTime(int time)
+    throws IllegalArgumentException {
+        if(time < 1) {
+            throw new IllegalArgumentException("invalid time diff given");
+        }
+
+        value = (value + time) % (60 * 60 * 24);
+        if(value < time) {
+            return true;
+        }
+        return false;
+    }
+
     public int getTime() {
         return value;
+    }
+
+    public boolean isFullHour() {
+        long f = value / 60;
+        return (f % 60 == 0);
     }
 
     @Override
