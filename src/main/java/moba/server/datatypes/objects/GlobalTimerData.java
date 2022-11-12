@@ -20,13 +20,14 @@
 
 package moba.server.datatypes.objects;
 
-import moba.server.datatypes.base.DayTime;
+import moba.server.datatypes.enumerations.Day;
 import moba.server.datatypes.base.Time;
 import java.util.Map;
 
 public class GlobalTimerData {
-    protected DayTime curModelTime = new DayTime();
-    protected int     multiplicator = 240;
+    protected Day  curModelDay;
+    protected Time curModelTime = new Time();
+    protected int  multiplicator = 240;
 
     public int getMultiplicator() {
         return multiplicator;
@@ -34,35 +35,47 @@ public class GlobalTimerData {
 
     public void setMultiplicator(int multiplicator)
     throws IllegalArgumentException {
-        if(multiplicator < 60 || multiplicator > 3600) {
-            throw new IllegalArgumentException("multiplicator out of range (< 60 || > 3600)");
+        if(multiplicator < 60 || multiplicator > 240) {
+            throw new IllegalArgumentException("multiplicator out of range (< 60 || > 240)");
         }
-        if(3600 % multiplicator != 0) {
-            throw new IllegalArgumentException("modulo 3600 check failed in multiplicator-setting");
+
+        if(multiplicator % 30 != 0) {
+            throw new IllegalArgumentException("multiplicator modulo 30 check failed in multiplicator-setting");
         }
         this.multiplicator = multiplicator;
     }
 
-    public DayTime getModelTime() {
+    public Day getCurModelDay() {
+        return curModelDay;
+    }
+
+    public void setCurModelDay(Day modelDay) {
+        curModelDay = modelDay;
+    }
+
+    public Time getCurModelTime() {
         return curModelTime;
     }
 
-    public void setModelTime(DayTime modelTime) {
+    public void setCurModelTime(Time modelTime) {
         curModelTime = modelTime;
     }
 
     public void fromJsonObject(Map<String, Object> map) {
-        curModelTime = new DayTime((String)map.get("curModelTime"));
+        curModelDay = Day.valueOf((String)map.get("curModelDay"));
+        curModelTime = new Time((String)map.get("curModelTime"));
         setMultiplicator(((Long)map.get("multiplicator")).intValue());
     }
 
     public boolean setTick() {
-        curModelTime.setValue((curModelTime.getValue() + multiplicator) % (60 * 60 * 24 * 7));
+        if(curModelTime.appendTime(multiplicator)) {
+            curModelDay = curModelDay.next();
+        }
         return curModelTime.isFullHour();
     }
 
     public boolean isTimeBetween(Time start, Time end) {
-        int time = curModelTime.getValue() ;
+        int time = curModelTime.getTime() ;
         time %= (60 * 60 * 24);
         if(start.getTime() < time && end.getTime() > time) {
             return true;
