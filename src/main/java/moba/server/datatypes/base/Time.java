@@ -26,7 +26,7 @@ import moba.server.json.JSONException;
 import moba.server.json.JSONToStringI;
 
 public class Time implements JSONToStringI {
-    protected int value;
+    protected int time;
 
     public Time() {
     }
@@ -41,8 +41,8 @@ public class Time implements JSONToStringI {
         if(hour < 0 || hour > 24 || minute < 0 || minute > 59) {
             throw new IllegalArgumentException();
         }
-        value = hour * 60 * 60;
-        value += minute * 60;
+        time = hour * 60 * 60;
+        time += minute * 60;
     }
 
     public Time(String time)
@@ -55,15 +55,15 @@ public class Time implements JSONToStringI {
         if(time < 0 || time > ((60 * 60 * 24) - 1)) {
             throw new IllegalArgumentException();
         }
-        value = time;
+        this.time = time;
     }
 
     public final void setTime(String time)
     throws IllegalArgumentException {
         String[] tokens = time.split(":");
 
-        value = Integer.parseInt(tokens[0]) * 60 * 60;
-        value += Integer.parseInt(tokens[1]) * 60;
+        this.time = Integer.parseInt(tokens[0]) * 60 * 60;
+        this.time += Integer.parseInt(tokens[1]) * 60;
     }
 
     public final boolean appendTime(int time)
@@ -72,25 +72,25 @@ public class Time implements JSONToStringI {
             throw new IllegalArgumentException("invalid time diff given");
         }
 
-        value = (value + time) % (60 * 60 * 24);
-        if(value < time) {
+        this.time = (this.time + time) % (60 * 60 * 24);
+        if(this.time < time) {
             return true;
         }
         return false;
     }
 
     public int getTime() {
-        return value;
+        return time;
     }
 
     public boolean isFullHour() {
-        long f = value / 60;
+        long f = time / 60;
         return (f % 60 == 0);
     }
 
     @Override
     public String toString() {
-        long t = value / 60;
+        long t = time / 60;
         long m = t % 60;
         t /= 60;
         long h = t % 24;
