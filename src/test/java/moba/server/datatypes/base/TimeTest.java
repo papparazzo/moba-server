@@ -29,7 +29,7 @@ public class TimeTest {
     public void testSetValue_int() {
         int val = 0;
         Time instance = new Time();
-        instance.setValue(val);
+        instance.setTime(val);
         fail("The test case is a prototype.");
     }
 
@@ -37,7 +37,7 @@ public class TimeTest {
     public void testSetValue_String() {
         String val = "";
         Time instance = new Time();
-        instance.setValue(val);
+        instance.setTime(val);
         fail("The test case is a prototype.");
     }
 
