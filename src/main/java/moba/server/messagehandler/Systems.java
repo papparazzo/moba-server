@@ -61,6 +61,10 @@ public class Systems extends MessageHandlerA {
                 setAutomaticMode(msg);
                 break;
 
+            case TOGGLE_AUTOMATIC_MODE:
+                setAutomaticMode(msg, true);
+                break;
+
             case TRIGGER_EMERGENCY_STOP:
                 triggerEmergencyStop(msg);
                 break;
@@ -71,6 +75,10 @@ public class Systems extends MessageHandlerA {
 
             case SET_STANDBY_MODE:
                 setStandByMode(msg);
+                break;
+
+            case TOGGLE_STANDBY_MODE:
+                setStandByMode(msg, true);
                 break;
 
             case GET_HARDWARE_STATE:
@@ -91,21 +99,27 @@ public class Systems extends MessageHandlerA {
     }
 
     protected void setAutomaticMode(Message msg) {
+        setAutomaticMode(msg, false);
+    }
+
+    protected void setAutomaticMode(Message msg, boolean toggle) {
         if(status == HardwareState.ERROR || status == HardwareState.EMERGENCY_STOP || status == HardwareState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
 
-        boolean setAutomaticMode = (boolean)msg.getData();
-
-        if(setAutomaticMode && status == HardwareState.AUTOMATIC) {
-            sendErrorMessage(msg.getEndpoint());
-            return;
+        if(toggle) {
+            automaticMode = !automaticMode;
+        } else {
+            var setAutomaticMode = (boolean)msg.getData();
+            if(setAutomaticMode && status == HardwareState.AUTOMATIC) {
+                sendErrorMessage(msg.getEndpoint());
+                return;
+            }
+            automaticMode = setAutomaticMode;
         }
 
-        automaticMode = setAutomaticMode;
-
-        if(setAutomaticMode) {
+        if(automaticMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
             dispatcher.dispatch(
                 new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Automatik", "Die Hardware befindet sich im Automatikmodus"))
@@ -179,21 +193,31 @@ public class Systems extends MessageHandlerA {
     }
 
     protected void setStandByMode(Message msg) {
+        setStandByMode(msg, false);
+    }
+
+    protected void setStandByMode(Message msg, boolean toggle) {
         if(status == HardwareState.ERROR || status == HardwareState.EMERGENCY_STOP) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
 
-        boolean setStandByMode = (boolean)msg.getData();
+        boolean setStandByMode;
 
-        if(setStandByMode && status == HardwareState.STANDBY) {
-            sendErrorMessage(msg.getEndpoint());
-            return;
+        if(toggle) {
+            setStandByMode = (status != HardwareState.STANDBY);
+        } else {
+            setStandByMode = (boolean)msg.getData();
+
+            if(setStandByMode && status == HardwareState.STANDBY) {
+                sendErrorMessage(msg.getEndpoint());
+                return;
+            }
         }
 
         if(setStandByMode) {
             dispatcher.dispatch(
-                new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.WARNING, "Standby", "Anlage wird in den Standby-Modus geschickt"))
+                new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Standby", "Anlage wird in den Standby-Modus geschickt"))
             );
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.STANDBY));
             return;
