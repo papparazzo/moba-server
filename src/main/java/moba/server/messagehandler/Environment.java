@@ -26,12 +26,15 @@ import java.util.Map;
 import moba.server.com.Dispatcher;
 
 import moba.server.datatypes.enumerations.ErrorId;
+import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.objects.AmbienceData;
 import moba.server.datatypes.objects.AmbientLightData;
 import moba.server.datatypes.objects.EnvironmentData;
+import moba.server.datatypes.objects.ErrorData;
 import moba.server.json.JSONException;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
+import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.EnvironmentMessage;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.config.ConfigException;
@@ -43,6 +46,8 @@ public class Environment extends MessageHandlerA {
     protected EnvironmentData  environment  = new EnvironmentData();
     protected AmbienceData     ambience     = new AmbienceData();
     protected AmbientLightData ambientLight = new AmbientLightData();
+
+    protected boolean          automatic    = false;
 
     public Environment(Dispatcher dispatcher, Config config) {
         this.dispatcher = dispatcher;
@@ -84,6 +89,7 @@ public class Environment extends MessageHandlerA {
                     break;
 
                 case SET_ENVIRONMENT:
+                    check();
                     environment.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
                     dispatcher.dispatch(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment));
@@ -94,6 +100,7 @@ public class Environment extends MessageHandlerA {
                     break;
 
                 case SET_AMBIENCE:
+                    check();
                     ambience.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
                     dispatcher.dispatch(new Message(EnvironmentMessage.SET_AMBIENCE, ambience));
@@ -106,6 +113,7 @@ public class Environment extends MessageHandlerA {
                     break;
 
                 case SET_AMBIENT_LIGHT:
+                    check();
                     setAmbientLight((Map<String, Object>)msg.getData());
                     storeData();
                     dispatcher.dispatch(new Message(EnvironmentMessage.SET_AMBIENT_LIGHT, ambientLight));
@@ -116,6 +124,18 @@ public class Environment extends MessageHandlerA {
             }
         } catch(java.lang.ClassCastException | IOException | JSONException | ConfigException | NullPointerException | IllegalArgumentException e) {
             throw new ErrorException(ErrorId.FAULTY_MESSAGE, e.getMessage());
+        }
+    }
+
+    @Override
+    public void hardwareStateChanged(HardwareState state) {
+        automatic = (state == HardwareState.AUTOMATIC);
+    }
+
+    protected void check()
+    throws ErrorException {
+        if(automatic) {
+            throw new ErrorException(ErrorId.SETTING_NOT_ALLOWED, "Setting not allowed in auto mode");
         }
     }
 
