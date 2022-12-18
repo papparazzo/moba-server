@@ -27,10 +27,8 @@ import moba.server.utilities.exceptions.ErrorException;
 public enum EnvironmentMessage implements MessageType {
     GET_ENVIRONMENT  (1),
     SET_ENVIRONMENT  (2),
-    GET_AMBIENCE     (3),
-    SET_AMBIENCE     (4),
-    GET_AMBIENT_LIGHT(5),
-    SET_AMBIENT_LIGHT(6);
+    SET_AMBIENCE     (3),
+    SET_AMBIENT_LIGHT(4);
 
     public final static int GROUP_ID = 5;
 

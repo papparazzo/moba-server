@@ -27,8 +27,6 @@ import moba.server.com.Dispatcher;
 
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
-import moba.server.datatypes.objects.AmbienceData;
-import moba.server.datatypes.objects.AmbientLightData;
 import moba.server.datatypes.objects.EnvironmentData;
 import moba.server.json.JSONException;
 import moba.server.messages.Message;
@@ -41,11 +39,8 @@ import moba.server.utilities.exceptions.ErrorException;
 public class Environment extends MessageHandlerA {
     protected Config  config = null;
 
-    protected EnvironmentData  environment  = new EnvironmentData();
-    protected AmbienceData     ambience     = new AmbienceData();
-    protected AmbientLightData ambientLight = new AmbientLightData();
-
-    protected boolean          automatic    = false;
+    protected EnvironmentData environment = new EnvironmentData();
+    protected boolean         automatic   = false;
 
     public Environment(Dispatcher dispatcher, Config config) {
         this.dispatcher = dispatcher;
@@ -64,14 +59,6 @@ public class Environment extends MessageHandlerA {
         if(o != null) {
             environment.fromJsonObject((Map<String, Object>)o);
         }
-        o = config.getSection("environment.ambience");
-        if(o != null) {
-            ambience.fromJsonObject((Map<String, Object>)o);
-        }
-        o = config.getSection("environment.ambientlight");
-        if(o != null) {
-            ambientLight = (AmbientLightData)o;
-        }
     }
 
     @Override
@@ -87,34 +74,14 @@ public class Environment extends MessageHandlerA {
                     break;
 
                 case SET_ENVIRONMENT:
-                    check();
                     environment.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
                     dispatcher.dispatch(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment));
                     break;
 
-                case GET_AMBIENCE:
-                    dispatcher.dispatch(new Message(EnvironmentMessage.SET_AMBIENCE, ambience), msg.getEndpoint());
-                    break;
-
                 case SET_AMBIENCE:
-                    check();
-                    ambience.fromJsonObject((Map<String, Object>)msg.getData());
-                    storeData();
-                    dispatcher.dispatch(new Message(EnvironmentMessage.SET_AMBIENCE, ambience));
-                    break;
-
-                case GET_AMBIENT_LIGHT:
-                    dispatcher.dispatch(
-                        new Message(EnvironmentMessage.SET_AMBIENT_LIGHT, ambientLight), msg.getEndpoint()
-                    );
-                    break;
-
                 case SET_AMBIENT_LIGHT:
-                    check();
-                    setAmbientLight((Map<String, Object>)msg.getData());
-                    storeData();
-                    dispatcher.dispatch(new Message(EnvironmentMessage.SET_AMBIENT_LIGHT, ambientLight));
+                    dispatcher.dispatch(msg);
                     break;
 
                 default:
@@ -130,20 +97,6 @@ public class Environment extends MessageHandlerA {
         automatic = (state == HardwareState.AUTOMATIC);
     }
 
-    protected void check()
-    throws ErrorException {
-        if(automatic) {
-            throw new ErrorException(ErrorId.SETTING_NOT_ALLOWED, "Setting not allowed in auto mode");
-        }
-    }
-
-    protected void setAmbientLight(Map<String, Object> map) {
-        ambientLight.setRed(convertToLong(map.get("red")));
-        ambientLight.setBlue(convertToLong(map.get("blue")));
-        ambientLight.setGreen(convertToLong(map.get("green")));
-        ambientLight.setWhite(convertToLong(map.get("white")));
-    }
-
     protected long convertToLong(Object o) {
         if(o != null && o.getClass() == Integer.class) {
             return (long)Long.valueOf((Integer)o);
@@ -154,9 +107,7 @@ public class Environment extends MessageHandlerA {
     protected void storeData()
     throws ConfigException, IOException, JSONException {
         HashMap<String, Object> map = new HashMap<>();
-        //map.put("ambient",      ambience);
-        //map.put("environment",  environment);
-        map.put("ambientlight", ambientLight);
+        map.put("environment", environment);
         config.setSection("environment", map);
         config.writeFile();
     }
