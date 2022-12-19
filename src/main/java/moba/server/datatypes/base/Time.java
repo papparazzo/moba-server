@@ -36,7 +36,7 @@ public class Time implements JSONToStringI {
         setTime(time);
     }
 
-   public Time(int hour, int minute)
+    public Time(int hour, int minute)
     throws IllegalArgumentException {
         if(hour < 0 || hour > 24 || minute < 0 || minute > 59) {
             throw new IllegalArgumentException();
