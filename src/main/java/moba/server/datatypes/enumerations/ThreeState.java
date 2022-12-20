@@ -20,18 +20,11 @@
 
 package moba.server.datatypes.enumerations;
 
-import java.io.IOException;
-
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-
-public enum ThreeState implements JSONToStringI {
+public enum ThreeState {
     ON,
     OFF,
     AUTO,
     UNSET;
-
-    protected final int value;
 
     public static ThreeState getValue(ThreeState t, ThreeState def) {
         if(t == ThreeState.UNSET) {
@@ -53,19 +46,5 @@ public enum ThreeState implements JSONToStringI {
             return def;
         }
         return t;
-    }
-
-    private ThreeState() {
-        value = ordinal();
-    }
-
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        StringBuilder b = new StringBuilder();
-        b.append('"');
-        b.append(ThreeState.values()[value].toString());
-        b.append('"');
-        return b.toString();
     }
 }

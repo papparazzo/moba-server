@@ -161,6 +161,8 @@ public class JSONEncoder {
             addArray((Object[])object);
         } else if(object instanceof Date) {
             addDate((Date)object);
+        } else if(object instanceof Enum) {
+            addString(object.toString());
         } else if(object instanceof InetAddress) {
             addInetAddr((InetAddress)object);
         } else if(object instanceof JSONToStringI) {

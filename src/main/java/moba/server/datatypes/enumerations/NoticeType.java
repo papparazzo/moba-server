@@ -20,29 +20,8 @@
 
 package moba.server.datatypes.enumerations;
 
-import java.io.IOException;
-
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-
-public enum NoticeType implements JSONToStringI {
+public enum NoticeType {
     INFO,
     WARNING,
     ERROR;
-
-    protected final int value;
-
-    private NoticeType() {
-        value = ordinal();
-    }
-
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        StringBuilder b = new StringBuilder();
-        b.append('"');
-        b.append(NoticeType.values()[value].toString());
-        b.append('"');
-        return b.toString();
-    }
 }

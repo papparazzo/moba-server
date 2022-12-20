@@ -20,27 +20,7 @@
 
 package moba.server.datatypes.enumerations;
 
-import java.io.IOException;
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-
-public enum DrivingDirection implements JSONToStringI {
+public enum DrivingDirection {
     FORWARD,
     BACKWARD;
-
-    protected final int value;
-
-    private DrivingDirection() {
-        value = ordinal();
-    }
-
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        StringBuilder b = new StringBuilder();
-        b.append('"');
-        b.append(DrivingDirection.values()[value].toString());
-        b.append('"');
-        return b.toString();
-    }
 }

@@ -20,12 +20,7 @@
 
 package moba.server.datatypes.enumerations;
 
-import java.io.IOException;
-
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-
-public enum ErrorId implements JSONToStringI {
+public enum ErrorId {
 
     UNKNOWN_ERROR,
     UNKNOWN_GROUP_ID,
@@ -47,19 +42,4 @@ public enum ErrorId implements JSONToStringI {
 
     SAME_ORIGIN_NEEDED;
 
-    protected final int value;
-
-    private ErrorId() {
-        value = ordinal();
-    }
-
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        StringBuilder b = new StringBuilder();
-        b.append('"');
-        b.append(ErrorId.values()[value].toString());
-        b.append('"');
-        return b.toString();
-    }
 }

@@ -20,17 +20,10 @@
 
 package moba.server.datatypes.enumerations;
 
-import java.io.IOException;
-
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-
-public enum ToggleState implements JSONToStringI {
+public enum ToggleState {
     ON,
     UNSET,
     OFF;
-
-    protected final int value;
 
     public static boolean getValue(ToggleState t, boolean def) {
         switch(t) {
@@ -117,19 +110,5 @@ public enum ToggleState implements JSONToStringI {
             return ToggleState.ON;
         }
         return ToggleState.OFF;
-    }
-
-    private ToggleState() {
-        value = ordinal();
-    }
-
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        StringBuilder b = new StringBuilder();
-        b.append('"');
-        b.append(ToggleState.values()[value].toString());
-        b.append('"');
-        return b.toString();
     }
 }

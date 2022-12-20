@@ -20,29 +20,9 @@
 
 package moba.server.datatypes.enumerations;
 
-import java.io.IOException;
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-
-public enum SwitchStand implements JSONToStringI {
+public enum SwitchStand {
     STRAIGHT_1,
     BEND_1,
     STRAIGHT_2,
     BEND_2;
-
-    protected final int value;
-
-    private SwitchStand() {
-        value = ordinal();
-    }
-
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        StringBuilder b = new StringBuilder();
-        b.append('"');
-        b.append(SwitchStand.values()[value].toString());
-        b.append('"');
-        return b.toString();
-    }
 }

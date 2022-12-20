@@ -20,11 +20,7 @@
 
 package moba.server.datatypes.enumerations;
 
-import java.io.IOException;
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-
-public enum Day implements JSONToStringI {
+public enum Day {
     SUNDAY,
     MONDAY,
     TUESDAY,
@@ -33,26 +29,10 @@ public enum Day implements JSONToStringI {
     FRIDAY,
     SATURDAY;
 
-    protected final int value;
-
-    private Day() {
-        value = ordinal();
-    }
-
     public Day next() {
         if (ordinal() == values().length - 1) {
             return values()[0];
         }
         return values()[ordinal() + 1];
-    }
-
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        StringBuilder b = new StringBuilder();
-        b.append('"');
-        b.append(Day.values()[value].toString());
-        b.append('"');
-        return b.toString();
     }
 }

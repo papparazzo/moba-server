@@ -20,19 +20,12 @@
 
 package moba.server.datatypes.enumerations;
 
-import java.io.IOException;
-
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-
-public enum Switch implements JSONToStringI {
+public enum Switch {
     ON,
     AUTO,
     UNSET,
     TRIGGER,
     OFF;
-
-    protected final int value;
 
     public static Switch getValue(String s, Switch def) {
         Switch t = Switch.valueOf(s);
@@ -40,19 +33,5 @@ public enum Switch implements JSONToStringI {
             return def;
         }
         return t;
-    }
-
-    private Switch() {
-        value = ordinal();
-    }
-
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        StringBuilder b = new StringBuilder();
-        b.append('"');
-        b.append(Switch.values()[value].toString());
-        b.append('"');
-        return b.toString();
     }
 }

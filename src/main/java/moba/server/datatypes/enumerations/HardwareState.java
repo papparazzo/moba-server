@@ -20,31 +20,10 @@
 
 package moba.server.datatypes.enumerations;
 
-import java.io.IOException;
-
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-
-public enum HardwareState implements JSONToStringI {
+public enum HardwareState {
     ERROR,
     STANDBY,
     EMERGENCY_STOP,
     MANUEL,
     AUTOMATIC;
-
-    protected final int value;
-
-    private HardwareState() {
-        value = ordinal();
-    }
-
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        StringBuilder b = new StringBuilder();
-        b.append('"');
-        b.append(HardwareState.values()[value].toString());
-        b.append('"');
-        return b.toString();
-    }
 }
