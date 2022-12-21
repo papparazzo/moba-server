@@ -40,6 +40,7 @@ public enum ErrorId {
 
     NO_DEFAULT_GIVEN,
 
-    SAME_ORIGIN_NEEDED;
+    SAME_ORIGIN_NEEDED,
 
+    SETTING_NOT_ALLOWED;
 }
