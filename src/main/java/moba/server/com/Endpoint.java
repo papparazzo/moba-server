@@ -131,6 +131,10 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
         getLogger().log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
     }
 
+    public Socket getSocket() {
+        return socket;
+    }
+
     public long getAppId() {
         return id;
     }

@@ -20,6 +20,7 @@
 
 package moba.server.messagehandler;
 
+import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
@@ -62,9 +63,7 @@ public class Server extends MessageHandlerA {
                 return;
         }
 
-        if(!checkForSameOrigin(msg.getEndpoint())) {
-            throw new ErrorException(ErrorId.SAME_ORIGIN_NEEDED, "same origin needed");
-        }
+        checkForSameOrigin(msg.getEndpoint().getSocket().getInetAddress());
 
         switch(smsg) {
             case RESET_CLIENT:
@@ -89,14 +88,11 @@ public class Server extends MessageHandlerA {
         dispatcher.dispatch(new Message(mType, null), ep);
     }
 
-    private boolean checkForSameOrigin(Endpoint ep) {
-//        if( FIXME: Implementieren
-//            ep.getSocket().getInetAddress().getHostAddress() ==
-//            Inet4Address.getLocalHost().getHostAddress()
-//        ) {
-            return true;
-//        }
-//        return false;
+    private void checkForSameOrigin(InetAddress addr) throws ErrorException {
+        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) {
+            return;
+        }
+        throw new ErrorException(ErrorId.SAME_ORIGIN_NEEDED, "same origin needed");
     }
 
     private void handleServerInfoReq(Endpoint ep) {
