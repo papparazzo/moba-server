@@ -91,15 +91,15 @@ public class JSONEncoder {
     throws IOException, JSONException {
         writer.write('{');
 
-        Class<?> klass = object.getClass();
+        Class<?> cls = object.getClass();
 
         boolean firstIteration = true;
 
-        Method[] methods = klass.getDeclaredMethods();
+        Method[] methods = cls.getMethods();
         for(final Method method : methods) {
             final int modifiers = method.getModifiers();
 
-            if(!Modifier.isPublic(modifiers) || Modifier.isStatic(modifiers)) {
+            if(Modifier.isStatic(modifiers)) {
                 continue;
             }
 
