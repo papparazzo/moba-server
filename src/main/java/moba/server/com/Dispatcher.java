@@ -188,7 +188,7 @@ public class Dispatcher implements Loggable {
             sendBroadCastMessage(grpId, msgId, data, grpId, msg.getEndpoint());
             sendBroadCastMessage(grpId, msgId, data, -1, msg.getEndpoint());
         } catch(IOException | JSONException e) {
-            getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            getLogger().log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
         }
     }
 
