@@ -109,7 +109,7 @@ public class JSONEncoder {
 
             String methodName = method.getName();
 
-            if(methodName.equals("getClass") && methodName.equals("getDeclaringClass")) {
+            if(methodName.equals("getClass") || methodName.equals("getDeclaringClass")) {
                 continue;
             }
 
