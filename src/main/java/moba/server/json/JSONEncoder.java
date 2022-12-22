@@ -121,18 +121,19 @@ public class JSONEncoder {
 
             key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
 
-            try {
-                if(!firstIteration) {
-                    writer.write(',');
-                }
-
-                writer.write('"');
-                writer.write(key);
-                writer.write("\":");
-                addJSONValue(method.invoke(object));
-                firstIteration = false;
-            } catch (IllegalAccessException | InvocationTargetException ignore) {
+            if(!firstIteration) {
+                writer.write(',');
             }
+
+            writer.write('"');
+            writer.write(key);
+            writer.write("\":");
+            try {
+                addJSONValue(method.invoke(object));
+            } catch (IllegalAccessException | InvocationTargetException exception) {
+                throw new JSONException("error in invoking method <" + methodName + ">", exception);
+            }
+            firstIteration = false;
         }
         writer.write('}');
     }
@@ -291,7 +292,7 @@ public class JSONEncoder {
 
     protected void addDate(Date date)
     throws IOException {
-        DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS");
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         addString(df.format(date));
     }
 
