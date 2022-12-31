@@ -172,7 +172,7 @@ public class Layout extends MessageHandlerA implements Loggable {
     protected void deleteLayout(Message msg)
     throws SQLException, IOException, ConfigException, JSONException, ErrorException {
         long id = (Long)msg.getData();
-        lock.isLockedByApp(id, msg.getEndpoint());
+        lock.isLockedByApp(msg.getEndpoint().getAppId(), id);
 
         Connection con = database.getConnection();
         String q = "DELETE FROM `TrackLayouts` WHERE (`locked` IS NULL OR `locked` = ?) AND `id` = ? ";
@@ -225,7 +225,7 @@ public class Layout extends MessageHandlerA implements Loggable {
         Map<String, Object> map = (Map)msg.getData();
 
         long id = (Long)map.get("id");
-        lock.isLockedByApp(id, msg.getEndpoint());
+        lock.isLockedByApp(msg.getEndpoint().getAppId(), id);
 
         TrackLayoutInfoData tl;
         boolean active = (boolean)map.get("active");
@@ -308,7 +308,7 @@ public class Layout extends MessageHandlerA implements Loggable {
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         long id = getId(map.get("id"));
 
-        if(!lock.isLockedByApp(id, msg.getEndpoint())) {
+        if(!lock.isLockedByApp(msg.getEndpoint().getAppId(), id)) {
             throw new ErrorException(ErrorId.DATASET_NOT_LOCKED, "layout <" + String.valueOf(id) + "> not locked");
         }
 
