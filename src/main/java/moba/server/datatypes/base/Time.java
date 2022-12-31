@@ -20,12 +20,7 @@
 
 package moba.server.datatypes.base;
 
-import java.io.IOException;
-
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-
-public class Time implements JSONToStringI {
+public class Time {
     protected int time;
 
     public Time() {
@@ -41,29 +36,16 @@ public class Time implements JSONToStringI {
         if(hour < 0 || hour > 24 || minute < 0 || minute > 59) {
             throw new IllegalArgumentException();
         }
-        time = hour * 60 * 60;
-        time += minute * 60;
-    }
-
-    public Time(String time)
-    throws IllegalArgumentException {
-        setTime(time);
+        time = hour * 60;
+        time += minute;
     }
 
     public final void setTime(int time)
     throws IllegalArgumentException {
-        if(time < 0 || time > ((60 * 60 * 24) - 1)) {
+        if(time < 0 || time > ((60 * 24) - 1)) {
             throw new IllegalArgumentException();
         }
         this.time = time;
-    }
-
-    public final void setTime(String time)
-    throws IllegalArgumentException {
-        String[] tokens = time.split(":");
-
-        this.time = Integer.parseInt(tokens[0]) * 60 * 60;
-        this.time += Integer.parseInt(tokens[1]) * 60;
     }
 
     public final boolean appendTime(int time)
@@ -72,7 +54,7 @@ public class Time implements JSONToStringI {
             throw new IllegalArgumentException("invalid time diff given");
         }
 
-        this.time = (this.time + time) % (60 * 60 * 24);
+        this.time = (this.time + time) % (60 * 24);
         if(this.time < time) {
             return true;
         }
@@ -84,37 +66,6 @@ public class Time implements JSONToStringI {
     }
 
     public boolean isFullHour() {
-        long f = time / 60;
-        return (f % 60 == 0);
-    }
-
-    @Override
-    public String toString() {
-        long t = time / 60;
-        long m = t % 60;
-        t /= 60;
-        long h = t % 24;
-
-        StringBuilder sb = new StringBuilder();
-        if(h < 10) {
-            sb.append("0");
-        }
-        sb.append(h);
-        sb.append(":");
-        if(m < 10) {
-            sb.append("0");
-        }
-        sb.append(m);
-        return sb.toString();
-    }
-
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        StringBuilder b = new StringBuilder();
-        b.append('"');
-        b.append(toString());
-        b.append('"');
-        return b.toString();
+        return (time % 60 == 0);
     }
 }
