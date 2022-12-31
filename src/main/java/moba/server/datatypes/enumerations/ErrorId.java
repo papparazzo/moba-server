@@ -42,5 +42,6 @@ public enum ErrorId {
 
     SAME_ORIGIN_NEEDED,
 
-    SETTING_NOT_ALLOWED;
+    SETTING_NOT_ALLOWED,
+    INVALID_VALUE_GIVEN;
 }
