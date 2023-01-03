@@ -20,11 +20,8 @@
 
 package moba.server.messagehandler;
 
-import moba.server.datatypes.enumerations.ColorTheme;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
-import moba.server.datatypes.enumerations.ThreeState;
-import moba.server.datatypes.objects.ColorThemeData;
 import moba.server.datatypes.objects.GlobalTimerData;
 import java.io.IOException;
 import java.util.HashMap;
@@ -41,13 +38,19 @@ import moba.server.utilities.config.Config;
 import moba.server.utilities.config.ConfigException;
 import moba.server.utilities.exceptions.ErrorException;
 
+/*
+ * https://www.laenderdaten.info/Europa/Deutschland/sonnenuntergang.php
+ *
+ * ab  4:00 Uhr Sonnenaufgang
+ * ab  5:00 Uhr Tag
+ * ab 21:00 Uhr Sonnenuntergang
+ * ab 22:00 Uht Nacht
+ */
 public class Timer extends MessageHandlerA implements Runnable {
     protected Config          config = null;
     protected final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     protected GlobalTimerData timerData = new GlobalTimerData();
-    protected ColorThemeData  themeData = new ColorThemeData();
 
-    protected ColorTheme       curTheme = null;
     protected volatile boolean isRunning = false;
 
     public Timer(Dispatcher dispatcher, Config config) {
@@ -67,25 +70,6 @@ public class Timer extends MessageHandlerA implements Runnable {
         o = config.getSection("globaltimer.globaltimer");
         if(o != null) {
             timerData = (GlobalTimerData)o;
-        }
-        o = config.getSection("globaltimer.colortheme");
-        if(o != null) {
-            themeData = (ColorThemeData)o;
-        }
-        switch(themeData.getCondition()) {
-            case UNSET:
-            case AUTO:
-                // FIXME: ...
-                break;
-
-            case ON:
-                curTheme = ColorTheme.BRIGHT;
-                break;
-
-            case OFF:
-                curTheme = ColorTheme.DIM;
-                break;
-
         }
     }
 
@@ -111,17 +95,6 @@ public class Timer extends MessageHandlerA implements Runnable {
                     dispatcher.dispatch(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData));
                     break;
 
-                case GET_COLOR_THEME:
-                    dispatcher.dispatch(new Message(TimerMessage.SET_COLOR_THEME, themeData), msg.getEndpoint());
-                    dispatcher.dispatch(new Message(TimerMessage.COLOR_THEME_EVENT, curTheme), msg.getEndpoint());
-                    break;
-
-                case SET_COLOR_THEME:
-                    themeData.fromJsonObject((Map<String, Object>)msg.getData());
-                    storeData();
-                    dispatcher.dispatch(new Message(TimerMessage.SET_COLOR_THEME, themeData));
-                    break;
-
                 default:
                     throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
             }
@@ -138,31 +111,11 @@ public class Timer extends MessageHandlerA implements Runnable {
             if(!isRunning) {
                 return;
             }
+
             if(timerData.setTick()) {
-                dispatcher.dispatch(new Message(TimerMessage.GLOBAL_TIMER_EVENT, timerData));
+                dispatcher.dispatch(new Message(TimerMessage.GLOBAL_TIMER_EVENT, timerData.getModelTime()));
             }
 
-            if(themeData.getCondition() != ThreeState.AUTO) {
-                return;
-            }
-
-            boolean isBetween = timerData.isTimeBetween(themeData.getBrightTime(), themeData.getDimTime());
-
-            if(isBetween && curTheme == ColorTheme.BRIGHT) {
-                return;
-            }
-
-            if(!isBetween && curTheme == ColorTheme.DIM) {
-                return;
-            }
-
-            if(curTheme == ColorTheme.BRIGHT) {
-                curTheme = ColorTheme.DIM;
-            } else {
-                curTheme = ColorTheme.BRIGHT;
-            }
-
-            dispatcher.dispatch(new Message(TimerMessage.COLOR_THEME_EVENT, curTheme));
         } catch(Exception e) {
 
         }
@@ -172,7 +125,6 @@ public class Timer extends MessageHandlerA implements Runnable {
     throws ConfigException, IOException, JSONException {
         HashMap<String, Object> map = new HashMap<>();
         map.put("globaltimer", timerData);
-        map.put("colortheme", themeData);
         config.setSection("globaltimer", map);
         config.writeFile();
     }

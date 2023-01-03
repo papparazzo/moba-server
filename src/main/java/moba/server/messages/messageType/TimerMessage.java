@@ -27,10 +27,7 @@ import moba.server.utilities.exceptions.ErrorException;
 public enum TimerMessage implements MessageType {
     GLOBAL_TIMER_EVENT(1),
     GET_GLOBAL_TIMER  (2),
-    SET_GLOBAL_TIMER  (3),
-    GET_COLOR_THEME   (4),
-    SET_COLOR_THEME   (5),
-    COLOR_THEME_EVENT (6);
+    SET_GLOBAL_TIMER  (3);
 
     public final static int GROUP_ID = 4;
 
