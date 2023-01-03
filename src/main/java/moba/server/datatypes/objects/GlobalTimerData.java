@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2022 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -20,66 +20,107 @@
 
 package moba.server.datatypes.objects;
 
-import moba.server.datatypes.enumerations.Day;
 import moba.server.datatypes.base.Time;
 import java.util.Map;
+import moba.server.datatypes.enumerations.Day;
+import moba.server.datatypes.enumerations.ErrorId;
+import moba.server.utilities.exceptions.ErrorException;
 
 public class GlobalTimerData {
-    protected Day  curModelDay;
-    protected Time curModelTime = new Time();
-    protected int  multiplicator = 240;
+    protected PointOfTime modelTime = new PointOfTime();
+
+    protected int  multiplicator = 4;
+
+    protected Time nightStartTime = new Time();
+    protected Time sunriseStartTime = new Time();
+    protected Time dayStartTime = new Time();
+    protected Time sunsetStartTime = new Time();
+
+    public void setModelTime(PointOfTime val) {
+        modelTime = val;
+    }
+
+    public PointOfTime getModelTime() {
+        return modelTime;
+    }
+
+    public boolean setTick() {
+        return modelTime.setTick(multiplicator);
+    }
+
+    public void setMultiplicator(int multiplicator)
+    throws IllegalArgumentException {
+        if(multiplicator < 1 || multiplicator > 4) {
+            throw new IllegalArgumentException("multiplicator out of range (< 1 || > 4)");
+        }
+        this.multiplicator = multiplicator;
+    }
 
     public int getMultiplicator() {
         return multiplicator;
     }
 
-    public void setMultiplicator(int multiplicator)
-    throws IllegalArgumentException {
-        if(multiplicator < 60 || multiplicator > 240) {
-            throw new IllegalArgumentException("multiplicator out of range (< 60 || > 240)");
-        }
-
-        if(multiplicator % 30 != 0) {
-            throw new IllegalArgumentException("multiplicator modulo 30 check failed in multiplicator-setting");
-        }
-        this.multiplicator = multiplicator;
+    public int getNightStartTime() {
+        return nightStartTime.getTime();
     }
 
-    public Day getCurModelDay() {
-        return curModelDay;
+    public void setNightStartTime(int val) {
+        nightStartTime = new Time(val);
     }
 
-    public void setCurModelDay(Day modelDay) {
-        curModelDay = modelDay;
+    public int getSunriseStartTime() {
+        return sunriseStartTime.getTime();
     }
 
-    public Time getCurModelTime() {
-        return curModelTime;
+    public void setSunriseStartTime(int val) {
+        sunriseStartTime = new Time(val);
     }
 
-    public void setCurModelTime(Time modelTime) {
-        curModelTime = modelTime;
+    public int getDayStartTime() {
+        return dayStartTime.getTime();
     }
 
-    public void fromJsonObject(Map<String, Object> map) {
-        curModelDay = Day.valueOf((String)map.get("curModelDay"));
-        curModelTime = new Time((String)map.get("curModelTime"));
+    public void setDayStartTime(int val) {
+        dayStartTime = new Time(val);
+    }
+
+    public int getSunsetStartTime() {
+        return sunsetStartTime.getTime();
+    }
+
+    public void setSunsetStartTime(int val) {
+        sunsetStartTime = new Time(val);
+    }
+
+    public void fromJsonObject(Map<String, Object> map)
+    throws ErrorException {
+        var pt = (Map<String, Object>)map.get("modelTime");
+
+        modelTime.setDay(Day.valueOf((String)pt.get("day")));
+        modelTime.setTime(((Long)pt.get("time")).intValue());
+
         setMultiplicator(((Long)map.get("multiplicator")).intValue());
+
+        setNightStartTime(((Long)map.get("nightStartTime")).intValue());
+        setSunriseStartTime(((Long)map.get("sunriseStartTime")).intValue());
+        setDayStartTime(((Long)map.get("dayStartTime")).intValue());
+        setSunsetStartTime(((Long)map.get("sunsetStartTime")).intValue());
+        validate();
     }
 
-    public boolean setTick() {
-        if(curModelTime.appendTime(multiplicator)) {
-            curModelDay = curModelDay.next();
-        }
-        return curModelTime.isFullHour();
-    }
+    protected void validate()
+    throws ErrorException {
 
-    public boolean isTimeBetween(Time start, Time end) {
-        int time = curModelTime.getTime() ;
-        time %= (60 * 60 * 24);
-        if(start.getTime() < time && end.getTime() > time) {
-            return true;
+        if(sunriseStartTime.getTime() > dayStartTime.getTime()) {
+            throw new ErrorException(ErrorId.INVALID_VALUE_GIVEN, "Tag vor Sonnenaufgang");
         }
-        return false;
+
+        if(dayStartTime.getTime() > sunsetStartTime.getTime()) {
+            throw new ErrorException(ErrorId.INVALID_VALUE_GIVEN, "Sonnenuntergang vor Tag");
+        }
+
+        if(sunsetStartTime.getTime() > nightStartTime.getTime()) {
+            throw new ErrorException(ErrorId.INVALID_VALUE_GIVEN, "Nacht vor Sonnenuntergang");
+        }
     }
 }
