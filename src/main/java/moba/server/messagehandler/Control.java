@@ -138,9 +138,9 @@ public class Control extends MessageHandlerA {
             "`BlockContact`.`ContactNumber` AS `BlockModulContactNumber` " +
             "FROM `BlockSections` " +
             "LEFT JOIN `FeedbackContacts` AS `TriggerContact` " +
-            "ON `BlockContactId` = `TriggerContact`.`Id` " +
+            "ON `BrakeTriggerContactId` = `TriggerContact`.`Id` " +
             "LEFT JOIN `FeedbackContacts` AS `BlockContact` " +
-            "ON `BrakeTriggerContactId` = `BlockContact`.`Id` " +
+            "ON `BlockContactId` = `BlockContact`.`Id` " +
             "LEFT JOIN `TrackLayoutSymbols` " +
             "ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` " +
             "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
