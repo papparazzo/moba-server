@@ -23,18 +23,16 @@ public class BlockContactData {
 
     private final ContactData brakeTriggerContact;
     private final ContactData blockContact;
-    private final int         trainId;
     private final int         id;
     private final int         xPos;
     private final int         yPos;
 
-    public BlockContactData(int id, int xPos, int yPos, ContactData brakeTriggerContact, ContactData blockContact, int trainId) {
+    public BlockContactData(int id, int xPos, int yPos, ContactData brakeTriggerContact, ContactData blockContact) {
         this.id   = id;
         this.xPos = xPos;
         this.yPos = yPos;
         this.brakeTriggerContact = brakeTriggerContact;
         this.blockContact = blockContact;
-        this.trainId = trainId;
     }
 
     public int getId() {
@@ -55,9 +53,5 @@ public class BlockContactData {
 
     public ContactData getBlockContact() {
         return blockContact;
-    }
-
-    public int getTrainId() {
-        return trainId;
     }
 }
