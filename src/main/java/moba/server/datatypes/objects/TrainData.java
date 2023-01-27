@@ -27,12 +27,14 @@ public class TrainData {
     protected int address;
     protected int speed;
     protected DrivingDirection drivingDirection;
+    protected int blockId;
 
-    public TrainData(int id, int address, int speed, DrivingDirection drivingDirection) {
+    public TrainData(int id, int address, int speed, DrivingDirection drivingDirection, int blockId) {
        this.id = id;
        this.address = address;
        this.speed = speed;
        this.drivingDirection = drivingDirection;
+       this.blockId = blockId;
     }
 
     public int getId() {
@@ -49,5 +51,9 @@ public class TrainData {
 
     public DrivingDirection getDrivingDirection() {
         return drivingDirection;
+    }
+
+    public int getBlockId() {
+        return blockId;
     }
 }
