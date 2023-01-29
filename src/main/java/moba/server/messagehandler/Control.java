@@ -93,7 +93,7 @@ public class Control extends MessageHandlerA {
     throws ErrorException {
         try {
             switch(ControlMessage.fromId(msg.getMessageId())) {
-                case GET_CONTACT_LIST_REQ:
+                case GET_BLOCK_LIST_REQ:
                     getContactList(msg);
                     break;
 
@@ -161,7 +161,7 @@ public class Control extends MessageHandlerA {
                     rs.getInt("TrainId")
                 ));
             }
-            dispatcher.dispatch(new Message(ControlMessage.GET_CONTACT_LIST_RES, arraylist), msg.getEndpoint());
+            dispatcher.dispatch(new Message(ControlMessage.GET_BLOCK_LIST_RES, arraylist), msg.getEndpoint());
         }
     }
 
