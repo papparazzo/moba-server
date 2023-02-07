@@ -34,7 +34,8 @@ public enum ControlMessage implements MessageType {
     LOCK_BLOCK_WAITING        (8),
     BLOCK_LOCKED              (9),
     BLOCK_LOCKING_FAILED     (10),
-    UNLOCK_BLOCK             (11);
+    UNLOCK_BLOCK             (11),
+    PUSH_TRAIN               (12);
 
     public final static int GROUP_ID = 10;
 
