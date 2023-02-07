@@ -21,7 +21,6 @@
 package moba.server.datatypes.enumerations;
 
 public enum ErrorId {
-
     UNKNOWN_ERROR,
     UNKNOWN_GROUP_ID,
     UNKNOWN_MESSAGE_ID,
