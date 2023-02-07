@@ -199,11 +199,21 @@ public class Control extends MessageHandlerA {
 
     protected void getTrainList(Message msg)
     throws SQLException, ErrorException {
+        long id = getId(msg.getData());
 
         Connection con = database.getConnection();
-        String q = "SELECT Id, Address, Speed, DrivingDirection FROM Trains";
+        String q =
+            "SELECT Trains.Id, Address, Speed, DrivingDirection " +
+            "FROM Trains " +
+            "LEFT JOIN BlockSections " +
+            "ON BlockSections.TrainId = Trains.Id " +
+            "LEFT JOIN `TrackLayoutSymbols` " +
+            "ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` " +
+            "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
+            pstmt.setLong(1, id);
+
             ArrayList<TrainData> arraylist;
             ResultSet rs = pstmt.executeQuery();
             arraylist = new ArrayList();
