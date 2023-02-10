@@ -94,7 +94,7 @@ public class Control extends MessageHandlerA {
         try {
             switch(ControlMessage.fromId(msg.getMessageId())) {
                 case GET_BLOCK_LIST_REQ:
-                    getContactList(msg);
+                    getBlockList(msg);
                     break;
 
                 case GET_SWITCH_STAND_LIST_REQ:
@@ -123,7 +123,7 @@ public class Control extends MessageHandlerA {
         }
     }
 
-    protected void getContactList(Message msg)
+    protected void getBlockList(Message msg)
     throws SQLException, ErrorException {
         long id = getId(msg.getData());
 
