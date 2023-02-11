@@ -26,7 +26,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
 
 import moba.server.com.Dispatcher;
 import moba.server.database.Database;
@@ -40,13 +42,16 @@ import moba.server.datatypes.objects.TrainData;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.ControlMessage;
+import moba.server.messages.messageType.LayoutMessage;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.exceptions.ErrorException;
 import moba.server.utilities.lock.BlockLock;
+import moba.server.utilities.lock.TracklayoutLock;
+import moba.server.utilities.logger.Loggable;
 
-public class Control extends MessageHandlerA {
+public class Control extends MessageHandlerA implements Loggable {
     protected Database       database     = null;
-    protected BlockLock      lock         = null;
+    protected BlockLock      blockLock    = null;
     protected Config         config       = null;
     protected Queue<Message> queue        = null;
     protected long           activeLayout = 0;
@@ -54,10 +59,11 @@ public class Control extends MessageHandlerA {
     public Control(Dispatcher dispatcher, Database database, Config config) {
         this.dispatcher = dispatcher;
         this.database   = database;
-        this.lock       = new BlockLock(database);
+        this.blockLock       = new BlockLock(database);
+        //this.lock       = new TracklayoutLock(database);
         this.queue      = new LinkedList<>();
         this.config     = config;
-        this.lock.resetAll();
+        this.blockLock.resetAll();
     }
 
     @Override
@@ -82,9 +88,9 @@ public class Control extends MessageHandlerA {
     @Override
     public void freeResources(long appId) {
         if(appId == -1) {
-            lock.resetAll();
+            blockLock.resetAll();
         } else {
-            lock.resetOwn(appId);
+            blockLock.resetOwn(appId);
         }
     }
 
@@ -232,7 +238,7 @@ public class Control extends MessageHandlerA {
     protected void lockBlock(Message msg, boolean wait)
     throws ErrorException {
         try {
-            lock.tryLock(msg.getEndpoint().getAppId(), msg.getData());
+            blockLock.tryLock(msg.getEndpoint().getAppId(), msg.getData());
             dispatcher.dispatch(new Message(ControlMessage.BLOCK_LOCKED, msg.getData()), msg.getEndpoint());
         } catch(ErrorException ex) {
             if(!wait) {
@@ -245,7 +251,7 @@ public class Control extends MessageHandlerA {
 
     protected void unLockBlock(Message msg)
     throws ErrorException {
-        lock.unlock(msg.getEndpoint().getAppId(), msg.getData());
+        blockLock.unlock(msg.getEndpoint().getAppId(), msg.getData());
 
         if(!queue.isEmpty()) {
             lockBlock(queue.remove(), true);
