@@ -81,17 +81,13 @@ public class Control extends MessageHandlerA implements Loggable {
     }
 
     @Override
-    public void shutdown() {
-        freeResources(-1);
+    public void freeResources() {
+        blockLock.resetAll();
     }
 
     @Override
     public void freeResources(long appId) {
-        if(appId == -1) {
-            blockLock.resetAll();
-        } else {
-            blockLock.resetOwn(appId);
-        }
+        blockLock.resetOwn(appId);
     }
 
     @Override

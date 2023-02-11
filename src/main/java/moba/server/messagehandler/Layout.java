@@ -77,7 +77,7 @@ public class Layout extends MessageHandlerA implements Loggable {
 
     @Override
     public void shutdown() {
-        freeResources(-1);
+        super.shutdown();
         try {
             storeData();
         } catch(ConfigException | IOException | JSONException e) {
@@ -86,12 +86,13 @@ public class Layout extends MessageHandlerA implements Loggable {
     }
 
     @Override
+    public void freeResources() {
+        lock.resetAll();
+    }
+
+    @Override
     public void freeResources(long appId) {
-        if(appId == -1) {
-            lock.resetAll();
-        } else {
-            lock.resetOwn(appId);
-        }
+        lock.resetOwn(appId);
     }
 
     @Override

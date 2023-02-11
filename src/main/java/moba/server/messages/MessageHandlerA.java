@@ -31,6 +31,9 @@ public abstract class MessageHandlerA {
     public abstract void handleMsg(Message msg)
     throws ErrorException;
 
+    public void freeResources() {
+    }
+
     public void freeResources(long appId) {
     }
 
@@ -41,6 +44,7 @@ public abstract class MessageHandlerA {
     }
 
     public void shutdown() {
+        freeResources();
     }
 
     public void reset() {
