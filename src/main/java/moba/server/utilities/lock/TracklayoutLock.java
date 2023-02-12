@@ -126,11 +126,11 @@ public final class TracklayoutLock extends AbstractLock {
     @Override
     public boolean isLockedByApp(long appId, Object data)
     throws ErrorException {
-        long lockedBy = getIdOfLockingApp(data);
+        var lockedBy = getIdOfLockingApp(data);
 
         getLogger().log(Level.INFO, "object is locked by <{1}>", new Object[]{lockedBy});
 
-        if(lockedBy == 0) {
+        if(lockedBy == null) {
             return false;
         }
         if(lockedBy == appId) {
@@ -139,7 +139,7 @@ public final class TracklayoutLock extends AbstractLock {
         throw new ErrorException(ErrorId.DATASET_LOCKED, "object is locked by <" + Long.toString(lockedBy) + ">");
     }
 
-    protected long getIdOfLockingApp(Object data)
+    protected Long getIdOfLockingApp(Object data)
     throws ErrorException {
         try {
             long id = (long)data;
@@ -154,7 +154,8 @@ public final class TracklayoutLock extends AbstractLock {
                 if(!rs.next()) {
                     throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + Long.toString(id) + ">");
                 }
-                return rs.getLong("locked");
+                var val = rs.getLong("locked");
+                return rs.wasNull() ? null : val;
             }
         } catch(SQLException e) {
             throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
