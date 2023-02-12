@@ -258,14 +258,14 @@ public class Layout extends MessageHandlerA implements Loggable {
     throws ErrorException {
         long id = getId(msg.getData());
         lock.unlock(msg.getEndpoint().getAppId(), id);
-        dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_UNLOCKED, id));
+        dispatcher.dispatch(new Message(LayoutMessage.UNLOCK_LAYOUT, id));
     }
 
     protected void lockLayout(Message msg)
     throws ErrorException {
         long id = getId(msg.getData());
         lock.tryLock(msg.getEndpoint().getAppId(), id);
-        dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_LOCKED, id));
+        dispatcher.dispatch(new Message(LayoutMessage.LOCK_LAYOUT, id));
     }
 
     protected void getLayout(Message msg, boolean tryLock)
