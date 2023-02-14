@@ -27,20 +27,15 @@ public enum LayoutMessage implements MessageType {
     GET_LAYOUTS_REQ         (1),
     GET_LAYOUTS_RES         (2),
     DELETE_LAYOUT           (3),
-      LAYOUT_DELETED          (4),
-    CREATE_LAYOUT           (5),
-      LAYOUT_CREATED          (6),
-    UPDATE_LAYOUT           (7),
-      LAYOUT_UPDATED          (8),
-    UNLOCK_LAYOUT           (9),
-    //LAYOUT_UNLOCKED         (10),
-    LOCK_LAYOUT             (11),
-    //LAYOUT_LOCKED           (12),
-    GET_LAYOUT_REQ          (13),
-    GET_LAYOUT_READ_ONLY_REQ(14),
-    GET_LAYOUT_RES          (15),
-    SAVE_LAYOUT             (16),
-    LAYOUT_CHANGED          (17);
+    CREATE_LAYOUT           (4),
+    UPDATE_LAYOUT           (5),
+    UNLOCK_LAYOUT           (6),
+    LOCK_LAYOUT             (7),
+    GET_LAYOUT_REQ          (8),
+    GET_LAYOUT_READ_ONLY_REQ(9),
+    GET_LAYOUT_RES          (10),
+    SAVE_LAYOUT             (11),
+    LAYOUT_CHANGED          (12);
 
     public final static int GROUP_ID = 8;
 

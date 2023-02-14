@@ -218,7 +218,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                 tl.setId(id);
             }
         }
-        dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_CREATED, tl));
+        dispatcher.dispatch(new Message(LayoutMessage.CREATE_LAYOUT, tl));
     }
 
     protected void updateLayout(Message msg)
