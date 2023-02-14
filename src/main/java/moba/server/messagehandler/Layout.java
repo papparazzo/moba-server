@@ -189,7 +189,7 @@ public class Layout extends MessageHandlerA implements Loggable {
         if(id == activeLayout) {
             storeData(-1);
         }
-        dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_DELETED, id));
+        dispatcher.dispatch(new Message(LayoutMessage.DELETE_LAYOUT, id));
     }
 
     protected void createLayout(Message msg)
@@ -250,7 +250,7 @@ public class Layout extends MessageHandlerA implements Loggable {
             if(active) {
                 storeData(id);
             }
-            dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_UPDATED, tl));
+            dispatcher.dispatch(new Message(LayoutMessage.UPDATE_LAYOUT, tl));
         }
     }
 
