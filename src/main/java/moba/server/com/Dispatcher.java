@@ -194,13 +194,14 @@ public class Dispatcher implements Loggable {
 
     protected void sendBroadCastMessage(int grpId, int msgId, String data, int groupKey, Endpoint exclEp)
     throws IOException, JSONException {
-        if(this.groupEP.containsKey((long)groupKey)) {
-            for(Endpoint ep : this.groupEP.get((long)groupKey)) {
-                if(ep == exclEp) {
-                    continue;
-                }
-                sendMessage(grpId, msgId, data, ep);
+        if(!this.groupEP.containsKey((long)groupKey)) {
+            return;
+        }
+        for(Endpoint ep : this.groupEP.get((long)groupKey)) {
+            if(ep == exclEp) {
+                continue;
             }
+            sendMessage(grpId, msgId, data, ep);
         }
     }
 
