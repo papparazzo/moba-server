@@ -99,6 +99,9 @@ public class Control extends MessageHandlerA implements Loggable {
                     getBlockList(msg);
                     break;
 
+                case SAVE_BLOCK_LIST:
+                    saveBlockList(msg);
+
                 case GET_SWITCH_STAND_LIST_REQ:
                     getSwitchStateList(msg);
                     break;
@@ -170,6 +173,99 @@ public class Control extends MessageHandlerA implements Loggable {
             }
             dispatcher.dispatch(new Message(ControlMessage.GET_BLOCK_LIST_RES, arraylist), msg.getEndpoint());
         }
+    }
+
+    protected void saveBlockList(Message msg)
+    throws SQLException, ErrorException {
+/*
+        Map<String, Object> map = (Map<String, Object>)msg.getData();
+        long id = getId(map.get("id"));
+
+        / *
+        if(!lock.isLockedByApp(msg.getEndpoint().getAppId(), id)) {
+            throw new ErrorException(ErrorId.DATASET_NOT_LOCKED, "layout <" + String.valueOf(id) + "> not locked");
+        }
+        * /
+
+        Connection con = database.getConnection();
+
+        String stmt = "UPDATE `TrackLayouts` SET `ModificationDate` = NOW() WHERE `Id` = ? ";
+
+        try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
+            pstmt.setLong(1, id);
+            getLogger().log(Level.INFO, pstmt.toString());
+            if(pstmt.executeUpdate() == 0) {
+                throw new ErrorException(ErrorId.DATASET_MISSING, "could not save <" + String.valueOf(id) + ">");
+            }
+        }
+
+        ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
+
+        stmt =
+            "DELETE `BlockSections`.* " +
+            "FROM `BlockSections` " +
+            "LEFT JOIN `TrackLayoutSymbols` ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` "    +
+            "WHERE `TrackLayoutId` = ?";
+
+        try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
+            pstmt.setLong(1, id);
+            getLogger().log(Level.INFO, pstmt.toString());
+            pstmt.executeUpdate();
+        }
+
+        for(Object item : arrayList) {
+            Map<String, Object> symbol = (Map<String, Object>)item;
+
+            stmt =
+                "INSERT INTO `BlockSections` (`Id`, `TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
+                "VALUES (?, ?, ?, ?, ?)";
+
+
+
+
+Integer	id
+Integer	xPos
+Integer	yPos
+ContactData	brakeTriggerContact
+ContactData	blockContact
+Integer	trainId
+
+
+
+
+
+
+
+
+            try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
+                if(symbol.get("id") == null) {
+                    pstmt.setNull(1, java.sql.Types.INTEGER);
+                } else {
+                    pstmt.setLong(1, (long)symbol.get("id"));
+                }
+
+                pstmt.setLong(2, id);
+                pstmt.setLong(3, (long)symbol.get("xPos"));
+                pstmt.setLong(4, (long)symbol.get("yPos"));
+                pstmt.setLong(5, (long)symbol.get("symbol"));
+                getLogger().log(Level.INFO, pstmt.toString());
+                pstmt.executeUpdate();
+            }
+        }
+
+        dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_CHANGED, map));
+
+
+
+
+
+        String q =
+                "";
+
+
+
+*/
+
     }
 
     protected void getSwitchStateList(Message msg)
