@@ -119,6 +119,11 @@ public class Control extends MessageHandlerA implements Loggable {
                     unLockBlock(msg);
                     break;
 
+                case PUSH_TRAIN:
+                    pushTrain(msg);
+                    dispatcher.dispatch(msg);
+                    break;
+
             }
         } catch(SQLException e) {
             throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
@@ -229,6 +234,51 @@ public class Control extends MessageHandlerA implements Loggable {
             }
             dispatcher.dispatch(new Message(ControlMessage.GET_TRAIN_LIST_RES, arraylist), msg.getEndpoint());
         }
+    }
+
+    protected void pushTrain(Message msg)
+    throws SQLException, ErrorException {
+        Connection con = database.getConnection();
+
+/*
+        var train = (Map<String, Object>)msg.getData();
+        var trainId = (long)train.get("id");
+
+        // FIXME: Transaction
+        String q =
+            "UPDATE `BlockSections` SET `BlockSections`.`TrainId` = NULL " +
+            "WHERE `BlockSections`.`TrainId` = ?";
+
+        try (PreparedStatement pstmt = con.prepareStatement(q)) {
+            pstmt.setLong(1, trainId);
+            if(pstmt.executeUpdate() == 0) {
+                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(trainId) + ">");
+            }
+        }
+
+        q =
+            "UPDATE `BlockSections` SET `BlockSections`.`TrainId` = ? " +
+            "WHERE `BlockSections`.`Id` = ?";
+
+        try (PreparedStatement pstmt = con.prepareStatement(q)) {
+            pstmt.setLong(1, trainId);
+            if(pstmt.executeUpdate() == 0) {
+                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(trainId) + ">");
+            }
+        }
+
+        q =
+            "UPDATE `Trains` SET `Trains`.`DrivingDirection` = ? " +
+            "WHERE `Trains`.`Id` = ?";
+
+        try (PreparedStatement pstmt = con.prepareStatement(q)) {
+            pstmt.setString(1, (String)train.get("direction"));
+            pstmt.setLong(2, trainId);
+            if(pstmt.executeUpdate() == 0) {
+                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(trainId) + ">");
+            }
+        }
+*/
     }
 
     protected void lockBlock(Message msg, boolean wait)
