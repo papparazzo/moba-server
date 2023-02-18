@@ -170,7 +170,6 @@ public class Dispatcher implements Loggable {
                 getLogger().log(Level.SEVERE, "msg is null!");
                 return;
             }
-            MessageLogger.out(msg, ep);
 
             StringBuilder sb = new StringBuilder();
             JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
@@ -181,26 +180,25 @@ public class Dispatcher implements Loggable {
             int msgId = msg.getMessageId();
             String data = sb.toString();
 
+            MessageLogger.out(msg, ep);
+
             if(ep != null) {
                 sendMessage(grpId, msgId, data, ep);
                 return;
             }
-            sendBroadCastMessage(grpId, msgId, data, grpId, msg.getEndpoint());
-            sendBroadCastMessage(grpId, msgId, data, -1, msg.getEndpoint());
+            sendBroadCastMessage(grpId, msgId, data, grpId);
+            sendBroadCastMessage(grpId, msgId, data, -1);
         } catch(IOException | JSONException e) {
             getLogger().log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
         }
     }
 
-    protected void sendBroadCastMessage(int grpId, int msgId, String data, int groupKey, Endpoint exclEp)
+    protected void sendBroadCastMessage(int grpId, int msgId, String data, int groupKey)
     throws IOException, JSONException {
         if(!this.groupEP.containsKey((long)groupKey)) {
             return;
         }
         for(Endpoint ep : this.groupEP.get((long)groupKey)) {
-            if(ep == exclEp) {
-                continue;
-            }
             sendMessage(grpId, msgId, data, ep);
         }
     }
