@@ -91,16 +91,14 @@ public class Message implements Comparable {
 
     @Override
     public String toString() {
-        String rv = "";
+        StringBuilder sb = new StringBuilder();
 
-        if(endpoint != null) {
-            rv = "<" + endpoint.toString() + ">";
-        }
-        rv += "<" + Long.toString(groupId) + ":" + Long.toString(messageId) + ">";
+        sb.append("[");
+        sb.append(groupId);
+        sb.append(":");
+        sb.append(messageId);
+        sb.append("]");
 
-        if(data != null) {
-            rv += "<" + data.toString() + ">";
-        }
-        return rv;
+        return sb.toString();
     }
 }
