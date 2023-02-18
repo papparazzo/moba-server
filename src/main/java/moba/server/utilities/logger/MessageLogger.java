@@ -71,21 +71,24 @@ public class MessageLogger {
         StringBuilder sb = new StringBuilder();
         SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS ");
         sb.append(df.format(new Date()));
-        if(type == MessageType.IN_MESSAGE) {
-            sb.append("-->| ");
-        } else {
-            sb.append("<--| ");
+
+        switch(type) {
+            case IN_MESSAGE:
+                sb.append("-->| ");
+                break;
+
+            case OUT_MESSAGE:
+                sb.append("<--| ");
+                break;
         }
-        sb.append("[");
-        sb.append(msg.getGroupId());
-        sb.append(":");
-        sb.append(msg.getMessageId());
-        sb.append("]");
+
+        sb.append(msg.toString());
         appendText(sb, msg);
-        sb.append(" EP-");
+
         if(ep == null) {
-            sb.append("0: NULL");
+            sb.append(" BC");
         } else {
+            sb.append(" #");
             sb.append(ep.toString());
         }
         System.out.println(sb);
