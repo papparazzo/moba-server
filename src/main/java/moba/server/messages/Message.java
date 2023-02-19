@@ -99,6 +99,13 @@ public class Message implements Comparable {
         sb.append(messageId);
         sb.append("]");
 
+        if(endpoint == null) {
+            sb.append(" BC");
+        } else {
+            sb.append(" #");
+            sb.append(endpoint.getAppId());
+        }
+
         return sb.toString();
     }
 }
