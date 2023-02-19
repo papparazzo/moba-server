@@ -171,7 +171,7 @@ public class Control extends MessageHandlerA implements Loggable {
                     rs.getInt("TrainId")
                 ));
             }
-            dispatcher.dispatch(new Message(ControlMessage.GET_BLOCK_LIST_RES, arraylist), msg.getEndpoint());
+            dispatcher.dispatch(new Message(ControlMessage.GET_BLOCK_LIST_RES, arraylist, msg.getEndpoint()));
         }
     }
 
@@ -296,7 +296,7 @@ Integer	trainId
                     SwitchStand.valueOf(rs.getString("SwitchStand"))
                 ));
             }
-            dispatcher.dispatch(new Message(ControlMessage.GET_SWITCH_STAND_LIST_RES, arraylist), msg.getEndpoint());
+            dispatcher.dispatch(new Message(ControlMessage.GET_SWITCH_STAND_LIST_RES, arraylist, msg.getEndpoint()));
         }
     }
 
@@ -328,7 +328,7 @@ Integer	trainId
                     DrivingDirection.valueOf(rs.getString("DrivingDirection"))
                 ));
             }
-            dispatcher.dispatch(new Message(ControlMessage.GET_TRAIN_LIST_RES, arraylist), msg.getEndpoint());
+            dispatcher.dispatch(new Message(ControlMessage.GET_TRAIN_LIST_RES, arraylist, msg.getEndpoint()));
         }
     }
 
@@ -368,23 +368,24 @@ Integer	trainId
             "WHERE `Trains`.`Id` = ?";
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setString(1, (String)train.get("direction"));
+            pstmt.setString(1, (String)data.get("direction"));
             pstmt.setLong(2, trainId);
             if(pstmt.executeUpdate() == 0) {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(trainId) + ">");
             }
         }
-*/
+        dispatcher.dispatch(new Message(ControlMessage.PUSH_TRAIN, msg.getData()));
+
     }
 
     protected void lockBlock(Message msg, boolean wait)
     throws ErrorException {
         try {
             blockLock.tryLock(msg.getEndpoint().getAppId(), msg.getData());
-            dispatcher.dispatch(new Message(ControlMessage.BLOCK_LOCKED, msg.getData()), msg.getEndpoint());
+            dispatcher.dispatch(new Message(ControlMessage.BLOCK_LOCKED, msg.getData(), msg.getEndpoint()));
         } catch(ErrorException ex) {
             if(!wait) {
-                dispatcher.dispatch(new Message(ControlMessage.BLOCK_LOCKING_FAILED, msg.getData()), msg.getEndpoint());
+                dispatcher.dispatch(new Message(ControlMessage.BLOCK_LOCKING_FAILED, msg.getData(), msg.getEndpoint()));
                 return;
             }
             queue.add(msg);

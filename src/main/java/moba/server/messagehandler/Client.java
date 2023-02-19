@@ -49,9 +49,7 @@ public class Client extends MessageHandlerA {
                 break;
 
             case ECHO_REQ:
-                dispatcher.dispatch(
-                    new Message(ClientMessage.ECHO_RES, msg.getData()), msg.getEndpoint()
-                );
+                dispatcher.dispatch(new Message(ClientMessage.ECHO_RES, msg.getData(), msg.getEndpoint()));
                 break;
 
             case START:
@@ -59,7 +57,8 @@ public class Client extends MessageHandlerA {
                 break;
 
             case ERROR:
-                dispatcher.dispatch(msg, msg.getEndpoint());
+                msg.convertToBroadCastMessage();
+                dispatcher.dispatch(msg);
                 break;
 
             default:
@@ -73,13 +72,13 @@ public class Client extends MessageHandlerA {
             dispatcher.dispatch(
                 new Message(
                     ClientMessage.ERROR,
-                    new ErrorData(ErrorId.INVALID_DATA_SEND, "Endpoint <" + ep.toString() + "> allready exists")
-                ),
-                msg.getEndpoint()
+                    new ErrorData(ErrorId.INVALID_DATA_SEND, "Endpoint <" + ep.toString() + "> allready exists"),
+                    msg.getEndpoint()
+                )
             );
             return;
         }
-        dispatcher.dispatch(new Message(ClientMessage.CONNECTED, ep.getAppId()), ep);
+        dispatcher.dispatch(new Message(ClientMessage.CONNECTED, ep.getAppId(), ep));
         dispatcher.dispatch(new Message(ServerMessage.NEW_CLIENT_STARTED, ep));
     }
 }

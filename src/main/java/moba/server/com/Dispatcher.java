@@ -160,11 +160,7 @@ public class Dispatcher implements Loggable {
         return null;
     }
 
-    public synchronized void dispatch(Message msg) {
-        dispatch(msg, null);
-    }
-
-    public void dispatch(Message msg, Endpoint ep) {
+    public void dispatch(Message msg) {
         try {
             if(msg == null) {
                 getLogger().log(Level.SEVERE, "msg is null!");
@@ -180,10 +176,10 @@ public class Dispatcher implements Loggable {
             int msgId = msg.getMessageId();
             String data = sb.toString();
 
-            MessageLogger.out(msg, ep);
+            MessageLogger.out(msg);
 
-            if(ep != null) {
-                sendMessage(grpId, msgId, data, ep);
+            if(msg.getEndpoint() != null) {
+                sendMessage(grpId, msgId, data, msg.getEndpoint());
                 return;
             }
             sendBroadCastMessage(grpId, msgId, data, grpId);

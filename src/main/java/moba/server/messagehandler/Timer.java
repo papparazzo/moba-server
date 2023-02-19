@@ -85,9 +85,7 @@ public class Timer extends MessageHandlerA implements Runnable {
         try {
             switch(TimerMessage.fromId(msg.getMessageId())) {
                 case GET_GLOBAL_TIMER:
-                    dispatcher.dispatch(
-                        new Message(TimerMessage.SET_GLOBAL_TIMER, timerData), msg.getEndpoint()
-                    );
+                    dispatcher.dispatch(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData, msg.getEndpoint()));
                     break;
 
                 case SET_GLOBAL_TIMER:

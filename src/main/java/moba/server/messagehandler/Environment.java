@@ -68,9 +68,7 @@ public class Environment extends MessageHandlerA {
             switch(EnvironmentMessage.fromId(msg.getMessageId())) {
 
                 case GET_ENVIRONMENT:
-                    dispatcher.dispatch(
-                        new Message(EnvironmentMessage.SET_ENVIRONMENT, environment), msg.getEndpoint()
-                    );
+                    dispatcher.dispatch(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment, msg.getEndpoint()));
                     break;
 
                 case SET_ENVIRONMENT:

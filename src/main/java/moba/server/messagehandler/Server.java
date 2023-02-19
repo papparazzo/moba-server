@@ -59,7 +59,7 @@ public class Server extends MessageHandlerA {
                 return;
 
             case CON_CLIENTS_REQ:
-                dispatcher.dispatch(new Message(ServerMessage.CON_CLIENTS_RES, dispatcher.getEndpoints()), msg.getEndpoint());
+                dispatcher.dispatch(new Message(ServerMessage.CON_CLIENTS_RES, dispatcher.getEndpoints(), msg.getEndpoint()));
                 return;
         }
 
@@ -85,7 +85,7 @@ public class Server extends MessageHandlerA {
         if(ep == null) {
             throw new ErrorException(ErrorId.INVALID_APP_ID, "app-id <" + msg.getData().toString() + "> is invalid");
         }
-        dispatcher.dispatch(new Message(mType, null), ep);
+        dispatcher.dispatch(new Message(mType, null, ep));
     }
 
     private void checkForSameOrigin(InetAddress addr) throws ErrorException {
@@ -115,6 +115,6 @@ public class Server extends MessageHandlerA {
         map.put("fwType",            java.lang.System.getProperty("java.vm.vendor", ""));
         map.put("fwVersion",         java.lang.System.getProperty("java.version", ""));
 
-        dispatcher.dispatch(new Message(ServerMessage.INFO_RES, map), ep);
+        dispatcher.dispatch(new Message(ServerMessage.INFO_RES, map, ep));
     }
 }
