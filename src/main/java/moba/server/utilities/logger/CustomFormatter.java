@@ -56,6 +56,7 @@ public class CustomFormatter extends Formatter {
         if(record.getSourceMethodName() != null) {
             sb.append(" ");
             sb.append(record.getSourceMethodName());
+            sb.append("()");
         }
         sb.append(" ");
         sb.append(formatMessage(record));
