@@ -79,6 +79,7 @@ public class Environment extends MessageHandlerA {
 
                 case SET_AMBIENCE:
                 case SET_AMBIENT_LIGHT:
+                    msg.convertToBroadCastMessage();
                     dispatcher.dispatch(msg);
                     break;
 
