@@ -35,6 +35,7 @@ import moba.server.messagehandler.Layout;
 import moba.server.messagehandler.Server;
 import moba.server.messagehandler.Systems;
 import moba.server.messages.MessageLoop;
+import moba.server.utilities.logger.MessageLogger;
 
 public class ServerApplication extends Application {
 
@@ -47,7 +48,7 @@ public class ServerApplication extends Application {
             boolean restart;
             maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
             do {
-                Dispatcher dispatcher = new Dispatcher();
+                Dispatcher dispatcher = new Dispatcher(new MessageLogger());
                 Acceptor acceptor = new Acceptor(msgQueueIn, dispatcher, (int)(long)config.getSection("common.serverConfig.port"), maxClients);
                 Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
                 MessageLoop loop = new MessageLoop(dispatcher);

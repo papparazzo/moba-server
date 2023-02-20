@@ -31,6 +31,7 @@ import moba.server.datatypes.base.Version;
 import moba.server.messages.MessageQueue;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.logger.CustomFormatter;
+import moba.server.utilities.logger.MessageLogger;
 
 abstract public class Application {
     protected Version      appVer;
@@ -48,7 +49,7 @@ abstract public class Application {
         this.startTime  = System.currentTimeMillis();
         this.buildDate  = date;
         this.config     = config;
-        this.msgQueueIn = new MessageQueue();
+        this.msgQueueIn = new MessageQueue(new MessageLogger());
 
         setUpLogger();
         loop();

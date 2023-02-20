@@ -33,19 +33,19 @@ public class MessageLogger {
         INTERN_MESSAGE
     }
 
-    public static void in(Message msg) {
-        MessageLogger.print(msg, MessageType.IN_MESSAGE, msg.getEndpoint());
+    public void in(Message msg) {
+        print(msg, MessageType.IN_MESSAGE, msg.getEndpoint());
     }
 
-    public static void out(Message msg) {
-        MessageLogger.print(msg, MessageType.OUT_MESSAGE, msg.getEndpoint());
+    public void out(Message msg) {
+        print(msg, MessageType.OUT_MESSAGE, msg.getEndpoint());
     }
 
-    public static void intern(Message msg, String data) {
-        MessageLogger.print(msg, MessageType.INTERN_MESSAGE, null);
+    public void intern(Message msg) {
+        print(msg, MessageType.INTERN_MESSAGE, null);
     }
 
-    protected static void print(Message msg, MessageType type, Endpoint ep) {
+    protected void print(Message msg, MessageType type, Endpoint ep) {
         if(msg == null) {
             return;
         }

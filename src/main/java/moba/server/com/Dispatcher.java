@@ -41,6 +41,12 @@ public class Dispatcher implements Loggable {
     protected final Set<Endpoint> allEndpoints = new HashSet<>();
     protected final Map<Long, Set<Endpoint>> groupEP = new HashMap<>();
 
+    protected MessageLogger messageLogger;
+
+    public Dispatcher(MessageLogger messageLogger) {
+        this.messageLogger = messageLogger;
+    }
+
     public boolean addEndpoint(Endpoint ep) {
         getLogger().log(Level.INFO, "try to add endpoint <{0}> appName <{1}> ver<{2}>", new Object[]{ep, ep.getAppName(), ep.getVersion()});
 
@@ -176,7 +182,7 @@ public class Dispatcher implements Loggable {
             int msgId = msg.getMessageId();
             String data = sb.toString();
 
-            MessageLogger.out(msg);
+            messageLogger.out(msg);
 
             if(msg.getEndpoint() != null) {
                 sendMessage(grpId, msgId, data, msg.getEndpoint());
