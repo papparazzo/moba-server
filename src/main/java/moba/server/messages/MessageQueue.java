@@ -21,13 +21,25 @@
 package moba.server.messages;
 
 import java.util.concurrent.PriorityBlockingQueue;
+import moba.server.messages.messageType.InternMessage;
 import moba.server.utilities.logger.MessageLogger;
 
 public class MessageQueue extends PriorityBlockingQueue<Message> {
 
+    protected MessageLogger logger;
+
+    public MessageQueue(MessageLogger logger) {
+        this.logger = logger;
+    }
+
     @Override
     public boolean add(Message msg) {
-        MessageLogger.in(msg);
+        if(msg.getGroupId() == InternMessage.GROUP_ID) {
+            logger.intern(msg);
+        } else {
+            logger.in(msg);
+        }
+
         return super.add(msg);
     }
 }
