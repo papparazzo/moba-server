@@ -84,9 +84,6 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
 
     @Override
     public String toString() {
-        if(socket == null) {
-            return "intern";
-        }
         return String.valueOf(id) + ": " + socket.toString();
     }
 
