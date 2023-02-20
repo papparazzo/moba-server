@@ -106,6 +106,11 @@ public class Message implements Comparable {
             sb.append(endpoint.getAppId());
         }
 
+        sb.append(" >> ");
+        if(data != null) {
+            sb.append(data.toString());
+        }
+
         return sb.toString();
     }
 }
