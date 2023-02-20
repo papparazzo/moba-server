@@ -62,6 +62,7 @@ public class Interface extends MessageHandlerA {
             case SET_BRAKE_VECTOR:
             case SET_LOCO_SPEED:
             case SET_LOCO_DIRECTION:
+                msg.convertToBroadCastMessage();
                 dispatcher.dispatch(msg);
                 return;
 
