@@ -193,10 +193,14 @@ public class Layout extends MessageHandlerA implements Loggable {
     }
 
     protected void createLayout(Message msg)
-    throws SQLException, ConfigException, IOException, JSONException {
+    throws SQLException, ConfigException, IOException, JSONException, ErrorException {
         Map<String, Object> map = (Map)msg.getData();
         boolean isActive = (boolean)map.get("active");
         long    currAppId = msg.getEndpoint().getAppId();
+
+        if(isActive) {
+            lock.isLockedByApp(msg.getEndpoint().getAppId(), activeLayout);
+        }
 
         TrackLayoutInfoData tl = new TrackLayoutInfoData((String)map.get("name"), (String)map.get("description"), currAppId, isActive);
         Connection con = database.getConnection();
