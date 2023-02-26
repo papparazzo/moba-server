@@ -318,7 +318,7 @@ public class Layout extends MessageHandlerA implements Loggable {
         }
 
         Connection con = database.getConnection();
-
+        // FIXME: Transaction
         String stmt = "UPDATE `TrackLayouts` SET `ModificationDate` = NOW() WHERE `Id` = ? ";
 
         try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
