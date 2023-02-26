@@ -51,7 +51,7 @@ public class Layout extends MessageHandlerA implements Loggable {
     protected Database        database     = null;
     protected TracklayoutLock lock         = null;
     protected Config          config       = null;
-    protected long            activeLayout = 0;
+    protected long            activeLayout = -1;
 
     public Layout(Dispatcher dispatcher, Database database, Config config) {
         this.database   = database;
@@ -395,7 +395,7 @@ public class Layout extends MessageHandlerA implements Loggable {
         if(o != null) {
             return (long)o;
         }
-        if(activeLayout >= 0) {
+        if(activeLayout > 0) {
             return activeLayout;
         }
         throw new ErrorException(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given");
