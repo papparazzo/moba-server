@@ -26,7 +26,6 @@ import java.util.Map;
 import moba.server.com.Dispatcher;
 
 import moba.server.datatypes.enumerations.ErrorId;
-import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.objects.EnvironmentData;
 import moba.server.json.JSONException;
 import moba.server.messages.Message;
@@ -40,7 +39,6 @@ public class Environment extends MessageHandlerA {
     protected Config  config = null;
 
     protected EnvironmentData environment = new EnvironmentData();
-    protected boolean         automatic   = false;
 
     public Environment(Dispatcher dispatcher, Config config) {
         this.dispatcher = dispatcher;
@@ -89,11 +87,6 @@ public class Environment extends MessageHandlerA {
         } catch(java.lang.ClassCastException | IOException | JSONException | ConfigException | NullPointerException | IllegalArgumentException e) {
             throw new ErrorException(ErrorId.FAULTY_MESSAGE, e.getMessage());
         }
-    }
-
-    @Override
-    public void hardwareStateChanged(HardwareState state) {
-        automatic = (state == HardwareState.AUTOMATIC);
     }
 
     protected long convertToLong(Object o) {
