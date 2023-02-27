@@ -130,10 +130,6 @@ public class Timer extends MessageHandlerA implements Runnable {
 
     @Override
     public void hardwareStateChanged(HardwareState state) {
-        boolean active = (state == HardwareState.AUTOMATIC);
-        if(isRunning == active) {
-            return;
-        }
-        isRunning = active;
+        isRunning = (state == HardwareState.AUTOMATIC);
     }
 }
