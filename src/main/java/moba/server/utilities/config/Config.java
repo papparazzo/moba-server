@@ -45,7 +45,7 @@ public class Config {
     }
 
     public void writeFile()
-    throws IOException, JSONException {
+    throws IOException {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setIndent(4);
