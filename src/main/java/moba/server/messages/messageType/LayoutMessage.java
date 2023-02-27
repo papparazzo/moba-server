@@ -35,7 +35,8 @@ public enum LayoutMessage implements MessageType {
     GET_LAYOUT_READ_ONLY_REQ(9),
     GET_LAYOUT_RES          (10),
     SAVE_LAYOUT             (11),
-    LAYOUT_CHANGED          (12);
+    LAYOUT_CHANGED          (12),
+    DEFAULT_LAYOUT_CHANGED  (13);
 
     public final static int GROUP_ID = 8;
 
