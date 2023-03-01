@@ -361,7 +361,7 @@ public class Layout extends MessageHandlerA implements Loggable {
             }
         }
 
-        dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_CHANGED, map));
+        dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_CHANGED, id));
     }
 
     protected Date getCreationDate(long id)
