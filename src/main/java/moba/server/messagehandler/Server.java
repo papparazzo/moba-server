@@ -20,7 +20,6 @@
 
 package moba.server.messagehandler;
 
-import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
@@ -86,13 +85,6 @@ public class Server extends MessageHandlerA {
             throw new ErrorException(ErrorId.INVALID_APP_ID, "app-id <" + msg.getData().toString() + "> is invalid");
         }
         dispatcher.dispatch(new Message(mType, null, ep));
-    }
-
-    private void checkForSameOrigin(InetAddress addr) throws ErrorException {
-        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) {
-            return;
-        }
-        throw new ErrorException(ErrorId.SAME_ORIGIN_NEEDED, "same origin needed");
     }
 
     private void handleServerInfoReq(Endpoint ep) {
