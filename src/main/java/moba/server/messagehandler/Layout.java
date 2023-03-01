@@ -141,7 +141,7 @@ public class Layout extends MessageHandlerA implements Loggable {
             }
         } catch(SQLException e) {
             throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
-        } catch(ConfigException | IOException | JSONException e) {
+        } catch(IOException e) {
             throw new ErrorException(ErrorId.UNKNOWN_ERROR, e.getMessage());
         }
     }
@@ -171,7 +171,7 @@ public class Layout extends MessageHandlerA implements Loggable {
     }
 
     protected void deleteLayout(Message msg)
-    throws SQLException, IOException, ConfigException, JSONException, ErrorException {
+    throws SQLException, ErrorException {
         long id = (Long)msg.getData();
         lock.isLockedByApp(msg.getEndpoint().getAppId(), id);
 
@@ -187,13 +187,13 @@ public class Layout extends MessageHandlerA implements Loggable {
             }
         }
         if(id == activeLayout) {
-            storeData(-1);
+            dispatcher.dispatch(new Message(InternMessage.DEFAULT_LAYOUT_CHANGED, -1));
         }
         dispatcher.dispatch(new Message(LayoutMessage.DELETE_LAYOUT, id));
     }
 
     protected void createLayout(Message msg)
-    throws SQLException, ConfigException, IOException, JSONException, ErrorException {
+    throws SQLException, IOException, ErrorException {
         Map<String, Object> map = (Map)msg.getData();
         boolean isActive = (boolean)map.get("active");
         long    currAppId = msg.getEndpoint().getAppId();
@@ -226,7 +226,7 @@ public class Layout extends MessageHandlerA implements Loggable {
     }
 
     protected void updateLayout(Message msg)
-    throws SQLException, ConfigException, IOException, JSONException, ErrorException {
+    throws SQLException, ErrorException {
         Map<String, Object> map = (Map)msg.getData();
 
         long id = (Long)map.get("id");
