@@ -36,12 +36,15 @@ public class Config {
     protected Map<String, Object> content;
 
     public Config(String fileName)
-    throws IOException, JSONException {
+    throws IOException, JSONException, ConfigException {
         InputStream is = new FileInputStream(fileName);
         this.fileName = fileName;
 
         Yaml yaml = new Yaml();
         content = (Map<String, Object>)yaml.load(is);
+        if(content == null || content.isEmpty()) {
+            throw new ConfigException("content is empty");
+        }
     }
 
     public void writeFile()
