@@ -57,20 +57,12 @@ public class Timer extends MessageHandlerA implements Runnable {
         this.dispatcher = dispatcher;
         this.config = config;
         this.scheduler.scheduleWithFixedDelay(this, 1, 1, TimeUnit.SECONDS);
+        this.timerData = (GlobalTimerData)config.getSection("globaltimer.globaltimer");
     }
 
     @Override
     public int getGroupId() {
         return TimerMessage.GROUP_ID;
-    }
-
-    @Override
-    public void init() {
-        Object o;
-        o = config.getSection("globaltimer.globaltimer");
-        if(o != null) {
-            timerData = (GlobalTimerData)o;
-        }
     }
 
     @Override
