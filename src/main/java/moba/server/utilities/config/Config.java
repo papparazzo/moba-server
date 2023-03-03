@@ -58,10 +58,6 @@ public class Config {
     }
 
     public Object getSection(String expr) {
-        if(content == null || content.isEmpty()) {
-            return null;
-        }
-
         String tokens[] = expr.split("\\.");
 
         Object o = content;
