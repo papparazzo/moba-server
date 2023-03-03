@@ -20,7 +20,9 @@
 
 package moba.server.messages;
 
+import java.net.InetAddress;
 import moba.server.com.Dispatcher;
+import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.utilities.exceptions.ErrorException;
 
@@ -31,27 +33,25 @@ public abstract class MessageHandlerA {
     public abstract void handleMsg(Message msg)
     throws ErrorException;
 
-    public void freeResources() {
-    }
-
     public void freeResources(long appId) {
     }
 
     public abstract int getGroupId();
 
-    public void init()
-    throws ExceptionInInitializerError {
-    }
-
     public void shutdown() {
-        freeResources();
-    }
-
-    public void reset() {
-        shutdown();
-        init();
     }
 
     public void hardwareStateChanged(HardwareState state) {
+    }
+
+    public void defaultLayoutChanged(long id) {
+    }
+
+    protected void checkForSameOrigin(InetAddress addr)
+    throws ErrorException {
+        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) {
+            return;
+        }
+        throw new ErrorException(ErrorId.SAME_ORIGIN_NEEDED, "same origin needed");
     }
 }
