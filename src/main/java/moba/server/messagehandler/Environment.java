@@ -43,20 +43,12 @@ public class Environment extends MessageHandlerA {
     public Environment(Dispatcher dispatcher, Config config) {
         this.dispatcher = dispatcher;
         this.config = config;
+        this.environment.fromJsonObject((Map<String, Object>)config.getSection("environment.environment"));
     }
 
     @Override
     public int getGroupId() {
         return EnvironmentMessage.GROUP_ID;
-    }
-
-    @Override
-    public void init() {
-        Object o;
-        o = config.getSection("environment.environment");
-        if(o != null) {
-            environment.fromJsonObject((Map<String, Object>)o);
-        }
     }
 
     @Override
