@@ -37,27 +37,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import moba.server.com.Dispatcher;
-import moba.server.json.JSONException;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
+import moba.server.messages.messageType.InternMessage;
 import moba.server.messages.messageType.LayoutMessage;
 import moba.server.utilities.lock.TracklayoutLock;
-import moba.server.utilities.config.Config;
-import moba.server.utilities.config.ConfigException;
 import moba.server.utilities.exceptions.ErrorException;
 import moba.server.utilities.logger.Loggable;
 
 public class Layout extends MessageHandlerA implements Loggable {
     protected Database        database     = null;
     protected TracklayoutLock lock         = null;
-    protected Config          config       = null;
     protected long            activeLayout = -1;
 
-    public Layout(Dispatcher dispatcher, Database database, Config config) {
+    public Layout(Dispatcher dispatcher, Database database) {
         this.database   = database;
         this.dispatcher = dispatcher;
         this.lock       = new TracklayoutLock(database);
-        this.config     = config;
         this.lock.resetAll();
     }
 
@@ -67,26 +63,7 @@ public class Layout extends MessageHandlerA implements Loggable {
     }
 
     @Override
-    public void init() {
-        Object o;
-        o = config.getSection("trackLayout.activeTracklayoutId");
-        if(o != null) {
-            activeLayout = (long)o;
-        }
-    }
-
-    @Override
     public void shutdown() {
-        super.shutdown();
-        try {
-            storeData();
-        } catch(ConfigException | IOException | JSONException e) {
-            getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
-        }
-    }
-
-    @Override
-    public void freeResources() {
         lock.resetAll();
     }
 
@@ -217,7 +194,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                 rs.next();
                 int id = rs.getInt(1);
                 if(isActive) {
-                    storeData(id);
+                    dispatcher.dispatch(new Message(InternMessage.DEFAULT_LAYOUT_CHANGED, id));
                 }
                 tl.setId(id);
             }
@@ -252,7 +229,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(id) + ">");
             }
             if(active) {
-                storeData(id);
+                dispatcher.dispatch(new Message(InternMessage.DEFAULT_LAYOUT_CHANGED, id));
             }
             dispatcher.dispatch(new Message(LayoutMessage.UPDATE_LAYOUT, tl));
         }
@@ -380,20 +357,6 @@ public class Layout extends MessageHandlerA implements Loggable {
         }
     }
 
-    protected void storeData(long id)
-    throws ConfigException, IOException, JSONException {
-        activeLayout = id;
-        storeData();
-    }
-
-    protected void storeData()
-    throws ConfigException, IOException, JSONException {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("activeTracklayoutId", activeLayout);
-        config.setSection("trackLayout", map);
-        config.writeFile();
-    }
-
     protected long getId(Object o)
     throws ErrorException {
         if(o != null) {
@@ -403,5 +366,10 @@ public class Layout extends MessageHandlerA implements Loggable {
             return activeLayout;
         }
         throw new ErrorException(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given");
+    }
+
+    @Override
+    public void defaultLayoutChanged(long id) {
+        activeLayout = id;
     }
 }
