@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-import java.util.logging.Level;
 
 import moba.server.com.Dispatcher;
 import moba.server.database.Database;
@@ -42,27 +41,22 @@ import moba.server.datatypes.objects.TrainData;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.ControlMessage;
-import moba.server.messages.messageType.LayoutMessage;
-import moba.server.utilities.config.Config;
 import moba.server.utilities.exceptions.ErrorException;
 import moba.server.utilities.lock.BlockLock;
-import moba.server.utilities.lock.TracklayoutLock;
 import moba.server.utilities.logger.Loggable;
 
 public class Control extends MessageHandlerA implements Loggable {
     protected Database       database     = null;
     protected BlockLock      blockLock    = null;
-    protected Config         config       = null;
     protected Queue<Message> queue        = null;
     protected long           activeLayout = 0;
 
-    public Control(Dispatcher dispatcher, Database database, Config config) {
+    public Control(Dispatcher dispatcher, Database database) {
         this.dispatcher = dispatcher;
         this.database   = database;
-        this.blockLock       = new BlockLock(database);
+        this.blockLock  = new BlockLock(database);
         //this.lock       = new TracklayoutLock(database);
         this.queue      = new LinkedList<>();
-        this.config     = config;
         this.blockLock.resetAll();
     }
 
@@ -72,16 +66,7 @@ public class Control extends MessageHandlerA implements Loggable {
     }
 
     @Override
-    public void init() {
-        Object o;
-        o = config.getSection("trackLayout.activeTracklayoutId");
-        if(o != null) {
-            activeLayout = (long)o;
-        }
-    }
-
-    @Override
-    public void freeResources() {
+    public void shutdown() {
         blockLock.resetAll();
     }
 
@@ -375,7 +360,6 @@ Integer	trainId
             }
         }
         dispatcher.dispatch(new Message(ControlMessage.PUSH_TRAIN, msg.getData()));
-
     }
 
     protected void lockBlock(Message msg, boolean wait)
@@ -410,5 +394,10 @@ Integer	trainId
             return activeLayout;
         }
         throw new ErrorException(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given");
+    }
+
+    @Override
+    public void defaultLayoutChanged(long id) {
+        activeLayout = id;
     }
 }
