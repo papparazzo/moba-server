@@ -35,6 +35,7 @@ import moba.server.messagehandler.Layout;
 import moba.server.messagehandler.Server;
 import moba.server.messagehandler.Systems;
 import moba.server.messages.MessageLoop;
+import moba.server.utilities.lock.TracklayoutLock;
 import moba.server.utilities.logger.MessageLogger;
 
 public class ServerApplication extends Application {
@@ -51,15 +52,17 @@ public class ServerApplication extends Application {
                 Dispatcher dispatcher = new Dispatcher(new MessageLogger());
                 Acceptor acceptor = new Acceptor(msgQueueIn, dispatcher, (int)(long)config.getSection("common.serverConfig.port"), maxClients);
                 Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
-                MessageLoop loop = new MessageLoop(dispatcher);
+                MessageLoop  loop = new MessageLoop(dispatcher, config);
+                TracklayoutLock lock = new TracklayoutLock(database);
+
                 loop.addHandler(new Client(dispatcher));
                 loop.addHandler(new Server(dispatcher, this));
                 loop.addHandler(new Timer(dispatcher, config));
                 loop.addHandler(new Environment(dispatcher, config));
-                loop.addHandler(new Systems(dispatcher, msgQueueIn));
-                loop.addHandler(new Layout(dispatcher, database, config));
+                loop.addHandler(new Systems(dispatcher, lock, msgQueueIn));
+                loop.addHandler(new Layout(dispatcher, database));
                 loop.addHandler(new Interface(dispatcher, msgQueueIn));
-                loop.addHandler(new Control(dispatcher, database, config));
+                loop.addHandler(new Control(dispatcher, database));
                 acceptor.startAcceptor();
                 restart = loop.loop(msgQueueIn);
                 dispatcher.resetDispatcher();
