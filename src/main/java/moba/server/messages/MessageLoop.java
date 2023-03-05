@@ -30,12 +30,9 @@ import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.objects.ErrorData;
-import moba.server.utilities.config.Config;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
-import moba.server.messages.messageType.LayoutMessage;
 import moba.server.messages.messageType.ServerMessage;
-import moba.server.utilities.config.ConfigException;
 import moba.server.utilities.exceptions.ErrorException;
 import moba.server.utilities.logger.Loggable;
 
@@ -43,11 +40,9 @@ public class MessageLoop implements Loggable {
 
     protected Map<Integer, MessageHandlerA> handlers   = new HashMap<>();
     protected Dispatcher                    dispatcher = null;
-    protected Config                        config     = null;
 
-    public MessageLoop(Dispatcher dispatcher, Config config) {
+    public MessageLoop(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
-        this.config     = config;
     }
 
     public void addHandler(MessageHandlerA msgHandler) {
@@ -60,11 +55,6 @@ public class MessageLoop implements Loggable {
 
     public boolean loop(MessageQueue in)
     throws InterruptedException {
-        var activeLayout = (long)config.getSection("trackLayout.activeTracklayoutId");
-        Iterator<Integer> iter = handlers.keySet().iterator();
-        while(iter.hasNext()) {
-            handlers.get(iter.next()).defaultLayoutChanged(activeLayout);
-        }
 
         while(true) {
             Message msg = in.take();
