@@ -44,9 +44,6 @@ public abstract class MessageHandlerA {
     public void hardwareStateChanged(HardwareState state) {
     }
 
-    public void defaultLayoutChanged(long id) {
-    }
-
     protected void checkForSameOrigin(InetAddress addr)
     throws ErrorException {
         if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) {
