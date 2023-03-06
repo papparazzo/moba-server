@@ -386,20 +386,4 @@ Integer	trainId
             lockBlock(queue.remove(), true);
         }
     }
-
-    protected long getId(Object o)
-    throws ErrorException {
-        if(o != null) {
-            return (long)o;
-        }
-        if(activeLayout >= 0) {
-            return activeLayout;
-        }
-        throw new ErrorException(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given");
-    }
-
-    @Override
-    public void defaultLayoutChanged(long id) {
-        activeLayout = id;
-    }
 }

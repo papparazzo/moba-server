@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import moba.server.com.Dispatcher;
+import moba.server.datatypes.objects.helper.ActiveLayout;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.InternMessage;
@@ -48,12 +49,13 @@ import moba.server.utilities.logger.Loggable;
 public class Layout extends MessageHandlerA implements Loggable {
     protected Database        database     = null;
     protected TracklayoutLock lock         = null;
-    protected long            activeLayout = -1;
+    protected ActiveLayout    activeLayout = null;
 
-    public Layout(Dispatcher dispatcher, Database database) {
-        this.database   = database;
-        this.dispatcher = dispatcher;
-        this.lock       = new TracklayoutLock(database);
+    public Layout(Dispatcher dispatcher, Database database, ActiveLayout activeLayout) {
+        this.database     = database;
+        this.dispatcher   = dispatcher;
+        this.activeLayout = activeLayout;
+        this.lock         = new TracklayoutLock(database);
         this.lock.resetAll();
     }
 
@@ -138,7 +140,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                     rs.getString("Name"),
                     rs.getString("Description"),
                     rs.getInt("Locked"),
-                    (id == activeLayout),
+                    (id == activeLayout.getActiveLayout()),
                     rs.getDate("ModificationDate"),
                     rs.getDate("CreationDate")
                 ));
@@ -163,8 +165,8 @@ public class Layout extends MessageHandlerA implements Loggable {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "could not delete <" + String.valueOf(id) + ">");
             }
         }
-        if(id == activeLayout) {
-            dispatcher.dispatch(new Message(InternMessage.DEFAULT_LAYOUT_CHANGED, -1));
+        if(id == activeLayout.getActiveLayout()) {
+            activeLayout.setActiveLayout(-1);
         }
         dispatcher.dispatch(new Message(LayoutMessage.DELETE_LAYOUT, id));
     }
@@ -194,7 +196,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                 rs.next();
                 int id = rs.getInt(1);
                 if(isActive) {
-                    dispatcher.dispatch(new Message(InternMessage.DEFAULT_LAYOUT_CHANGED, id));
+                    activeLayout.setActiveLayout(id);
                 }
                 tl.setId(id);
             }
@@ -229,7 +231,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(id) + ">");
             }
             if(active) {
-                dispatcher.dispatch(new Message(InternMessage.DEFAULT_LAYOUT_CHANGED, id));
+                activeLayout.setActiveLayout(id);
             }
             dispatcher.dispatch(new Message(LayoutMessage.UPDATE_LAYOUT, tl));
         }
@@ -237,21 +239,21 @@ public class Layout extends MessageHandlerA implements Loggable {
 
     protected void unlockLayout(Message msg)
     throws ErrorException {
-        long id = getId(msg.getData());
+        long id = activeLayout.getActiveLayout(msg.getData());
         lock.unlock(msg.getEndpoint().getAppId(), id);
         dispatcher.dispatch(new Message(LayoutMessage.UNLOCK_LAYOUT, id));
     }
 
     protected void lockLayout(Message msg)
     throws ErrorException {
-        long id = getId(msg.getData());
+        long id = activeLayout.getActiveLayout(msg.getData());
         lock.tryLock(msg.getEndpoint().getAppId(), id);
         dispatcher.dispatch(new Message(LayoutMessage.LOCK_LAYOUT, id));
     }
 
     protected void getLayout(Message msg, boolean tryLock)
     throws SQLException, ErrorException {
-        long id = getId(msg.getData());
+        long id = activeLayout.getActiveLayout(msg.getData());
 
         if(tryLock) {
             lock.tryLock(msg.getEndpoint().getAppId(), id);
@@ -288,7 +290,7 @@ public class Layout extends MessageHandlerA implements Loggable {
     throws SQLException, ErrorException {
 
         Map<String, Object> map = (Map<String, Object>)msg.getData();
-        long id = getId(map.get("id"));
+        long id = activeLayout.getActiveLayout(map.get("id"));
 
         if(!lock.isLockedByApp(msg.getEndpoint().getAppId(), id)) {
             throw new ErrorException(ErrorId.DATASET_NOT_LOCKED, "layout <" + String.valueOf(id) + "> not locked");
