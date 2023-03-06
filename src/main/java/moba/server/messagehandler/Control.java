@@ -38,6 +38,7 @@ import moba.server.datatypes.objects.BlockContactData;
 import moba.server.datatypes.objects.ContactData;
 import moba.server.datatypes.objects.SwitchStateData;
 import moba.server.datatypes.objects.TrainData;
+import moba.server.datatypes.objects.helper.ActiveLayout;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.ControlMessage;
@@ -49,15 +50,16 @@ public class Control extends MessageHandlerA implements Loggable {
     protected Database       database     = null;
     protected BlockLock      blockLock    = null;
     protected Queue<Message> queue        = null;
-    protected long           activeLayout = 0;
+    protected ActiveLayout   activeLayout = null;
 
-    public Control(Dispatcher dispatcher, Database database) {
+    public Control(Dispatcher dispatcher, Database database, ActiveLayout activeLayout) {
         this.dispatcher = dispatcher;
         this.database   = database;
         this.blockLock  = new BlockLock(database);
         //this.lock       = new TracklayoutLock(database);
         this.queue      = new LinkedList<>();
         this.blockLock.resetAll();
+        this.activeLayout = activeLayout;
     }
 
     @Override
@@ -120,7 +122,7 @@ public class Control extends MessageHandlerA implements Loggable {
 
     protected void getBlockList(Message msg)
     throws SQLException, ErrorException {
-        long id = getId(msg.getData());
+        long id = activeLayout.getActiveLayout(msg.getData());
 
         Connection con = database.getConnection();
 
@@ -255,7 +257,7 @@ Integer	trainId
 
     protected void getSwitchStateList(Message msg)
     throws SQLException, ErrorException {
-        long id = getId(msg.getData());
+        long id = activeLayout.getActiveLayout(msg.getData());
 
         Connection con = database.getConnection();
 
@@ -287,7 +289,7 @@ Integer	trainId
 
     protected void getTrainList(Message msg)
     throws SQLException, ErrorException {
-        long id = getId(msg.getData());
+        long id = activeLayout.getActiveLayout(msg.getData());
 
         Connection con = database.getConnection();
         String q =
