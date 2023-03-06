@@ -40,7 +40,6 @@ import moba.server.com.Dispatcher;
 import moba.server.datatypes.objects.helper.ActiveLayout;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
-import moba.server.messages.messageType.InternMessage;
 import moba.server.messages.messageType.LayoutMessage;
 import moba.server.utilities.lock.TracklayoutLock;
 import moba.server.utilities.exceptions.ErrorException;
@@ -357,21 +356,5 @@ public class Layout extends MessageHandlerA implements Loggable {
             }
             return rs.getDate("CreationDate");
         }
-    }
-
-    protected long getId(Object o)
-    throws ErrorException {
-        if(o != null) {
-            return (long)o;
-        }
-        if(activeLayout > 0) {
-            return activeLayout;
-        }
-        throw new ErrorException(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given");
-    }
-
-    @Override
-    public void defaultLayoutChanged(long id) {
-        activeLayout = id;
     }
 }
