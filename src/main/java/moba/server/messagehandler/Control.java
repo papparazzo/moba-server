@@ -323,18 +323,20 @@ Integer	trainId
     throws SQLException, ErrorException {
         Connection con = database.getConnection();
 
-/*
-        var train = (Map<String, Object>)msg.getData();
-        var trainId = (long)train.get("id");
+        var data = (Map<String, Object>)msg.getData();
+        var trainId = (long)data.get("trainId");
+        var fromBlock = (long)data.get("fromBlock");
+        var toBlock = (long)data.get("toBlock");
 
         // FIXME: Transaction
         String q =
             "UPDATE `BlockSections` SET `BlockSections`.`TrainId` = NULL " +
-            "WHERE `BlockSections`.`TrainId` = ?";
+            "WHERE `BlockSections`.`Id` = ? AND `BlockSections`.`TrainId` = ?";
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, trainId);
-            if(pstmt.executeUpdate() == 0) {
+            pstmt.setLong(1, fromBlock);
+            pstmt.setLong(2, trainId);
+            if(pstmt.executeUpdate() != 1) {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(trainId) + ">");
             }
         }
@@ -345,7 +347,8 @@ Integer	trainId
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setLong(1, trainId);
-            if(pstmt.executeUpdate() == 0) {
+            pstmt.setLong(2, toBlock);
+            if(pstmt.executeUpdate() != 1) {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(trainId) + ">");
             }
         }
