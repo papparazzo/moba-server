@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
 
 import moba.server.com.Dispatcher;
 import moba.server.database.Database;
@@ -111,7 +112,6 @@ public class Control extends MessageHandlerA implements Loggable {
 
                 case PUSH_TRAIN:
                     pushTrain(msg);
-                    dispatcher.dispatch(msg);
                     break;
 
             }
@@ -164,15 +164,17 @@ public class Control extends MessageHandlerA implements Loggable {
 
     protected void saveBlockList(Message msg)
     throws SQLException, ErrorException {
-/*
-        Map<String, Object> map = (Map<String, Object>)msg.getData();
-        long id = getId(map.get("id"));
 
-        / *
+        Map<String, Object> map = (Map<String, Object>)msg.getData();
+        long id = (long)map.get("id");
+
+        /*
         if(!lock.isLockedByApp(msg.getEndpoint().getAppId(), id)) {
             throw new ErrorException(ErrorId.DATASET_NOT_LOCKED, "layout <" + String.valueOf(id) + "> not locked");
         }
-        * /
+        */
+
+       //// map.get("blockContacts");
 
         Connection con = database.getConnection();
 
@@ -186,8 +188,6 @@ public class Control extends MessageHandlerA implements Loggable {
             }
         }
 
-        ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
-
         stmt =
             "DELETE `BlockSections`.* " +
             "FROM `BlockSections` " +
@@ -200,6 +200,8 @@ public class Control extends MessageHandlerA implements Loggable {
             pstmt.executeUpdate();
         }
 
+        ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
+
         for(Object item : arrayList) {
             Map<String, Object> symbol = (Map<String, Object>)item;
 
@@ -208,7 +210,7 @@ public class Control extends MessageHandlerA implements Loggable {
                 "VALUES (?, ?, ?, ?, ?)";
 
 
-
+/*
 
 Integer	id
 Integer	xPos
@@ -217,7 +219,7 @@ ContactData	brakeTriggerContact
 ContactData	blockContact
 Integer	trainId
 
-
+*/
 
 
 
@@ -240,7 +242,7 @@ Integer	trainId
             }
         }
 
-        dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_CHANGED, map));
+        //dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_CHANGED, map));
 
 
 
@@ -248,11 +250,6 @@ Integer	trainId
 
         String q =
                 "";
-
-
-
-*/
-
     }
 
     protected void getSwitchStateList(Message msg)
