@@ -203,16 +203,19 @@ public class Control extends MessageHandlerA implements Loggable {
         ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
 
         for(Object item : arrayList) {
-            Map<String, Object> symbol = (Map<String, Object>)item;
+            Map<String, Object> block = (Map<String, Object>)item;
 
             stmt =
-                "INSERT INTO `BlockSections` (`Id`, `TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
-                "VALUES (?, ?, ?, ?, ?)";
+                "INSERT INTO `BlockSections` " +
+                "(`Id`, `BrakeTriggerContactId`, `BlockContactId`, `TrainId`, `Locked`) " +
+                "SELECT `Id`, ?, ?, ?, ? " +
+                "FROM `TrackLayoutSymbols` " +
+                "WHERE TrackLayoutSymbols.XPos = ? AND TrackLayoutSymbols.YPos = ?";
 
-
+            try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
 /*
 
-Integer	id
+
 Integer	xPos
 Integer	yPos
 ContactData	brakeTriggerContact
@@ -225,18 +228,12 @@ Integer	trainId
 
 
 
+                pstmt.setLong(1, (long)block.get("symbol"));
 
-            try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-                if(symbol.get("id") == null) {
-                    pstmt.setNull(1, java.sql.Types.INTEGER);
-                } else {
-                    pstmt.setLong(1, (long)symbol.get("id"));
-                }
 
                 pstmt.setLong(2, id);
-                pstmt.setLong(3, (long)symbol.get("xPos"));
-                pstmt.setLong(4, (long)symbol.get("yPos"));
-                pstmt.setLong(5, (long)symbol.get("symbol"));
+                pstmt.setLong(3, (long)block.get("xPos"));
+                pstmt.setLong(4, (long)block.get("yPos"));
                 getLogger().log(Level.INFO, pstmt.toString());
                 pstmt.executeUpdate();
             }
@@ -248,8 +245,6 @@ Integer	trainId
 
 
 
-        String q =
-                "";
     }
 
     protected void getSwitchStateList(Message msg)
