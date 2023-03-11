@@ -215,7 +215,6 @@ public class Control extends MessageHandlerA implements Loggable {
             try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
 /*
 
-
 Integer	xPos
 Integer	yPos
 ContactData	brakeTriggerContact
@@ -224,12 +223,7 @@ Integer	trainId
 
 */
 
-
-
-
-
                 pstmt.setLong(1, (long)block.get("symbol"));
-
 
                 pstmt.setLong(2, id);
                 pstmt.setLong(3, (long)block.get("xPos"));
@@ -240,10 +234,6 @@ Integer	trainId
         }
 
         //dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_CHANGED, map));
-
-
-
-
 
     }
 
