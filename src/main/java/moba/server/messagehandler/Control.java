@@ -148,14 +148,18 @@ public class Control extends MessageHandlerA implements Loggable {
             ArrayList<BlockContactData> arraylist;
             ResultSet rs = pstmt.executeQuery();
             arraylist = new ArrayList();
+            
             while(rs.next()) {
+                Integer trainId = rs.getInt("TrainId");
+                trainId = rs.wasNull() ? null : trainId;
+
                 arraylist.add(new BlockContactData(
                     rs.getInt("Id"),
                     rs.getInt("XPos"),
                     rs.getInt("YPos"),
                     new ContactData(rs.getInt("TriggerModulAddress"), rs.getInt("TriggerModulContactNumber")),
                     new ContactData(rs.getInt("BlockModulAddress"), rs.getInt("BlockModulContactNumber")),
-                    rs.getInt("TrainId")
+                    trainId
                 ));
             }
             dispatcher.dispatch(new Message(ControlMessage.GET_BLOCK_LIST_RES, arraylist, msg.getEndpoint()));
