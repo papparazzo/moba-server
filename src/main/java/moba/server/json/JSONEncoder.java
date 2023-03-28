@@ -151,13 +151,13 @@ public class JSONEncoder {
         } else if(object instanceof String) {
             addString((String)object);
         } else if(object instanceof Integer) {
-            addLong(object);
+            addNumber(object);
         } else if(object instanceof Long) {
-            addLong(object);
+            addNumber(object);
         } else if(object instanceof Double) {
-            addDouble(object);
+            addNumber(object);
         } else if(object instanceof Float) {
-            addDouble(object);
+            addNumber(object);
         } else if(object.getClass().isArray()) {
             addArray((Object[])object);
         } else if(object instanceof Date) {
@@ -280,12 +280,7 @@ public class JSONEncoder {
         writer.write("null");
     }
 
-    protected void addLong(Object obj)
-    throws IOException {
-        writer.write(String.valueOf(obj));
-    }
-
-    protected void addDouble(Object obj)
+    protected void addNumber(Object obj)
     throws IOException {
         writer.write(String.valueOf(obj));
     }
