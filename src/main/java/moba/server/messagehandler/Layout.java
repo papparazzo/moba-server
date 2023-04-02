@@ -165,6 +165,7 @@ public class Layout extends MessageHandlerA implements Loggable {
             }
         }
         if(id == activeLayout.getActiveLayout()) {
+            // TODO: Check if automode
             activeLayout.setActiveLayout(-1);
         }
         dispatcher.dispatch(new Message(LayoutMessage.DELETE_LAYOUT, id));
@@ -195,6 +196,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                 rs.next();
                 int id = rs.getInt(1);
                 if(isActive) {
+                    // TODO: Check if automode
                     activeLayout.setActiveLayout(id);
                 }
                 tl.setId(id);
@@ -230,6 +232,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                 throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(id) + ">");
             }
             if(active) {
+                // TODO: Check if automode
                 activeLayout.setActiveLayout(id);
             }
             dispatcher.dispatch(new Message(LayoutMessage.UPDATE_LAYOUT, tl));
