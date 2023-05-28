@@ -32,7 +32,7 @@ public class Database {
     private Connection con = null;
 
     public enum ConnectorType {
-        MYSQL_CONNECTOR
+        MARIADB_CONNECTOR
     }
 
     public Database(HashMap<String, Object> map)
@@ -43,8 +43,8 @@ public class Database {
         }
 
         switch(ConnectorType.valueOf((String)map.get("connectorType"))) {
-            case MYSQL_CONNECTOR:
-                String url = "jdbc:mysql://" + (String)map.get("host") + "/" + (String)map.get("db");
+            case MARIADB_CONNECTOR:
+                String url = "jdbc:mariadb://" + (String)map.get("host") + "/" + (String)map.get("db");
                 String usr = (String)map.get("usr");
                 String pwd = (String)map.get("pwd");
                 connect(url, usr, pwd);
