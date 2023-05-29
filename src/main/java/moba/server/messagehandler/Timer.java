@@ -49,7 +49,7 @@ import moba.server.utilities.exceptions.ErrorException;
 public class Timer extends MessageHandlerA implements Runnable {
     protected Config          config = null;
     protected final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    protected GlobalTimerData timerData = new GlobalTimerData();
+    protected GlobalTimerData timerData = null;
 
     protected volatile boolean isRunning = false;
 
@@ -58,6 +58,9 @@ public class Timer extends MessageHandlerA implements Runnable {
         this.config = config;
         this.scheduler.scheduleWithFixedDelay(this, 1, 1, TimeUnit.SECONDS);
         this.timerData = (GlobalTimerData)config.getSection("globaltimer.globaltimer");
+        if(timerData == null) {
+            this.timerData = new GlobalTimerData();
+        }
     }
 
     @Override
