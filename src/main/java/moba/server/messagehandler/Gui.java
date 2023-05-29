@@ -44,11 +44,10 @@ public class Gui extends MessageHandlerA {
     public void handleMsg(Message msg)
     throws ErrorException {
         switch(msg.getMessageId()) {
-            case SYSTEM_NOTICE:
+            case SYSTEM_NOTICE ->
                 sendSystemNotice(msg);
-                break;
 
-            default:
+            default ->
                 throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
         }
     }

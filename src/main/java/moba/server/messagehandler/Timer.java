@@ -79,17 +79,16 @@ public class Timer extends MessageHandlerA implements Runnable {
     throws ErrorException {
         try {
             switch(TimerMessage.fromId(msg.getMessageId())) {
-                case GET_GLOBAL_TIMER:
+                case GET_GLOBAL_TIMER -> 
                     dispatcher.dispatch(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData, msg.getEndpoint()));
-                    break;
 
-                case SET_GLOBAL_TIMER:
+                case SET_GLOBAL_TIMER -> {
                     timerData.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
                     dispatcher.dispatch(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData));
-                    break;
+                }
 
-                default:
+                default -> 
                     throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
             }
         } catch(java.lang.ClassCastException | IOException | JSONException | ConfigException | NullPointerException e) {

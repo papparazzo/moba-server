@@ -53,27 +53,27 @@ public class Server extends MessageHandlerA {
         ServerMessage smsg = ServerMessage.fromId(msg.getMessageId());
 
         switch(smsg) {
-            case INFO_REQ:
+            case INFO_REQ -> {
                 handleServerInfoReq(msg.getEndpoint());
                 return;
+            }
 
-            case CON_CLIENTS_REQ:
+            case CON_CLIENTS_REQ -> {
                 dispatcher.dispatch(new Message(ServerMessage.CON_CLIENTS_RES, dispatcher.getEndpoints(), msg.getEndpoint()));
                 return;
+            }
         }
 
         checkForSameOrigin(msg.getEndpoint().getSocket().getInetAddress());
 
         switch(smsg) {
-            case RESET_CLIENT:
+            case RESET_CLIENT -> 
                 sendToClient(msg, ClientMessage.RESET);
-                break;
 
-            case SELF_TESTING_CLIENT:
+            case SELF_TESTING_CLIENT ->
                 sendToClient(msg, ClientMessage.SELF_TESTING);
-                break;
 
-            default:
+            default -> 
                 throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
         }
     }

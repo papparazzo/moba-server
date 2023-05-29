@@ -45,23 +45,21 @@ public class Client extends MessageHandlerA {
     public void handleMsg(Message msg)
     throws ErrorException {
         switch(ClientMessage.fromId(msg.getMessageId())) {
-            case VOID:
-                break;
+            case VOID -> {
+            }
 
-            case ECHO_REQ:
+            case ECHO_REQ -> 
                 dispatcher.dispatch(new Message(ClientMessage.ECHO_RES, msg.getData(), msg.getEndpoint()));
-                break;
 
-            case START:
+            case START -> 
                 handleClientStart(msg);
-                break;
 
-            case ERROR:
+            case ERROR -> {
                 msg.convertToBroadCastMessage();
                 dispatcher.dispatch(msg);
-                break;
+            }
 
-            default:
+            default -> 
                 throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
         }
     }

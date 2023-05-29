@@ -78,43 +78,34 @@ public class Layout extends MessageHandlerA implements Loggable {
     throws ErrorException {
         try {
             switch(LayoutMessage.fromId(msg.getMessageId())) {
-                case GET_LAYOUTS_REQ:
+                case GET_LAYOUTS_REQ -> 
                     getLayouts(msg);
-                    break;
 
-                case GET_LAYOUT_REQ:
+                case GET_LAYOUT_REQ ->
                     getLayout(msg, true);
-                    break;
 
-                case GET_LAYOUT_READ_ONLY_REQ:
+                case GET_LAYOUT_READ_ONLY_REQ ->
                     getLayout(msg, false);
-                    break;
 
-                case DELETE_LAYOUT:
+                case DELETE_LAYOUT -> 
                     deleteLayout(msg);
-                    break;
 
-                case CREATE_LAYOUT:
+                case CREATE_LAYOUT -> 
                     createLayout(msg);
-                    break;
 
-                case UPDATE_LAYOUT:
+                case UPDATE_LAYOUT -> 
                     updateLayout(msg);
-                    break;
 
-                case UNLOCK_LAYOUT:
+                case UNLOCK_LAYOUT -> 
                     unlockLayout(msg);
-                    break;
 
-                case LOCK_LAYOUT:
+                case LOCK_LAYOUT -> 
                     lockLayout(msg);
-                    break;
 
-                case SAVE_LAYOUT:
+                case SAVE_LAYOUT -> 
                     saveLayout(msg);
-                    break;
 
-                default:
+                default -> 
                     throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
             }
         } catch(SQLException e) {
