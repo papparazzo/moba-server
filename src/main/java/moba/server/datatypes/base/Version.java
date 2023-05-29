@@ -75,7 +75,7 @@ public class Version implements Comparable, JSONToStringI {
             }
 
             if(sa.length > 3) {
-                patch = Integer.valueOf(sa[3]);
+                patch = Integer.parseInt(sa[3]);
             }
 
         } catch(NumberFormatException e) {

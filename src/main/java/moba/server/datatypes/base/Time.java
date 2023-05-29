@@ -55,10 +55,7 @@ public class Time {
         }
 
         this.time = (this.time + time) % (60 * 24);
-        if(this.time < time) {
-            return true;
-        }
-        return false;
+        return this.time < time;
     }
 
     public int getTime() {

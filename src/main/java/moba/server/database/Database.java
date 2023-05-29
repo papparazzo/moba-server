@@ -43,14 +43,14 @@ public class Database {
         }
 
         switch(ConnectorType.valueOf((String)map.get("connectorType"))) {
-            case MARIADB_CONNECTOR:
+            case MARIADB_CONNECTOR -> {
                 String url = "jdbc:mariadb://" + (String)map.get("host") + "/" + (String)map.get("db");
                 String usr = (String)map.get("usr");
                 String pwd = (String)map.get("pwd");
                 connect(url, usr, pwd);
-                break;
+            }
 
-            default:
+            default ->
                 throw new DatabaseException("unsuported connector-type");
         }
     }
