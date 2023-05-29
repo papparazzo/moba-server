@@ -57,24 +57,19 @@ public class Environment extends MessageHandlerA {
         try {
             switch(EnvironmentMessage.fromId(msg.getMessageId())) {
 
-                case GET_ENVIRONMENT:
-                    dispatcher.dispatch(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment, msg.getEndpoint()));
-                    break;
+                case GET_ENVIRONMENT -> dispatcher.dispatch(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment, msg.getEndpoint()));
 
-                case SET_ENVIRONMENT:
+                case SET_ENVIRONMENT -> {
                     environment.fromJsonObject((Map<String, Object>)msg.getData());
                     storeData();
                     dispatcher.dispatch(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment));
-                    break;
+                }
 
-                case SET_AMBIENCE:
-                case SET_AMBIENT_LIGHT:
+                case SET_AMBIENCE, SET_AMBIENT_LIGHT -> {
                     msg.convertToBroadCastMessage();
                     dispatcher.dispatch(msg);
-                    break;
-
-                default:
-                    throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
+                }
+                default -> throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
             }
         } catch(java.lang.ClassCastException | IOException | JSONException | ConfigException | NullPointerException | IllegalArgumentException e) {
             throw new ErrorException(ErrorId.FAULTY_MESSAGE, e.getMessage());
