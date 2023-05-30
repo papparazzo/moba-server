@@ -29,7 +29,10 @@ import java.util.Map;
 
 import moba.server.json.JSONException;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.inspector.TagInspector;
+import org.yaml.snakeyaml.nodes.Tag;
 
 public class Config {
     protected String              fileName;
@@ -40,7 +43,12 @@ public class Config {
         InputStream is = new FileInputStream(fileName);
         this.fileName = fileName;
 
-        Yaml yaml = new Yaml();
+        // https://www.veracode.com/blog/research/resolving-cve-2022-1471-snakeyaml-20-release-0
+        LoaderOptions options = new LoaderOptions();
+        TagInspector allowedTags = (Tag tag) -> true;
+        options.setTagInspector(allowedTags);
+        
+        Yaml yaml = new Yaml(options);
         content = (Map<String, Object>)yaml.load(is);
         if(content == null || content.isEmpty()) {
             throw new ConfigException("content is empty");
