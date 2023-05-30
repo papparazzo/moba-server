@@ -142,14 +142,14 @@ public class JSONEncoder {
     throws IOException, JSONException {
         if(object == null) {
             addNull();
-        } else if(object instanceof Map) {
-            addObject((Map)object);
-        } else if(object instanceof Boolean) {
-            addBoolean((Boolean)object);
-        } else if(object instanceof ArrayList) {
-            addArray((ArrayList)object);
-        } else if(object instanceof String) {
-            addString((String)object);
+        } else if(object instanceof Map map) {
+            addObject(map);
+        } else if(object instanceof Boolean boolean1) {
+            addBoolean(boolean1);
+        } else if(object instanceof ArrayList arrayList) {
+            addArray(arrayList);
+        } else if(object instanceof String string) {
+            addString(string);
         } else if(object instanceof Integer) {
             addNumber(object);
         } else if(object instanceof Long) {
@@ -160,16 +160,16 @@ public class JSONEncoder {
             addNumber(object);
         } else if(object.getClass().isArray()) {
             addArray((Object[])object);
-        } else if(object instanceof Date) {
-            addDate((Date)object);
+        } else if(object instanceof Date date) {
+            addDate(date);
         } else if(object instanceof Enum) {
             addString(object.toString());
-        } else if(object instanceof InetAddress) {
-            addInetAddr((InetAddress)object);
-        } else if(object instanceof JSONToStringI) {
-            writer.write(((JSONToStringI)object).toJsonString(formated, indent));
-        } else if(object instanceof Set) {
-            addSet((Set)object);
+        } else if(object instanceof InetAddress inetAddress) {
+            addInetAddr(inetAddress);
+        } else if(object instanceof JSONToStringI jSONToStringI) {
+            writer.write(jSONToStringI.toJsonString(formated, indent));
+        } else if(object instanceof Set set) {
+            addSet(set);
         } else {
             addObject(object);
         }
@@ -236,40 +236,24 @@ public class JSONEncoder {
             char c = str.charAt(i);
 
             switch(c) {
-                case '\\':
-                case '"':
-                case '/':
+                case '\\', '"', '/' -> {
                     writer.write('\\');
                     writer.write(c);
-                    break;
+                }
+                case '\b' -> writer.write("\\b");
+                case '\t' -> writer.write("\\t");
+                case '\n' -> writer.write("\\n");
+                case '\f' -> writer.write("\\f");
+                case '\r' -> writer.write("\\r");
 
-                case '\b':
-                    writer.write("\\b");
-                    break;
-
-                case '\t':
-                    writer.write("\\t");
-                    break;
-
-                case '\n':
-                    writer.write("\\n");
-                    break;
-
-                case '\f':
-                    writer.write("\\f");
-                    break;
-
-                case '\r':
-                    writer.write("\\r");
-                    break;
-
-                default:
+                default -> {
                     if(c < '\u0020' || c >= '\u0080') {
                         writer.write("\\u");
                         writer.write(Integer.toHexString(0x10000 | c).substring(1).toUpperCase());
                     } else {
                         writer.write(c);
                     }
+                }
             }
         }
         writer.write('"');
@@ -318,25 +302,21 @@ public class JSONEncoder {
     throws IOException {
 
         switch(c) {
-            case '{':
-            case '[':
+            case '{', '[' -> {
                 writer.write(c);
                 addFormatStr(1);
-                break;
-
-            case ',':
+            }
+            case ',' -> {
                 writer.write(c);
                 addFormatStr(0);
-                break;
+            }
 
-            case '}':
-            case ']':
+            case '}', ']' -> {
                 addFormatStr(-1);
                 writer.write(c);
-                break;
+            }
 
-            default:
-                writer.write(c);
+            default -> writer.write(c);
         }
     }
 }
