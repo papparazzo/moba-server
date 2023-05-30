@@ -119,7 +119,9 @@ public class JSONEncoder {
 
             String key = methodName.substring(3);
 
-            key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
+            key = 
+                key.substring(0, 1).toLowerCase(Locale.ROOT) +
+                key.substring(1);
 
             if(!firstIteration) {
                 writer.write(',');
