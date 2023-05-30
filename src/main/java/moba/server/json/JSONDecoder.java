@@ -56,7 +56,10 @@ public class JSONDecoder {
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
             c = reader.next();
 
-            if(Character.isWhitespace(c) || !(Character.isLetterOrDigit(c) || c == '_' || c == '"')) {
+            if(
+                Character.isWhitespace(c) || 
+                !(Character.isLetterOrDigit(c) || c == '_' || c == '"')
+            ) {
                 throw new JSONException("key contains invalide char!");
             }
 
@@ -82,17 +85,17 @@ public class JSONDecoder {
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
             c = reader.next(!strict);
             switch(c) {
-                case '}':
+                case '}' -> {
                     if(!map.isEmpty())  {
                         throw new JSONException("expected new key");
                     }
                     return map;
+                }
 
-                case '"':
+                case '"' -> 
                     key = nextKey();
-                    break;
 
-                default:
+                default ->
                     throw new JSONException("invalid key");
             }
             reader.checkNext(':', !strict);
@@ -103,13 +106,14 @@ public class JSONDecoder {
             map.put(key, nextValue());
 
             switch(reader.next(!strict)) {
-                case ',':
-                    break;
+                case ',' -> {
+                }
 
-                case '}':
+                case '}' -> {
                     return map;
+                }
 
-                default:
+                default -> 
                     throw new JSONException("expected a ',' or '}'");
             }
         }
@@ -119,29 +123,36 @@ public class JSONDecoder {
     protected Object nextValue()
     throws JSONException, IOException {
         switch(reader.peek(!strict)) {
-            case 'n':
+            case 'n' -> {
                 return nextNull();
+            }
 
-            case 't':
+            case 't' -> {
                 return nextTrue();
+            }
 
-            case 'f':
+            case 'f' -> {
                 return nextFalse();
+            }
 
-            case '"':
+            case '"' -> {
                 return nextString();
+            }
 
-            case '{':
+            case '{' -> {
                 return nextObject();
+            }
 
-            case '[':
+            case '[' -> {
                 return nextArray();
+            }
 
-            case 0:
+            case 0 -> 
                 throw new IOException("input stream corrupted!");
 
-            default:
+            default -> {
                 return nextNumber();
+            }
         }
     }
 
@@ -171,54 +182,31 @@ public class JSONDecoder {
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
             c = reader.next();
             switch(c) {
-                case '\n':
-                case '\r':
+                case '\n', '\r' -> 
                     throw new JSONException("invalid char");
-
-                case '\\':
+                    
+                case '\\' -> {
                     c = reader.next();
                     switch (c) {
-                        case 'b':
-                            sb.append('\b');
-                            break;
+                        case 'b' -> sb.append('\b');
+                        case 't' -> sb.append('\t');
+                        case 'n' -> sb.append('\n');
+                        case 'f' -> sb.append('\f');
+                        case 'r' -> sb.append('\r');
+                        case 'u' -> sb.append((char)Integer.parseInt(reader.next(4), 16));
 
-                        case 't':
-                            sb.append('\t');
-                            break;
-
-                        case 'n':
-                            sb.append('\n');
-                            break;
-
-                        case 'f':
-                            sb.append('\f');
-                            break;
-
-                        case 'r':
-                            sb.append('\r');
-                            break;
-
-                        case 'u':
-                            sb.append((char)Integer.parseInt(reader.next(4), 16));
-                            break;
-
-                        case '"':
-                        case '\\':
-                        case '/':
-                            sb.append(c);
-                            break;
-
-                        default:
+                        case '"', '\\', '/' -> sb.append(c);
+                        default ->
                             throw new JSONException("invalid escape-sequence");
                     }
-                    break;
+                }
 
-                case '"':
+                case '"' -> {
                     return sb.toString();
+                }
 
-                default:
+                default -> 
                     sb.append(c);
-                    break;
             }
         }
         throw new JSONException("maximum string-length of <" + JSONDecoder.MAX_STRING_LENGTH + "> reached!");
@@ -240,14 +228,13 @@ public class JSONDecoder {
             c = reader.next(!strict);
 
             switch(c) {
-                case ',':
-                    arrayList.add(nextValue());
-                    break;
+                case ',' -> arrayList.add(nextValue());
 
-                case ']':
+                case ']' -> {
                     return arrayList;
+                }
 
-                default:
+                default ->
                     throw new JSONException("expected ',' or ']'");
             }
         }
