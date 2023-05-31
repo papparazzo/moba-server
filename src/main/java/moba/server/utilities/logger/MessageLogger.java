@@ -55,17 +55,14 @@ public class MessageLogger {
         sb.append(df.format(new Date()));
 
         switch(type) {
-            case IN_MESSAGE:
+            case IN_MESSAGE -> 
                 sb.append("-->| ");
-                break;
 
-            case OUT_MESSAGE:
+            case OUT_MESSAGE ->
                 sb.append("<--| ");
-                break;
 
-            case INTERN_MESSAGE:
+            case INTERN_MESSAGE ->
                 sb.append("   | ");
-                break;
 
         }
 
