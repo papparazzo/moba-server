@@ -43,13 +43,19 @@ public class ToObject {
                 continue;
             }
 
-            if(method.getParameterTypes().length != 1 || method.getReturnType() != Void.TYPE) {
+            if(
+                method.getParameterTypes().length != 1 || 
+                method.getReturnType() != Void.TYPE
+            ) {
                 continue;
             }
 
             String methodName = method.getName();
 
-            if(methodName.equals("getClass") || methodName.equals("getDeclaringClass")) {
+            if(
+                methodName.equals("getClass") || 
+                methodName.equals("getDeclaringClass")
+            ) {
                 continue;
             }
 
@@ -59,12 +65,17 @@ public class ToObject {
 
             String key = methodName.substring(3);
 
-            key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
+            key =
+                key.substring(0, 1).toLowerCase(Locale.ROOT) +
+                key.substring(1);
 
             try {
                 method.invoke((String)map.get(key));
             } catch (IllegalAccessException | InvocationTargetException exception) {
-                throw new JSONException("error in invoking method <" + methodName + ">", exception);
+                throw new JSONException(
+                    "error in invoking method <" + methodName + ">",
+                    exception
+                );
             }
         }
     }
