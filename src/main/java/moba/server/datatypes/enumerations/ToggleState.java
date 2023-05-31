@@ -27,50 +27,56 @@ public enum ToggleState {
 
     public static boolean getValue(ToggleState t, boolean def) {
         switch(t) {
-            case UNSET:
+            case UNSET -> {
                 return def;
+            }
 
-            case ON:
+            case ON -> {
                 return true;
+            }
 
-            case OFF:
+            case OFF -> {
                 return false;
+            }
 
-            default:
-                throw new UnsupportedOperationException("Not supported yet.");
+            default -> throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 
     public static boolean getValue(Switch s, boolean def) {
         switch(s) {
-            case UNSET:
+            case UNSET -> {
                 return def;
+            }
 
-            case ON:
+            case ON -> {
                 return true;
+            }
 
-            case OFF:
+            case OFF -> {
                 return false;
+            }
 
-            default:
-                throw new UnsupportedOperationException("Not supported yet.");
+            default -> throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 
     public static boolean getValue(String s, boolean def) {
         ToggleState t = ToggleState.valueOf(s);
         switch(t) {
-            case UNSET:
+            case UNSET -> {
                 return def;
+            }
 
-            case ON:
+            case ON -> {
                 return true;
+            }
 
-            case OFF:
+            case OFF -> {
                 return false;
+            }
 
-            default:
-                throw new UnsupportedOperationException("Not supported yet.");
+            default -> throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 
@@ -91,17 +97,19 @@ public enum ToggleState {
 
     public static ToggleState getValue(Switch s, ToggleState def) {
         switch(s) {
-            case OFF:
+            case OFF -> {
                 return ToggleState.OFF;
+            }
 
-            case ON:
+            case ON -> {
                 return ToggleState.ON;
+            }
 
-            case UNSET:
+            case UNSET -> {
                 return def;
+            }
 
-            default:
-                throw new UnsupportedOperationException("Not supported yet.");
+            default -> throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 
