@@ -38,7 +38,9 @@ public class Percent implements JSONToStringI {
     public final void setValue(int val)
     throws IllegalArgumentException {
         if(val > 100 || val < 0) {
-            throw new IllegalArgumentException(String.format("Val <%d> out of range", val));
+            throw new IllegalArgumentException(
+              String.format("Val <%d> out of range", val)
+            );
         }
         value = val;
     }
