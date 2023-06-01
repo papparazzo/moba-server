@@ -44,7 +44,10 @@ public class Database {
 
         switch(ConnectorType.valueOf((String)map.get("connectorType"))) {
             case MARIADB_CONNECTOR -> {
-                String url = "jdbc:mariadb://" + (String)map.get("host") + "/" + (String)map.get("db");
+                String url = 
+                    "jdbc:mariadb://" + (String)map.get("host") + 
+                    "/" + (String)map.get("db");
+                
                 String usr = (String)map.get("usr");
                 String pwd = (String)map.get("pwd");
                 connect(url, usr, pwd);
@@ -61,7 +64,10 @@ public class Database {
         try {
             con = DriverManager.getConnection(url, usr, pwd);
         } catch(SQLException e) {
-            throw new DatabaseException("unable to connect url: <" + url + ">", e);
+            throw new DatabaseException(
+                "unable to connect url: <" + url + ">", 
+            e
+            );
         }
     }
 
