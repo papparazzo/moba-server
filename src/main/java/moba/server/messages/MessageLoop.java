@@ -61,22 +61,26 @@ public class MessageLoop implements Loggable {
 
             if(msg.getGroupId() == InternMessage.GROUP_ID) {
                 switch(InternMessage.fromId(msg.getMessageId())) {
-                    case SERVER_RESET:
+                    case SERVER_RESET -> {
                         in.clear();
                         resetHandler();
                         return true;
+                    }
 
-                    case SERVER_SHUTDOWN:
+                    case SERVER_SHUTDOWN -> {
                         shutdownHandler();
                         return false;
+                    }
 
-                    case SET_HARDWARE_STATE:
+                    case SET_HARDWARE_STATE -> {
                         hardwareStateChangedHandler((HardwareState)msg.getData());
                         continue;
+                    }
 
-                    case CLIENT_SHUTDOWN:
+                    case CLIENT_SHUTDOWN -> {
                         handleClientClose(msg);
                         continue;
+                    }
                 }
             }
 
