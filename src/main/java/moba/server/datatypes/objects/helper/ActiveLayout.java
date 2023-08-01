@@ -39,7 +39,7 @@ public class ActiveLayout {
     public ActiveLayout(Dispatcher dispatcher, Config config) {
         this.config = config;
         this.dispatcher = dispatcher;
-        activeLayout = (long)config.getSection("trackLayout.activeTracklayoutId");
+        activeLayout = (long)config.getSection("trackLayout.activeTrackLayoutId");
     }
 
     public long getActiveLayout() {
@@ -54,14 +54,14 @@ public class ActiveLayout {
         if(activeLayout > 0) {
             return activeLayout;
         }
-        throw new ErrorException(ErrorId.NO_DEFAULT_GIVEN, "no default-tracklayout given");
+        throw new ErrorException(ErrorId.NO_DEFAULT_GIVEN, "no default-track-layout given");
     }
 
     public void setActiveLayout(long activeLayout)
     throws ErrorException {
         try {
             HashMap<String, Object> map = new HashMap<>();
-            map.put("activeTracklayoutId", activeLayout);
+            map.put("activeTrackLayoutId", activeLayout);
             config.setSection("trackLayout", map);
             config.writeFile();
         } catch(ConfigException | IOException e) {

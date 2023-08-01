@@ -35,12 +35,12 @@ public class App {
 
     public static void main(String[] args)
     throws Exception {
-        ServerApplication appl = new ServerApplication();
+        ServerApplication app = new ServerApplication();
 
         try {
             TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
             DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-            appl.run(
+            app.run(
                 App.APP_NAME,
                 new Version(App.APP_VERSION),
                 formatter.parse(App.APP_DATE),

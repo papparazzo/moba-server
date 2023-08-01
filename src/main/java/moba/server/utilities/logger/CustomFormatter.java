@@ -32,8 +32,8 @@ public class CustomFormatter extends Formatter {
     private final Version versionStr;
     private final Date    buildDate;
 
-    public CustomFormatter(String appl, Version ver, Date buildDate) {
-        applName   = appl;
+    public CustomFormatter(String appName, Version ver, Date buildDate) {
+        this.appName = appName;
         versionStr = ver;
         this.buildDate  = buildDate;
     }
@@ -83,7 +83,7 @@ public class CustomFormatter extends Formatter {
         buf.append("------------------------------------------------------");
         buf.append("\n");
         buf.append("  name:     ");
-        buf.append(applName);
+        buf.append(appName);
         buf.append("\n");
         buf.append("  version:  ");
         buf.append(versionStr);

@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import moba.server.database.Database;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.objects.TrackLayoutInfoData;
-import moba.server.datatypes.objects.TracklayoutSymbolData;
+import moba.server.datatypes.objects.TrackLayoutSymbolData;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,20 +41,20 @@ import moba.server.datatypes.objects.helper.ActiveLayout;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.LayoutMessage;
-import moba.server.utilities.lock.TracklayoutLock;
+import moba.server.utilities.lock.TrackLayoutLock;
 import moba.server.utilities.exceptions.ErrorException;
 import moba.server.utilities.logger.Loggable;
 
 public class Layout extends MessageHandlerA implements Loggable {
     protected Database        database     = null;
-    protected TracklayoutLock lock         = null;
+    protected TrackLayoutLock lock         = null;
     protected ActiveLayout    activeLayout = null;
 
     public Layout(Dispatcher dispatcher, Database database, ActiveLayout activeLayout) {
         this.database     = database;
         this.dispatcher   = dispatcher;
         this.activeLayout = activeLayout;
-        this.lock         = new TracklayoutLock(database);
+        this.lock         = new TrackLayoutLock(database);
         this.lock.resetAll();
     }
 
@@ -263,11 +263,11 @@ public class Layout extends MessageHandlerA implements Loggable {
             pstmt.setLong(1, id);
             getLogger().log(Level.INFO, pstmt.toString());
 
-            ArrayList<TracklayoutSymbolData> arraylist;
+            ArrayList<TrackLayoutSymbolData> arraylist;
             ResultSet rs = pstmt.executeQuery();
             arraylist = new ArrayList();
             while(rs.next()) {
-                arraylist.add(new TracklayoutSymbolData(
+                arraylist.add(new TrackLayoutSymbolData(
                     rs.getLong("Id"),
                     rs.getLong("XPos"),
                     rs.getLong("YPos"),

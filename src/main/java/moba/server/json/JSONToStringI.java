@@ -23,6 +23,6 @@ package moba.server.json;
 import java.io.IOException;
 
 public interface JSONToStringI {
-    public String toJsonString(boolean formated, int indent)
+    String toJsonString(boolean formatted, int indent)
     throws JSONException, IOException;
 }

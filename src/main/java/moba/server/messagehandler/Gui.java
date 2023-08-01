@@ -48,7 +48,7 @@ public class Gui extends MessageHandlerA {
                 sendSystemNotice(msg);
 
             default ->
-                throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
+                throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">.");
         }
     }
 

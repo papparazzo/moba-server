@@ -32,40 +32,40 @@ import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 public class ErrorData implements JSONToStringI {
 
     protected final ErrorId errorId;
-    protected final String additonalMsg;
+    protected final String additionalMsg;
 
     public ErrorData(ErrorId errorId) {
         this(errorId, "");
     }
 
-    public ErrorData(ErrorId errorId, String additonalMsg) {
+    public ErrorData(ErrorId errorId, String additionalMsg) {
         this.errorId = errorId;
-        this.additonalMsg = additonalMsg;
+        this.additionalMsg = additionalMsg;
     }
 
     @Override
     public String toString() {
-        return "[" + errorId.toString() + "] " + additonalMsg;
+        return "[" + errorId.toString() + "] " + additionalMsg;
     }
 
     public ErrorId getErrorId() {
         return errorId;
     }
 
-    public String getAdditonalMsg() {
-        return additonalMsg;
+    public String getAdditionalMsg() {
+        return additionalMsg;
     }
 
     @Override
-    public String toJsonString(boolean formated, int indent)
+    public String toJsonString(boolean formatted, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
         map.put("errorId",      errorId);
-        map.put("additonalMsg", additonalMsg);
+        map.put("additionalMsg", additionalMsg);
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb, formated);
+        JSONEncoder encoder = new JSONEncoder(jsb, formatted);
         encoder.encode(map, indent);
         return sb.toString();
     }

@@ -50,7 +50,7 @@ public class EnvironmentData implements JSONToStringI {
     }
 
     @Override
-    public String toJsonString(boolean formated, int indent)
+    public String toJsonString(boolean formatted, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> map = new HashMap<>();
         map.put("thunderStorm", thunderStorm);
@@ -63,7 +63,7 @@ public class EnvironmentData implements JSONToStringI {
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb, formated);
+        JSONEncoder encoder = new JSONEncoder(jsb, formatted);
         encoder.encode(map, indent);
         return sb.toString();
     }

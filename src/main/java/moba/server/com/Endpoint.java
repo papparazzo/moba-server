@@ -88,7 +88,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
     }
 
     @Override
-    public String toJsonString(boolean formated, int indent)
+    public String toJsonString(boolean formatted, int indent)
     throws JSONException, IOException {
         HashMap<String, Object> app = new HashMap<>();
         app.put("appName",   appName);
@@ -106,7 +106,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb, formated);
+        JSONEncoder encoder = new JSONEncoder(jsb, formatted);
         encoder.encode(map, indent);
         return sb.toString();
     }

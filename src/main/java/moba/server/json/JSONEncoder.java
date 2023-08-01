@@ -47,12 +47,12 @@ public class JSONEncoder {
         this(writer, false);
     }
 
-    public JSONEncoder(JSONStreamWriterI writer, boolean formated)
+    public JSONEncoder(JSONStreamWriterI writer, boolean formatted)
     throws IOException {
         if(writer == null) {
             throw new IOException("stream-writer not set");
         }
-        this.formated = formated;
+        this.formatted = formatted;
         this.writer = writer;
     }
 
@@ -198,11 +198,11 @@ public class JSONEncoder {
         writer.write(']');
     }
 
-    protected void addSet(Set setlist)
+    protected void addSet(Set setList)
     throws IOException, JSONException {
         writer.write('[');
         boolean fr = true;
-        for(Object item : setlist) {
+        for(Object item : setList) {
             if(!fr) {
                 writer.write(',');
             }
@@ -289,7 +289,7 @@ public class JSONEncoder {
 
     protected void addFormatStr(int indent)
     throws IOException {
-        if(!formated) {
+        if(!formatted) {
             return;
         }
 

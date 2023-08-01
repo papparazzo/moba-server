@@ -54,7 +54,7 @@ public class Hash implements JSONToStringI {
     }
 
     @Override
-    public String toJsonString(boolean formated, int indent)
+    public String toJsonString(boolean formatted, int indent)
     throws JSONException, IOException {
         StringBuilder b = new StringBuilder();
         b.append('"');

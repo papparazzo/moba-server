@@ -36,7 +36,7 @@ import moba.server.messagehandler.Layout;
 import moba.server.messagehandler.Server;
 import moba.server.messagehandler.Systems;
 import moba.server.messages.MessageLoop;
-import moba.server.utilities.lock.TracklayoutLock;
+import moba.server.utilities.lock.TrackLayoutLock;
 import moba.server.utilities.logger.MessageLogger;
 
 public class ServerApplication extends Application {
@@ -55,7 +55,7 @@ public class ServerApplication extends Application {
                 Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
                 MessageLoop  loop = new MessageLoop(dispatcher);
                 ActiveLayout activeLayout = new ActiveLayout(dispatcher, config);
-                TracklayoutLock lock = new TracklayoutLock(database);
+                TrackLayoutLock lock = new TrackLayoutLock(database);
 
                 loop.addHandler(new Client(dispatcher));
                 loop.addHandler(new Server(dispatcher, this));

@@ -70,7 +70,7 @@ public class Interface extends MessageHandlerA {
                 return;
 
             default:
-                throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
+                throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">.");
         }
     }
 
@@ -81,7 +81,7 @@ public class Interface extends MessageHandlerA {
                 dispatcher.dispatch(
                     new Message(
                         GuiMessage.SYSTEM_NOTICE,
-                        new NoticeData(NoticeType.INFO, "Hardwareverbindung", "Die Verbindung zur Harware wurde hergestellt")
+                        new NoticeData(NoticeType.INFO, "Hardwareverbindung", "Die Verbindung zur Hardware wurde hergestellt")
                     )
                 );
                 break;

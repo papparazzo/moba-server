@@ -90,7 +90,7 @@ public class TrackLayoutInfoData implements JSONToStringI {
     }
 
     @Override
-    public String toJsonString(boolean formated, int indent)
+    public String toJsonString(boolean formatted, int indent)
     throws IOException, JSONException {
         HashMap<String, Object> map = new HashMap<>();
 
@@ -106,7 +106,7 @@ public class TrackLayoutInfoData implements JSONToStringI {
 
         StringBuilder sb = new StringBuilder();
         JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb, formated);
+        JSONEncoder encoder = new JSONEncoder(jsb, formatted);
         encoder.encode(map);
         return sb.toString();
     }

@@ -49,7 +49,7 @@ public class Byte implements JSONToStringI {
     }
 
     @Override
-    public String toJsonString(boolean formated, int indent)
+    public String toJsonString(boolean formatted, int indent)
     throws JSONException, IOException {
         return String.valueOf(value);
     }

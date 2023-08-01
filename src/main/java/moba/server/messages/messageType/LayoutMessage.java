@@ -63,6 +63,6 @@ public enum LayoutMessage implements MessageType {
                 return type;
             }
         }
-        throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg [" + Long.toString(GROUP_ID) + ":" + Long.toString(id) + "].");
+        throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg [" + Long.toString(GROUP_ID) + ":" + Long.toString(id) + "].");
     }
 }
