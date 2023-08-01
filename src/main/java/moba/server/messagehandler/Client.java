@@ -70,7 +70,7 @@ public class Client extends MessageHandlerA {
             dispatcher.dispatch(
                 new Message(
                     ClientMessage.ERROR,
-                    new ErrorData(ErrorId.INVALID_DATA_SEND, "Endpoint <" + ep.toString() + "> allready exists"),
+                    new ErrorData(ErrorId.INVALID_DATA_SEND, "Endpoint <" + ep + "> already exists"),
                     msg.getEndpoint()
                 )
             );

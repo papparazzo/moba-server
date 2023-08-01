@@ -30,11 +30,11 @@ import moba.server.database.Database;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.utilities.exceptions.ErrorException;
 
-public final class TracklayoutLock extends AbstractLock {
+public final class TrackLayoutLock extends AbstractLock {
 
     protected Database database = null;
 
-    public TracklayoutLock(Database database) {
+    public TrackLayoutLock(Database database) {
         this.database = database;
     }
 
@@ -43,9 +43,9 @@ public final class TracklayoutLock extends AbstractLock {
         try {
             Connection con = database.getConnection();
 
-            try(PreparedStatement pstmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL")) {
-                pstmt.executeUpdate();
-                getLogger().log(Level.INFO, pstmt.toString());
+            try(PreparedStatement stmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL")) {
+                stmt.executeUpdate();
+                getLogger().log(Level.INFO, stmt.toString());
             }
         } catch(SQLException e) {
             getLogger().log(Level.WARNING, e.toString());
@@ -57,10 +57,10 @@ public final class TracklayoutLock extends AbstractLock {
         try {
             Connection con = database.getConnection();
 
-            try(PreparedStatement pstmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL WHERE `Locked` = ?")) {
-                pstmt.setLong(1, appId);
-                pstmt.executeUpdate();
-                getLogger().log(Level.INFO, pstmt.toString());
+            try(PreparedStatement stmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL WHERE `Locked` = ?")) {
+                stmt.setLong(1, appId);
+                stmt.executeUpdate();
+                getLogger().log(Level.INFO, stmt.toString());
             }
         } catch(SQLException e) {
             getLogger().log(Level.WARNING, e.toString());
@@ -80,13 +80,13 @@ public final class TracklayoutLock extends AbstractLock {
             Connection con = database.getConnection();
             String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` IS NULL AND `id` = ? ";
 
-            try(PreparedStatement pstmt = con.prepareStatement(q)) {
-                pstmt.setLong(1, appId);
-                pstmt.setLong(2, id);
+            try(PreparedStatement stmt = con.prepareStatement(q)) {
+                stmt.setLong(1, appId);
+                stmt.setLong(2, id);
 
-                getLogger().log(Level.INFO, pstmt.toString());
+                getLogger().log(Level.INFO, stmt.toString());
 
-                if(pstmt.executeUpdate() == 0) {
+                if(stmt.executeUpdate() == 0) {
                     throw new ErrorException(ErrorId.DATASET_LOCKED, "object is already locked");
                 }
             }
@@ -108,14 +108,14 @@ public final class TracklayoutLock extends AbstractLock {
             Connection con = database.getConnection();
             String q = "UPDATE `TrackLayouts` SET `locked` = NULL WHERE `locked` = ? AND `id` = ? ";
 
-            try(PreparedStatement pstmt = con.prepareStatement(q)) {
-                pstmt.setLong(1, appId);
-                pstmt.setLong(2, id);
+            try(PreparedStatement stmt = con.prepareStatement(q)) {
+                stmt.setLong(1, appId);
+                stmt.setLong(2, id);
 
-                getLogger().log(Level.INFO, pstmt.toString());
+                getLogger().log(Level.INFO, stmt.toString());
 
-                if(pstmt.executeUpdate() == 0) {
-                    throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + Long.toString(id) + ">");
+                if(stmt.executeUpdate() == 0) {
+                    throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + id + ">");
                 }
             }
         } catch(SQLException e) {
@@ -147,12 +147,12 @@ public final class TracklayoutLock extends AbstractLock {
 
             String q = "SELECT `locked` FROM `TrackLayouts` WHERE `Id` = ?";
 
-            try(PreparedStatement pstmt = con.prepareStatement(q)) {
-                pstmt.setLong(1, id);
-                getLogger().log(Level.INFO, pstmt.toString());
-                ResultSet rs = pstmt.executeQuery();
+            try(PreparedStatement stmt = con.prepareStatement(q)) {
+                stmt.setLong(1, id);
+                getLogger().log(Level.INFO, stmt.toString());
+                ResultSet rs = stmt.executeQuery();
                 if(!rs.next()) {
-                    throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + Long.toString(id) + ">");
+                    throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + id + ">");
                 }
                 var val = rs.getLong("locked");
                 return rs.wasNull() ? null : val;

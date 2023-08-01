@@ -91,7 +91,7 @@ public class Interface extends MessageHandlerA {
                 dispatcher.dispatch(
                     new Message(
                         GuiMessage.SYSTEM_NOTICE,
-                        new NoticeData(NoticeType.ERROR, "Hardwareverbindung", "Die Verbindung zur Harware wurde unterbrochen")
+                        new NoticeData(NoticeType.ERROR, "Hardwareverbindung", "Die Verbindung zur Hardware wurde unterbrochen")
                     )
                 );
                 break;

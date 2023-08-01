@@ -22,6 +22,6 @@ package moba.server.datatypes.enumerations;
 public enum EmergencyTriggerReason {
     CENTRAL_STATION,
     EXTERN,
-    SOFTWARE_MANUELL,
-    SELF_ACTING_BY_EXTERN_SWITCHING;
+    SOFTWARE_MANUEL,
+    SELF_ACTING_BY_EXTERN_SWITCHING
 }

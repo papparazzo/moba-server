@@ -28,7 +28,7 @@ import java.util.Date;
 
 public class CustomFormatter extends Formatter {
 
-    private final String  applName;
+    private final String  appName;
     private final Version versionStr;
     private final Date    buildDate;
 
