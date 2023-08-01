@@ -23,5 +23,5 @@ package moba.server.datatypes.enumerations;
 public enum NoticeType {
     INFO,
     WARNING,
-    ERROR;
+    ERROR
 }

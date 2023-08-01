@@ -26,5 +26,5 @@ public enum HardwareState {
     EMERGENCY_STOP,
     MANUEL,
     AUTOMATIC,
-    AUTOMATIC_HALT;
+    AUTOMATIC_HALT
 }

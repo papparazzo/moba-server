@@ -22,6 +22,6 @@ package moba.server.datatypes.enumerations;
 
 public enum Connectivity {
     CONNECTED,
-    ERROR;
+    ERROR
 }
 

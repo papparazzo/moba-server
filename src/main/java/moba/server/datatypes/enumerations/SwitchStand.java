@@ -24,5 +24,5 @@ public enum SwitchStand {
     STRAIGHT_1,
     BEND_1,
     STRAIGHT_2,
-    BEND_2;
+    BEND_2
 }

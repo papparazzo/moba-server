@@ -22,5 +22,5 @@ package moba.server.datatypes.enumerations;
 
 public enum DrivingDirection {
     FORWARD,
-    BACKWARD;
+    BACKWARD
 }

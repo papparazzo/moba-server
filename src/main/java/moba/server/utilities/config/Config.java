@@ -66,7 +66,7 @@ public class Config {
     }
 
     public Object getSection(String expr) {
-        String tokens[] = expr.split("\\.");
+        String[] tokens = expr.split("\\.");
 
         Object o = content;
 
