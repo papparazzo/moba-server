@@ -42,7 +42,7 @@ public enum ControlMessage implements MessageType {
 
     public final static int GROUP_ID = 10;
 
-    protected int messageId;
+    private final int messageId;
 
     ControlMessage(int msgId) {
         messageId = msgId;

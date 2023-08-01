@@ -35,7 +35,7 @@ public enum InterfaceMessage implements MessageType {
 
     public final static int GROUP_ID = 6;
 
-    protected int messageId;
+    private final int messageId;
 
     InterfaceMessage(int msgId) {
         messageId = msgId;

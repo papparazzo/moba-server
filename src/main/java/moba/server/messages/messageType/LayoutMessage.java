@@ -40,7 +40,7 @@ public enum LayoutMessage implements MessageType {
 
     public final static int GROUP_ID = 8;
 
-    protected int messageId;
+    private final int messageId;
 
     LayoutMessage(int msgId) {
         messageId = msgId;

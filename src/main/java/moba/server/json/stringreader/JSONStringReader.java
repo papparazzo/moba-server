@@ -25,7 +25,7 @@ import moba.server.json.streamreader.JSONStreamReaderI;
 
 
 public class JSONStringReader {
-    private JSONStreamReaderI reader = null;
+    private final JSONStreamReaderI reader;
     private char lastChar = 0;
 
     public JSONStringReader(JSONStreamReaderI reader) {

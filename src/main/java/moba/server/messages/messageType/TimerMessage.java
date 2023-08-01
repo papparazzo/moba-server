@@ -31,7 +31,7 @@ public enum TimerMessage implements MessageType {
 
     public final static int GROUP_ID = 4;
 
-    protected int messageId;
+    private final int messageId;
 
     TimerMessage(int msgId) {
         messageId = msgId;

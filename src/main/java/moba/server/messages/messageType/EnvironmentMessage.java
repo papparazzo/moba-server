@@ -32,7 +32,7 @@ public enum EnvironmentMessage implements MessageType {
 
     public final static int GROUP_ID = 5;
 
-    protected int messageId;
+    private final int messageId;
 
     EnvironmentMessage(int msgId) {
         messageId = msgId;

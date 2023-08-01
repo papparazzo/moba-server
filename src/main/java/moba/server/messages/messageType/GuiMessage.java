@@ -28,7 +28,7 @@ public enum GuiMessage implements MessageType {
 
     public final static int GROUP_ID = 9;
 
-    protected int messageId;
+    private final int messageId;
 
     GuiMessage(int msgId) {
         messageId = msgId;

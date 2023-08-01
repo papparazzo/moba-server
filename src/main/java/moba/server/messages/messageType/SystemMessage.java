@@ -37,7 +37,7 @@ public enum SystemMessage implements MessageType {
 
     public final static int GROUP_ID = 7;
 
-    protected int messageId;
+    private final int messageId;
 
     SystemMessage(int msgId) {
         messageId = msgId;

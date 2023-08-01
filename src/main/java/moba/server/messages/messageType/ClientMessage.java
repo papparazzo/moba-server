@@ -37,7 +37,7 @@ public enum ClientMessage implements MessageType {
 
     public final static int GROUP_ID = 2;
 
-    protected int messageId;
+    private final int messageId;
 
     ClientMessage(int msgId) {
         messageId = msgId;

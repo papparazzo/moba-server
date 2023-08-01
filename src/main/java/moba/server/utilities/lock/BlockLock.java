@@ -32,7 +32,7 @@ import moba.server.utilities.exceptions.ErrorException;
 
 public final class BlockLock extends AbstractLock {
 
-    protected Database database = null;
+    private Database database;
 
     public BlockLock(Database database) {
         this.database = database;
