@@ -50,11 +50,9 @@ public class Dispatcher implements Loggable {
     public boolean addEndpoint(Endpoint ep) {
         getLogger().log(Level.INFO, "try to add endpoint <{0}> appName <{1}> ver<{2}>", new Object[]{ep, ep.getAppName(), ep.getVersion()});
 
-        Iterator<Endpoint> iter = allEndpoints.iterator();
-
-        while(iter.hasNext()) {
-            if(iter.next() == ep) {
-                getLogger().log(Level.WARNING, "Enpoint <{0}> allready set", new Object[]{ep});
+        for(Endpoint allEndpoint: allEndpoints) {
+            if(allEndpoint == ep) {
+                getLogger().log(Level.WARNING, "Endpoint <{0}> already set", new Object[]{ep});
                 return false;
             }
         }
@@ -116,13 +114,8 @@ public class Dispatcher implements Loggable {
         if(!groupEP.containsKey(grpId)) {
             return;
         }
-        Iterator<Endpoint> iter = groupEP.get(grpId).iterator();
 
-        while(iter.hasNext()) {
-            if(iter.next() == ep) {
-                iter.remove();
-            }
-        }
+        groupEP.get(grpId).removeIf(endpoint -> endpoint == ep);
     }
 
     protected void shutDownEndpoint(Endpoint ep) {
@@ -146,10 +139,9 @@ public class Dispatcher implements Loggable {
     }
 
     public void resetDispatcher() {
-        Iterator<Endpoint> iter = allEndpoints.iterator();
 
-        while(iter.hasNext()) {
-            shutDownEndpoint(iter.next());
+        for(Endpoint allEndpoint: allEndpoints) {
+            shutDownEndpoint(allEndpoint);
         }
     }
 

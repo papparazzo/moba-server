@@ -67,7 +67,7 @@ public class CustomFormatter extends Formatter {
                 try(PrintWriter pw = new PrintWriter(sw)) {
                     record.getThrown().printStackTrace(pw);
                 }
-                sb.append(sw.toString());
+                sb.append(sw);
             }
             catch(Exception ex) {
                 // noop
@@ -106,9 +106,8 @@ public class CustomFormatter extends Formatter {
 
     @Override
     public String getTail(Handler h) {
-        StringBuilder buf = new StringBuilder(500);
-        buf.append("------------------------------------------------------");
-        buf.append("------------------------------------------------------\n");
-        return buf.toString();
+        return
+            "------------------------------------------------------" +
+            "------------------------------------------------------\n";
     }
 }
