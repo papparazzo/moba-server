@@ -162,13 +162,13 @@ public class JSONDecoder {
     }
 
     protected Boolean nextTrue()
-    throws JSONException, IOException {
+    throws IOException {
         reader.checkNext("true", !strict);
         return Boolean.TRUE;
     }
 
     protected Boolean nextFalse()
-    throws JSONException, IOException {
+    throws IOException {
         reader.checkNext("false", !strict);
         return Boolean.FALSE;
     }
