@@ -28,7 +28,7 @@ import java.util.Map;
 import moba.server.json.stringreader.JSONStringReader;
 
 public class JSONDecoder {
-    protected JSONStringReader reader = null;
+    protected JSONStringReader reader;
     protected boolean           strict;
     protected static final int  MAX_STRING_LENGTH = 1024;
 
@@ -37,8 +37,7 @@ public class JSONDecoder {
         this(reader, true);
     }
 
-    public JSONDecoder(JSONStringReader reader, boolean strict)
-    throws JSONException {
+    public JSONDecoder(JSONStringReader reader, boolean strict) {
         this.reader = reader;
         this.strict = strict;
     }
@@ -157,7 +156,7 @@ public class JSONDecoder {
     }
 
     protected Object nextNull()
-    throws JSONException, IOException {
+    throws IOException {
         reader.checkNext("null", !strict);
         return null;
     }

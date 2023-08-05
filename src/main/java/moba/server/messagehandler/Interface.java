@@ -38,7 +38,7 @@ import moba.server.utilities.exceptions.ErrorException;
 public class Interface extends MessageHandlerA {
     protected ServerApplication app = null;
 
-    protected MessageQueue msgQueueIn = null;
+    protected MessageQueue msgQueueIn;
 
     public Interface(Dispatcher dispatcher, MessageQueue msgQueueIn) {
         this.dispatcher = dispatcher;
