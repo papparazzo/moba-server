@@ -22,9 +22,6 @@ package moba.server.utilities.config;
 
 public class ConfigException extends Exception {
 
-    public ConfigException() {
-    }
-
     public ConfigException(String msg) {
         super(msg);
     }
