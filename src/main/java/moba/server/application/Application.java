@@ -43,7 +43,7 @@ abstract public class Application {
     protected MessageQueue msgQueueIn = null;
 
     public void run(String appName, Version appVer, Date date, Config config)
-    throws IOException, Exception {
+    throws Exception {
         this.appVer     = appVer;
         this.appName    = appName;
         this.startTime  = System.currentTimeMillis();
