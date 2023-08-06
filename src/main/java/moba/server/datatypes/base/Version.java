@@ -45,11 +45,11 @@ public class Version implements Comparable, JSONToStringI {
 
         String str = version;
 
-        if(str == null || str.length() == 0) {
+        if(str == null || str.isEmpty()) {
             throw new IllegalArgumentException("version-string is empty or not set");
         }
 
-        String sa[] = str.split("-");
+        String[] sa = str.split("-");
 
         str = sa[0];
         try {
@@ -123,13 +123,7 @@ public class Version implements Comparable, JSONToStringI {
         if(build > v.build) {
             return 1;
         }
-        if(patch < v.patch) {
-            return -1;
-        }
-        if(patch > v.patch) {
-            return 1;
-        }
-        return 0;
+        return Integer.compare(patch, v.patch);
     }
 
     @Override
@@ -157,20 +151,10 @@ public class Version implements Comparable, JSONToStringI {
     }
 
     @Override
-    public String toJsonString(boolean formated, int indent) {
+    public String toJsonString(boolean formatted, int indent) {
         if(major == -1) {
             return "\"0.0.0.0\"";
         }
-        StringBuilder b = new StringBuilder();
-        b.append('"');
-        b.append(String.valueOf(major));
-        b.append('.');
-        b.append(String.valueOf(minor));
-        b.append('.');
-        b.append(String.valueOf(build));
-        b.append('.');
-        b.append(String.valueOf(patch));
-        b.append('"');
-        return b.toString();
+        return String.valueOf('"' + major + '.' + minor + '.' + build + '.' + patch + '"');
     }
 }

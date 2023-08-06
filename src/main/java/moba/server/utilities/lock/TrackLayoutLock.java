@@ -32,7 +32,7 @@ import moba.server.utilities.exceptions.ErrorException;
 
 public final class TrackLayoutLock extends AbstractLock {
 
-    protected Database database = null;
+    private final Database database;
 
     public TrackLayoutLock(Database database) {
         this.database = database;
@@ -136,10 +136,10 @@ public final class TrackLayoutLock extends AbstractLock {
         if(lockedBy == appId) {
             return true;
         }
-        throw new ErrorException(ErrorId.DATASET_LOCKED, "object is locked by <" + Long.toString(lockedBy) + ">");
+        throw new ErrorException(ErrorId.DATASET_LOCKED, "object is locked by <" + lockedBy + ">");
     }
 
-    protected Long getIdOfLockingApp(Object data)
+    private Long getIdOfLockingApp(Object data)
     throws ErrorException {
         try {
             long id = (long)data;

@@ -68,13 +68,7 @@ public class Message implements Comparable {
         long i = trigger;
         long j = ((Message)o).trigger;
 
-        if(i < j) {
-            return -1;
-        }
-        if(i > j) {
-            return 1;
-        }
-        return 0;
+        return Long.compare(i, j);
     }
 
     public Endpoint getEndpoint() {
