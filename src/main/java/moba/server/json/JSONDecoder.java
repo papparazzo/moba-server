@@ -59,7 +59,7 @@ public class JSONDecoder {
                 Character.isWhitespace(c) || 
                 !(Character.isLetterOrDigit(c) || c == '_' || c == '"')
             ) {
-                throw new JSONException("key contains invalide char!");
+                throw new JSONException("key contains invalid char!");
             }
 
             if(c == '"') {

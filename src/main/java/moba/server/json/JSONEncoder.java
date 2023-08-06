@@ -37,8 +37,8 @@ import java.lang.reflect.Modifier;
 import moba.server.json.streamwriter.JSONStreamWriterI;
 
 public class JSONEncoder {
-    protected boolean          formated;
-    protected int              indent = 0;
+    protected boolean formatted;
+    protected int     indent = 0;
 
     protected JSONStreamWriterI writer = null;
 
@@ -169,7 +169,7 @@ public class JSONEncoder {
         } else if(object instanceof InetAddress inetAddress) {
             addInetAddr(inetAddress);
         } else if(object instanceof JSONToStringI jSONToStringI) {
-            writer.write(jSONToStringI.toJsonString(formated, indent));
+            writer.write(jSONToStringI.toJsonString(formatted, indent));
         } else if(object instanceof Set set) {
             addSet(set);
         } else {
