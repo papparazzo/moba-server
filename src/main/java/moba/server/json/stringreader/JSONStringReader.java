@@ -53,7 +53,7 @@ public class JSONStringReader {
 
     public void checkNext(String s, boolean ignoreWhitespace)
     throws IOException {
-        for (int i = 0; i < s.length(); i++){
+        for(int i = 0; i < s.length(); i++) {
             checkNext(s.charAt(i), ignoreWhitespace);
         }
     }

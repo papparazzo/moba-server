@@ -77,7 +77,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
         closing = true;
         try {
             socket.close();
-        } catch(IOException e) {
+        } catch(IOException ignored) {
 
         }
     }

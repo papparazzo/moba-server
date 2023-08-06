@@ -56,15 +56,6 @@ public class NoticeData {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("[");
-        sb.append(type.toString());
-        sb.append("] ");
-        sb.append(caption);
-        sb.append(": ");
-        sb.append(text);
-
-        return sb.toString();
+        return "[" + type.toString() + "] " + caption + ": " + text;
     }
 }

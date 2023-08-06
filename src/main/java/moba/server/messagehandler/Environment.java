@@ -80,7 +80,7 @@ public class Environment extends MessageHandlerA {
 
     protected long convertToLong(Object o) {
         if(o != null && o.getClass() == Integer.class) {
-            return (long)Long.valueOf((Integer)o);
+            return Long.valueOf((Integer)o);
         }
         return (Long)o;
     }

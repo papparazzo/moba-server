@@ -21,6 +21,6 @@
 package moba.server.messages;
 
 public interface MessageType {
-    public int getMessageId();
-    public int getGroupId();
+    int getMessageId();
+    int getGroupId();
 }

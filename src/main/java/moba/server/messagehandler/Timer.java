@@ -47,7 +47,7 @@ import moba.server.utilities.exceptions.ErrorException;
  * ab 22:00 Uht Nacht
  */
 public class Timer extends MessageHandlerA implements Runnable {
-    protected Config          config = null;
+    protected Config          config;
     protected final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     protected GlobalTimerData timerData = null;
 
@@ -109,7 +109,7 @@ public class Timer extends MessageHandlerA implements Runnable {
                 dispatcher.dispatch(new Message(TimerMessage.GLOBAL_TIMER_EVENT, timerData.getModelTime()));
             }
 
-        } catch(Exception e) {
+        } catch(Exception ignored) {
 
         }
     }
