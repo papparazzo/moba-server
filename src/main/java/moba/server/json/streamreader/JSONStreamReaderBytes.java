@@ -24,8 +24,8 @@ import java.io.IOException;
 
 public class JSONStreamReaderBytes implements JSONStreamReaderI {
 
-    protected byte[] data = null;
-    protected int length = 0;
+    protected byte[] data;
+    protected int length;
     protected int index = 0;
 
     public JSONStreamReaderBytes(byte[] input, int len) {
@@ -39,6 +39,6 @@ public class JSONStreamReaderBytes implements JSONStreamReaderI {
         if(index == data.length) {
             throw new IOException("End of string reached");
         }
-        return (int)data[index++];
+        return data[index++];
     }
 }

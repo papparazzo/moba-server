@@ -39,7 +39,7 @@ import moba.server.utilities.logger.Loggable;
 public class MessageLoop implements Loggable {
 
     protected Map<Integer, MessageHandlerA> handlers   = new HashMap<>();
-    protected Dispatcher                    dispatcher = null;
+    protected Dispatcher                    dispatcher;
 
     public MessageLoop(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
@@ -54,7 +54,7 @@ public class MessageLoop implements Loggable {
     }
 
     public boolean loop(MessageQueue in)
-    throws InterruptedException {
+    throws InterruptedException, ErrorException {
 
         while(true) {
             Message msg = in.take();

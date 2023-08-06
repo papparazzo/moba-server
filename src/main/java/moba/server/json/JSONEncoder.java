@@ -280,11 +280,7 @@ public class JSONEncoder {
     protected void addInetAddr(InetAddress addr)
     throws IOException {
         String str = addr.getHostAddress();
-        if(str == null) {
-            addString("0.0.0.0");
-        } else {
-            addString(str);
-        }
+        addString(Objects.requireNonNullElse(str, "0.0.0.0"));
     }
 
     protected void addFormatStr(int indent)
