@@ -29,7 +29,7 @@ public enum InternMessage implements MessageType {
 
     public final static int GROUP_ID = 1;
 
-    protected int messageId;
+    private final int messageId;
 
     InternMessage(int msgId) {
         messageId = msgId;

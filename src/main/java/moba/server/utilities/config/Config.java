@@ -49,7 +49,7 @@ public class Config {
         options.setTagInspector(allowedTags);
         
         Yaml yaml = new Yaml(options);
-        content = (Map<String, Object>)yaml.load(is);
+        content = yaml.load(is);
         if(content == null || content.isEmpty()) {
             throw new ConfigException("content is empty");
         }
