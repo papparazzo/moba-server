@@ -22,7 +22,6 @@ package moba.server.utilities.logger;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import moba.server.com.Endpoint;
 
 import moba.server.messages.Message;
 
@@ -34,18 +33,18 @@ public class MessageLogger {
     }
 
     public void in(Message msg) {
-        print(msg, MessageType.IN_MESSAGE, msg.getEndpoint());
+        print(msg, MessageType.IN_MESSAGE);
     }
 
     public void out(Message msg) {
-        print(msg, MessageType.OUT_MESSAGE, msg.getEndpoint());
+        print(msg, MessageType.OUT_MESSAGE);
     }
 
     public void intern(Message msg) {
-        print(msg, MessageType.INTERN_MESSAGE, null);
+        print(msg, MessageType.INTERN_MESSAGE);
     }
 
-    protected void print(Message msg, MessageType type, Endpoint ep) {
+    protected void print(Message msg, MessageType type) {
         if(msg == null) {
             return;
         }
