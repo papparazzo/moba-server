@@ -101,10 +101,9 @@ public class MessageLoop implements Loggable {
     }
 
     protected void freeResources(long appId) {
-        Iterator<Integer> iter = handlers.keySet().iterator();
 
-        while(iter.hasNext()) {
-            handlers.get(iter.next()).freeResources(appId);
+        for(Integer integer: handlers.keySet()) {
+            handlers.get(integer).freeResources(appId);
         }
     }
 
@@ -112,9 +111,8 @@ public class MessageLoop implements Loggable {
         dispatcher.getEndpoints().forEach((ep) -> {
             dispatcher.dispatch(new Message(ClientMessage.RESET, null, ep));
         });
-        Iterator<Integer> iter = handlers.keySet().iterator();
-        while(iter.hasNext()) {
-            handlers.get(iter.next()).shutdown();
+        for(Integer integer: handlers.keySet()) {
+            handlers.get(integer).shutdown();
         }
     }
 
@@ -122,16 +120,14 @@ public class MessageLoop implements Loggable {
         dispatcher.getEndpoints().forEach((ep) -> {
             dispatcher.dispatch(new Message(ClientMessage.SHUTDOWN, null, ep));
         });
-        Iterator<Integer> iter = handlers.keySet().iterator();
-        while(iter.hasNext()) {
-            handlers.get(iter.next()).shutdown();
+        for(Integer integer: handlers.keySet()) {
+            handlers.get(integer).shutdown();
         }
     }
 
     protected void hardwareStateChangedHandler(HardwareState state) {
-        Iterator<Integer> iter = handlers.keySet().iterator();
-        while(iter.hasNext()) {
-            handlers.get(iter.next()).hardwareStateChanged(state);
+        for(Integer integer: handlers.keySet()) {
+            handlers.get(integer).hardwareStateChanged(state);
         }
     }
 
