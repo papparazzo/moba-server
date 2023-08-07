@@ -65,7 +65,7 @@ public class MessageLogger {
 
         }
 
-        sb.append(msg.toString());
+        sb.append(msg);
         System.out.println(sb);
     }
 }
