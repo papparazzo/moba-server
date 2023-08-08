@@ -34,10 +34,6 @@ public class ErrorData implements JSONToStringI {
     protected final ErrorId errorId;
     protected final String additionalMsg;
 
-    public ErrorData(ErrorId errorId) {
-        this(errorId, "");
-    }
-
     public ErrorData(ErrorId errorId, String additionalMsg) {
         this.errorId = errorId;
         this.additionalMsg = additionalMsg;
@@ -46,14 +42,6 @@ public class ErrorData implements JSONToStringI {
     @Override
     public String toString() {
         return "[" + errorId.toString() + "] " + additionalMsg;
-    }
-
-    public ErrorId getErrorId() {
-        return errorId;
-    }
-
-    public String getAdditionalMsg() {
-        return additionalMsg;
     }
 
     @Override
