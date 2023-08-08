@@ -41,7 +41,7 @@ public class JSONEncoder {
     protected boolean formatted;
     protected int     indent = 0;
 
-    protected JSONStreamWriterI writer = null;
+    protected JSONStreamWriterI writer;
 
     public JSONEncoder(JSONStreamWriterI writer)
     throws IOException {
