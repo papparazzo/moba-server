@@ -20,21 +20,6 @@
 
 package moba.server.datatypes.objects;
 
-public final class ContactData {
+public record ContactData(int moduleAddr, int contactNb) {
 
-    protected int modulAddr;
-    protected int contactNb;
-
-    public ContactData(int modulAddr, int contactNb) {
-        this.modulAddr = modulAddr;
-        this.contactNb = contactNb;
-    }
-
-    public int getModulAddr() {
-        return modulAddr;
-    }
-
-    public int getContactNb() {
-        return contactNb;
-    }
 }
