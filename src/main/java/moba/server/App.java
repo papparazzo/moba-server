@@ -33,8 +33,7 @@ public class App {
     protected static final String APP_DATE      = "13.05.2011";
     protected static final String APP_VERSION   = "1.0.0-0000";
 
-    public static void main(String[] args)
-    throws Exception {
+    public static void main(String[] args) {
         ServerApplication app = new ServerApplication();
 
         try {

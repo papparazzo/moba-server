@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import moba.server.json.JSONException;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -39,7 +38,7 @@ public class Config {
     protected Map<String, Object> content;
 
     public Config(String fileName)
-    throws IOException, JSONException, ConfigException {
+    throws IOException, ConfigException {
         InputStream is = new FileInputStream(fileName);
         this.fileName = fileName;
 
