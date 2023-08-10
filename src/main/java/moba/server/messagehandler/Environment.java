@@ -40,6 +40,7 @@ public class Environment extends MessageHandlerA {
 
     protected EnvironmentData environment = new EnvironmentData();
 
+    @SuppressWarnings("unchecked")
     public Environment(Dispatcher dispatcher, Config config) {
         this.dispatcher = dispatcher;
         this.config = config;
@@ -52,6 +53,7 @@ public class Environment extends MessageHandlerA {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void handleMsg(Message msg)
     throws ErrorException {
         try {

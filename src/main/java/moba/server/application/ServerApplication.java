@@ -44,6 +44,7 @@ public class ServerApplication extends Application {
     protected int maxClients = -1;
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void loop()
     throws Exception {
         try {

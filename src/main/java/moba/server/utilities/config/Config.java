@@ -64,6 +64,7 @@ public class Config {
         yaml.dump(content, new FileWriter(this.fileName));
     }
 
+    @SuppressWarnings("unchecked")
     public Object getSection(String expr) {
         String[] tokens = expr.split("\\.");
 

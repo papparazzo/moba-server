@@ -166,6 +166,7 @@ public class Control extends MessageHandlerA implements Loggable {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected void saveBlockList(Message msg)
     throws SQLException, ErrorException {
 
@@ -241,6 +242,7 @@ Integer	trainId
 
     }
 
+    @SuppressWarnings("unchecked")
     protected void getSwitchStateList(Message msg)
     throws SQLException, ErrorException {
         long id = activeLayout.getActiveLayout(msg.getData());
@@ -305,6 +307,7 @@ Integer	trainId
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected void pushTrain(Message msg)
     throws SQLException, ErrorException {
         Connection con = database.getConnection();

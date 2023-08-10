@@ -68,6 +68,7 @@ public final class BlockLock extends AbstractLock {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void tryLock(long appId, Object data)
     throws ErrorException {
         try {
@@ -106,6 +107,7 @@ public final class BlockLock extends AbstractLock {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void unlock(long appId, Object data)
     throws ErrorException {
        try {
@@ -144,6 +146,7 @@ public final class BlockLock extends AbstractLock {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean isLockedByApp(long appId, Object data)
     throws ErrorException {
         try {

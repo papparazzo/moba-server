@@ -141,6 +141,7 @@ public class JSONEncoder {
         writer.write('}');
     }
 
+    @SuppressWarnings("unchecked")
     protected void addJSONValue(Object object)
     throws IOException, JSONException {
         if(object == null) {

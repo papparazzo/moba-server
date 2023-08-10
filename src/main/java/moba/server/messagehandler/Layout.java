@@ -162,6 +162,7 @@ public class Layout extends MessageHandlerA implements Loggable {
         dispatcher.dispatch(new Message(LayoutMessage.DELETE_LAYOUT, id));
     }
 
+    @SuppressWarnings("unchecked")
     protected void createLayout(Message msg)
     throws SQLException, IOException, ErrorException {
         Map<String, Object> map = (Map)msg.getData();
@@ -196,6 +197,7 @@ public class Layout extends MessageHandlerA implements Loggable {
         dispatcher.dispatch(new Message(LayoutMessage.CREATE_LAYOUT, tl));
     }
 
+    @SuppressWarnings("unchecked")
     protected void updateLayout(Message msg)
     throws SQLException, ErrorException {
         Map<String, Object> map = (Map)msg.getData();
@@ -279,6 +281,7 @@ public class Layout extends MessageHandlerA implements Loggable {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected void saveLayout(Message msg)
     throws SQLException, ErrorException {
 

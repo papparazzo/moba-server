@@ -75,6 +75,7 @@ public class Timer extends MessageHandlerA implements Runnable {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void handleMsg(Message msg)
     throws ErrorException {
         try {
