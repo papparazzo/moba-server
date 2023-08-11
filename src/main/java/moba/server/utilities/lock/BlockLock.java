@@ -43,9 +43,9 @@ public final class BlockLock extends AbstractLock {
         try {
             Connection con = database.getConnection();
 
-            try(PreparedStatement pstmt = con.prepareStatement("UPDATE `BlockSections` SET `Locked` = NULL")) {
-                pstmt.executeUpdate();
-                getLogger().log(Level.INFO, pstmt.toString());
+            try(PreparedStatement stmt = con.prepareStatement("UPDATE `BlockSections` SET `Locked` = NULL")) {
+                stmt.executeUpdate();
+                getLogger().log(Level.INFO, stmt.toString());
             }
         } catch(SQLException e) {
             getLogger().log(Level.WARNING, e.toString());
@@ -57,10 +57,10 @@ public final class BlockLock extends AbstractLock {
         try {
             Connection con = database.getConnection();
 
-            try(PreparedStatement pstmt = con.prepareStatement("UPDATE `BlockSections` SET `Locked` = NULL WHERE `Locked` = ?")) {
-                pstmt.setLong(1, appId);
-                pstmt.executeUpdate();
-                getLogger().log(Level.INFO, pstmt.toString());
+            try(PreparedStatement stmt = con.prepareStatement("UPDATE `BlockSections` SET `Locked` = NULL WHERE `Locked` = ?")) {
+                stmt.setLong(1, appId);
+                stmt.executeUpdate();
+                getLogger().log(Level.INFO, stmt.toString());
             }
         } catch(SQLException e) {
             getLogger().log(Level.WARNING, e.toString());
@@ -86,16 +86,16 @@ public final class BlockLock extends AbstractLock {
                 "SET `locked` = ? " +
                 "WHERE `locked` IS NULL AND `id` IN (" + getPlaceHolderString(list.size()) + ")";
 
-            try(PreparedStatement pstmt = con.prepareStatement(q)) {
-                pstmt.setLong(1, appId);
+            try(PreparedStatement stmt = con.prepareStatement(q)) {
+                stmt.setLong(1, appId);
                 int i = 1;
                 for(Long v : list) {
-                    pstmt.setLong(++i, v);
+                    stmt.setLong(++i, v);
                 }
 
-                getLogger().log(Level.INFO, pstmt.toString());
+                getLogger().log(Level.INFO, stmt.toString());
 
-                if(pstmt.executeUpdate() != list.size()) {
+                if(stmt.executeUpdate() != list.size()) {
                     con.rollback();
                     throw new ErrorException(ErrorId.DATASET_LOCKED, "object is already locked");
                 }
@@ -125,16 +125,16 @@ public final class BlockLock extends AbstractLock {
                 "SET `locked` = NULL " +
                 "WHERE `locked` = ? AND `id` IN (" + getPlaceHolderString(list.size()) + ")";
 
-            try(PreparedStatement pstmt = con.prepareStatement(q)) {
-                pstmt.setLong(1, appId);
+            try(PreparedStatement stmt = con.prepareStatement(q)) {
+                stmt.setLong(1, appId);
                 int i = 1;
                 for(Long v : list) {
-                    pstmt.setLong(++i, v);
+                    stmt.setLong(++i, v);
                 }
 
-                getLogger().log(Level.INFO, pstmt.toString());
+                getLogger().log(Level.INFO, stmt.toString());
 
-                if(pstmt.executeUpdate() != list.size()) {
+                if(stmt.executeUpdate() != list.size()) {
                     con.rollback();
                     throw new ErrorException(ErrorId.DATASET_MISSING, "no blocks found");
                 }
@@ -159,15 +159,15 @@ public final class BlockLock extends AbstractLock {
                 "FROM `BlockSections` " +
                 "WHERE `Id` IN (" + getPlaceHolderString(list.size()) + ") GROUP BY `locked`";
 
-            try(PreparedStatement pstmt = con.prepareStatement(q)) {
+            try(PreparedStatement stmt = con.prepareStatement(q)) {
                 int i = 0;
                 for(Long v : list) {
-                    pstmt.setLong(++i, v);
+                    stmt.setLong(++i, v);
                 }
 
-                getLogger().log(Level.INFO, pstmt.toString());
+                getLogger().log(Level.INFO, stmt.toString());
 
-                ResultSet rs = pstmt.executeQuery();
+                ResultSet rs = stmt.executeQuery();
 
                 if(!rs.next()) {
                     throw new ErrorException(ErrorId.DATASET_MISSING, "no record set found");
