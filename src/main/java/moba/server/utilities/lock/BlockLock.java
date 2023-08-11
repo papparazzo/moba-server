@@ -32,7 +32,7 @@ import moba.server.utilities.exceptions.ErrorException;
 
 public final class BlockLock extends AbstractLock {
 
-    private Database database;
+    private final Database database;
 
     public BlockLock(Database database) {
         this.database = database;
@@ -195,17 +195,14 @@ public final class BlockLock extends AbstractLock {
         }
     }
 
-    protected String getPlaceHolderString(int size) {
+    private String getPlaceHolderString(int size) {
         if(size < 1) {
             throw new IllegalArgumentException("size < 1");
         }
 
         StringBuilder builder = new StringBuilder();
 
-        for(int i = 0; i < size; i++) {
-            builder.append("?,");
-        }
-
+        builder.append("?,".repeat(size));
         return builder.deleteCharAt(builder.length() - 1).toString();
     }
 }
