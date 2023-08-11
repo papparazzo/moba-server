@@ -30,12 +30,12 @@ import moba.server.utilities.logger.Loggable;
 
 public class Acceptor extends Thread implements Loggable {
 
-    private MessageQueue in = null;
+    private MessageQueue in;
 
     private ServerSocket serverSocket = null;
-    private Dispatcher   dispatcher   = null;
-    private int          serverport   = 0;
-    private int          maxClients   = 0;
+    private Dispatcher   dispatcher;
+    private int          serverport;
+    private int          maxClients;
 
     public Acceptor(MessageQueue in, Dispatcher dispatcher, int serverport, int maxClients) {
         this.in         = in;
