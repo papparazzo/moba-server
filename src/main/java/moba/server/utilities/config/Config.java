@@ -79,7 +79,7 @@ public class Config {
         }
 
         if(o != null && o.getClass() == Integer.class) {
-            o = (long)Long.valueOf((Integer)o);
+            o = Long.valueOf((Integer)o);
         }
 
         return o;
@@ -91,17 +91,5 @@ public class Config {
             content = new HashMap<>();
         }
         content.put(section, val);
-    }
-
-    public boolean removeSection(String section)
-    throws ConfigException {
-        if(content == null) {
-            throw new ConfigException("object is null");
-        }
-        return (content.remove(section) != null);
-    }
-
-    public boolean sectionExists(String section) {
-        return (getSection(section) != null);
     }
 }
