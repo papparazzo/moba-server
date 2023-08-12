@@ -32,17 +32,21 @@ import moba.server.utilities.exceptions.ErrorException;
 
 public class ActiveLayout {
 
-    protected long activeLayout;
+    protected Long activeLayout;
     protected Dispatcher dispatcher;
     protected Config config;
 
     public ActiveLayout(Dispatcher dispatcher, Config config) {
         this.config = config;
         this.dispatcher = dispatcher;
-        activeLayout = (long)config.getSection("trackLayout.activeTrackLayoutId");
+        activeLayout = (Long)config.getSection("trackLayout.activeTrackLayoutId");
     }
 
     public long getActiveLayout() {
+        if(activeLayout == null) {
+            //FIXME switch to nullable...
+            return -1;
+        }
         return activeLayout;
     }
 
@@ -51,7 +55,7 @@ public class ActiveLayout {
         if(defaultId != null) {
             return (long)defaultId;
         }
-        if(activeLayout > 0) {
+        if(activeLayout != null) {
             return activeLayout;
         }
         throw new ErrorException(ErrorId.NO_DEFAULT_GIVEN, "no default-track-layout given");
