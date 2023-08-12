@@ -35,14 +35,14 @@ public class ByteTest {
         instance = new Byte(255);
         assertEquals(255, instance.getValue());
         try {
-            instance = new Byte(256);
+            new Byte(256);
             fail("Expected an IllegalArgumentException to be thrown");
-        }catch(Exception e) {
+        } catch(Exception ignored) {
         }
         try {
-            instance = new Byte(-1);
+            new Byte(-1);
             fail("Expected an IllegalArgumentException to be thrown");
-        }catch(Exception e) {
+        } catch(Exception ignored) {
         }
     }
 
@@ -60,23 +60,23 @@ public class ByteTest {
         try {
             instance.setValue(256);
             fail("Expected an IllegalArgumentException to be thrown");
-        }catch(Exception e) {
+        } catch(Exception ignored) {
         }
         try {
             instance.setValue(-1);
             fail("Expected an IllegalArgumentException to be thrown");
-        }catch(Exception e) {
+        } catch(Exception ignored) {
         }
     }
 
     @Test
     public void testToJsonString()
     throws Exception {
-        boolean formated = false;
+        boolean formatted = false;
         int indent = 0;
         Byte instance = new Byte(5);
         String expResult = "5";
-        String result = instance.toJsonString(formated, indent);
+        String result = instance.toJsonString(formatted, indent);
         assertEquals(expResult, result);
     }
 }
