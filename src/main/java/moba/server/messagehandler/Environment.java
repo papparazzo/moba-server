@@ -36,7 +36,7 @@ import moba.server.utilities.config.ConfigException;
 import moba.server.utilities.exceptions.ErrorException;
 
 public class Environment extends MessageHandlerA {
-    protected Config  config = null;
+    protected Config  config;
 
     protected EnvironmentData environment = new EnvironmentData();
 

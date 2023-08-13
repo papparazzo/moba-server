@@ -46,9 +46,9 @@ import moba.server.utilities.exceptions.ErrorException;
 import moba.server.utilities.logger.Loggable;
 
 public class Layout extends MessageHandlerA implements Loggable {
-    protected Database        database     = null;
-    protected TrackLayoutLock lock         = null;
-    protected ActiveLayout    activeLayout = null;
+    protected Database        database;
+    protected TrackLayoutLock lock;
+    protected ActiveLayout    activeLayout;
 
     public Layout(Dispatcher dispatcher, Database database, ActiveLayout activeLayout) {
         this.database     = database;

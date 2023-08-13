@@ -23,7 +23,7 @@ package moba.server.json.streamwriter;
 import java.io.IOException;
 
 public class JSONStreamWriterStringBuilder implements JSONStreamWriterI {
-    StringBuilder sb = null;
+    StringBuilder sb;
 
     public JSONStreamWriterStringBuilder(StringBuilder sb) {
         this.sb = sb;

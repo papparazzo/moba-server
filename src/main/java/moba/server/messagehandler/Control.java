@@ -48,10 +48,10 @@ import moba.server.utilities.lock.BlockLock;
 import moba.server.utilities.logger.Loggable;
 
 public class Control extends MessageHandlerA implements Loggable {
-    protected Database       database     = null;
-    protected BlockLock      blockLock    = null;
-    protected Queue<Message> queue        = null;
-    protected ActiveLayout   activeLayout = null;
+    protected Database       database;
+    protected BlockLock      blockLock;
+    protected Queue<Message> queue;
+    protected ActiveLayout   activeLayout;
 
     public Control(Dispatcher dispatcher, Database database, ActiveLayout activeLayout) {
         this.dispatcher = dispatcher;
