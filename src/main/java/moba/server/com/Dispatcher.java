@@ -93,9 +93,7 @@ public class Dispatcher implements Loggable {
 
         removeEndpointFromGroup((long)-1, ep);
 
-        ep.getMsgGroups().forEach((msgGroup) -> {
-            removeEndpointFromGroup(msgGroup, ep);
-        });
+        ep.getMsgGroups().forEach((msgGroup) -> removeEndpointFromGroup(msgGroup, ep));
         getLogger().log(Level.INFO, "endpoint <{0}> successfully removed!", new Object[]{ep});
     }
 
