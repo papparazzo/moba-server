@@ -96,7 +96,7 @@ public class Dispatcher implements Loggable {
         ep.getMsgGroups().forEach((msgGroup) -> {
             removeEndpointFromGroup(msgGroup, ep);
         });
-        getLogger().log(Level.INFO, "endpoint <{0}> succesfully removed!", new Object[]{ep});
+        getLogger().log(Level.INFO, "endpoint <{0}> successfully removed!", new Object[]{ep});
     }
 
     protected void addEndpointToGroup(Long grpId, Endpoint ep) {
@@ -124,13 +124,13 @@ public class Dispatcher implements Loggable {
                 ep.interrupt();
                 ep.join(250);
             } catch(InterruptedException e) {
-                getLogger().log(Level.WARNING, "InterruptedException occured! <{0}>", new Object[]{e.toString()});
+                getLogger().log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
             }
         }
         try {
             ep.closeEndpoint();
         } catch(Exception e) {
-            getLogger().log(Level.WARNING, "Exception occured! <{0}> Closing socket failed!", new Object[]{e.toString()});
+            getLogger().log(Level.WARNING, "Exception occurred! <{0}> Closing socket failed!", new Object[]{e.toString()});
         }
     }
 
