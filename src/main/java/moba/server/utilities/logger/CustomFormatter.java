@@ -78,36 +78,17 @@ public class CustomFormatter extends Formatter {
 
     @Override
     public String getHead(Handler h) {
-        StringBuilder buf = new StringBuilder(1000);
-        buf.append("------------------------------------------------------");
-        buf.append("------------------------------------------------------");
-        buf.append("\n");
-        buf.append("  name:     ");
-        buf.append(appName);
-        buf.append("\n");
-        buf.append("  version:  ");
-        buf.append(versionStr);
-        buf.append("\n");
-        buf.append("  author:   Stefan Paproth (Pappi-@gmx.de)");
-        buf.append("\n");
-        buf.append("  build on: ");
-        if(buildDate == null) {
-            buf.append("-");
-        } else {
-            SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-            buf.append(df.format(buildDate));
-        }
-        buf.append("\n------------------------------------------------------");
-        buf.append("------------------------------------------------------\n");
-
-        // build on: Feb  7 2008 17:54:09
-        return buf.toString();
+        return
+            "-".repeat(108) + "\n" +
+            "  name:     " + appName + "\n" +
+            "  version:  " + versionStr + "\n" +
+            "  author:   " + author + "\n" +
+            "  build on: " + buildDate + "\n" +
+            "-".repeat(108) + "\n";
     }
 
     @Override
     public String getTail(Handler h) {
-        return
-            "------------------------------------------------------" +
-            "------------------------------------------------------\n";
+        return "-".repeat(108) + "\n";
     }
 }

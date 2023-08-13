@@ -40,8 +40,8 @@ import moba.server.utilities.exceptions.ErrorException;
 
 public class Systems extends MessageHandlerA {
     protected HardwareState status = HardwareState.ERROR;
-    protected MessageQueue msgQueue = null;
     protected MessageQueue msgQueue;
+    protected ActiveLayout activeLayout;
 
     protected boolean automaticMode = false;
 
