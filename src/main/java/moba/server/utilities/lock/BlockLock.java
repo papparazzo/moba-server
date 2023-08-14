@@ -175,7 +175,7 @@ public final class BlockLock extends AbstractLock {
                 long lockedBy = rs.getLong("locked");
                 long cnt = rs.getLong("cnt");
 
-                // more then 1 found: parts are locked and parts are unlocked
+                // more than 1 found: parts are locked and parts are unlocked
                 if(rs.next()) {
                     throw new ErrorException(ErrorId.DATASET_LOCKED, "object is locked");
                 }
