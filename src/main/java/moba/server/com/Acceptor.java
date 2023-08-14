@@ -59,9 +59,9 @@ public class Acceptor extends Thread implements Loggable {
         } catch(IOException e) {
             getLogger().log(Level.WARNING, "could not close server socket! <{0}>", new Object[]{e.toString()});
         } catch(InterruptedException e) {
-            getLogger().log(Level.WARNING, "InterruptedException occured! <{0}>", new Object[]{e.toString()});
+            getLogger().log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
         }
-        getLogger().info("Acceptor sucessfull stoped.");
+        getLogger().info("Acceptor successful stopped.");
     }
 
     @Override
@@ -82,7 +82,7 @@ public class Acceptor extends Thread implements Loggable {
                 }
             } while(!isinit && !isInterrupted());
 
-            getLogger().log(Level.INFO, "Succesfull bind on port <{0}>", new Object[]{serverport});
+            getLogger().log(Level.INFO, "Successful bind on port <{0}>", new Object[]{serverPort});
 
             while(!isInterrupted()) {
                 Socket socket = serverSocket.accept();
