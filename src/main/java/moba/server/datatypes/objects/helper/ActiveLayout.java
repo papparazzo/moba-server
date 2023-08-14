@@ -27,7 +27,6 @@ import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.LayoutMessage;
 import moba.server.utilities.config.Config;
-import moba.server.utilities.config.ConfigException;
 import moba.server.utilities.exceptions.ErrorException;
 
 public class ActiveLayout {
@@ -68,7 +67,7 @@ public class ActiveLayout {
             map.put("activeTrackLayoutId", activeLayout);
             config.setSection("trackLayout", map);
             config.writeFile();
-        } catch(ConfigException | IOException e) {
+        } catch(IOException e) {
             //dispatcher.dispatch(new Message(ClientMessage.ERROR, e.getErrorData(), msg.getEndpoint()));
             throw new ErrorException(ErrorId.UNKNOWN_ERROR, e.getMessage());
         }
