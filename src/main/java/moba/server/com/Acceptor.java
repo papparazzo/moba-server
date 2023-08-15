@@ -30,17 +30,16 @@ import moba.server.utilities.logger.Loggable;
 
 public class Acceptor extends Thread implements Loggable {
 
-    private MessageQueue in;
+    private ServerSocket       serverSocket = null;
+    private final MessageQueue in;
+    private final Dispatcher   dispatcher;
+    private final int          serverPort;
+    private final int          maxClients;
 
-    private ServerSocket serverSocket = null;
-    private Dispatcher   dispatcher;
-    private int          serverport;
-    private int          maxClients;
-
-    public Acceptor(MessageQueue in, Dispatcher dispatcher, int serverport, int maxClients) {
+    public Acceptor(MessageQueue in, Dispatcher dispatcher, int serverPort, int maxClients) {
         this.in         = in;
         this.dispatcher = dispatcher;
-        this.serverport = serverport;
+        this.serverPort = serverPort;
         this.maxClients = maxClients;
     }
 
@@ -67,20 +66,20 @@ public class Acceptor extends Thread implements Loggable {
     @Override
     public void run() {
         long    id = 0;
-        boolean isinit = false;
+        boolean isInit = false;
 
         getLogger().info("acceptor-thread started");
 
         try {
             do {
                 try {
-                    serverSocket = new ServerSocket(serverport);
-                    isinit = true;
+                    serverSocket = new ServerSocket(serverPort);
+                    isInit = true;
                 } catch(IOException e) {
-                    getLogger().log(Level.WARNING, "binding on port <{0}> failed! <{1}>", new Object[]{this.serverport, e.toString()});
+                    getLogger().log(Level.WARNING, "binding on port <{0}> failed! <{1}>", new Object[]{this.serverPort, e.toString()});
                     Thread.sleep(2500);
                 }
-            } while(!isinit && !isInterrupted());
+            } while(!isInit && !isInterrupted());
 
             getLogger().log(Level.INFO, "Successful bind on port <{0}>", new Object[]{serverPort});
 
