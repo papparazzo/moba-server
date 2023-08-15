@@ -32,8 +32,8 @@ import moba.server.utilities.exceptions.ErrorException;
 public class ActiveLayout {
 
     protected Long activeLayout;
-    protected Dispatcher dispatcher;
-    protected Config config;
+    protected final Dispatcher dispatcher;
+    protected final Config config;
 
     public ActiveLayout(Dispatcher dispatcher, Config config) {
         this.config = config;
