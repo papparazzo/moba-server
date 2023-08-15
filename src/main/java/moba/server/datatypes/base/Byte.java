@@ -22,7 +22,6 @@ package moba.server.datatypes.base;
 
 import java.io.IOException;
 
-import moba.server.json.JSONException;
 import moba.server.json.JSONToStringI;
 
 public class Byte implements JSONToStringI {
@@ -50,7 +49,7 @@ public class Byte implements JSONToStringI {
 
     @Override
     public String toJsonString(boolean formatted, int indent)
-    throws JSONException, IOException {
+    throws IOException {
         return String.valueOf(value);
     }
 }
