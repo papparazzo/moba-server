@@ -85,8 +85,7 @@ public class Config {
         return o;
     }
 
-    public void setSection(String section, Object val)
-    throws ConfigException {
+    public void setSection(String section, Object val) {
         if(content == null) {
             content = new HashMap<>();
         }
