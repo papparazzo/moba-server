@@ -26,8 +26,7 @@ import org.junit.Test;
 
 public class ByteTest {
     @Test
-    public void testConstructor()
-    throws Exception {
+    public void testConstructor() {
         Byte instance = new Byte();
         assertEquals(0, instance.getValue());
         instance = new Byte(5);
