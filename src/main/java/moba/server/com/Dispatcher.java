@@ -57,15 +57,13 @@ public class Dispatcher implements Loggable {
             }
         }
 
-        ArrayList<Long> grps = ep.getMsgGroups();
+        ArrayList<Long> msgGroups = ep.getMsgGroups();
 
-        if(grps.isEmpty()) {
+        if(msgGroups.isEmpty()) {
             addEndpointToGroup((long)-1, ep);
         }
 
-        grps.forEach((msgGroup) -> {
-            addEndpointToGroup(msgGroup, ep);
-        });
+        msgGroups.forEach((msgGroup) -> addEndpointToGroup(msgGroup, ep));
 
         allEndpoints.add(ep);
         return true;
