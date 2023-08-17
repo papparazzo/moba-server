@@ -70,7 +70,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
         this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
         this.dataInputStream  = new DataInputStream(socket.getInputStream());
 
-        setName("endpoint #" + String.valueOf(id));
+        setName("endpoint #" + id);
     }
 
     public void closeEndpoint() {
@@ -84,7 +84,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
 
     @Override
     public String toString() {
-        return String.valueOf(id) + ": " + socket.toString();
+        return id + ": " + socket.toString();
     }
 
     @Override
