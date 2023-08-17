@@ -73,7 +73,7 @@ public class Environment extends MessageHandlerA {
                     dispatcher.dispatch(msg);
                 }
                 default ->
-                    throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
+                    throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">.");
             }
         } catch(java.lang.ClassCastException | IOException | JSONException | ConfigException | NullPointerException | IllegalArgumentException e) {
             throw new ErrorException(ErrorId.FAULTY_MESSAGE, e.getMessage());
