@@ -41,7 +41,7 @@ public class Dispatcher implements Loggable {
     protected final Set<Endpoint> allEndpoints = new HashSet<>();
     protected final Map<Long, Set<Endpoint>> groupEP = new HashMap<>();
 
-    protected MessageLogger messageLogger;
+    protected final MessageLogger messageLogger;
 
     public Dispatcher(MessageLogger messageLogger) {
         this.messageLogger = messageLogger;
