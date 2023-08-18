@@ -54,7 +54,7 @@ public class Database {
             }
 
             default ->
-                throw new DatabaseException("unsuported connector-type");
+                throw new DatabaseException("unsupported connector-type");
         }
     }
 
