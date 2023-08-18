@@ -55,7 +55,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
     protected String   appName;
 
     protected ArrayList<Long>  msgGroups = new ArrayList<>();
-    protected PriorityBlockingQueue<Message> in = null;
+    protected PriorityBlockingQueue<Message> in;
 
     protected DataOutputStream dataOutputStream;
     protected DataInputStream  dataInputStream;
