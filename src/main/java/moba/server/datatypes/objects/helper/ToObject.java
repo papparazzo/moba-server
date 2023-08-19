@@ -20,7 +20,6 @@
 
 package moba.server.datatypes.objects.helper;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -31,7 +30,7 @@ import moba.server.json.JSONException;
 public class ToObject {
 
     protected void addObject(Object object, Map<String, Object> map)
-    throws IOException, JSONException {
+    throws JSONException {
 
         Class<?> cls = object.getClass();
 
@@ -59,7 +58,7 @@ public class ToObject {
                 continue;
             }
 
-            if(!methodName.startsWith("get") || methodName.length() <= 3) {
+            if(!methodName.startsWith("get") || methodName.length() < 4) {
                 continue;
             }
 
@@ -70,7 +69,7 @@ public class ToObject {
                 key.substring(1);
 
             try {
-                method.invoke((String)map.get(key));
+                method.invoke(map.get(key));
             } catch (IllegalAccessException | InvocationTargetException exception) {
                 throw new JSONException(
                     "error in invoking method <" + methodName + ">",
