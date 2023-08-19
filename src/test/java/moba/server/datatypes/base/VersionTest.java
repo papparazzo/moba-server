@@ -20,58 +20,52 @@
 
 package moba.server.datatypes.base;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class VersionTest {
     @Test
     public void testCompareMajor() {
-        Version v = null;
+        Version v = new Version();
         Version instance = new Version();
         int expResult = 0;
         int result = instance.compareMajor(v);
         assertEquals(expResult, result);
-        fail("The test case is a prototype.");
     }
 
     @Test
     public void testCompareMinor() {
-        Version v = null;
+        Version v = new Version();
         Version instance = new Version();
         int expResult = 0;
         int result = instance.compareMinor(v);
         assertEquals(expResult, result);
-        fail("The test case is a prototype.");
     }
 
     @Test
     public void testCompareTo() {
-        Object o = null;
+        Object o = new Version();
         Version instance = new Version();
         int expResult = 0;
         int result = instance.compareTo(o);
         assertEquals(expResult, result);
-        fail("The test case is a prototype.");
     }
 
     @Test
     public void testToString() {
         Version instance = new Version();
-        String expResult = "";
+        String expResult = "0.0.0-0000";
         String result = instance.toString();
         assertEquals(expResult, result);
-        fail("The test case is a prototype.");
     }
 
     @Test
     public void testToJsonString() {
-        boolean formated = false;
+        boolean formatted = false;
         int indent = 0;
         Version instance = new Version();
-        String expResult = "";
-        String result = instance.toJsonString(formated, indent);
+        String expResult = "\"0.0.0.0\"";
+        String result = instance.toJsonString(formatted, indent);
         assertEquals(expResult, result);
-        fail("The test case is a prototype.");
     }
 }
