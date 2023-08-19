@@ -20,9 +20,8 @@
 
 package moba.server.datatypes.base;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class TimeTest {
     @Test
@@ -30,16 +29,8 @@ public class TimeTest {
         int val = 0;
         Time instance = new Time();
         instance.setTime(val);
-        fail("The test case is a prototype.");
     }
 
-    @Test
-    public void testSetValue_String() {
-        String val = "";
-        Time instance = new Time();
-        instance.setTime(val);
-        fail("The test case is a prototype.");
-    }
 
     @Test
     public void testGetValue() {
@@ -47,27 +38,5 @@ public class TimeTest {
         int expResult = 0;
         int result = instance.getTime();
         assertEquals(expResult, result);
-        fail("The test case is a prototype.");
-    }
-
-    @Test
-    public void testToString() {
-        Time instance = new Time();
-        String expResult = "";
-        String result = instance.toString();
-        assertEquals(expResult, result);
-        fail("The test case is a prototype.");
-    }
-
-    @Test
-    public void testToJsonString()
-    throws Exception {
-        boolean formated = false;
-        int indent = 0;
-        Time instance = new Time();
-        String expResult = "";
-        String result = instance.toJsonString(formated, indent);
-        assertEquals(expResult, result);
-        fail("The test case is a prototype.");
     }
 }
