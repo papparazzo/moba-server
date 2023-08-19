@@ -90,7 +90,7 @@ public class Timer extends MessageHandlerA implements Runnable {
                 }
 
                 default -> 
-                    throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
+                    throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">.");
             }
         } catch(java.lang.ClassCastException | IOException | JSONException | ConfigException | NullPointerException e) {
             throw new ErrorException(ErrorId.FAULTY_MESSAGE, e.getMessage());
