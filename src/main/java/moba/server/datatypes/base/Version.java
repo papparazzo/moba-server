@@ -33,13 +33,6 @@ public class Version implements Comparable, JSONToStringI {
         this.major = -1;
     }
 
-    public Version(int major, int minor, int build, int patch) {
-        this.major = major;
-        this.minor = minor;
-        this.build = build;
-        this.patch = patch;
-    }
-
     public Version(String version)
     throws IllegalArgumentException {
 
@@ -132,11 +125,11 @@ public class Version implements Comparable, JSONToStringI {
             return "0.0.0-0000";
         }
         StringBuilder b = new StringBuilder();
-        b.append(String.valueOf(major));
+        b.append(major);
         b.append('.');
-        b.append(String.valueOf(minor));
+        b.append(minor);
         b.append('.');
-        b.append(String.valueOf(build));
+        b.append(build);
         b.append('-');
 
         if(patch < 10) {
@@ -146,7 +139,7 @@ public class Version implements Comparable, JSONToStringI {
         } else if(patch < 1000) {
             b.append("0");
         }
-        b.append(String.valueOf(patch));
+        b.append(patch);
         return b.toString();
     }
 
