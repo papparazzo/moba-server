@@ -23,8 +23,6 @@ package moba.server.json.streamwriter;
 import java.io.IOException;
 
 public interface JSONStreamWriterI {
-    void write(int i)
-    throws IOException;
 
     void write(char c)
     throws IOException;
