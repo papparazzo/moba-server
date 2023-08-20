@@ -20,22 +20,22 @@
 
 package moba.server.datatypes.base;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HashTest {
-    @Test(expected = IllegalArgumentException.class)
+
+    @Test
     public void testSetValue() {
         String val = "";
         Hash instance = new Hash();
-        instance.setValue(val);
+        assertThrows(IllegalArgumentException.class, () -> instance.setValue(val));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGetValueToShort() {
-        String expResult = "ABC";
-        new Hash(expResult);
+        assertThrows(IllegalArgumentException.class, () -> new Hash("ABC"));
     }
 
     @Test
