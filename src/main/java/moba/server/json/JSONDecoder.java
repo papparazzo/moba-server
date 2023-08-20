@@ -211,7 +211,7 @@ public class JSONDecoder {
         throw new JSONException("maximum string-length of <" + JSONDecoder.MAX_STRING_LENGTH + "> reached!");
     }
 
-    protected ArrayList nextArray()
+    protected ArrayList<Object> nextArray()
     throws JSONException, IOException {
         ArrayList<Object> arrayList = new ArrayList<>();
         reader.checkNext('[', !strict);
