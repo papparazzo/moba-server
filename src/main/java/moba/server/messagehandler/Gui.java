@@ -20,7 +20,6 @@
 
 package moba.server.messagehandler;
 
-import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
@@ -30,10 +29,6 @@ public class Gui extends MessageHandlerA {
     protected static final int GROUP_ID = 9;
 
     protected static final int SYSTEM_NOTICE = 1;
-
-    public Gui(Dispatcher dispatcher) {
-        this.dispatcher = dispatcher;
-    }
 
     @Override
     public int getGroupId() {
