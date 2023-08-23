@@ -114,7 +114,7 @@ public class JSONEncoder {
                 continue;
             }
 
-            if(!methodName.startsWith("get") || methodName.length() <= 3) {
+            if(!methodName.startsWith("get") || methodName.length() < 4) {
                 continue;
             }
 
