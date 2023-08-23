@@ -57,7 +57,7 @@ public class Timer extends MessageHandlerA implements Runnable {
         this.dispatcher = dispatcher;
         this.config = config;
         this.scheduler.scheduleWithFixedDelay(this, 1, 1, TimeUnit.SECONDS);
-        this.timerData = (GlobalTimerData)config.getSection("globaltimer.globaltimer");
+        this.timerData = (GlobalTimerData)config.getSection("globalTimer.globalTimer");
         if(timerData == null) {
             this.timerData = new GlobalTimerData();
         }
@@ -118,8 +118,8 @@ public class Timer extends MessageHandlerA implements Runnable {
     protected void storeData()
     throws ConfigException, IOException, JSONException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("globaltimer", timerData);
-        config.setSection("globaltimer", map);
+        map.put("globalTimer", timerData);
+        config.setSection("globalTimer", map);
         config.writeFile();
     }
 
