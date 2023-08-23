@@ -106,7 +106,7 @@ public class Message implements Comparable {
 
         sb.append(" >> ");
         if(data != null) {
-            sb.append(data.toString());
+            sb.append(data);
         }
 
         return sb.toString();
