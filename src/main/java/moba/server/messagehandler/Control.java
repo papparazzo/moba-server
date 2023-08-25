@@ -147,7 +147,7 @@ public class Control extends MessageHandlerA implements Loggable {
 
             ArrayList<BlockContactData> arraylist;
             ResultSet rs = pstmt.executeQuery();
-            arraylist = new ArrayList();
+            arraylist = new ArrayList<>();
             
             while(rs.next()) {
                 Integer trainId = rs.getInt("TrainId");
@@ -262,7 +262,7 @@ Integer	trainId
 
             ArrayList<SwitchStateData> arraylist;
             ResultSet rs = pstmt.executeQuery();
-            arraylist = new ArrayList();
+            arraylist = new ArrayList<>();
             while(rs.next()) {
                 arraylist.add(new SwitchStateData(
                     rs.getInt("Id"),
@@ -294,7 +294,7 @@ Integer	trainId
 
             ArrayList<TrainData> arraylist;
             ResultSet rs = pstmt.executeQuery();
-            arraylist = new ArrayList();
+            arraylist = new ArrayList<>();
             while(rs.next()) {
                 arraylist.add(new TrainData(
                     rs.getInt("Id"),
@@ -356,8 +356,7 @@ Integer	trainId
         dispatcher.dispatch(new Message(ControlMessage.PUSH_TRAIN, msg.getData()));
     }
 
-    protected void lockBlock(Message msg, boolean wait)
-    throws ErrorException {
+    protected void lockBlock(Message msg, boolean wait) {
         try {
             blockLock.tryLock(msg.getEndpoint().getAppId(), msg.getData());
             dispatcher.dispatch(new Message(ControlMessage.BLOCK_LOCKED, msg.getData(), msg.getEndpoint()));
