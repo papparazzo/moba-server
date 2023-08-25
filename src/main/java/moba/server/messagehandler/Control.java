@@ -57,7 +57,7 @@ public class Control extends MessageHandlerA implements Loggable {
         this.dispatcher = dispatcher;
         this.database   = database;
         this.blockLock  = new BlockLock(database);
-        //this.lock       = new TracklayoutLock(database);
+        //this.lock       = new TrackLayoutLock(database);
         this.queue      = new LinkedList<>();
         this.blockLock.resetAll();
         this.activeLayout = activeLayout;
