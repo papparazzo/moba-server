@@ -189,7 +189,7 @@ public class Control extends MessageHandlerA implements Loggable {
             pstmt.setLong(1, id);
             getLogger().log(Level.INFO, pstmt.toString());
             if(pstmt.executeUpdate() == 0) {
-                throw new ErrorException(ErrorId.DATASET_MISSING, "could not save <" + String.valueOf(id) + ">");
+                throw new ErrorException(ErrorId.DATASET_MISSING, "could not save <" + id + ">");
             }
         }
 
@@ -326,7 +326,7 @@ Integer	trainId
             pstmt.setLong(1, fromBlock);
             pstmt.setLong(2, trainId);
             if(pstmt.executeUpdate() != 1) {
-                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(trainId) + ">");
+                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + trainId + ">");
             }
         }
 
@@ -338,7 +338,7 @@ Integer	trainId
             pstmt.setLong(1, trainId);
             pstmt.setLong(2, toBlock);
             if(pstmt.executeUpdate() != 1) {
-                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(trainId) + ">");
+                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + trainId + ">");
             }
         }
 
@@ -350,7 +350,7 @@ Integer	trainId
             pstmt.setString(1, (String)data.get("direction"));
             pstmt.setLong(2, trainId);
             if(pstmt.executeUpdate() == 0) {
-                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(trainId) + ">");
+                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + trainId + ">");
             }
         }
         dispatcher.dispatch(new Message(ControlMessage.PUSH_TRAIN, msg.getData()));
