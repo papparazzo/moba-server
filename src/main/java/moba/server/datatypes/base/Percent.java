@@ -31,10 +31,6 @@ public class Percent implements JSONToStringI {
     public Percent() {
     }
 
-    public Percent(int val) {
-        setValue(val);
-    }
-
     public final void setValue(int val)
     throws IllegalArgumentException {
         if(val > 100 || val < 0) {
