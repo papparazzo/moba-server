@@ -30,7 +30,6 @@ public class PercentTest {
         int val = 0;
         Percent instance = new Percent();
         instance.setValue(val);
-        fail("The test case is a prototype.");
     }
 
     @Test
@@ -39,18 +38,16 @@ public class PercentTest {
         int expResult = 0;
         int result = instance.getValue();
         assertEquals(expResult, result);
-        fail("The test case is a prototype.");
     }
 
     @Test
     public void testToJsonString()
     throws Exception {
-        boolean formated = false;
+        boolean formatted = false;
         int indent = 0;
         Percent instance = new Percent();
-        String expResult = "";
-        String result = instance.toJsonString(formated, indent);
+        String expResult = "0";
+        String result = instance.toJsonString(formatted, indent);
         assertEquals(expResult, result);
-        fail("The test case is a prototype.");
     }
 }
