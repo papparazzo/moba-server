@@ -50,9 +50,9 @@ public class Server extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg)
     throws ErrorException {
-        ServerMessage smsg = ServerMessage.fromId(msg.getMessageId());
+        ServerMessage sMsg = ServerMessage.fromId(msg.getMessageId());
 
-        switch(smsg) {
+        switch(sMsg) {
             case INFO_REQ -> {
                 handleServerInfoReq(msg.getEndpoint());
                 return;
@@ -66,7 +66,7 @@ public class Server extends MessageHandlerA {
 
         checkForSameOrigin(msg.getEndpoint().getSocket().getInetAddress());
 
-        switch(smsg) {
+        switch(sMsg) {
             case RESET_CLIENT -> 
                 sendToClient(msg, ClientMessage.RESET);
 
