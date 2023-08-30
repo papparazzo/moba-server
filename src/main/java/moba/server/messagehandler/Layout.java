@@ -106,7 +106,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                     saveLayout(msg);
 
                 default -> 
-                    throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknow msg <" + Long.toString(msg.getMessageId()) + ">.");
+                    throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">.");
             }
         } catch(SQLException e) {
             throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
@@ -156,7 +156,7 @@ public class Layout extends MessageHandlerA implements Loggable {
             }
         }
         if(id == activeLayout.getActiveLayout()) {
-            // TODO: Check if automode
+            // TODO: Check if auto-mode
             activeLayout.setActiveLayout(-1);
         }
         dispatcher.dispatch(new Message(LayoutMessage.DELETE_LAYOUT, id));
@@ -188,7 +188,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                 rs.next();
                 int id = rs.getInt(1);
                 if(isActive) {
-                    // TODO: Check if automode
+                    // TODO: Check if auto-mode
                     activeLayout.setActiveLayout(id);
                 }
                 tl.setId(id);
@@ -214,18 +214,18 @@ public class Layout extends MessageHandlerA implements Loggable {
 
         String q = "UPDATE `TrackLayouts` SET `Name` = ?, `Description` = ?, `ModificationDate` = ? WHERE (`locked` IS NULL OR `locked` = ?) AND `id` = ? ";
 
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setString(1, tl.getName());
-            pstmt.setString(2, tl.getDescription());
-            pstmt.setDate(3, new java.sql.Date(tl.getModificationDate().getTime()));
-            pstmt.setLong(4, appId);
-            pstmt.setLong(5, id);
-            getLogger().log(Level.INFO, pstmt.toString());
-            if(pstmt.executeUpdate() == 0) {
-                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + String.valueOf(id) + ">");
+        try (PreparedStatement stmt = con.prepareStatement(q)) {
+            stmt.setString(1, tl.getName());
+            stmt.setString(2, tl.getDescription());
+            stmt.setDate(3, new java.sql.Date(tl.getModificationDate().getTime()));
+            stmt.setLong(4, appId);
+            stmt.setLong(5, id);
+            getLogger().log(Level.INFO, stmt.toString());
+            if(stmt.executeUpdate() == 0) {
+                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + id + ">");
             }
             if(active) {
-                // TODO: Check if automode
+                // TODO: Check if auto-mode
                 activeLayout.setActiveLayout(id);
             }
             dispatcher.dispatch(new Message(LayoutMessage.UPDATE_LAYOUT, tl));
@@ -261,13 +261,13 @@ public class Layout extends MessageHandlerA implements Loggable {
 
         String q = "SELECT `Id`, `XPos`, `YPos`, `Symbol` FROM `TrackLayoutSymbols` WHERE `TrackLayoutId` = ?";
 
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, id);
-            getLogger().log(Level.INFO, pstmt.toString());
+        try (PreparedStatement stmt = con.prepareStatement(q)) {
+            stmt.setLong(1, id);
+            getLogger().log(Level.INFO, stmt.toString());
 
             ArrayList<TrackLayoutSymbolData> arraylist;
-            ResultSet rs = pstmt.executeQuery();
-            arraylist = new ArrayList();
+            ResultSet rs = stmt.executeQuery();
+            arraylist = new ArrayList<>();
             while(rs.next()) {
                 arraylist.add(new TrackLayoutSymbolData(
                     rs.getLong("Id"),
