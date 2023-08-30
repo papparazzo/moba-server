@@ -6,4 +6,5 @@ build
 
 /nbproject/
 /.idea
-config.yaml
+/config.yaml
+/moba.db
