@@ -20,8 +20,6 @@
 
 package moba.server.json.streamwriter;
 
-import java.io.IOException;
-
 public class JSONStreamWriterStringBuilder implements JSONStreamWriterI {
     StringBuilder sb;
 
@@ -30,20 +28,12 @@ public class JSONStreamWriterStringBuilder implements JSONStreamWriterI {
     }
 
     @Override
-    public void write(int i)
-    throws IOException {
-        sb.append(i);
-    }
-
-    @Override
-    public void write(char c)
-    throws IOException {
+    public void write(char c) {
         sb.append(c);
     }
 
     @Override
-    public void write(String s)
-    throws IOException {
+    public void write(String s) {
         sb.append(s);
     }
 
@@ -53,8 +43,7 @@ public class JSONStreamWriterStringBuilder implements JSONStreamWriterI {
     }
 
     @Override
-    public void close()
-    throws IOException {
+    public void close() {
 
     }
 }
