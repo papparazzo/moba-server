@@ -100,7 +100,7 @@ public class Dispatcher implements Loggable {
         if(groupEP.containsKey(grpId)) {
             set = groupEP.get(grpId);
         } else {
-            set = new HashSet();
+            set = new HashSet<>();
         }
         set.add(ep);
         groupEP.put(grpId, set);
