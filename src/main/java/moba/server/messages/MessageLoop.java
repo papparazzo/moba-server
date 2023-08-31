@@ -49,10 +49,6 @@ public class MessageLoop implements Loggable {
         handlers.put(msgHandler.getGroupId(), msgHandler);
     }
 
-    public Set<Integer> getRegisteredHandlers() {
-        return handlers.keySet();
-    }
-
     public boolean loop(MessageQueue in)
     throws InterruptedException, ErrorException {
 
