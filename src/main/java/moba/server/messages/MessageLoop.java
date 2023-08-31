@@ -21,9 +21,7 @@
 package moba.server.messages;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 
 import moba.server.com.Dispatcher;
@@ -81,7 +79,7 @@ public class MessageLoop implements Loggable {
             }
 
             if(!handlers.containsKey(msg.getGroupId())) {
-                ErrorData err = new ErrorData(ErrorId.UNKNOWN_GROUP_ID, "handler for group <" + Integer.toString(msg.getGroupId()) + "> was not registered!");
+                ErrorData err = new ErrorData(ErrorId.UNKNOWN_GROUP_ID, "handler for group <" + msg.getGroupId() + "> was not registered!");
 
                 getLogger().log(Level.WARNING, err.toString());
 
