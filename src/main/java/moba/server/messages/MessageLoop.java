@@ -104,18 +104,14 @@ public class MessageLoop implements Loggable {
     }
 
     protected void resetHandler() {
-        dispatcher.getEndpoints().forEach((ep) -> {
-            dispatcher.dispatch(new Message(ClientMessage.RESET, null, ep));
-        });
+        dispatcher.getEndpoints().forEach((ep) -> dispatcher.dispatch(new Message(ClientMessage.RESET, null, ep)));
         for(Integer integer: handlers.keySet()) {
             handlers.get(integer).shutdown();
         }
     }
 
     protected void shutdownHandler() {
-        dispatcher.getEndpoints().forEach((ep) -> {
-            dispatcher.dispatch(new Message(ClientMessage.SHUTDOWN, null, ep));
-        });
+        dispatcher.getEndpoints().forEach((ep) -> dispatcher.dispatch(new Message(ClientMessage.SHUTDOWN, null, ep)));
         for(Integer integer: handlers.keySet()) {
             handlers.get(integer).shutdown();
         }
