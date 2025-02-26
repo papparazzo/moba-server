@@ -19,7 +19,9 @@
  */
 package moba.server.messages.messageType;
 
+import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.messages.MessageType;
+import moba.server.utilities.exceptions.ErrorException;
 
 public enum InternMessage implements MessageType {
     SERVER_SHUTDOWN       (1),
@@ -45,12 +47,13 @@ public enum InternMessage implements MessageType {
         return messageId;
     }
 
-    public static InternMessage fromId(int id) {
+    public static InternMessage fromId(int id)
+    throws ErrorException {
         for(InternMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }
         }
-        return null;
+        throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg [" + Long.toString(GROUP_ID) + ":" + Long.toString(id) + "].");
     }
 }
