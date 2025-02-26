@@ -31,15 +31,6 @@ public class Time {
         setTime(time);
     }
 
-    public Time(int hour, int minute)
-    throws IllegalArgumentException {
-        if(hour < 0 || hour > 24 || minute < 0 || minute > 59) {
-            throw new IllegalArgumentException();
-        }
-        time = hour * 60;
-        time += minute;
-    }
-
     public final void setTime(int time)
     throws IllegalArgumentException {
         if(time < 0 || time > ((60 * 24) - 1)) {
