@@ -27,9 +27,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 
-public class Database {
+public final class Database {
 
-    private Connection con = null;
+    private Connection connection = null;
 
     public enum ConnectorType {
         MARIADB_CONNECTOR
@@ -60,14 +60,10 @@ public class Database {
 
     private void connect(String url, String usr, String pwd)
     throws DatabaseException {
-
         try {
-            con = DriverManager.getConnection(url, usr, pwd);
+            connection = DriverManager.getConnection(url, usr, pwd);
         } catch(SQLException e) {
-            throw new DatabaseException(
-                "unable to connect url: <" + url + ">", 
-            e
-            );
+            throw new DatabaseException("unable to connect url: <" + url + ">", e);
         }
     }
 
@@ -78,6 +74,6 @@ public class Database {
     }
 
     public Connection getConnection() {
-        return con;
+        return connection;
     }
 }
