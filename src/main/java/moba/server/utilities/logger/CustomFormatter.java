@@ -30,12 +30,20 @@ public class CustomFormatter extends Formatter {
 
     private final String  appName;
     private final Version versionStr;
-    private final Date    buildDate;
+    private final String  buildDate;
+
+    private final String  author;
 
     public CustomFormatter(String appName, Version ver, Date buildDate) {
         this.appName = appName;
         versionStr = ver;
-        this.buildDate  = buildDate;
+        if(buildDate == null) {
+            this.buildDate = "-";
+        } else {
+            SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+            this.buildDate = df.format(buildDate);
+        }
+        this.author = "Stefan Paproth (Pappi-@gmx.de)";
     }
 
     @Override
