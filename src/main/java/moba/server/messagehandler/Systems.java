@@ -157,22 +157,12 @@ public class Systems extends MessageHandlerA {
 
     protected String getEmergencyStopReason(String reason) {
 
-        switch(EmergencyTriggerReason.valueOf(reason)) {
-            case CENTRAL_STATION:
-                return "Auslösegrund: Es wurde ein Nothalt durch die CentralStation ausgelöst";
-
-            case EXTERN:
-                return "Auslösegrund: Externe Hardware";
-
-            case SELF_ACTING_BY_EXTERN_SWITCHING:
-                return "Auslösegrund: Weichenstellung durch CS im Automatikmodus";
-
-            case SOFTWARE_MANUEL:
-                return "Auslösegrund: Manuell durch Steuerungssoftware";
-
-            default:
-                return "unbekannter Auslösegrund";
-        }
+        return switch(EmergencyTriggerReason.valueOf(reason)) {
+            case CENTRAL_STATION                 -> "Auslösegrund: Es wurde ein Nothalt durch die CentralStation ausgelöst";
+            case EXTERN                          -> "Auslösegrund: Externe Hardware";
+            case SELF_ACTING_BY_EXTERN_SWITCHING -> "Auslösegrund: Weichenstellung durch CS im Automatikmodus";
+            case SOFTWARE_MANUEL                 -> "Auslösegrund: Manuell durch Steuerungssoftware";
+        };
     }
 
     protected void releaseEmergencyStop(Message msg) {
