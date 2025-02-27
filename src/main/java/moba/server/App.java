@@ -46,7 +46,9 @@ public class App {
                 new Config(App.INI_FILE_NAME)
             );
         } catch(Exception e) {
+            //noinspection CallToPrintStackTrace
             e.printStackTrace();
+            System.err.println(e.getMessage());
             System.exit(1);
         } finally {
             System.exit(0);
