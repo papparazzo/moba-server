@@ -34,7 +34,7 @@ public class CustomFormatter extends Formatter {
 
     private final String  author;
 
-    public CustomFormatter(String appName, Version ver, Date buildDate) {
+    public CustomFormatter(String appName, Version ver, String author, Date buildDate) {
         this.appName = appName;
         versionStr = ver;
         if(buildDate == null) {
@@ -43,7 +43,7 @@ public class CustomFormatter extends Formatter {
             SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             this.buildDate = df.format(buildDate);
         }
-        this.author = "Stefan Paproth (Pappi-@gmx.de)";
+        this.author = author;
     }
 
     @Override
