@@ -32,6 +32,7 @@ public class App {
     protected static final String APP_NAME      = "appserver";
     protected static final String APP_DATE      = "13.05.2011";
     protected static final String APP_VERSION   = "1.0.0-0000";
+    protected static final String APP_AUTHOR    = "Stefan Paproth (Pappi-@gmx.de)";
 
     public static void main(String[] args) {
         ServerApplication app = new ServerApplication();
@@ -42,6 +43,7 @@ public class App {
             app.run(
                 App.APP_NAME,
                 new Version(App.APP_VERSION),
+                App.APP_AUTHOR,
                 formatter.parse(App.APP_DATE),
                 new Config(App.INI_FILE_NAME)
             );
