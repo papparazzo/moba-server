@@ -36,16 +36,18 @@ import moba.server.utilities.logger.MessageLogger;
 abstract public class Application {
     protected Version      appVer;
     protected String       appName;
+    protected String       author;
     protected Date         buildDate;
     protected long         startTime;
 
     protected Config       config = null;
     protected MessageQueue msgQueueIn = null;
 
-    public void run(String appName, Version appVer, Date date, Config config)
+    public void run(String appName, Version appVer, String author, Date date, Config config)
     throws Exception {
         this.appVer     = appVer;
         this.appName    = appName;
+        this.author     = author;
         this.startTime  = System.currentTimeMillis();
         this.buildDate  = date;
         this.config     = config;
@@ -85,13 +87,13 @@ abstract public class Application {
 
         if(logfile != null && !logfile.isEmpty()) {
             FileHandler fh = new FileHandler(logfile);
-            fh.setFormatter(new CustomFormatter(appName, appVer, buildDate));
+            fh.setFormatter(new CustomFormatter(appName, appVer, author, buildDate));
             fh.setLevel(level);
             logger.addHandler(fh);
         }
 
         ConsoleHandler ch = new ConsoleHandler();
-        ch.setFormatter(new CustomFormatter(appName, appVer, buildDate));
+        ch.setFormatter(new CustomFormatter(appName, appVer, author, buildDate));
         ch.setLevel(level);
         logger.addHandler(ch);
     }
