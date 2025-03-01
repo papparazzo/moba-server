@@ -289,7 +289,7 @@ public class Layout extends MessageHandlerA implements Loggable {
         long id = activeLayout.getActiveLayout(map.get("id"));
 
         if(!lock.isLockedByApp(msg.getEndpoint().getAppId(), id)) {
-            throw new ErrorException(ErrorId.DATASET_NOT_LOCKED, "layout <" + String.valueOf(id) + "> not locked");
+            throw new ErrorException(ErrorId.DATASET_NOT_LOCKED, "layout <" + id + "> not locked");
         }
 
         Connection con = database.getConnection();
@@ -300,7 +300,7 @@ public class Layout extends MessageHandlerA implements Loggable {
             pstmt.setLong(1, id);
             getLogger().log(Level.INFO, pstmt.toString());
             if(pstmt.executeUpdate() == 0) {
-                throw new ErrorException(ErrorId.DATASET_MISSING, "could not save <" + String.valueOf(id) + ">");
+                throw new ErrorException(ErrorId.DATASET_MISSING, "could not save <" + id + ">");
             }
         }
 
