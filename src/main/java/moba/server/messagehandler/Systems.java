@@ -37,6 +37,7 @@ import moba.server.messages.messageType.GuiMessage;
 import moba.server.messages.messageType.InternMessage;
 import moba.server.messages.messageType.SystemMessage;
 import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.lock.TrackLayoutLock;
 
 public class Systems extends MessageHandlerA {
     protected HardwareState status = HardwareState.ERROR;
@@ -44,15 +45,24 @@ public class Systems extends MessageHandlerA {
     protected ActiveLayout activeLayout;
 
     protected boolean automaticMode = false;
+    protected TrackLayoutLock lock;
 
-    public Systems(Dispatcher dispatcher, MessageQueue msgQueue) {
-        this.dispatcher = dispatcher;
-        this.msgQueue   = msgQueue;
+    public Systems(Dispatcher dispatcher, TrackLayoutLock lock, ActiveLayout activeLayout, MessageQueue msgQueue) {
+        this.dispatcher   = dispatcher;
+        this.msgQueue     = msgQueue;
+        this.activeLayout = activeLayout;
+        this.lock         = lock;
+        this.lock.resetAll();
     }
 
     @Override
     public int getGroupId() {
         return SystemMessage.GROUP_ID;
+    }
+
+    @Override
+    public void shutdown() {
+        lock.resetAll();
     }
 
     @Override
@@ -100,23 +110,31 @@ public class Systems extends MessageHandlerA {
         }
     }
 
-    protected void setAutomaticMode(Message msg) {
+    protected void setAutomaticMode(Message msg)
+    throws ErrorException {
         setAutomaticMode(msg, false);
     }
 
-    protected void setAutomaticMode(Message msg, boolean toggle) {
+    protected void setAutomaticMode(Message msg, boolean toggle)
+    throws ErrorException {
         if(status == HardwareState.ERROR || status == HardwareState.EMERGENCY_STOP || status == HardwareState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
 
         if(toggle) {
+            if(!automaticMode) {
+                lock.tryLock(0, activeLayout.getActiveLayout());
+            }
             automaticMode = !automaticMode;
         } else {
-            var setAutomaticMode = (boolean)msg.getData();
+            boolean setAutomaticMode = (boolean)msg.getData();
             if(setAutomaticMode && status == HardwareState.AUTOMATIC) {
                 sendErrorMessage(msg.getEndpoint());
                 return;
+            }
+            if(!setAutomaticMode) {
+                lock.tryLock(0, activeLayout.getActiveLayout());
             }
             automaticMode = setAutomaticMode;
         }
@@ -133,6 +151,8 @@ public class Systems extends MessageHandlerA {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
+
+        lock.resetOwn(0);
 
         msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
         dispatcher.dispatch(new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Automatik", "Automatikmodus wurde deaktiviert")));
