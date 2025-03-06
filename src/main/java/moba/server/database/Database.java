@@ -30,7 +30,9 @@ public final class Database {
     private Connection connection = null;
 
     public enum ConnectorType {
-        MARIADB_CONNECTOR
+        MARIADB_CONNECTOR,
+        MYSQL_CONNECTOR,
+        SQLITE_CONNECTOR
     }
 
     public Database(HashMap<String, Object> map)
@@ -42,18 +44,32 @@ public final class Database {
 
         switch(ConnectorType.valueOf((String)map.get("connectorType"))) {
             case MARIADB_CONNECTOR -> {
-                String url = 
-                    "jdbc:mariadb://" + (String)map.get("host") + 
-                    "/" + (String)map.get("db");
-                
+                String url = "jdbc:mariadb://" + map.get("host") + "/" + map.get("db");
                 String usr = (String)map.get("usr");
                 String pwd = (String)map.get("pwd");
                 connect(url, usr, pwd);
             }
 
+            case MYSQL_CONNECTOR -> {
+                String url = "jdbc:mysql://" + map.get("host") + "/" + map.get("db");
+                String usr = (String)map.get("usr");
+                String pwd = (String)map.get("pwd");
+                connect(url, usr, pwd);
+            }
+
+            case SQLITE_CONNECTOR -> {
+                String url = "jdbc:sqlite:" + map.get("db") + ".db";
+                connect(url);
+            }
+            
             default ->
                 throw new DatabaseException("unsupported connector-type");
         }
+    }
+
+    private void connect(String url)
+    throws DatabaseException {
+        connect(url, null, null);
     }
 
     private void connect(String url, String usr, String pwd)
