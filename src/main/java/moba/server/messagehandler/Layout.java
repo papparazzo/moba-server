@@ -152,7 +152,7 @@ public class Layout extends MessageHandlerA implements Loggable {
             pstmt.setLong(2, id);
             getLogger().log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
             if(pstmt.executeUpdate() == 0) {
-                throw new ErrorException(ErrorId.DATASET_MISSING, "could not delete <" + String.valueOf(id) + ">");
+                throw new ErrorException(ErrorId.DATASET_MISSING, "could not delete <" + id + ">");
             }
         }
         if(id == activeLayout.getActiveLayout()) {
