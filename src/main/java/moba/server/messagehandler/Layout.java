@@ -178,13 +178,13 @@ public class Layout extends MessageHandlerA implements Loggable {
 
         String q = "INSERT INTO `TrackLayouts` (`Name`, `Description`, `CreationDate`, `ModificationDate`, `Locked`) VALUES (?, ?, NOW(), NOW(), ?)";
 
-        try(PreparedStatement pstmt = con.prepareStatement(q, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            pstmt.setString(1, tl.getName());
-            pstmt.setString(2, tl.getDescription());
-            pstmt.setLong(3, currAppId);
-            pstmt.executeUpdate();
-            getLogger().log(Level.INFO, pstmt.toString());
-            try(ResultSet rs = pstmt.getGeneratedKeys()) {
+        try(PreparedStatement stmt = con.prepareStatement(q, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, tl.getName());
+            stmt.setString(2, tl.getDescription());
+            stmt.setLong(3, currAppId);
+            stmt.executeUpdate();
+            getLogger().log(Level.INFO, stmt.toString());
+            try(ResultSet rs = stmt.getGeneratedKeys()) {
                 rs.next();
                 int id = rs.getInt(1);
                 if(isActive) {
