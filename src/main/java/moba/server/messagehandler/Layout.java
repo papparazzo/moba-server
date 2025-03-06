@@ -20,6 +20,7 @@
 
 package moba.server.messagehandler;
 
+import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -121,8 +122,10 @@ public class Layout extends MessageHandlerA implements Loggable {
 
         ArrayList<TrackLayoutInfoData> arraylist;
         getLogger().log(Level.INFO, q);
-        try(ResultSet rs = database.query(q)) {
-            arraylist = new ArrayList();
+
+        try(Statement stmt = database.getConnection().createStatement()) {
+            ResultSet rs = stmt.executeQuery(q);
+            arraylist = new ArrayList<>();
             while(rs.next()) {
                 long id = rs.getLong("Id");
                 arraylist.add(new TrackLayoutInfoData(
