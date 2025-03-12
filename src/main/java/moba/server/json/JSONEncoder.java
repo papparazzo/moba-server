@@ -95,6 +95,7 @@ public class JSONEncoder {
         Class<?> cls = object.getClass();
 
         boolean firstIteration = true;
+        boolean handleRecord = cls.isRecord();
 
         Method[] methods = cls.getMethods();
         for(final Method method : methods) {
@@ -114,11 +115,11 @@ public class JSONEncoder {
                 continue;
             }
 
-            if(!methodName.startsWith("get") || methodName.length() < 4) {
+            if(!handleRecord && (!methodName.startsWith("get") || methodName.length() < 4)) {
                 continue;
             }
 
-            String key = methodName.substring(3);
+            String key = methodName.substring(handleRecord ? 0 : 3);
 
             key = 
                 key.substring(0, 1).toLowerCase(Locale.ROOT) +
