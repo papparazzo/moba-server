@@ -73,7 +73,7 @@ public class JSONEncoder {
     throws IOException, JSONException {
         writer.write('{');
         if(map != null) {
-            Iterator iter = map.entrySet().iterator();
+            Iterator<?> iter = map.entrySet().iterator();
             while(iter.hasNext()) {
                 Map.Entry entry = (Map.Entry)iter.next();
                 writer.write('"');
@@ -141,7 +141,6 @@ public class JSONEncoder {
         writer.write('}');
     }
 
-    @SuppressWarnings("unchecked")
     protected void addJSONValue(Object object)
     throws IOException, JSONException {
         if(object == null) {
@@ -251,7 +250,7 @@ public class JSONEncoder {
                 case '\r' -> writer.write("\\r");
 
                 default -> {
-                    if(c < '\u0020' || c >= '\u0080') {
+                    if(c < ' ' || c >= '\u0080') {
                         writer.write("\\u");
                         writer.write(Integer.toHexString(0x10000 | c).substring(1).toUpperCase());
                     } else {
@@ -292,7 +291,7 @@ public class JSONEncoder {
         }
 
         indent += indent * 4;
-        writer.write(System.getProperty("line.separator"));
+        writer.write(System.lineSeparator());
         for(int i = 0; i < indent; i++) {
             write(' ');
         }
