@@ -94,6 +94,7 @@ public class GlobalTimerData {
 
     public void fromJsonObject(Map<String, Object> map)
     throws ErrorException {
+        @SuppressWarnings("unchecked")
         var pt = (Map<String, Object>)map.get("modelTime");
 
         modelTime.setDay(Day.valueOf((String)pt.get("day")));
