@@ -22,32 +22,10 @@ package moba.server.datatypes.objects;
 
 import moba.server.datatypes.enumerations.DrivingDirection;
 
-public class PushTrainData {
-    protected int fromBlock;
-    protected int toBlock;
-    protected int trainId;
-    protected DrivingDirection direction;
-
-    public PushTrainData(int fromBlock, int toBlock, int trainId, DrivingDirection direction) {
-       this.fromBlock = fromBlock;
-       this.toBlock = toBlock;
-       this.trainId = trainId;
-       this.direction = direction;
-    }
-
-    public int getFromBlock() {
-        return fromBlock;
-    }
-
-    public int getToBlock() {
-        return toBlock;
-    }
-
-    public int getTrainId() {
-        return trainId;
-    }
-
-    public DrivingDirection getDirection() {
-        return direction;
-    }
+public record PushTrainData(
+    int fromBlock,
+    int toBlock,
+    int trainId,
+    DrivingDirection direction
+) {
 }
