@@ -41,7 +41,8 @@ public class Environment extends MessageHandlerA {
     protected final EnvironmentData environment = new EnvironmentData();
 
     @SuppressWarnings("unchecked")
-    public Environment(Dispatcher dispatcher, Config config) {
+    public Environment(Dispatcher dispatcher, Config config)
+    throws ErrorException {
         this.dispatcher = dispatcher;
         this.config = config;
         this.environment.fromJsonObject((Map<String, Object>)config.getSection("environment.environment"));

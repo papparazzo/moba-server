@@ -20,6 +20,9 @@
 
 package moba.server.datatypes.enumerations;
 
+import moba.server.datatypes.enumerations.helper.CheckedEnum;
+import moba.server.utilities.exceptions.ErrorException;
+
 public enum ThreeState {
     ON,
     OFF,
@@ -40,11 +43,9 @@ public enum ThreeState {
         return ThreeState.OFF;
     }
 
-    public static ThreeState getValue(String s, ThreeState def) {
-        ThreeState t = ThreeState.valueOf(s);
-        if(t == ThreeState.UNSET) {
-            return def;
-        }
-        return t;
+    public static ThreeState getValue(String s, ThreeState def)
+    throws ErrorException {
+        ThreeState t = CheckedEnum.getFromString(ThreeState.class, s);
+        return getValue(t, def);
     }
 }

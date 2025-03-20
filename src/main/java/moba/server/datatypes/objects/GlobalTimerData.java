@@ -24,6 +24,7 @@ import moba.server.datatypes.base.Time;
 import java.util.Map;
 import moba.server.datatypes.enumerations.Day;
 import moba.server.datatypes.enumerations.ErrorId;
+import moba.server.datatypes.enumerations.helper.CheckedEnum;
 import moba.server.utilities.exceptions.ErrorException;
 
 public class GlobalTimerData {
@@ -97,7 +98,7 @@ public class GlobalTimerData {
         @SuppressWarnings("unchecked")
         var pt = (Map<String, Object>)map.get("modelTime");
 
-        modelTime.setDay(Day.valueOf((String)pt.get("day")));
+        modelTime.setDay(CheckedEnum.getFromString(Day.class, (String)pt.get("day")));
         modelTime.setTime(((Long)pt.get("time")).intValue());
 
         setMultiplicator(((Long)map.get("multiplicator")).intValue());

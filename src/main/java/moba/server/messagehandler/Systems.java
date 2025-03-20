@@ -26,6 +26,7 @@ import moba.server.datatypes.enumerations.EmergencyTriggerReason;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.enumerations.NoticeType;
+import moba.server.datatypes.enumerations.helper.CheckedEnum;
 import moba.server.datatypes.objects.ErrorData;
 import moba.server.datatypes.objects.NoticeData;
 import moba.server.datatypes.objects.helper.ActiveLayout;
@@ -158,7 +159,8 @@ public class Systems extends MessageHandlerA {
         dispatcher.dispatch(new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Automatik", "Automatikmodus wurde deaktiviert")));
     }
 
-    protected void triggerEmergencyStop(Message msg) {
+    protected void triggerEmergencyStop(Message msg)
+    throws ErrorException {
         if(status == HardwareState.ERROR || status == HardwareState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
             return;
@@ -175,9 +177,9 @@ public class Systems extends MessageHandlerA {
         msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.EMERGENCY_STOP));
     }
 
-    protected String getEmergencyStopReason(String reason) {
-
-        return switch(EmergencyTriggerReason.valueOf(reason)) {
+    protected String getEmergencyStopReason(String reason)
+    throws ErrorException {
+        return switch(CheckedEnum.getFromString(EmergencyTriggerReason.class, reason)) {
             case CENTRAL_STATION                 -> "Auslösegrund: Es wurde ein Nothalt durch die CentralStation ausgelöst";
             case EXTERN                          -> "Auslösegrund: Externe Hardware";
             case SELF_ACTING_BY_EXTERN_SWITCHING -> "Auslösegrund: Weichenstellung durch CS im Automatikmodus";

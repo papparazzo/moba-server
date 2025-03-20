@@ -25,6 +25,7 @@ import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.Connectivity;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.enumerations.NoticeType;
+import moba.server.datatypes.enumerations.helper.CheckedEnum;
 import moba.server.datatypes.objects.NoticeData;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.messages.Message;
@@ -54,7 +55,7 @@ public class Interface extends MessageHandlerA {
     throws ErrorException {
         switch(InterfaceMessage.fromId(msg.getMessageId())) {
             case CONNECTIVITY_STATE_CHANGED:
-                setConnectivity(Connectivity.valueOf((String)msg.getData()));
+                setConnectivity(CheckedEnum.getFromString(Connectivity.class, (String)msg.getData()));
                 return;
 
             case CONTACT_TRIGGERED:

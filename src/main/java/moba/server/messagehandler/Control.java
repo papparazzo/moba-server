@@ -35,6 +35,7 @@ import moba.server.database.Database;
 import moba.server.datatypes.enumerations.DrivingDirection;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.SwitchStand;
+import moba.server.datatypes.enumerations.helper.CheckedEnum;
 import moba.server.datatypes.objects.BlockContactData;
 import moba.server.datatypes.objects.ContactData;
 import moba.server.datatypes.objects.SwitchStateData;
@@ -300,7 +301,7 @@ Integer	trainId
                     rs.getInt("Id"),
                     rs.getInt("Address"),
                     rs.getInt("Speed"),
-                    DrivingDirection.valueOf(rs.getString("DrivingDirection"))
+                    CheckedEnum.getFromString(DrivingDirection.class, rs.getString("DrivingDirection"))
                 ));
             }
             dispatcher.dispatch(new Message(ControlMessage.GET_TRAIN_LIST_RES, arraylist, msg.getEndpoint()));
