@@ -22,32 +22,10 @@ package moba.server.datatypes.objects;
 
 import moba.server.datatypes.enumerations.SwitchStand;
 
-public class SwitchStateData {
-    private final int         id;
-    private final int         xPos;
-    private final int         yPos;
-    private final SwitchStand switchStand;
-
-    public SwitchStateData(int id, int xPos, int yPos, SwitchStand switchStand) {
-        this.id   = id;
-        this.xPos = xPos;
-        this.yPos = yPos;
-        this.switchStand = switchStand;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public int getXPos() {
-        return xPos;
-    }
-
-    public int getYPos() {
-        return yPos;
-    }
-
-    public SwitchStand getSwitchStand() {
-        return switchStand;
-    }
+public record SwitchStateData(
+    int id,
+    int xPos,
+    int yPos,
+    SwitchStand switchStand
+) {
 }

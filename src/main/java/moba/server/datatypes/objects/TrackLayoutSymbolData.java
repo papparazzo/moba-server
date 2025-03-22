@@ -19,32 +19,10 @@
  */
 package moba.server.datatypes.objects;
 
-public class TrackLayoutSymbolData {
-    protected long    id;
-    protected long    symbol;
-    protected long    xPos;
-    protected long    yPos;
-
-    public TrackLayoutSymbolData(long id, long xPos, long yPos, long symbol) {
-        this.id      = id;
-        this.xPos   = xPos;
-        this.yPos   = yPos;
-        this.symbol = symbol;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public long getSymbol() {
-        return symbol;
-    }
-
-    public long getXPos() {
-        return xPos;
-    }
-
-    public long getYPos() {
-        return yPos;
-    }
+public record TrackLayoutSymbolData(
+    long id,
+    long xPos,
+    long yPos,
+    long symbol
+) {
 }
