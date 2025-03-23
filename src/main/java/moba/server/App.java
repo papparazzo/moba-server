@@ -30,8 +30,8 @@ import moba.server.application.ServerApplication;
 public class App {
     protected static final String INI_FILE_NAME = "config.yaml";
     protected static final String APP_NAME      = "moba-server";
-    protected static final String APP_DATE      = "22.03.2025";
-    protected static final String APP_VERSION   = "1.1.0-0000";
+    protected static final String APP_DATE      = "23.03.2025";
+    protected static final String APP_VERSION   = "1.2.0-0000";
     protected static final String APP_AUTHOR    = "Stefan Paproth (Pappi-@gmx.de)";
 
     public static void main(String[] args) {

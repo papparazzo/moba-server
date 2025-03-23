@@ -45,5 +45,5 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-version = "1.1.0-0000"
+version = "1.2.0-0000"
 
