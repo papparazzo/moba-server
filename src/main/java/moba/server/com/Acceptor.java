@@ -43,8 +43,11 @@ public class Acceptor extends Thread implements Loggable {
         this.maxClients = maxClients;
     }
 
-    public void startAcceptor() {
+    public void startAcceptor()
+    throws IOException {
         setName("acceptor");
+        serverSocket = new ServerSocket(serverPort);
+        getLogger().log(Level.INFO, "Successful bind on port <{0}>", new Object[]{serverPort});
         start();
     }
 
@@ -65,24 +68,11 @@ public class Acceptor extends Thread implements Loggable {
 
     @Override
     public void run() {
-        long    id = 0;
-        boolean isInit = false;
+        long id = 0;
 
         getLogger().info("acceptor-thread started");
 
         try {
-            do {
-                try {
-                    serverSocket = new ServerSocket(serverPort);
-                    isInit = true;
-                } catch(IOException e) {
-                    getLogger().log(Level.WARNING, "binding on port <{0}> failed! <{1}>", new Object[]{this.serverPort, e.toString()});
-                    Thread.sleep(2500);
-                }
-            } while(!isInit && !isInterrupted());
-
-            getLogger().log(Level.INFO, "Successful bind on port <{0}>", new Object[]{serverPort});
-
             while(!isInterrupted()) {
                 Socket socket = serverSocket.accept();
                 getLogger().log(Level.INFO, "new client <{0}> socket <{1}>", new Object[]{++id, socket.toString()});
@@ -93,7 +83,7 @@ public class Acceptor extends Thread implements Loggable {
                 }
                 (new Endpoint(id, socket, in)).start();
             }
-        } catch (InterruptedException | IOException e) {
+        } catch (IOException e) {
             getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
         }
         getLogger().info("acceptor-thread terminated");
