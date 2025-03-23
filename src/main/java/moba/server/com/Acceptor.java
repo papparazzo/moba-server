@@ -87,6 +87,7 @@ public class Acceptor extends Thread implements Loggable {
                 Socket socket = serverSocket.accept();
                 getLogger().log(Level.INFO, "new client <{0}> socket <{1}>", new Object[]{++id, socket.toString()});
                 if(dispatcher.getEndPointsCount() == maxClients) {
+                    socket.close();
                     getLogger().log(Level.SEVERE, "Max amount of clients <{0}> connected!", new Object[]{maxClients});
                     break;
                 }

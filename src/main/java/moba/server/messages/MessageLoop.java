@@ -79,7 +79,11 @@ public class MessageLoop implements Loggable {
             }
 
             if(!handlers.containsKey(msg.getGroupId())) {
-                ErrorData err = new ErrorData(ErrorId.UNKNOWN_GROUP_ID, "handler for group <" + msg.getGroupId() + "> was not registered!");
+                ErrorData err =
+                    new ErrorData(
+                        ErrorId.UNKNOWN_GROUP_ID,
+                        "handler for group <" + msg.getGroupId() + "> was not registered!"
+                    );
 
                 getLogger().log(Level.WARNING, err.toString());
 
