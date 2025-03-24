@@ -76,6 +76,11 @@ public class Acceptor extends Thread implements Loggable {
             while(!isInterrupted()) {
                 Socket socket = serverSocket.accept();
                 getLogger().log(Level.INFO, "new client <{0}> socket <{1}>", new Object[]{++id, socket.toString()});
+
+                if(!allowedOrigin(socket)) {
+                    socket.close();
+                    continue;
+                }
                 if(dispatcher.getEndPointsCount() == maxClients) {
                     socket.close();
                     getLogger().log(Level.SEVERE, "Max amount of clients <{0}> connected!", new Object[]{maxClients});
@@ -87,5 +92,11 @@ public class Acceptor extends Thread implements Loggable {
             getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
         }
         getLogger().info("acceptor-thread terminated");
+    }
+
+    private boolean allowedOrigin(Socket socket) {
+        // TODO: Implement a deny-list / allow-list
+        return true;
+        //return socket.getInetAddress().getHostAddress() == "Inet4Address.getLocalHost().getHostAddress()";
     }
 }
