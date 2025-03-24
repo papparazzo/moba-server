@@ -159,6 +159,9 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
             int msgId = dataInputStream.readInt();
             int size = dataInputStream.readInt();
 
+            // TODO: Add size-check...
+            //if (size > 4096) {
+
             byte[] buffer = new byte[size];
             int len = dataInputStream.read(buffer, 0, size);
 
@@ -183,7 +186,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
             ClientMessage.GROUP_ID != msg.getGroupId() ||
             ClientMessage.START.getMessageId() != msg.getMessageId()
         ) {
-            throw new IOException("first msg is neither CLIENT_START");
+            throw new IOException("first msg is not CLIENT_START");
         }
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         appName = (String)map.get("appName");
