@@ -119,11 +119,15 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
             while(!isInterrupted()) {
                 in.add(getNextMessage());
             }
-        } catch(IOException e) {
-            getLogger().log(Level.INFO, "Endpoint #{0}: IOException, closing client... <{1}>", new Object[]{id, e.toString()});
-            in.add(new Message(InternMessage.CLIENT_SHUTDOWN, null, this));
         } catch(NullPointerException e) {
-            // noop
+            // noop -> getNextMessage returns null, when closing is set to true.
+            //         That's lead to a NullPointerException in PriorityBlockingQueue.add()
+        } catch(Exception e) {
+            getLogger().log(Level.INFO, "Endpoint #{0}: Exception, closing client... <{1}>", new Object[]{id, e.toString()});
+            in.add(new Message(InternMessage.CLIENT_SHUTDOWN, null, this));
+        } catch(OutOfMemoryError e) {
+            getLogger().log(Level.SEVERE, "Endpoint #{0}: OutOfMemoryError <{1}>", new Object[]{id, e.toString()});
+            in.add(new Message(InternMessage.CLIENT_SHUTDOWN, null, this));
         }
         getLogger().log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
     }
@@ -153,7 +157,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
     }
 
     protected Message getNextMessage()
-    throws IOException {
+    throws IOException, JSONException {
         try {
             int groupId = dataInputStream.readInt();
             int msgId = dataInputStream.readInt();
@@ -172,15 +176,12 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
                 return null;
             }
             throw new IOException(e);
-        } catch(JSONException e) {
-            getLogger().log(Level.SEVERE, "Endpoint #{0}: JSONException <{1}>", new Object[]{id, e.toString()});
-            throw new IOException(e);
         }
     }
 
     @SuppressWarnings("unchecked")
     private void init()
-    throws IOException {
+    throws IOException, JSONException {
         Message msg = getNextMessage();
         if(
             ClientMessage.GROUP_ID != msg.getGroupId() ||
