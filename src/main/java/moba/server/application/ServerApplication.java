@@ -53,8 +53,8 @@ final public class ServerApplication {
     private final Date    buildDate;
     private final long    startTime;
 
-    private Config        config = null;
-    private MessageQueue  msgQueueIn = null;
+    private final Config        config;
+    private final MessageQueue  msgQueueIn;
 
     public ServerApplication(String appName, Version appVer, Date date, Config config) {
         this.appVer     = appVer;
@@ -91,9 +91,12 @@ final public class ServerApplication {
         try {
             boolean restart;
             maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
+            int port = (int)(long)config.getSection("common.serverConfig.port");
+            var allowList = (ArrayList<String>)config.getSection("common.serverConfig.allowedIPs");
+
             do {
                 Dispatcher dispatcher = new Dispatcher(new MessageLogger());
-                Acceptor acceptor = new Acceptor(msgQueueIn, dispatcher, (int)(long)config.getSection("common.serverConfig.port"), maxClients);
+                Acceptor acceptor = new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList);
                 Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
                 MessageLoop  loop = new MessageLoop(dispatcher);
                 ActiveLayout activeLayout = new ActiveLayout(dispatcher, config);

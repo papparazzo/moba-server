@@ -23,24 +23,30 @@ package moba.server.com;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 
 import moba.server.messages.MessageQueue;
 import moba.server.utilities.logger.Loggable;
 
-public class Acceptor extends Thread implements Loggable {
+final public class Acceptor extends Thread implements Loggable {
 
-    private ServerSocket       serverSocket = null;
-    private final MessageQueue in;
-    private final Dispatcher   dispatcher;
-    private final int          serverPort;
-    private final int          maxClients;
+    private ServerSocket            serverSocket = null;
+    private final MessageQueue      in;
+    private final Dispatcher        dispatcher;
+    private final int               serverPort;
+    private final int               maxClients;
+    private final ArrayList<String> allowList;
 
-    public Acceptor(MessageQueue in, Dispatcher dispatcher, int serverPort, int maxClients) {
+    public Acceptor(
+        MessageQueue in, Dispatcher dispatcher, int serverPort, int maxClients, ArrayList<String> allowList
+    ) {
         this.in         = in;
         this.dispatcher = dispatcher;
         this.serverPort = serverPort;
         this.maxClients = maxClients;
+        this.allowList  = allowList;
     }
 
     public void startAcceptor()
@@ -94,9 +100,23 @@ public class Acceptor extends Thread implements Loggable {
         getLogger().info("acceptor-thread terminated");
     }
 
-    private boolean allowedOrigin(Socket socket) {
-        // TODO: Implement a deny-list / allow-list
-        return true;
-        //return socket.getInetAddress().getHostAddress() == "Inet4Address.getLocalHost().getHostAddress()";
+    private boolean allowedOrigin(Socket socket)
+    throws UnknownHostException {
+        if(allowList.isEmpty()) {
+            getLogger().log(Level.WARNING, "allow-list is empty! No restricted access.");
+            return true;
+        }
+
+        var addr = socket.getInetAddress();
+        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) {
+            return true;
+        }
+
+        String address = addr.getHostAddress();
+        if(allowList.contains(address)) {
+            return true;
+        }
+        getLogger().log(Level.SEVERE, "access of ip-address <{0}> is forbidden!", new Object[]{address});
+        return false;
     }
 }
