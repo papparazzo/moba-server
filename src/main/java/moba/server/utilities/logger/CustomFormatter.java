@@ -32,9 +32,8 @@ public class CustomFormatter extends Formatter {
     private final Version versionStr;
     private final String  buildDate;
 
-    private final String  author;
 
-    public CustomFormatter(String appName, Version ver, String author, Date buildDate) {
+    public CustomFormatter(String appName, Version ver, Date buildDate) {
         this.appName = appName;
         versionStr = ver;
         if(buildDate == null) {
@@ -43,7 +42,6 @@ public class CustomFormatter extends Formatter {
             SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             this.buildDate = df.format(buildDate);
         }
-        this.author = author;
     }
 
     @Override
@@ -62,7 +60,7 @@ public class CustomFormatter extends Formatter {
         }
 
         if(record.getSourceMethodName() != null) {
-            sb.append(" ");
+            sb.append(".");
             sb.append(record.getSourceMethodName());
             sb.append("()");
         }
@@ -90,7 +88,6 @@ public class CustomFormatter extends Formatter {
             "-".repeat(108) + "\n" +
             "  name:     " + appName + "\n" +
             "  version:  " + versionStr + "\n" +
-            "  author:   " + author + "\n" +
             "  build on: " + buildDate + "\n" +
             "-".repeat(108) + "\n";
     }

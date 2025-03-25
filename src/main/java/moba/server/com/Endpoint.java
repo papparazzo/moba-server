@@ -163,9 +163,6 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
             int msgId = dataInputStream.readInt();
             int size = dataInputStream.readInt();
 
-            // TODO: Add size-check...
-            //if (size > 4096) {
-
             byte[] buffer = new byte[size];
             int len = dataInputStream.read(buffer, 0, size);
 
