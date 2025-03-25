@@ -20,12 +20,15 @@
 
 package moba.server.application;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import moba.server.com.Acceptor;
 import moba.server.com.Dispatcher;
 import moba.server.database.Database;
 import moba.server.database.DatabaseException;
+import moba.server.datatypes.base.Version;
 import moba.server.datatypes.objects.helper.ActiveLayout;
 import moba.server.messagehandler.Client;
 import moba.server.messagehandler.Control;
@@ -36,16 +39,54 @@ import moba.server.messagehandler.Layout;
 import moba.server.messagehandler.Server;
 import moba.server.messagehandler.Systems;
 import moba.server.messages.MessageLoop;
+import moba.server.messages.MessageQueue;
+import moba.server.utilities.config.Config;
 import moba.server.utilities.lock.TrackLayoutLock;
 import moba.server.utilities.logger.MessageLogger;
 
-public class ServerApplication extends Application {
+final public class ServerApplication {
 
-    protected int maxClients = -1;
+    private int           maxClients = -1;
 
-    @Override
+    private final Version appVer;
+    private final String  appName;
+    private final Date    buildDate;
+    private final long    startTime;
+
+    private Config        config = null;
+    private MessageQueue  msgQueueIn = null;
+
+    public ServerApplication(String appName, Version appVer, Date date, Config config) {
+        this.appVer     = appVer;
+        this.appName    = appName;
+        this.startTime  = System.currentTimeMillis();
+        this.buildDate  = date;
+        this.config     = config;
+        this.msgQueueIn = new MessageQueue(new MessageLogger());
+    }
+
+    public Version getVersion() {
+        return appVer;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public Date getBuildDate() {
+        return buildDate;
+    }
+
+    public int getMaxClients() {
+        return maxClients;
+    }
+
     @SuppressWarnings("unchecked")
-    protected void loop()
+    public void run()
     throws Exception {
         try {
             boolean restart;
@@ -74,9 +115,5 @@ public class ServerApplication extends Application {
         } catch(DatabaseException | InterruptedException e) {
             throw new Exception(e);
         }
-    }
-
-    public int getMaxClients() {
-        return maxClients;
     }
 }

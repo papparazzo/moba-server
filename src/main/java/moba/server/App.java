@@ -22,31 +22,35 @@ package moba.server;
 
 import moba.server.datatypes.base.Version;
 import moba.server.utilities.config.Config;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.TimeZone;
-import moba.server.application.ServerApplication;
+import java.util.logging.*;
 
-public class App {
-    protected static final String INI_FILE_NAME = "config.yaml";
-    protected static final String APP_NAME      = "moba-server";
-    protected static final String APP_DATE      = "23.03.2025";
-    protected static final String APP_VERSION   = "1.2.0-0000";
-    protected static final String APP_AUTHOR    = "Stefan Paproth (Pappi-@gmx.de)";
+import moba.server.application.ServerApplication;
+import moba.server.utilities.logger.CustomFormatter;
+
+final public class App {
+    private static final String APP_CONFIG  = "config.yaml";
+    private static final String APP_NAME    = "moba-server";
+    private static final String APP_DATE    = "23.03.2025";
+    private static final String APP_VERSION = "1.2.0-0000";
 
     public static void main(String[] args) {
-        ServerApplication app = new ServerApplication();
-
         try {
             TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
             DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-            app.run(
+            Version ver = new Version(App.APP_VERSION);
+            setUpLogger(ver, formatter.parse(App.APP_DATE));
+            ServerApplication app = new ServerApplication(
                 App.APP_NAME,
-                new Version(App.APP_VERSION),
-                App.APP_AUTHOR,
+                ver,
                 formatter.parse(App.APP_DATE),
-                new Config(App.INI_FILE_NAME)
+                new Config(App.APP_CONFIG)
             );
+            app.run();
         } catch(Exception e) {
             //noinspection CallToPrintStackTrace
             e.printStackTrace();
@@ -55,5 +59,18 @@ public class App {
         } finally {
             System.exit(0);
         }
+    }
+
+    private static void setUpLogger(Version ver, Date buildDate) {
+        Level level = Level.INFO;
+
+        Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+        logger.setUseParentHandlers(false);
+        logger.setLevel(level);
+
+        ConsoleHandler ch = new ConsoleHandler();
+        ch.setFormatter(new CustomFormatter(App.APP_NAME, ver, buildDate));
+        ch.setLevel(level);
+        logger.addHandler(ch);
     }
 }
