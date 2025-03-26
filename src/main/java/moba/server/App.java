@@ -36,7 +36,7 @@ final public class App {
     private static final String APP_CONFIG  = "config.yaml";
     private static final String APP_NAME    = "moba-server";
     private static final String APP_DATE    = "25.03.2025";
-    private static final String APP_VERSION = "1.3.0-0000";
+    private static final String APP_VERSION = "1.3.1-0000";
 
     public static void main(String[] args) {
         try {
