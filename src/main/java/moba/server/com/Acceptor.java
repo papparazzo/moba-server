@@ -102,7 +102,7 @@ final public class Acceptor extends Thread implements Loggable {
 
     private boolean allowedOrigin(Socket socket)
     throws UnknownHostException {
-        if(allowList.isEmpty()) {
+        if(allowList == null || allowList.isEmpty()) {
             getLogger().log(Level.WARNING, "allow-list is empty! No restricted access.");
             return true;
         }
