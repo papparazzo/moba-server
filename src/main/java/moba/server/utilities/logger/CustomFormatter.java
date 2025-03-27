@@ -32,7 +32,6 @@ public class CustomFormatter extends Formatter {
     private final Version versionStr;
     private final String  buildDate;
 
-
     public CustomFormatter(String appName, Version ver, Date buildDate) {
         this.appName = appName;
         versionStr = ver;
