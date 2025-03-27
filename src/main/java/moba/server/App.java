@@ -36,7 +36,7 @@ import org.apache.commons.cli.*;
 final public class App {
     private static final String APP_CONFIG  = "config.yaml";
     private static final String APP_NAME    = "moba-server";
-    private static final String APP_DATE    = "25.03.2025";
+    private static final String APP_DATE    = "2025-03-25";
     private static final String APP_VERSION = "1.3.1-0000";
 
     public static void main(String[] args) {
@@ -91,7 +91,7 @@ final public class App {
             }
 
             TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
-            DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             Version ver = new Version(App.APP_VERSION);
             setUpLogger(ver, formatter.parse(App.APP_DATE));
             ServerApplication app = new ServerApplication(
