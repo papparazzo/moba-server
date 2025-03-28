@@ -25,7 +25,7 @@ import java.util.Date;
 
 import moba.server.messages.Message;
 
-public class MessageLogger {
+final public class MessageLogger {
     public enum MessageType {
         IN_MESSAGE,
         OUT_MESSAGE,
@@ -44,7 +44,7 @@ public class MessageLogger {
         print(msg, MessageType.INTERN_MESSAGE);
     }
 
-    protected void print(Message msg, MessageType type) {
+    private void print(Message msg, MessageType type) {
         if(msg == null) {
             return;
         }
