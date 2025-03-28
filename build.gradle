@@ -26,6 +26,7 @@ dependencies {
     implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
     implementation 'org.yaml:snakeyaml:2.0'
     implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
+    implementation 'commons-cli:commons-cli:1.9.0'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
