@@ -21,27 +21,26 @@
 package moba.server.com;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 
 import moba.server.messages.MessageQueue;
+import moba.server.utilities.AllowList;
 import moba.server.utilities.logger.Loggable;
 
 final public class Acceptor extends Thread implements Loggable {
 
-    private ServerSocket            serverSocket = null;
-    private final MessageQueue      in;
-    private final Dispatcher        dispatcher;
-    private final int               serverPort;
-    private final int               maxClients;
-    private final ArrayList<String> allowList;
+    private ServerSocket       serverSocket = null;
+    private final MessageQueue in;
+    private final Dispatcher   dispatcher;
+    private final int          serverPort;
+    private final int          maxClients;
+    private final AllowList    allowList;
 
-    public Acceptor(
-        MessageQueue in, Dispatcher dispatcher, int serverPort, int maxClients, ArrayList<String> allowList
-    ) {
+    public Acceptor(MessageQueue in, Dispatcher dispatcher, int serverPort, int maxClients, AllowList allowList) {
         this.in         = in;
         this.dispatcher = dispatcher;
         this.serverPort = serverPort;
@@ -102,21 +101,12 @@ final public class Acceptor extends Thread implements Loggable {
 
     private boolean allowedOrigin(Socket socket)
     throws UnknownHostException {
-        if(allowList == null || allowList.isEmpty()) {
-            getLogger().log(Level.WARNING, "allow-list is empty! No restricted access.");
-            return true;
-        }
+        InetAddress addr = socket.getInetAddress();
 
-        var addr = socket.getInetAddress();
-        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) {
+        if(allowList.isAllowed(addr)) {
             return true;
         }
-
-        String address = addr.getHostAddress();
-        if(allowList.contains(address)) {
-            return true;
-        }
-        getLogger().log(Level.SEVERE, "access of ip-address <{0}> is forbidden!", new Object[]{address});
+        getLogger().log(Level.SEVERE, "access of ip <{0}> is forbidden!", new Object[]{addr});
         return false;
     }
 }

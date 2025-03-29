@@ -32,14 +32,17 @@ import moba.server.messages.MessageHandlerA;
 import moba.server.messages.MessageType;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.ServerMessage;
+import moba.server.utilities.AllowList;
 import moba.server.utilities.exceptions.ErrorException;
 
-public class Server extends MessageHandlerA {
-    protected ServerApplication app;
+final public class Server extends MessageHandlerA {
+    private final ServerApplication app;
+    private AllowList allowList;
 
-    public Server(Dispatcher dispatcher, ServerApplication app) {
+    public Server(Dispatcher dispatcher, ServerApplication app, AllowList allowList) {
         this.dispatcher = dispatcher;
         this.app = app;
+        this.allowList = allowList;
     }
 
     @Override

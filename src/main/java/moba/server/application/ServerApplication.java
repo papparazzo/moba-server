@@ -20,7 +20,6 @@
 
 package moba.server.application;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -40,6 +39,7 @@ import moba.server.messagehandler.Server;
 import moba.server.messagehandler.Systems;
 import moba.server.messages.MessageLoop;
 import moba.server.messages.MessageQueue;
+import moba.server.utilities.AllowList;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.lock.TrackLayoutLock;
 import moba.server.utilities.logger.MessageLogger;
@@ -92,8 +92,7 @@ final public class ServerApplication {
             boolean restart;
             maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
             int port = (int)(long)config.getSection("common.serverConfig.port");
-            var allowList = (ArrayList<String>)config.getSection("common.serverConfig.allowedIPs");
-
+            AllowList allowList = new AllowList(maxClients);
             do {
                 Dispatcher dispatcher = new Dispatcher(new MessageLogger());
                 Acceptor acceptor = new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList);
@@ -103,7 +102,7 @@ final public class ServerApplication {
                 TrackLayoutLock lock = new TrackLayoutLock(database);
 
                 loop.addHandler(new Client(dispatcher));
-                loop.addHandler(new Server(dispatcher, this));
+                loop.addHandler(new Server(dispatcher, this, allowList));
                 loop.addHandler(new Timer(dispatcher, config));
                 loop.addHandler(new Environment(dispatcher, config));
                 loop.addHandler(new Systems(dispatcher, lock, activeLayout, msgQueueIn));
