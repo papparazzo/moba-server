@@ -51,7 +51,7 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-version = "1.4.0-0000"
+version = "1.5.0-0000"
 
 jar {
     manifest {

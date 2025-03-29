@@ -21,10 +21,9 @@
 package moba.server;
 
 import moba.server.datatypes.base.Version;
+import moba.server.utilities.ManifestReader;
 import moba.server.utilities.config.Config;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.logging.*;
@@ -36,30 +35,32 @@ import org.apache.commons.cli.*;
 final public class App {
     private static final String APP_CONFIG  = "config.yaml";
     private static final String APP_NAME    = "moba-server";
-    private static final String APP_DATE    = "2025-03-25";
-    private static final String APP_VERSION = "1.4.0-0000";
 
     public static void main(String[] args) {
         try {
+            ManifestReader manifest = new ManifestReader(App.class);
             CommandLineParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(getOptions(), args);
+
+            String appName = manifest.getAppName();
+            Version appVersion = manifest.getVersion();
+            Date buildDate = manifest.getBuildDate();
+
             if(cmd.hasOption("h")) {
-                printHelp();
+                printHelp(appName);
                 System.exit(0);
             }
             if(cmd.hasOption("v")) {
-                printInfo();
+                printInfo(appName, appVersion, buildDate);
                 System.exit(0);
             }
 
             TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            Version ver = new Version(App.APP_VERSION);
-            setUpLogger(ver, formatter.parse(App.APP_DATE));
+            setUpLogger(appName, appVersion, buildDate);
             ServerApplication app = new ServerApplication(
-                App.APP_NAME,
-                ver,
-                formatter.parse(App.APP_DATE),
+                appName,
+                appVersion,
+                buildDate,
                 new Config(cmd.getOptionValue("c", App.APP_CONFIG))
             );
             app.run();
@@ -76,7 +77,7 @@ final public class App {
         }
     }
 
-    private static void setUpLogger(Version ver, Date buildDate) {
+    private static void setUpLogger(String appName, Version ver, Date buildDate) {
         Level level = Level.INFO;
 
         Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -84,7 +85,7 @@ final public class App {
         logger.setLevel(level);
 
         ConsoleHandler ch = new ConsoleHandler();
-        ch.setFormatter(new CustomFormatter(App.APP_NAME, ver, buildDate));
+        ch.setFormatter(new CustomFormatter(appName, ver, buildDate));
         ch.setLevel(level);
         logger.addHandler(ch);
     }
@@ -97,9 +98,9 @@ final public class App {
             addOption("v", "version", false, "print version");
     }
 
-    private static void printInfo() {
+    private static void printInfo(String appName, Version appVersion, Date buildDate) {
         String header =
-            App.APP_NAME + " " + App.APP_VERSION + " (build on " + App.APP_DATE + ")" +
+            appName + " " + appVersion.toString() + " (build on " + buildDate + ")" +
             System.lineSeparator() + System.lineSeparator() +
            "Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>" + System.lineSeparator() +
            System.lineSeparator() +
@@ -114,12 +115,12 @@ final public class App {
            "GNU Affero General Public License for more details." + System.lineSeparator() +
            System.lineSeparator() +
            "You should have received a copy of the GNU Affero General Public License" + System.lineSeparator() +
-           "along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.";
+           "along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.";
         System.err.println(header);
     }
 
-    private static void printHelp() {
+    private static void printHelp(String appName) {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp( App.APP_NAME + " [OPTION]", System.lineSeparator(), getOptions(), "");
+        formatter.printHelp( appName + " [OPTION]", System.lineSeparator(), getOptions(), "");
     }
 }
