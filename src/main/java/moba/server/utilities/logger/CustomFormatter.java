@@ -14,7 +14,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
+ *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
 
@@ -29,25 +29,20 @@ import java.util.Date;
 public class CustomFormatter extends Formatter {
 
     private final String  appName;
-    private final Version versionStr;
-    private final String  buildDate;
+    private final Version appVersion;
+    private final Date    buildDate;
 
-    public CustomFormatter(String appName, Version ver, Date buildDate) {
+    public CustomFormatter(String appName, Version appVersion, Date buildDate) {
         this.appName = appName;
-        versionStr = ver;
-        if(buildDate == null) {
-            this.buildDate = "-";
-        } else {
-            SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-            this.buildDate = df.format(buildDate);
-        }
+        this.appVersion = appVersion;
+        this.buildDate = buildDate;
     }
 
     @Override
     public synchronized String format(LogRecord record) {
         StringBuilder sb = new StringBuilder();
 
-        SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS ");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSS ");
         sb.append(df.format(new Date()));
         sb.append(record.getLevel().getLocalizedName());
         sb.append(" ");
@@ -86,7 +81,7 @@ public class CustomFormatter extends Formatter {
         return
             "-".repeat(108) + "\n" +
             "  name:     " + appName + "\n" +
-            "  version:  " + versionStr + "\n" +
+            "  version:  " + appVersion + "\n" +
             "  build on: " + buildDate + "\n" +
             "-".repeat(108) + "\n";
     }

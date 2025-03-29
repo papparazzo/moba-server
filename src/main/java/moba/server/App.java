@@ -14,7 +14,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
+ *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
 
@@ -40,44 +40,6 @@ final public class App {
     private static final String APP_VERSION = "1.4.0-0000";
 
     public static void main(String[] args) {
-/*
-        //try {
-             Enumeration<URL> resources = App.class.getClassLoader()
-   .getResources("META-INF/MANIFEST.MF");
-
-             while (resources.hasMoreElements()) {
-     try {
-       Manifest manifest = new Manifest(resources.nextElement().openStream());
-                   Attributes mainAttributes = manifest.getMainAttributes();
-            String implVersion = mainAttributes.getValue("Built-By");
-
-            System.out.println(implVersion);
-
-
-       // If the line above leads to <null> manifest Attributes try from JarInputStream:
-       // Manifest manifest = resources.nextElement().openStream().getManifest();
-
-       // check that this is your manifest and do what you need or get the next one
-
-     } catch (IOException E) {
-       // handle
-     }
- }
-
-
-
-                     URLClassLoader cl = (URLClassLoader) App.class.getClassLoader();
-            URL url = cl.findResource("META-INF/MANIFEST.MF");
-            Manifest manifest = new Manifest(url.openStream());
-            Attributes mainAttributes = manifest.getMainAttributes();
-            String implVersion = mainAttributes.getValue("Implementation-Version");
-
-            System.out.println(implVersion);
-        } catch (IOException E) {
-            // handle
-        }
-*/
-
         try {
             CommandLineParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(getOptions(), args);
