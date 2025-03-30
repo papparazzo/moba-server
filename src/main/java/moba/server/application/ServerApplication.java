@@ -41,6 +41,7 @@ import moba.server.messagehandler.Systems;
 import moba.server.messages.MessageLoop;
 import moba.server.messages.MessageQueue;
 import moba.server.utilities.AllowList;
+import moba.server.com.IPC;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.lock.TrackLayoutLock;
 import moba.server.utilities.logger.MessageLogger;
@@ -103,6 +104,7 @@ final public class ServerApplication {
 
                 BackgroundHandlerComposite handler = new BackgroundHandlerComposite();
                 handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList));
+                handler.add(new IPC("/tmp/moba-fifo", msgQueueIn));
 
                 loop.addHandler(new Client(dispatcher));
                 loop.addHandler(new Server(dispatcher, this, allowList));

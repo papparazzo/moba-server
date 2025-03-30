@@ -25,14 +25,17 @@ import moba.server.messages.MessageType;
 import moba.server.utilities.exceptions.ErrorException;
 
 public enum ServerMessage implements MessageType {
-    NEW_CLIENT_STARTED (1),
-    CLIENT_CLOSED      (2),
-    RESET_CLIENT       (3),
-    INFO_REQ           (4),
-    INFO_RES           (5),
-    CON_CLIENTS_REQ    (6),
-    CON_CLIENTS_RES    (7),
-    SELF_TESTING_CLIENT(8);
+    NEW_CLIENT_STARTED   (1),
+    CLIENT_CLOSED        (2),
+    RESET_CLIENT         (3),
+    INFO_REQ             (4),
+    INFO_RES             (5),
+    CON_CLIENTS_REQ      (6),
+    CON_CLIENTS_RES      (7),
+    SELF_TESTING_CLIENT  (8),
+    ADD_ALLOWED_IP       (9),
+    GET_ALLOWED_IP_LIST  (10),
+    SET_ALLOWED_IP_LIST  (11);
 
     public final static int GROUP_ID = 3;
 

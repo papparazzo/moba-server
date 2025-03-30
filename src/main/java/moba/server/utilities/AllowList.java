@@ -23,18 +23,40 @@ package moba.server.utilities;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 
-public class AllowList {
+final public class AllowList {
 
     private final CircularFifoQueue<InetAddress> allowList;
 
-    public AllowList(int maxEntries)
-    throws InterruptedException {
+    public AllowList(int maxEntries, ArrayList<String> allowed)
+    throws InterruptedException, UnknownHostException {
         allowList = new CircularFifoQueue<>(maxEntries);
+        for(String addr: allowed) {
+            add(addr);
+        }
     }
 
-    public synchronized void clear() {
+    public ArrayList<String> getList() {
+        ArrayList<String> list = new ArrayList<>(allowList.size());
+        for(InetAddress addr: allowList) {
+            list.add(addr.getHostAddress());
+        }
+        return list;
+    }
+
+    public synchronized void setList(ArrayList<String> list)
+    throws UnknownHostException {
         allowList.clear();
+        for(String addr: list) {
+            add(addr);
+        }
+    }
+
+    public synchronized boolean add(String address)
+    throws UnknownHostException {
+        return add(InetAddress.getByName(address));
     }
 
     public synchronized boolean add(InetAddress ip) {
