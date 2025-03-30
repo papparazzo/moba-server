@@ -48,6 +48,6 @@ public class Gui extends MessageHandlerA {
     }
 
     public void sendSystemNotice(Message msg) {
-        dispatcher.dispatch(new Message(GROUP_ID, SYSTEM_NOTICE, msg.getData()));
+        dispatcher.broadcast(new Message(GROUP_ID, SYSTEM_NOTICE, msg.getData()));
     }
 }

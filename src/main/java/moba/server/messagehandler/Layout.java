@@ -139,7 +139,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                 ));
             }
         }
-        dispatcher.dispatch(new Message(LayoutMessage.GET_LAYOUTS_RES, arraylist, msg.getEndpoint()));
+        dispatcher.send(new Message(LayoutMessage.GET_LAYOUTS_RES, arraylist), msg.getEndpoint());
     }
 
     protected void deleteLayout(Message msg)
@@ -162,7 +162,7 @@ public class Layout extends MessageHandlerA implements Loggable {
             // TODO: Check if auto-mode
             activeLayout.setActiveLayout(-1);
         }
-        dispatcher.dispatch(new Message(LayoutMessage.DELETE_LAYOUT, id));
+        dispatcher.broadcast(new Message(LayoutMessage.DELETE_LAYOUT, id));
     }
 
     @SuppressWarnings("unchecked")
@@ -197,7 +197,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                 tl.setId(id);
             }
         }
-        dispatcher.dispatch(new Message(LayoutMessage.CREATE_LAYOUT, tl));
+        dispatcher.broadcast(new Message(LayoutMessage.CREATE_LAYOUT, tl));
     }
 
     @SuppressWarnings("unchecked")
@@ -231,7 +231,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                 // TODO: Check if auto-mode
                 activeLayout.setActiveLayout(id);
             }
-            dispatcher.dispatch(new Message(LayoutMessage.UPDATE_LAYOUT, tl));
+            dispatcher.broadcast(new Message(LayoutMessage.UPDATE_LAYOUT, tl));
         }
     }
 
@@ -239,14 +239,14 @@ public class Layout extends MessageHandlerA implements Loggable {
     throws ErrorException {
         long id = activeLayout.getActiveLayout(msg.getData());
         lock.unlock(msg.getEndpoint().getAppId(), id);
-        dispatcher.dispatch(new Message(LayoutMessage.UNLOCK_LAYOUT, id));
+        dispatcher.broadcast(new Message(LayoutMessage.UNLOCK_LAYOUT, id));
     }
 
     protected void lockLayout(Message msg)
     throws ErrorException {
         long id = activeLayout.getActiveLayout(msg.getData());
         lock.tryLock(msg.getEndpoint().getAppId(), id);
-        dispatcher.dispatch(new Message(LayoutMessage.LOCK_LAYOUT, id));
+        dispatcher.broadcast(new Message(LayoutMessage.LOCK_LAYOUT, id));
     }
 
     protected void getLayout(Message msg, boolean tryLock)
@@ -280,7 +280,7 @@ public class Layout extends MessageHandlerA implements Loggable {
                 ));
             }
             map.put("symbols", arraylist);
-            dispatcher.dispatch(new Message(LayoutMessage.GET_LAYOUT_RES, map, msg.getEndpoint()));
+            dispatcher.send(new Message(LayoutMessage.GET_LAYOUT_RES, map), msg.getEndpoint());
         }
     }
 
@@ -339,7 +339,7 @@ public class Layout extends MessageHandlerA implements Loggable {
             }
         }
 
-        dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_CHANGED, id));
+        dispatcher.broadcast(new Message(LayoutMessage.LAYOUT_CHANGED, id));
     }
 
     protected Date getCreationDate(long id)

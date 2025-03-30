@@ -95,7 +95,7 @@ public class Systems extends MessageHandlerA {
                 break;
 
             case GET_HARDWARE_STATE:
-                dispatcher.dispatch(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString(), msg.getEndpoint()));
+                dispatcher.send(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString()), msg.getEndpoint());
                 break;
 
             case HARDWARE_SHUTDOWN:
@@ -142,8 +142,15 @@ public class Systems extends MessageHandlerA {
 
         if(automaticMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
-            dispatcher.dispatch(
-                new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Automatik", "Die Hardware befindet sich im Automatikmodus"))
+            dispatcher.broadcast(
+                new Message(
+                    GuiMessage.SYSTEM_NOTICE,
+                    new NoticeData(
+                        NoticeType.INFO,
+                        "Automatik",
+                        "Die Hardware befindet sich im Automatikmodus"
+                    )
+                )
             );
             return;
         }
@@ -156,7 +163,12 @@ public class Systems extends MessageHandlerA {
         lock.resetOwn(0);
 
         msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
-        dispatcher.dispatch(new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Automatik", "Automatikmodus wurde deaktiviert")));
+        dispatcher.broadcast(
+            new Message(
+                GuiMessage.SYSTEM_NOTICE,
+                new NoticeData(NoticeType.INFO, "Automatik", "Automatikmodus wurde deaktiviert")
+            )
+        );
     }
 
     protected void triggerEmergencyStop(Message msg)
@@ -171,8 +183,15 @@ public class Systems extends MessageHandlerA {
             return;
         }
 
-        dispatcher.dispatch(
-            new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.WARNING, "Nothalt gedrückt", getEmergencyStopReason((String)msg.getData())))
+        dispatcher.broadcast(
+            new Message(
+                GuiMessage.SYSTEM_NOTICE,
+                new NoticeData(
+                    NoticeType.WARNING,
+                    "Nothalt gedrückt",
+                    getEmergencyStopReason((String)msg.getData())
+                )
+            )
         );
         msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.EMERGENCY_STOP));
     }
@@ -198,7 +217,13 @@ public class Systems extends MessageHandlerA {
             return;
         }
 
-        dispatcher.dispatch(new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Nothaltfreigabe", "Der Nothalt wurde wieder freigegeben")));
+        dispatcher.broadcast(
+            new Message(
+                GuiMessage.SYSTEM_NOTICE,
+                new NoticeData(NoticeType.INFO, "Nothaltfreigabe", "Der Nothalt wurde wieder freigegeben")
+            )
+        );
+
         if(automaticMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
         } else {
@@ -230,8 +255,11 @@ public class Systems extends MessageHandlerA {
         }
 
         if(setStandByMode) {
-            dispatcher.dispatch(
-                new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Standby", "Anlage wird in den Standby-Modus geschickt"))
+            dispatcher.broadcast(
+                new Message(
+                    GuiMessage.SYSTEM_NOTICE,
+                    new NoticeData(NoticeType.INFO, "Standby", "Anlage wird in den Standby-Modus geschickt")
+                )
             );
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.STANDBY));
             return;
@@ -242,7 +270,12 @@ public class Systems extends MessageHandlerA {
             return;
         }
 
-        dispatcher.dispatch(new Message(GuiMessage.SYSTEM_NOTICE, new NoticeData(NoticeType.INFO, "Standby", "Die Anlage wird aus dem Standby-Modus geholt")));
+        dispatcher.broadcast(
+            new Message(
+                GuiMessage.SYSTEM_NOTICE,
+                new NoticeData(NoticeType.INFO, "Standby", "Die Anlage wird aus dem Standby-Modus geholt")
+            )
+        );
         if(automaticMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
         } else {
@@ -251,14 +284,21 @@ public class Systems extends MessageHandlerA {
     }
 
     protected void sendErrorMessage(Endpoint endpoint) {
-        dispatcher.dispatch(
-            new Message(ClientMessage.ERROR, new ErrorData(ErrorId.INVALID_STATUS_CHANGE, "Current state is <" + status.toString() + ">"), endpoint)
+        dispatcher.send(
+            new Message(
+                ClientMessage.ERROR,
+                new ErrorData(
+                    ErrorId.INVALID_STATUS_CHANGE,
+                    "Current state is <" + status.toString() + ">"
+                )
+            ),
+            endpoint
         );
     }
 
     @Override
     public void hardwareStateChanged(HardwareState state) {
         status = state;
-        dispatcher.dispatch(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString()));
+        dispatcher.broadcast(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString()));
     }
 }

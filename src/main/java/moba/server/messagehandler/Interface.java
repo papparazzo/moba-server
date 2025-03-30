@@ -65,12 +65,13 @@ public class Interface extends MessageHandlerA {
             case SET_LOCO_DIRECTION:
             case SET_LOCO_FUNCTION:
             case SWITCH_ACCESSORY_DECODERS:
-                msg.convertToBroadCastMessage();
-                dispatcher.dispatch(msg);
+                dispatcher.broadcast(msg);
                 return;
 
             default:
-                throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">.");
+                throw new ErrorException(
+                    ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">."
+                );
         }
     }
 
@@ -78,20 +79,28 @@ public class Interface extends MessageHandlerA {
         switch(connectivity) {
             case CONNECTED:
                 msgQueueIn.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
-                dispatcher.dispatch(
+                dispatcher.broadcast(
                     new Message(
                         GuiMessage.SYSTEM_NOTICE,
-                        new NoticeData(NoticeType.INFO, "Hardwareverbindung", "Die Verbindung zur Hardware wurde hergestellt")
+                        new NoticeData(
+                            NoticeType.INFO,
+                            "Hardwareverbindung",
+                            "Die Verbindung zur Hardware wurde hergestellt"
+                        )
                     )
                 );
                 break;
 
             case ERROR:
                 msgQueueIn.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.ERROR));
-                dispatcher.dispatch(
+                dispatcher.broadcast(
                     new Message(
                         GuiMessage.SYSTEM_NOTICE,
-                        new NoticeData(NoticeType.ERROR, "Hardwareverbindung", "Die Verbindung zur Hardware wurde unterbrochen")
+                        new NoticeData(
+                            NoticeType.ERROR,
+                            "Hardwareverbindung",
+                            "Die Verbindung zur Hardware wurde unterbrochen"
+                        )
                     )
                 );
                 break;

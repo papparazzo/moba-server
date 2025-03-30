@@ -110,6 +110,6 @@ final public class Server extends MessageHandlerA {
         map.put("fwType",            java.lang.System.getProperty("java.vm.vendor", ""));
         map.put("fwVersion",         java.lang.System.getProperty("java.version", ""));
 
-        dispatcher.dispatch(new Message(ServerMessage.INFO_RES, map, ep));
+        dispatcher.send(new Message(ServerMessage.INFO_RES, map), ep);
     }
 }

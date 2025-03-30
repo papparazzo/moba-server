@@ -59,10 +59,6 @@ public class Message implements Comparable {
         trigger = System.currentTimeMillis();
     }
 
-    public void convertToBroadCastMessage() {
-        endpoint = null;
-    }
-
     @Override
     public int compareTo(Object o) {
         long i = trigger;

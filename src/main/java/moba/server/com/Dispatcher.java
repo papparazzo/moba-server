@@ -154,33 +154,43 @@ public class Dispatcher implements Loggable {
         return null;
     }
 
-    public void dispatch(Message msg) {
+    public void send(Message message, Endpoint endpoint) {
         try {
-            if(msg == null) {
-                getLogger().log(Level.SEVERE, "msg is null!");
+            if(endpoint == null) {
                 return;
             }
+            sendMessage(
+                message.getGroupId(),
+                message.getMessageId(),
+                getMessageData(message),
+                endpoint
+            );
+        } catch(IOException | JSONException e) {
+            getLogger().log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
+        }
+    }
 
-            StringBuilder sb = new StringBuilder();
-            JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-            JSONEncoder encoder = new JSONEncoder(jsb);
-            encoder.encode(msg.getData());
+    public void broadcast(Message message) {
+        try {
+            int grpId = message.getGroupId();
+            int msgId = message.getMessageId();
+            String data = getMessageData(message);
 
-            int grpId = msg.getGroupId();
-            int msgId = msg.getMessageId();
-            String data = sb.toString();
-
-            messageLogger.out(msg);
-
-            if(msg.getEndpoint() != null) {
-                sendMessage(grpId, msgId, data, msg.getEndpoint());
-                return;
-            }
             sendBroadCastMessage(grpId, msgId, data, grpId);
             sendBroadCastMessage(grpId, msgId, data, -1);
         } catch(IOException | JSONException e) {
             getLogger().log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
         }
+    }
+
+    private String getMessageData(Message message)
+    throws IOException, JSONException {
+        messageLogger.out(message);
+        StringBuilder sb = new StringBuilder();
+        JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
+        JSONEncoder encoder = new JSONEncoder(jsb);
+        encoder.encode(message.getData());
+        return sb.toString();
     }
 
     protected void sendBroadCastMessage(int grpId, int msgId, String data, int groupKey)
@@ -194,7 +204,7 @@ public class Dispatcher implements Loggable {
     }
 
     protected void sendMessage(int grpId, int msgId, String data, Endpoint endpoint)
-    throws IOException, JSONException {
+    throws IOException {
         DataOutputStream dataOutputStream = endpoint.getDataOutputStream();
         dataOutputStream.writeInt(grpId);
         dataOutputStream.writeInt(msgId);

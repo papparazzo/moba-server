@@ -87,13 +87,14 @@ public class MessageLoop implements Loggable {
 
                 getLogger().log(Level.WARNING, err.toString());
 
-                dispatcher.dispatch(new Message(ClientMessage.ERROR, err, msg.getEndpoint()));
+                dispatcher.send(new Message(ClientMessage.ERROR, err), msg.getEndpoint());
                 continue;
             }
             try {
                 handlers.get(msg.getGroupId()).handleMsg(msg);
             } catch(ErrorException e) {
-                dispatcher.dispatch(new Message(ClientMessage.ERROR, e.getErrorData(), msg.getEndpoint()));
+                getLogger().log(Level.WARNING, "ErrorException! <{0}>", new Object[]{e.toString()});
+                dispatcher.send(new Message(ClientMessage.ERROR, e.getErrorData()), msg.getEndpoint());
             } catch(Exception e) {
                 getLogger().log(Level.SEVERE, e.toString());
                 in.clear();
@@ -110,14 +111,14 @@ public class MessageLoop implements Loggable {
     }
 
     protected void resetHandler() {
-        dispatcher.getEndpoints().forEach((ep) -> dispatcher.dispatch(new Message(ClientMessage.RESET, null, ep)));
+        dispatcher.getEndpoints().forEach((ep) -> dispatcher.send(new Message(ClientMessage.RESET, null), ep));
         for(Integer integer: handlers.keySet()) {
             handlers.get(integer).shutdown();
         }
     }
 
     protected void shutdownHandler() {
-        dispatcher.getEndpoints().forEach((ep) -> dispatcher.dispatch(new Message(ClientMessage.SHUTDOWN, null, ep)));
+        dispatcher.getEndpoints().forEach((ep) -> dispatcher.send(new Message(ClientMessage.SHUTDOWN, null), ep));
         for(Integer integer: handlers.keySet()) {
             handlers.get(integer).shutdown();
         }
@@ -133,6 +134,6 @@ public class MessageLoop implements Loggable {
         long appId = msg.getEndpoint().getAppId();
         freeResources(appId);
         dispatcher.removeEndpoint(msg.getEndpoint());
-        dispatcher.dispatch(new Message(ServerMessage.CLIENT_CLOSED, appId));
+        dispatcher.broadcast(new Message(ServerMessage.CLIENT_CLOSED, appId));
     }
 }

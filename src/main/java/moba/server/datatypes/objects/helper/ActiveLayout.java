@@ -71,7 +71,7 @@ public class ActiveLayout {
             //dispatcher.dispatch(new Message(ClientMessage.ERROR, e.getErrorData(), msg.getEndpoint()));
             throw new ErrorException(ErrorId.UNKNOWN_ERROR, e.getMessage());
         }
-        dispatcher.dispatch(new Message(LayoutMessage.DEFAULT_LAYOUT_CHANGED, activeLayout));
+        dispatcher.broadcast(new Message(LayoutMessage.DEFAULT_LAYOUT_CHANGED, activeLayout));
         this.activeLayout = activeLayout;
     }
 }
