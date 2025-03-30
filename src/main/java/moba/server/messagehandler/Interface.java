@@ -20,7 +20,6 @@
 
 package moba.server.messagehandler;
 
-import moba.server.application.ServerApplication;
 import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.Connectivity;
 import moba.server.datatypes.enumerations.HardwareState;

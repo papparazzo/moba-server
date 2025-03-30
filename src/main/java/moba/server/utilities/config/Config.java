@@ -65,8 +65,8 @@ public class Config {
     }
 
     @SuppressWarnings("unchecked")
-    public Object getSection(String expr) {
-        String[] tokens = expr.split("\\.");
+    public Object getSection(String section) {
+        String[] tokens = section.split("\\.");
 
         Object o = content;
 
@@ -85,10 +85,26 @@ public class Config {
         return o;
     }
 
+    @SuppressWarnings("unchecked")
     public void setSection(String section, Object val) {
         if(content == null) {
             content = new HashMap<>();
         }
-        content.put(section, val);
+
+        String[] tokens = section.split("\\.");
+
+        Map<String, Object> o = content;
+
+        for(int i = 0; i < tokens.length - 1; i++) {
+            String s = tokens[i];
+
+            if(o == null) {
+                o = new HashMap<>();
+            } else {
+                o = (Map<String, Object>)o.get(s);
+            }
+        }
+        String s = tokens[tokens.length - 1];
+        o.put(s, val);
     }
 }

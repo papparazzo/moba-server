@@ -21,6 +21,7 @@
 package moba.server.messagehandler;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import moba.server.application.ServerApplication;
@@ -33,16 +34,19 @@ import moba.server.messages.MessageType;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.AllowList;
+import moba.server.utilities.config.Config;
 import moba.server.utilities.exceptions.ErrorException;
 
 final public class Server extends MessageHandlerA {
     private final ServerApplication app;
-    private AllowList allowList;
+    private final AllowList allowList;
+    private final Config config;
 
-    public Server(Dispatcher dispatcher, ServerApplication app, AllowList allowList) {
+    public Server(Dispatcher dispatcher, ServerApplication app, AllowList allowList, Config config) {
         this.dispatcher = dispatcher;
         this.app = app;
         this.allowList = allowList;
+        this.config = config;
     }
 
     @Override
@@ -56,38 +60,64 @@ final public class Server extends MessageHandlerA {
         ServerMessage sMsg = ServerMessage.fromId(msg.getMessageId());
 
         switch(sMsg) {
-            case INFO_REQ -> {
-                handleServerInfoReq(msg.getEndpoint());
-                return;
-            }
-
-            case CON_CLIENTS_REQ -> {
-                dispatcher.dispatch(new Message(ServerMessage.CON_CLIENTS_RES, dispatcher.getEndpoints(), msg.getEndpoint()));
-                return;
-            }
-        }
-
-        checkForSameOrigin(msg.getEndpoint().getSocket().getInetAddress());
-
-        switch(sMsg) {
-            case RESET_CLIENT -> 
-                sendToClient(msg, ClientMessage.RESET);
-
-            case SELF_TESTING_CLIENT ->
-                sendToClient(msg, ClientMessage.SELF_TESTING);
-
-            default -> 
-                throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">.");
+            case INFO_REQ            -> handleServerInfoReq(msg.getEndpoint());
+            case CON_CLIENTS_REQ     -> handleClientsReq(msg.getEndpoint());
+            case RESET_CLIENT        -> sendToClient(msg, ClientMessage.RESET);
+            case SELF_TESTING_CLIENT -> sendToClient(msg, ClientMessage.SELF_TESTING);
+            case ADD_ALLOWED_IP      -> handleAddIpAddress(msg);
+            case GET_ALLOWED_IP_LIST -> handleGetAllowedIpList(msg.getEndpoint());
+            case SET_ALLOWED_IP_LIST -> handleSetAllowedIpList(msg);
+            default                  ->
+                throw new ErrorException(
+                    ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">."
+                );
         }
     }
 
-    protected void sendToClient(Message msg, MessageType mType)
+
+    private void sendToClient(Message msg, MessageType mType)
     throws ErrorException {
         Endpoint ep = dispatcher.getEndpointByAppId((long)msg.getData());
         if(ep == null) {
             throw new ErrorException(ErrorId.INVALID_APP_ID, "app-id <" + msg.getData().toString() + "> is invalid");
         }
-        dispatcher.dispatch(new Message(mType, null, ep));
+        dispatcher.send(new Message(mType, null), ep);
+    }
+
+    private void handleAddIpAddress(Message msg)
+    throws ErrorException {
+        String address = (String)msg.getData();
+        try {
+            this.allowList.add(address);
+            var list = allowList.getList();
+            config.setSection("common.serverConfig.allowedIPs", list);
+            config.writeFile();
+            dispatcher.broadcast(new Message(ServerMessage.SET_ALLOWED_IP_LIST, list));
+        } catch(Exception e) {
+            throw new ErrorException(ErrorId.UNKNOWN_ERROR, e.getMessage());
+        }
+    }
+
+    private void handleGetAllowedIpList(Endpoint endpoint) {
+        dispatcher.send(new Message(ServerMessage.SET_ALLOWED_IP_LIST, allowList.getList()), endpoint);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void handleSetAllowedIpList(Message message)
+    throws ErrorException {
+        try {
+            ArrayList<String> list = (ArrayList<String>)message.getData();
+            allowList.setList(list);
+            config.setSection("common.serverConfig.allowedIPs", list);
+            config.writeFile();
+            dispatcher.broadcast(new Message(ServerMessage.SET_ALLOWED_IP_LIST, list));
+        } catch(Exception e) {
+            throw new ErrorException(ErrorId.UNKNOWN_ERROR, e.getMessage());
+        }
+    }
+
+    private void handleClientsReq(Endpoint endpoint) {
+        dispatcher.send(new Message(ServerMessage.CON_CLIENTS_RES, dispatcher.getEndpoints()), endpoint);
     }
 
     private void handleServerInfoReq(Endpoint ep) {

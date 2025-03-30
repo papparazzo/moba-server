@@ -20,6 +20,7 @@
 
 package moba.server.application;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -30,14 +31,7 @@ import moba.server.database.Database;
 import moba.server.database.DatabaseException;
 import moba.server.datatypes.base.Version;
 import moba.server.datatypes.objects.helper.ActiveLayout;
-import moba.server.messagehandler.Client;
-import moba.server.messagehandler.Control;
-import moba.server.messagehandler.Environment;
-import moba.server.messagehandler.Timer;
-import moba.server.messagehandler.Interface;
-import moba.server.messagehandler.Layout;
-import moba.server.messagehandler.Server;
-import moba.server.messagehandler.Systems;
+import moba.server.messagehandler.*;
 import moba.server.messages.MessageLoop;
 import moba.server.messages.MessageQueue;
 import moba.server.utilities.AllowList;
@@ -94,7 +88,9 @@ final public class ServerApplication {
             boolean restart;
             maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
             int port = (int)(long)config.getSection("common.serverConfig.port");
-            AllowList allowList = new AllowList(maxClients);
+            var allowed = (ArrayList<String>)config.getSection("common.serverConfig.allowedIPs");
+            AllowList allowList = new AllowList(maxClients, allowed);
+
             do {
                 Dispatcher dispatcher = new Dispatcher(new MessageLogger());
                 Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
@@ -104,16 +100,17 @@ final public class ServerApplication {
 
                 BackgroundHandlerComposite handler = new BackgroundHandlerComposite();
                 handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList));
-                handler.add(new IPC("/tmp/moba-fifo", msgQueueIn));
+                handler.add(new IPC((String)config.getSection("common.serverConfig.ipc"), msgQueueIn));
 
                 loop.addHandler(new Client(dispatcher));
-                loop.addHandler(new Server(dispatcher, this, allowList));
+                loop.addHandler(new Server(dispatcher, this, allowList, config));
                 loop.addHandler(new Timer(dispatcher, config));
                 loop.addHandler(new Environment(dispatcher, config));
                 loop.addHandler(new Systems(dispatcher, lock, activeLayout, msgQueueIn));
                 loop.addHandler(new Layout(dispatcher, database, activeLayout));
                 loop.addHandler(new Interface(dispatcher, msgQueueIn));
                 loop.addHandler(new Control(dispatcher, database, activeLayout));
+                loop.addHandler(new Gui());
 
                 handler.start();
                 restart = loop.loop(msgQueueIn);

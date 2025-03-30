@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.logging.Level;
 
 import moba.server.messages.MessageQueue;
@@ -81,8 +80,8 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
 
         getLogger().info("acceptor-thread started");
 
-        try {
-            while(!isInterrupted()) {
+        while(!isInterrupted()) {
+            try {
                 Socket socket = serverSocket.accept();
                 getLogger().log(Level.INFO, "new client <{0}> socket <{1}>", new Object[]{++id, socket.toString()});
 
@@ -96,15 +95,14 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
                     continue;
                 }
                 (new Endpoint(id, socket, msgQueue)).start();
+            } catch (Exception e) {
+                getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
             }
-        } catch (IOException e) {
-            getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
         }
         getLogger().info("acceptor-thread terminated");
     }
 
-    private boolean allowedOrigin(Socket socket)
-    throws UnknownHostException {
+    private boolean allowedOrigin(Socket socket) {
         InetAddress addr = socket.getInetAddress();
 
         if(allowList.isAllowed(addr)) {

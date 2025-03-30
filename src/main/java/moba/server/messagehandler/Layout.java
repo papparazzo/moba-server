@@ -168,7 +168,7 @@ public class Layout extends MessageHandlerA implements Loggable {
     @SuppressWarnings("unchecked")
     protected void createLayout(Message msg)
     throws SQLException, IOException, ErrorException {
-        Map<String, Object> map = (Map)msg.getData();
+        Map<String, Object> map = (Map<String, Object>)msg.getData();
         boolean isActive = (boolean)map.get("active");
         long    currAppId = msg.getEndpoint().getAppId();
 
@@ -179,7 +179,8 @@ public class Layout extends MessageHandlerA implements Loggable {
         TrackLayoutInfoData tl = new TrackLayoutInfoData((String)map.get("name"), (String)map.get("description"), currAppId, isActive);
         Connection con = database.getConnection();
 
-        String q = "INSERT INTO `TrackLayouts` (`Name`, `Description`, `CreationDate`, `ModificationDate`, `Locked`) VALUES (?, ?, NOW(), NOW(), ?)";
+        String q =
+            "INSERT INTO `TrackLayouts` (`Name`, `Description`, `CreationDate`, `ModificationDate`, `Locked`) VALUES (?, ?, NOW(), NOW(), ?)";
 
         try(PreparedStatement stmt = con.prepareStatement(q, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, tl.getName());
@@ -203,7 +204,7 @@ public class Layout extends MessageHandlerA implements Loggable {
     @SuppressWarnings("unchecked")
     protected void updateLayout(Message msg)
     throws SQLException, ErrorException {
-        Map<String, Object> map = (Map)msg.getData();
+        Map<String, Object> map = (Map<String, Object>)msg.getData();
 
         long id = (Long)map.get("id");
         lock.isLockedByApp(msg.getEndpoint().getAppId(), id);
