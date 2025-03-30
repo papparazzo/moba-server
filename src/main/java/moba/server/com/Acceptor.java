@@ -31,32 +31,36 @@ import moba.server.messages.MessageQueue;
 import moba.server.utilities.AllowList;
 import moba.server.utilities.logger.Loggable;
 
-final public class Acceptor extends Thread implements Loggable {
+final public class Acceptor extends Thread implements Loggable, BackgroundHandlerInterface {
 
     private ServerSocket       serverSocket = null;
-    private final MessageQueue in;
+    private final MessageQueue msgQueue;
     private final Dispatcher   dispatcher;
     private final int          serverPort;
     private final int          maxClients;
     private final AllowList    allowList;
 
-    public Acceptor(MessageQueue in, Dispatcher dispatcher, int serverPort, int maxClients, AllowList allowList) {
-        this.in         = in;
+    public Acceptor(MessageQueue msgQueue, Dispatcher dispatcher, int serverPort, int maxClients, AllowList allowList) {
+        this.msgQueue   = msgQueue;
         this.dispatcher = dispatcher;
         this.serverPort = serverPort;
         this.maxClients = maxClients;
         this.allowList  = allowList;
     }
 
-    public void startAcceptor()
-    throws IOException {
+    public void start() {
         setName("acceptor");
-        serverSocket = new ServerSocket(serverPort);
+        try {
+            serverSocket = new ServerSocket(serverPort);
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        }
+
         getLogger().log(Level.INFO, "Successful bind on port <{0}>", new Object[]{serverPort});
-        start();
+        super.start();
     }
 
-    public void stopAcceptor() {
+    public void halt() {
         try {
             if(serverSocket != null) {
                 serverSocket.close();
@@ -91,7 +95,7 @@ final public class Acceptor extends Thread implements Loggable {
                     getLogger().log(Level.SEVERE, "Max amount of clients <{0}> connected!", new Object[]{maxClients});
                     continue;
                 }
-                (new Endpoint(id, socket, in)).start();
+                (new Endpoint(id, socket, msgQueue)).start();
             }
         } catch (IOException e) {
             getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});

@@ -54,7 +54,7 @@ final public class ManifestReader {
         Attributes attrs = manifest.getMainAttributes();
 
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        buildDate = formatter.parse(attrs.getValue("Build-Timestamp"));;
+        buildDate = formatter.parse(attrs.getValue("Build-Timestamp"));
         appName = attrs.getValue("Implementation-Title");
         version = new Version(attrs.getValue("Implementation-Version"));
 

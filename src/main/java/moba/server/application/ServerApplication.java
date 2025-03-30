@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import moba.server.com.Acceptor;
+import moba.server.com.BackgroundHandlerComposite;
 import moba.server.com.Dispatcher;
 import moba.server.database.Database;
 import moba.server.database.DatabaseException;
@@ -95,11 +96,13 @@ final public class ServerApplication {
             AllowList allowList = new AllowList(maxClients);
             do {
                 Dispatcher dispatcher = new Dispatcher(new MessageLogger());
-                Acceptor acceptor = new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList);
                 Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
                 MessageLoop  loop = new MessageLoop(dispatcher);
                 ActiveLayout activeLayout = new ActiveLayout(dispatcher, config);
                 TrackLayoutLock lock = new TrackLayoutLock(database);
+
+                BackgroundHandlerComposite handler = new BackgroundHandlerComposite();
+                handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList));
 
                 loop.addHandler(new Client(dispatcher));
                 loop.addHandler(new Server(dispatcher, this, allowList));
@@ -109,10 +112,11 @@ final public class ServerApplication {
                 loop.addHandler(new Layout(dispatcher, database, activeLayout));
                 loop.addHandler(new Interface(dispatcher, msgQueueIn));
                 loop.addHandler(new Control(dispatcher, database, activeLayout));
-                acceptor.startAcceptor();
+
+                handler.start();
                 restart = loop.loop(msgQueueIn);
                 dispatcher.resetDispatcher();
-                acceptor.stopAcceptor();
+                handler.halt();
             } while(restart);
         } catch(DatabaseException | InterruptedException e) {
             throw new Exception(e);

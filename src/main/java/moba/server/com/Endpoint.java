@@ -28,7 +28,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Level;
 
 import moba.server.datatypes.base.Version;
@@ -40,6 +39,7 @@ import moba.server.json.streamreader.JSONStreamReaderBytes;
 import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 import moba.server.json.stringreader.JSONStringReader;
 import moba.server.messages.Message;
+import moba.server.messages.MessageQueue;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
 import moba.server.utilities.logger.Loggable;
@@ -55,17 +55,17 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
     protected String   appName;
 
     protected ArrayList<Long>  msgGroups = new ArrayList<>();
-    protected PriorityBlockingQueue<Message> in;
+    protected MessageQueue msgQueue;
 
     protected DataOutputStream dataOutputStream;
     protected DataInputStream  dataInputStream;
 
-    public Endpoint(long id, Socket socket, PriorityBlockingQueue<Message> in)
+    public Endpoint(long id, Socket socket, MessageQueue msgQueue)
     throws IOException {
-        this.id               = id;
-        this.startTime        = System.currentTimeMillis();
-        this.socket           = socket;
-        this.in               = in;
+        this.id        = id;
+        this.startTime = System.currentTimeMillis();
+        this.socket    = socket;
+        this.msgQueue  = msgQueue;
 
         this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
         this.dataInputStream  = new DataInputStream(socket.getInputStream());
@@ -117,17 +117,17 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
         try {
             init();
             while(!isInterrupted()) {
-                in.add(getNextMessage());
+                msgQueue.add(getNextMessage());
             }
         } catch(NullPointerException e) {
             // noop -> getNextMessage returns null, when closing is set to true.
             //         That's lead to a NullPointerException in PriorityBlockingQueue.add()
         } catch(Exception e) {
             getLogger().log(Level.INFO, "Endpoint #{0}: Exception, closing client... <{1}>", new Object[]{id, e.toString()});
-            in.add(new Message(InternMessage.CLIENT_SHUTDOWN, null, this));
+            msgQueue.add(new Message(InternMessage.CLIENT_SHUTDOWN, null, this));
         } catch(OutOfMemoryError e) {
             getLogger().log(Level.SEVERE, "Endpoint #{0}: OutOfMemoryError <{1}>", new Object[]{id, e.toString()});
-            in.add(new Message(InternMessage.CLIENT_SHUTDOWN, null, this));
+            msgQueue.add(new Message(InternMessage.CLIENT_SHUTDOWN, null, this));
         }
         getLogger().log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
     }
@@ -194,6 +194,6 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
             throw new IOException("invalid msg groups given");
         }
         msgGroups = (ArrayList<Long>)o;
-        in.add(msg);
+        msgQueue.add(msg);
     }
 }

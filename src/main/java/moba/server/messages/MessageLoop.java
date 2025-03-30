@@ -94,6 +94,10 @@ public class MessageLoop implements Loggable {
                 handlers.get(msg.getGroupId()).handleMsg(msg);
             } catch(ErrorException e) {
                 dispatcher.dispatch(new Message(ClientMessage.ERROR, e.getErrorData(), msg.getEndpoint()));
+            } catch(Exception e) {
+                getLogger().log(Level.SEVERE, e.toString());
+                in.clear();
+                return true;
             }
         }
     }
