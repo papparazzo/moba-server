@@ -269,7 +269,7 @@ Integer	trainId
                     rs.getInt("Id"),
                     rs.getInt("XPos"),
                     rs.getInt("YPos"),
-                    SwitchStand.valueOf(rs.getString("SwitchStand"))
+                    CheckedEnum.getFromString(SwitchStand.class, rs.getString("SwitchStand"))
                 ));
             }
             dispatcher.send(new Message(ControlMessage.GET_SWITCH_STAND_LIST_RES, arraylist), msg.getEndpoint());
