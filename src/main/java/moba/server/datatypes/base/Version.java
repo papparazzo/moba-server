@@ -145,9 +145,6 @@ public class Version implements Comparable, JSONToStringI {
 
     @Override
     public String toJsonString(boolean formatted, int indent) {
-        if(major == -1) {
-            return "\"0.0.0.0\"";
-        }
-        return String.valueOf('"' + major + '.' + minor + '.' + build + '.' + patch + '"');
+        return "\"" + this + "\"";
     }
 }
