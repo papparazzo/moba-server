@@ -29,17 +29,10 @@ import moba.server.json.stringreader.JSONStringReader;
 
 public class JSONDecoder {
     protected JSONStringReader reader;
-    protected boolean           strict;
     protected static final int  MAX_STRING_LENGTH = 1024;
 
-    public JSONDecoder(JSONStringReader reader)
-    throws JSONException {
-        this(reader, true);
-    }
-
-    public JSONDecoder(JSONStringReader reader, boolean strict) {
+    public JSONDecoder(JSONStringReader reader) {
         this.reader = reader;
-        this.strict = strict;
     }
 
     public Object decode()
@@ -79,10 +72,10 @@ public class JSONDecoder {
         Map<String, Object> map = new HashMap<>();
         String key;
         char c;
-        reader.checkNext('{', !strict);
+        reader.checkNext('{');
 
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
-            c = reader.next(!strict);
+            c = reader.next();
             switch(c) {
                 case '}' -> {
                     if(!map.isEmpty())  {
@@ -97,14 +90,14 @@ public class JSONDecoder {
                 default ->
                     throw new JSONException("invalid key");
             }
-            reader.checkNext(':', !strict);
+            reader.checkNext(':');
 
             if(map.containsKey(key)) {
                 throw new JSONException("duplicate key <" + key + ">");
             }
             map.put(key, nextValue());
 
-            switch(reader.next(!strict)) {
+            switch(reader.next()) {
                 case ',' -> {
                 }
 
@@ -121,7 +114,7 @@ public class JSONDecoder {
 
     protected Object nextValue()
     throws JSONException, IOException {
-        switch(reader.peek(!strict)) {
+        switch(reader.peek()) {
             case 'n' -> {
                 return nextNull();
             }
@@ -157,25 +150,25 @@ public class JSONDecoder {
 
     protected Object nextNull()
     throws IOException {
-        reader.checkNext("null", !strict);
+        reader.checkNext("null");
         return null;
     }
 
     protected Boolean nextTrue()
     throws IOException {
-        reader.checkNext("true", !strict);
+        reader.checkNext("true");
         return Boolean.TRUE;
     }
 
     protected Boolean nextFalse()
     throws IOException {
-        reader.checkNext("false", !strict);
+        reader.checkNext("false");
         return Boolean.FALSE;
     }
 
     protected String nextString()
     throws JSONException, IOException {
-        reader.checkNext('"', !strict);
+        reader.checkNext('"');
         char c;
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
@@ -214,8 +207,8 @@ public class JSONDecoder {
     protected ArrayList<Object> nextArray()
     throws JSONException, IOException {
         ArrayList<Object> arrayList = new ArrayList<>();
-        reader.checkNext('[', !strict);
-        char c = reader.peek(!strict);
+        reader.checkNext('[');
+        char c = reader.peek();
 
         if(c == ']') {
             reader.next();
@@ -224,7 +217,7 @@ public class JSONDecoder {
         arrayList.add(nextValue());
 
         while(true) {
-            c = reader.next(!strict);
+            c = reader.next();
 
             switch(c) {
                 case ',' -> arrayList.add(nextValue());
@@ -244,7 +237,7 @@ public class JSONDecoder {
         char c;
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
-            c = reader.peek(!strict);
+            c = reader.peek();
 
             if(",]}".indexOf(c) != -1 || c == 0) {
                 return parseNumber(sb.toString());

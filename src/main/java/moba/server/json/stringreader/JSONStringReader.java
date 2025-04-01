@@ -23,7 +23,6 @@ package moba.server.json.stringreader;
 import java.io.IOException;
 import moba.server.json.streamreader.JSONStreamReaderI;
 
-
 public class JSONStringReader {
     private final JSONStreamReaderI reader;
     private char lastChar = 0;
@@ -33,12 +32,8 @@ public class JSONStringReader {
     }
 
     public char peek() {
-        return peek(false);
-    }
-
-    public char peek(boolean ignoreWhitespace) {
         try {
-            char c = next(ignoreWhitespace);
+            char c = next();
             lastChar = c;
             return c;
         } catch(IOException e) {
@@ -48,24 +43,14 @@ public class JSONStringReader {
 
     public void checkNext(String s)
     throws IOException {
-        checkNext(s, false);
-    }
-
-    public void checkNext(String s, boolean ignoreWhitespace)
-    throws IOException {
         for(int i = 0; i < s.length(); i++) {
-            checkNext(s.charAt(i), ignoreWhitespace);
+            checkNext(s.charAt(i));
         }
     }
 
     public void checkNext(char x)
     throws IOException {
-        checkNext(x, false);
-    }
-
-    public void checkNext(char x, boolean ignoreWhitespace)
-    throws IOException {
-        char c = next(ignoreWhitespace);
+        char c = next();
         if(c != x) {
             throw new IOException("expected '" + x + "' found '" + c + "'!");
         }
@@ -73,21 +58,12 @@ public class JSONStringReader {
 
     public char next()
     throws IOException {
-        return next(false);
-    }
-
-    public char next(boolean ignoreWhitespace)
-    throws IOException {
         if(lastChar != 0) {
             char t = lastChar;
             lastChar = 0;
             return t;
         }
-        int c;
-        do {
-            c = reader.read();
-        } while(Character.isWhitespace(c) && ignoreWhitespace);
-//System.err.print((char)c);
+        int c = reader.read();
         if(c == -1 || c == 0) {
             throw new IOException("input stream corrupted!");
         }
@@ -96,18 +72,13 @@ public class JSONStringReader {
 
     public String next(int n)
     throws IOException {
-        return next(n, false);
-    }
-
-    public String next(int n, boolean ignoreWhitespace)
-    throws IOException {
         StringBuilder sb = new StringBuilder();
         if(n == 0) {
             return "";
         }
 
         for(int i = 0; i < n; ++i) {
-            char c = next(ignoreWhitespace);
+            char c = next();
             sb.append(c);
         }
         return sb.toString();
