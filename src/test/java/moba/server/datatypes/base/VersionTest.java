@@ -64,7 +64,7 @@ public class VersionTest {
         boolean formatted = false;
         int indent = 0;
         Version instance = new Version();
-        String expResult = "\"0.0.0.0\"";
+        String expResult = "\"0.0.0-0000\"";
         String result = instance.toJsonString(formatted, indent);
         assertEquals(expResult, result);
     }
