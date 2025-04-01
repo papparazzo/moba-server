@@ -27,7 +27,11 @@ import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.logger.Loggable;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -54,6 +58,15 @@ final public class IPC extends Thread implements Loggable, BackgroundHandlerInte
 
     public void start() {
         setName("ipc");
+
+        try {
+            var attr = Files.readAttributes(new File(fifoFile).toPath(), BasicFileAttributes.class);
+            if(!attr.isOther()) {
+                throw new RuntimeException("<" + fifoFile + "> is not a named pipe");
+            }
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        }
         super.start();
     }
 
@@ -77,7 +90,7 @@ final public class IPC extends Thread implements Loggable, BackgroundHandlerInte
     private void handleAction(String line) {
         String[] parts = line.split(":");
 
-         switch(parts[0]) {
+        switch(parts[0]) {
             case "SET_ALLOWED_IP_LIST":
                 msgQueue.add(new Message(ServerMessage.SET_ALLOWED_IP_LIST, getAsArrayList(parts[1])));
                 break;
