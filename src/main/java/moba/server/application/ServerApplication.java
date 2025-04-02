@@ -23,6 +23,7 @@ package moba.server.application;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import moba.server.com.Acceptor;
 import moba.server.com.BackgroundHandlerComposite;
@@ -38,9 +39,10 @@ import moba.server.utilities.AllowList;
 import moba.server.com.IPC;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.lock.TrackLayoutLock;
+import moba.server.utilities.logger.Loggable;
 import moba.server.utilities.logger.MessageLogger;
 
-final public class ServerApplication {
+final public class ServerApplication implements Loggable {
 
     private int           maxClients = -1;
 
@@ -58,7 +60,7 @@ final public class ServerApplication {
         this.startTime  = System.currentTimeMillis();
         this.buildDate  = date;
         this.config     = config;
-        this.msgQueueIn = new MessageQueue(new MessageLogger());
+        this.msgQueueIn = new MessageQueue(new MessageLogger(getLogger()));
     }
 
     public Version getVersion() {
@@ -85,6 +87,7 @@ final public class ServerApplication {
     public void run()
     throws Exception {
         try {
+            Logger logger = getLogger();
             boolean restart;
             maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
             int port = (int)(long)config.getSection("common.serverConfig.port");
@@ -92,7 +95,7 @@ final public class ServerApplication {
             AllowList allowList = new AllowList(maxClients, allowed);
 
             do {
-                Dispatcher dispatcher = new Dispatcher(new MessageLogger());
+                Dispatcher dispatcher = new Dispatcher(new MessageLogger(logger), logger);
                 Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
                 MessageLoop  loop = new MessageLoop(dispatcher);
                 ActiveLayout activeLayout = new ActiveLayout(dispatcher, config);

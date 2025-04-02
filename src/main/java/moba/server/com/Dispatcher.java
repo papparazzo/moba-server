@@ -29,6 +29,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import moba.server.json.JSONEncoder;
 
 import moba.server.json.JSONException;
@@ -37,22 +39,25 @@ import moba.server.messages.Message;
 import moba.server.utilities.logger.MessageLogger;
 import moba.server.utilities.logger.Loggable;
 
-public class Dispatcher implements Loggable {
+public class Dispatcher {
     protected final Set<Endpoint> allEndpoints = new HashSet<>();
     protected final Map<Long, Set<Endpoint>> groupEP = new HashMap<>();
 
     protected final MessageLogger messageLogger;
 
-    public Dispatcher(MessageLogger messageLogger) {
+    protected Logger logger;
+
+    public Dispatcher(MessageLogger messageLogger, Logger logger) {
+        this.logger = logger;
         this.messageLogger = messageLogger;
     }
 
     public boolean addEndpoint(Endpoint ep) {
-        getLogger().log(Level.INFO, "try to add endpoint <{0}> appName <{1}> ver<{2}>", new Object[]{ep, ep.getAppName(), ep.getVersion()});
+        logger.log(Level.INFO, "try to add endpoint <{0}> appName <{1}> ver<{2}>", new Object[]{ep, ep.getAppName(), ep.getVersion()});
 
         for(Endpoint allEndpoint: allEndpoints) {
             if(allEndpoint == ep) {
-                getLogger().log(Level.WARNING, "Endpoint <{0}> already set", new Object[]{ep});
+                logger.log(Level.WARNING, "Endpoint <{0}> already set", new Object[]{ep});
                 return false;
             }
         }
@@ -86,13 +91,13 @@ public class Dispatcher implements Loggable {
         }
 
         if(!removed) {
-            getLogger().log(Level.WARNING, "could not remove endpoint <{0}> from set!", new Object[]{ep});
+            logger.log(Level.WARNING, "could not remove endpoint <{0}> from set!", new Object[]{ep});
         }
 
         removeEndpointFromGroup((long)-1, ep);
 
         ep.getMsgGroups().forEach((msgGroup) -> removeEndpointFromGroup(msgGroup, ep));
-        getLogger().log(Level.INFO, "endpoint <{0}> successfully removed!", new Object[]{ep});
+        logger.log(Level.INFO, "endpoint <{0}> successfully removed!", new Object[]{ep});
     }
 
     protected void addEndpointToGroup(Long grpId, Endpoint ep) {
@@ -120,13 +125,13 @@ public class Dispatcher implements Loggable {
                 ep.interrupt();
                 ep.join(250);
             } catch(InterruptedException e) {
-                getLogger().log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
+                logger.log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
             }
         }
         try {
             ep.closeEndpoint();
         } catch(Exception e) {
-            getLogger().log(Level.WARNING, "Exception occurred! <{0}> Closing socket failed!", new Object[]{e.toString()});
+            logger.log(Level.WARNING, "Exception occurred! <{0}> Closing socket failed!", new Object[]{e.toString()});
         }
     }
 
@@ -166,7 +171,7 @@ public class Dispatcher implements Loggable {
                 endpoint
             );
         } catch(IOException | JSONException e) {
-            getLogger().log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
+            logger.log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
         }
     }
 
@@ -179,7 +184,7 @@ public class Dispatcher implements Loggable {
             sendBroadCastMessage(grpId, msgId, data, grpId);
             sendBroadCastMessage(grpId, msgId, data, -1);
         } catch(IOException | JSONException e) {
-            getLogger().log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
+            logger.log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
         }
     }
 

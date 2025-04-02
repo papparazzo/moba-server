@@ -20,8 +20,7 @@
 
 package moba.server.utilities.logger;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.logging.Logger;
 
 import moba.server.messages.Message;
 
@@ -31,6 +30,10 @@ final public class MessageLogger {
         OUT_MESSAGE,
         INTERN_MESSAGE
     }
+
+    private final Logger logger;
+
+    public MessageLogger(Logger logger) {this.logger = logger;}
 
     public void in(Message msg) {
         print(msg, MessageType.IN_MESSAGE);
@@ -50,8 +53,6 @@ final public class MessageLogger {
         }
 
         StringBuilder sb = new StringBuilder();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSS ");
-        sb.append(df.format(new Date()));
 
         switch(type) {
             case IN_MESSAGE -> 
@@ -66,6 +67,6 @@ final public class MessageLogger {
         }
 
         sb.append(msg);
-        System.out.println(sb);
+        this.logger.info(sb.toString());
     }
 }
