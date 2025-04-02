@@ -48,7 +48,8 @@ public class CustomFormatter extends Formatter {
         sb.append(" ");
 
         if(record.getSourceClassName() != null) {
-            sb.append(record.getSourceClassName());
+            var name = record.getSourceClassName();
+            sb.append(name, name.lastIndexOf(".") + 1, name.length());
         } else {
             sb.append(record.getLoggerName());
         }
