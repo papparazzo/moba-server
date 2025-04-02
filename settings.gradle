@@ -13,4 +13,4 @@ plugins {
 }
 
 rootProject.name = 'moba-server'
-include('app')
+include('src')
