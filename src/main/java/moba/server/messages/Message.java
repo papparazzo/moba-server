@@ -105,6 +105,9 @@ public class Message implements Comparable {
             sb.append(data);
         }
 
+        if (sb.length() > 125) {
+            return sb.substring(0, 122) + "...";
+        }
         return sb.toString();
     }
 }
