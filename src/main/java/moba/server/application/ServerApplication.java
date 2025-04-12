@@ -97,7 +97,7 @@ final public class ServerApplication implements Loggable {
             do {
                 Dispatcher dispatcher = new Dispatcher(new MessageLogger(logger), logger);
                 Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
-                MessageLoop  loop = new MessageLoop(dispatcher);
+                MessageLoop  loop = new MessageLoop(dispatcher, logger);
                 ActiveLayout activeLayout = new ActiveLayout(dispatcher, config);
                 TrackLayoutLock lock = new TrackLayoutLock(database);
 

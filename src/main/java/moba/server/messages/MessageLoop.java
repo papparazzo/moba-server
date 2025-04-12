@@ -23,6 +23,7 @@ package moba.server.messages;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.ErrorId;
@@ -32,15 +33,16 @@ import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
 import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.exceptions.ErrorException;
-import moba.server.utilities.logger.Loggable;
 
-public class MessageLoop implements Loggable {
+public class MessageLoop {
 
     protected Map<Integer, MessageHandlerA> handlers   = new HashMap<>();
     protected Dispatcher                    dispatcher;
+    protected Logger                         logger;
 
-    public MessageLoop(Dispatcher dispatcher) {
+    public MessageLoop(Dispatcher dispatcher, Logger logger) {
         this.dispatcher = dispatcher;
+        this.logger = logger;
     }
 
     public void addHandler(MessageHandlerA msgHandler) {
@@ -85,7 +87,7 @@ public class MessageLoop implements Loggable {
                         "handler for group <" + msg.getGroupId() + "> was not registered!"
                     );
 
-                getLogger().log(Level.WARNING, err.toString());
+                logger.log(Level.WARNING, err.toString());
 
                 dispatcher.send(new Message(ClientMessage.ERROR, err), msg.getEndpoint());
                 continue;
@@ -93,10 +95,10 @@ public class MessageLoop implements Loggable {
             try {
                 handlers.get(msg.getGroupId()).handleMsg(msg);
             } catch(ErrorException e) {
-                getLogger().log(Level.WARNING, "ErrorException! <{0}>", new Object[]{e.toString()});
+                logger.log(Level.WARNING, "ErrorException! <{0}>", new Object[]{e.toString()});
                 dispatcher.send(new Message(ClientMessage.ERROR, e.getErrorData()), msg.getEndpoint());
             } catch(Exception e) {
-                getLogger().log(Level.SEVERE, e.toString());
+                logger.log(Level.SEVERE, e.toString());
                 in.clear();
                 return true;
             }
