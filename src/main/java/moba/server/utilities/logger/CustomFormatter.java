@@ -21,6 +21,7 @@
 package moba.server.utilities.logger;
 
 import moba.server.datatypes.base.Version;
+
 import java.util.logging.*;
 import java.io.*;
 import java.text.*;
@@ -69,8 +70,7 @@ public class CustomFormatter extends Formatter {
                     record.getThrown().printStackTrace(pw);
                 }
                 sb.append(sw);
-            }
-            catch(Exception ex) {
+            } catch(Exception ex) {
                 // noop
             }
         }

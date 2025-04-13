@@ -202,7 +202,7 @@ public class Systems extends MessageHandlerA {
             case CENTRAL_STATION                 -> "Auslösegrund: Es wurde ein Nothalt durch die CentralStation ausgelöst";
             case EXTERN                          -> "Auslösegrund: Externe Hardware";
             case SELF_ACTING_BY_EXTERN_SWITCHING -> "Auslösegrund: Weichenstellung durch CS im Automatikmodus";
-            case SOFTWARE_MANUEL                 -> "Auslösegrund: Manuell durch Steuerungssoftware";
+            case SOFTWARE_MANUAL                 -> "Auslösegrund: Manuell durch Steuerungssoftware";
         };
     }
 

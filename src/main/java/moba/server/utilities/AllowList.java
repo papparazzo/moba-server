@@ -33,6 +33,9 @@ final public class AllowList {
     public AllowList(int maxEntries, ArrayList<String> allowed)
     throws InterruptedException, UnknownHostException {
         allowList = new CircularFifoQueue<>(maxEntries);
+        if(allowed == null) {
+            return;
+        }
         for(String addr: allowed) {
             add(addr);
         }
