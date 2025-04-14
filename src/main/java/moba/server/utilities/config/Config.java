@@ -38,7 +38,7 @@ public class Config {
     protected Map<String, Object> content;
 
     public Config(String fileName)
-    throws IOException, ConfigException {
+    throws IOException {
         InputStream is = new FileInputStream(fileName);
         this.fileName = fileName;
 
@@ -50,7 +50,7 @@ public class Config {
         Yaml yaml = new Yaml(options);
         content = yaml.load(is);
         if(content == null || content.isEmpty()) {
-            throw new ConfigException("content is empty");
+            throw new IllegalStateException("content is empty");
         }
     }
 
