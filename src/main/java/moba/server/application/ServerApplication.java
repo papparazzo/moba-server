@@ -86,12 +86,13 @@ final public class ServerApplication implements Loggable {
     @SuppressWarnings("unchecked")
     public void run()
     throws Exception {
-            Logger logger = getLogger();
-            boolean restart;
-            maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
-            int port = (int)(long)config.getSection("common.serverConfig.port");
-            var allowed = (ArrayList<String>)config.getSection("common.serverConfig.allowedIPs");
-            AllowList allowList = new AllowList(maxClients, allowed);
+        Logger logger = getLogger();
+        boolean restart;
+        maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
+        int port = (int)(long)config.getSection("common.serverConfig.port");
+        var allowed = (ArrayList<String>)config.getSection("common.serverConfig.allowedIPs");
+        var logList = new LogList();
+        AllowList allowList = new AllowList(maxClients, allowed);
 
         do {
             Dispatcher dispatcher = new Dispatcher(new MessageLogger(logger), logger);

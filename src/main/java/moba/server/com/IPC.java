@@ -60,7 +60,12 @@ final public class IPC extends Thread implements Loggable, BackgroundHandlerInte
         setName("ipc");
 
         try {
-            var attr = Files.readAttributes(new File(fifoFile).toPath(), BasicFileAttributes.class);
+            File f = new File(fifoFile);
+            if(!f.exists()) {
+                new ProcessBuilder("bash", "-c", "mkfifo " + fifoFile).inheritIO().start();
+            }
+
+            var attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
             if(!attr.isOther()) {
                 throw new RuntimeException("<" + fifoFile + "> is not a named pipe");
             }
