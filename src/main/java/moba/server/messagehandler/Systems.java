@@ -40,13 +40,13 @@ import moba.server.messages.messageType.SystemMessage;
 import moba.server.utilities.exceptions.ErrorException;
 import moba.server.utilities.lock.TrackLayoutLock;
 
-public class Systems extends MessageHandlerA {
-    protected HardwareState status = HardwareState.ERROR;
-    protected MessageQueue msgQueue;
-    protected ActiveLayout activeLayout;
+final public class Systems extends MessageHandlerA {
+    private HardwareState status = HardwareState.ERROR;
+    private boolean automaticMode = false;
 
-    protected boolean automaticMode = false;
-    protected TrackLayoutLock lock;
+    private final MessageQueue msgQueue;
+    private final ActiveLayout activeLayout;
+    private final TrackLayoutLock lock;
 
     public Systems(Dispatcher dispatcher, TrackLayoutLock lock, ActiveLayout activeLayout, MessageQueue msgQueue) {
         this.dispatcher   = dispatcher;
@@ -105,18 +105,15 @@ public class Systems extends MessageHandlerA {
             case HARDWARE_RESET:
                 msgQueue.add(new Message(InternMessage.SERVER_RESET, null));
                 break;
-
-            default:
-                throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">.");
         }
     }
 
-    protected void setAutomaticMode(Message msg)
+    private void setAutomaticMode(Message msg)
     throws ErrorException {
         setAutomaticMode(msg, false);
     }
 
-    protected void setAutomaticMode(Message msg, boolean toggle)
+    private void setAutomaticMode(Message msg, boolean toggle)
     throws ErrorException {
         if(status == HardwareState.ERROR || status == HardwareState.EMERGENCY_STOP || status == HardwareState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
@@ -171,7 +168,7 @@ public class Systems extends MessageHandlerA {
         );
     }
 
-    protected void triggerEmergencyStop(Message msg)
+    private void triggerEmergencyStop(Message msg)
     throws ErrorException {
         if(status == HardwareState.ERROR || status == HardwareState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
@@ -196,7 +193,7 @@ public class Systems extends MessageHandlerA {
         msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.EMERGENCY_STOP));
     }
 
-    protected String getEmergencyStopReason(String reason)
+    private String getEmergencyStopReason(String reason)
     throws ErrorException {
         return switch(CheckedEnum.getFromString(EmergencyTriggerReason.class, reason)) {
             case CENTRAL_STATION                 -> "Auslösegrund: Es wurde ein Nothalt durch die CentralStation ausgelöst";
@@ -206,7 +203,7 @@ public class Systems extends MessageHandlerA {
         };
     }
 
-    protected void releaseEmergencyStop(Message msg) {
+    private void releaseEmergencyStop(Message msg) {
         if(status == HardwareState.ERROR || status == HardwareState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
             return;
@@ -231,11 +228,11 @@ public class Systems extends MessageHandlerA {
         }
     }
 
-    protected void setStandByMode(Message msg) {
+    private void setStandByMode(Message msg) {
         setStandByMode(msg, false);
     }
 
-    protected void setStandByMode(Message msg, boolean toggle) {
+    private void setStandByMode(Message msg, boolean toggle) {
         if(status == HardwareState.ERROR || status == HardwareState.EMERGENCY_STOP) {
             sendErrorMessage(msg.getEndpoint());
             return;
@@ -283,7 +280,7 @@ public class Systems extends MessageHandlerA {
         }
     }
 
-    protected void sendErrorMessage(Endpoint endpoint) {
+    private void sendErrorMessage(Endpoint endpoint) {
         dispatcher.send(
             new Message(
                 ClientMessage.ERROR,

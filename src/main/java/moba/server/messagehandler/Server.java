@@ -57,9 +57,7 @@ final public class Server extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg)
     throws ErrorException {
-        ServerMessage sMsg = ServerMessage.fromId(msg.getMessageId());
-
-        switch(sMsg) {
+        switch(ServerMessage.fromId(msg.getMessageId())) {
             case INFO_REQ            -> handleServerInfoReq(msg.getEndpoint());
             case CON_CLIENTS_REQ     -> handleClientsReq(msg.getEndpoint());
             case RESET_CLIENT        -> sendToClient(msg, ClientMessage.RESET);
@@ -67,13 +65,9 @@ final public class Server extends MessageHandlerA {
             case ADD_ALLOWED_IP      -> handleAddIpAddress(msg);
             case GET_ALLOWED_IP_LIST -> handleGetAllowedIpList(msg.getEndpoint());
             case SET_ALLOWED_IP_LIST -> handleSetAllowedIpList(msg);
-            default                  ->
-                throw new ErrorException(
-                    ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">."
-                );
+            case GET_LOG_LIST        -> handleGetLogList(msg.getEndpoint());
         }
     }
-
 
     private void sendToClient(Message msg, MessageType mType)
     throws ErrorException {

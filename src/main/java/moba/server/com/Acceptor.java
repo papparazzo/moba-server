@@ -91,7 +91,7 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
                 }
                 if(dispatcher.getEndPointsCount() == maxClients) {
                     socket.close();
-                    getLogger().log(Level.SEVERE, "Max amount of clients <{0}> connected!", new Object[]{maxClients});
+                    getLogger().log(Level.WARNING, "Max amount of clients <{0}> connected!", new Object[]{maxClients});
                     continue;
                 }
                 (new Endpoint(id, socket, msgQueue)).start();
@@ -108,7 +108,7 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
         if(allowList.isAllowed(addr)) {
             return true;
         }
-        getLogger().log(Level.SEVERE, "access of ip <{0}> is forbidden!", new Object[]{addr});
+        getLogger().log(Level.WARNING, "access of ip <{0}> is forbidden!", new Object[]{addr});
         return false;
     }
 }

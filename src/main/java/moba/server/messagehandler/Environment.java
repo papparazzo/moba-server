@@ -25,14 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import moba.server.com.Dispatcher;
 
-import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.objects.EnvironmentData;
-import moba.server.json.JSONException;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.EnvironmentMessage;
 import moba.server.utilities.config.Config;
-import moba.server.utilities.config.ConfigException;
 import moba.server.utilities.exceptions.ErrorException;
 
 public class Environment extends MessageHandlerA {
@@ -56,32 +53,24 @@ public class Environment extends MessageHandlerA {
     @Override
     @SuppressWarnings("unchecked")
     public void handleMsg(Message msg)
-    throws ErrorException {
-        try {
-            switch(EnvironmentMessage.fromId(msg.getMessageId())) {
+    throws ErrorException, IOException {
+        switch(EnvironmentMessage.fromId(msg.getMessageId())) {
+            case GET_ENVIRONMENT ->
+                dispatcher.send(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment), msg.getEndpoint());
 
-                case GET_ENVIRONMENT -> 
-                    dispatcher.send(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment), msg.getEndpoint());
-
-                case SET_ENVIRONMENT -> {
-                    environment.fromJsonObject((Map<String, Object>)msg.getData());
-                    storeData();
-                    dispatcher.broadcast(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment));
-                }
-
-                case SET_AMBIENCE, SET_AMBIENT_LIGHT ->
-                    dispatcher.broadcast(msg);
-
-                default ->
-                    throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">.");
+            case SET_ENVIRONMENT -> {
+                environment.fromJsonObject((Map<String, Object>)msg.getData());
+                storeData();
+                dispatcher.broadcast(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment));
             }
-        } catch(java.lang.ClassCastException | IOException | JSONException | ConfigException | NullPointerException | IllegalArgumentException e) {
-            throw new ErrorException(ErrorId.FAULTY_MESSAGE, e.getMessage());
+
+            case SET_AMBIENCE, SET_AMBIENT_LIGHT ->
+                dispatcher.broadcast(msg);
         }
     }
 
     protected void storeData()
-    throws ConfigException, IOException, JSONException {
+    throws IOException {
         HashMap<String, Object> map = new HashMap<>();
         map.put("environment", environment);
         config.setSection("environment", map);

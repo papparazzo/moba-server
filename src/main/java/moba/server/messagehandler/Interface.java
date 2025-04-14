@@ -65,12 +65,6 @@ public class Interface extends MessageHandlerA {
             case SET_LOCO_FUNCTION:
             case SWITCH_ACCESSORY_DECODERS:
                 dispatcher.broadcast(msg);
-                return;
-
-            default:
-                throw new ErrorException(
-                    ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">."
-                );
         }
     }
 

@@ -41,8 +41,8 @@ import moba.server.utilities.exceptions.ErrorException;
 /*
  * https://www.laenderdaten.info/Europa/Deutschland/sonnenuntergang.php
  *
- * ab  4:00 Uhr Sonnenaufgang
- * ab  5:00 Uhr Tag
+ * ab 04:00 Uhr Sonnenaufgang
+ * ab 05:00 Uhr Tag
  * ab 21:00 Uhr Sonnenuntergang
  * ab 22:00 Uht Nacht
  */
@@ -116,7 +116,7 @@ public class Timer extends MessageHandlerA implements Runnable {
     }
 
     protected void storeData()
-    throws ConfigException, IOException, JSONException {
+    throws IOException {
         HashMap<String, Object> map = new HashMap<>();
         map.put("globalTimer", timerData);
         config.setSection("globalTimer", map);

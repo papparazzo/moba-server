@@ -34,11 +34,11 @@ import moba.server.messages.messageType.InternMessage;
 import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.exceptions.ErrorException;
 
-public class MessageLoop {
+final public class MessageLoop {
 
-    protected Map<Integer, MessageHandlerA> handlers   = new HashMap<>();
-    protected Dispatcher                    dispatcher;
-    protected Logger                         logger;
+    private final Map<Integer, MessageHandlerA> handlers   = new HashMap<>();
+    private final Dispatcher                    dispatcher;
+    private final Logger                        logger;
 
     public MessageLoop(Dispatcher dispatcher, Logger logger) {
         this.dispatcher = dispatcher;
@@ -112,27 +112,27 @@ public class MessageLoop {
         }
     }
 
-    protected void resetHandler() {
+    private void resetHandler() {
         dispatcher.getEndpoints().forEach((ep) -> dispatcher.send(new Message(ClientMessage.RESET, null), ep));
         for(Integer integer: handlers.keySet()) {
             handlers.get(integer).shutdown();
         }
     }
 
-    protected void shutdownHandler() {
+    private void shutdownHandler() {
         dispatcher.getEndpoints().forEach((ep) -> dispatcher.send(new Message(ClientMessage.SHUTDOWN, null), ep));
         for(Integer integer: handlers.keySet()) {
             handlers.get(integer).shutdown();
         }
     }
 
-    protected void hardwareStateChangedHandler(HardwareState state) {
+    private void hardwareStateChangedHandler(HardwareState state) {
         for(Integer integer: handlers.keySet()) {
             handlers.get(integer).hardwareStateChanged(state);
         }
     }
 
-    protected void handleClientClose(Message msg) {
+    private void handleClientClose(Message msg) {
         long appId = msg.getEndpoint().getAppId();
         freeResources(appId);
         dispatcher.removeEndpoint(msg.getEndpoint());

@@ -31,7 +31,7 @@ final public class AllowList {
     private final CircularFifoQueue<InetAddress> allowList;
 
     public AllowList(int maxEntries, ArrayList<String> allowed)
-    throws InterruptedException, UnknownHostException {
+    throws UnknownHostException {
         allowList = new CircularFifoQueue<>(maxEntries);
         if(allowed == null) {
             return;
@@ -73,7 +73,6 @@ final public class AllowList {
         if (ip.isAnyLocalAddress() || ip.isLoopbackAddress()) {
             return true;
         }
-
         return allowList.contains(ip);
     }
 }

@@ -76,43 +76,17 @@ public class Layout extends MessageHandlerA implements Loggable {
 
     @Override
     public void handleMsg(Message msg)
-    throws ErrorException {
-        try {
-            switch(LayoutMessage.fromId(msg.getMessageId())) {
-                case GET_LAYOUTS_REQ -> 
-                    getLayouts(msg);
-
-                case GET_LAYOUT_REQ ->
-                    getLayout(msg, true);
-
-                case GET_LAYOUT_READ_ONLY_REQ ->
-                    getLayout(msg, false);
-
-                case DELETE_LAYOUT -> 
-                    deleteLayout(msg);
-
-                case CREATE_LAYOUT -> 
-                    createLayout(msg);
-
-                case UPDATE_LAYOUT -> 
-                    updateLayout(msg);
-
-                case UNLOCK_LAYOUT -> 
-                    unlockLayout(msg);
-
-                case LOCK_LAYOUT -> 
-                    lockLayout(msg);
-
-                case SAVE_LAYOUT -> 
-                    saveLayout(msg);
-
-                default -> 
-                    throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">.");
-            }
-        } catch(SQLException e) {
-            throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
-        } catch(IOException e) {
-            throw new ErrorException(ErrorId.UNKNOWN_ERROR, e.getMessage());
+    throws ErrorException, SQLException {
+        switch(LayoutMessage.fromId(msg.getMessageId())) {
+            case GET_LAYOUTS_REQ          -> getLayouts(msg);
+            case GET_LAYOUT_REQ           -> getLayout(msg, true);
+            case GET_LAYOUT_READ_ONLY_REQ -> getLayout(msg, false);
+            case DELETE_LAYOUT            -> deleteLayout(msg);
+            case CREATE_LAYOUT            -> createLayout(msg);
+            case UPDATE_LAYOUT            -> updateLayout(msg);
+            case UNLOCK_LAYOUT            -> unlockLayout(msg);
+            case LOCK_LAYOUT              -> lockLayout(msg);
+            case SAVE_LAYOUT              -> saveLayout(msg);
         }
     }
 
@@ -167,7 +141,7 @@ public class Layout extends MessageHandlerA implements Loggable {
 
     @SuppressWarnings("unchecked")
     protected void createLayout(Message msg)
-    throws SQLException, IOException, ErrorException {
+    throws SQLException, ErrorException {
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         boolean isActive = (boolean)map.get("active");
         long    currAppId = msg.getEndpoint().getAppId();

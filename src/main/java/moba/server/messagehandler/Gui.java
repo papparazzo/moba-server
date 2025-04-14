@@ -20,9 +20,9 @@
 
 package moba.server.messagehandler;
 
-import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
+import moba.server.messages.messageType.GuiMessage;
 import moba.server.utilities.exceptions.ErrorException;
 
 public class Gui extends MessageHandlerA {
@@ -38,15 +38,8 @@ public class Gui extends MessageHandlerA {
     @Override
     public void handleMsg(Message msg)
     throws ErrorException {
-        switch(msg.getMessageId()) {
-            case SYSTEM_NOTICE ->
-                sendSystemNotice(msg);
-
-            default ->
-                throw new ErrorException(
-                    ErrorId.UNKNOWN_MESSAGE_ID,
-                    "unknown msg <" + Long.toString(msg.getMessageId()) + ">."
-                );
+        switch(GuiMessage.fromId(msg.getMessageId())) {
+            case SYSTEM_NOTICE -> sendSystemNotice(msg);
         }
     }
 

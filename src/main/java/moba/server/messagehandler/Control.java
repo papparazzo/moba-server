@@ -81,43 +81,16 @@ public class Control extends MessageHandlerA implements Loggable {
 
     @Override
     public void handleMsg(Message msg)
-    throws ErrorException {
-        try {
-            switch(ControlMessage.fromId(msg.getMessageId())) {
-                case GET_BLOCK_LIST_REQ:
-                    getBlockList(msg);
-                    break;
-
-                case SAVE_BLOCK_LIST:
-                    saveBlockList(msg);
-
-                case GET_SWITCH_STAND_LIST_REQ:
-                    getSwitchStateList(msg);
-                    break;
-
-                case GET_TRAIN_LIST_REQ:
-                    getTrainList(msg);
-                    break;
-
-                case LOCK_BLOCK:
-                    lockBlock(msg, false);
-                    break;
-
-                case LOCK_BLOCK_WAITING:
-                    lockBlock(msg, true);
-                    break;
-
-                case UNLOCK_BLOCK:
-                    unLockBlock(msg);
-                    break;
-
-                case PUSH_TRAIN:
-                    pushTrain(msg);
-                    break;
-
-            }
-        } catch(SQLException e) {
-            throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
+    throws ErrorException, SQLException {
+        switch(ControlMessage.fromId(msg.getMessageId())) {
+            case GET_BLOCK_LIST_REQ        -> getBlockList(msg);
+            case SAVE_BLOCK_LIST           -> saveBlockList(msg);
+            case GET_SWITCH_STAND_LIST_REQ -> getSwitchStateList(msg);
+            case GET_TRAIN_LIST_REQ        -> getTrainList(msg);
+            case LOCK_BLOCK                -> lockBlock(msg, false);
+            case LOCK_BLOCK_WAITING        -> lockBlock(msg, true);
+            case UNLOCK_BLOCK              -> unLockBlock(msg);
+            case PUSH_TRAIN                -> pushTrain(msg);
         }
     }
 
@@ -243,7 +216,6 @@ Integer	trainId
 
     }
 
-    @SuppressWarnings("unchecked")
     protected void getSwitchStateList(Message msg)
     throws SQLException, ErrorException {
         long id = activeLayout.getActiveLayout(msg.getData());

@@ -29,7 +29,7 @@ public abstract class MessageHandlerA {
     protected Dispatcher dispatcher = null;
 
     public abstract void handleMsg(Message msg)
-    throws ErrorException;
+    throws Exception;
 
     public void freeResources(long appId) {
     }
