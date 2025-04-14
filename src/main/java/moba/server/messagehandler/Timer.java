@@ -30,12 +30,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import moba.server.com.Dispatcher;
-import moba.server.json.JSONException;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.TimerMessage;
 import moba.server.utilities.config.Config;
-import moba.server.utilities.config.ConfigException;
 import moba.server.utilities.exceptions.ErrorException;
 
 /*
@@ -77,25 +75,16 @@ public class Timer extends MessageHandlerA implements Runnable {
     @Override
     @SuppressWarnings("unchecked")
     public void handleMsg(Message msg)
-    throws ErrorException {
-        try {
-            switch(TimerMessage.fromId(msg.getMessageId())) {
-                case GET_GLOBAL_TIMER -> 
-                    dispatcher.send(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData), msg.getEndpoint());
+    throws ErrorException, IOException {
+        switch(TimerMessage.fromId(msg.getMessageId())) {
+            case GET_GLOBAL_TIMER ->
+                dispatcher.send(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData), msg.getEndpoint());
 
-                case SET_GLOBAL_TIMER -> {
-                    timerData.fromJsonObject((Map<String, Object>)msg.getData());
-                    storeData();
-                    dispatcher.broadcast(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData));
-                }
-
-                default -> 
-                    throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg <" + Long.toString(msg.getMessageId()) + ">.");
+            case SET_GLOBAL_TIMER -> {
+                timerData.fromJsonObject((Map<String, Object>)msg.getData());
+                storeData();
+                dispatcher.broadcast(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData));
             }
-        } catch(java.lang.ClassCastException | IOException | JSONException | ConfigException | NullPointerException e) {
-            throw new ErrorException(ErrorId.FAULTY_MESSAGE, e.getMessage());
-        } catch(IllegalArgumentException e) {
-            throw new ErrorException(ErrorId.INVALID_DATA_SEND, e.getMessage());
         }
     }
 

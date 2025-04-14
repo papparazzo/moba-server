@@ -86,7 +86,6 @@ final public class ServerApplication implements Loggable {
     @SuppressWarnings("unchecked")
     public void run()
     throws Exception {
-        try {
             Logger logger = getLogger();
             boolean restart;
             maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
@@ -94,16 +93,16 @@ final public class ServerApplication implements Loggable {
             var allowed = (ArrayList<String>)config.getSection("common.serverConfig.allowedIPs");
             AllowList allowList = new AllowList(maxClients, allowed);
 
-            do {
-                Dispatcher dispatcher = new Dispatcher(new MessageLogger(logger), logger);
-                Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
-                MessageLoop  loop = new MessageLoop(dispatcher, logger);
-                ActiveLayout activeLayout = new ActiveLayout(dispatcher, config);
-                TrackLayoutLock lock = new TrackLayoutLock(database);
+        do {
+            Dispatcher dispatcher = new Dispatcher(new MessageLogger(logger), logger);
+            Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
+            MessageLoop  loop = new MessageLoop(dispatcher, logger);
+            ActiveLayout activeLayout = new ActiveLayout(dispatcher, config);
+            TrackLayoutLock lock = new TrackLayoutLock(database);
 
-                BackgroundHandlerComposite handler = new BackgroundHandlerComposite();
-                handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList));
-                handler.add(new IPC((String)config.getSection("common.serverConfig.ipc"), msgQueueIn));
+            BackgroundHandlerComposite handler = new BackgroundHandlerComposite();
+            handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList));
+            handler.add(new IPC((String)config.getSection("common.serverConfig.ipc"), msgQueueIn));
 
                 loop.addHandler(new Client(dispatcher));
                 loop.addHandler(new Server(dispatcher, this, allowList, config));
@@ -115,13 +114,10 @@ final public class ServerApplication implements Loggable {
                 loop.addHandler(new Control(dispatcher, database, activeLayout));
                 loop.addHandler(new Gui());
 
-                handler.start();
-                restart = loop.loop(msgQueueIn);
-                dispatcher.resetDispatcher();
-                handler.halt();
-            } while(restart);
-        } catch(DatabaseException | InterruptedException e) {
-            throw new Exception(e);
-        }
+            handler.start();
+            restart = loop.loop(msgQueueIn);
+            dispatcher.resetDispatcher();
+            handler.halt();
+        } while(restart);
     }
 }
