@@ -95,7 +95,6 @@ public class JSONEncoder {
         Class<?> cls = object.getClass();
 
         boolean firstIteration = true;
-        boolean handleRecord = cls.isRecord();
 
         Method[] methods = cls.getMethods();
         for(final Method method : methods) {
@@ -115,11 +114,11 @@ public class JSONEncoder {
                 continue;
             }
 
-            if(!handleRecord && (!methodName.startsWith("get") || methodName.length() < 4)) {
+            if(!methodName.startsWith("get") || methodName.length() < 4) {
                 continue;
             }
 
-            String key = methodName.substring(handleRecord ? 0 : 3);
+            String key = methodName.substring(3);
 
             key = 
                 key.substring(0, 1).toLowerCase(Locale.ROOT) +
@@ -136,6 +135,39 @@ public class JSONEncoder {
                 addJSONValue(method.invoke(object));
             } catch (IllegalAccessException | InvocationTargetException exception) {
                 throw new JSONException("error in invoking method <" + methodName + ">", exception);
+            }
+            firstIteration = false;
+        }
+        writer.write('}');
+    }
+
+    protected void addRecord(Object object)
+    throws IOException, JSONException {
+        writer.write('{');
+
+        Class<?> cls = object.getClass();
+
+        Field[] fields = cls.getDeclaredFields();
+
+        boolean firstIteration = true;
+
+        for(Field field : fields) {
+            field.setAccessible(true);
+
+            if(!firstIteration) {
+                writer.write(',');
+            }
+
+            String key = field.getName();
+
+            writer.write('"');
+            writer.write(key);
+            writer.write("\":");
+
+            try {
+                addJSONValue(field.get(object));
+            } catch (IllegalAccessException exception) {
+                throw new JSONException("error in invoking method <" + key + ">", exception);
             }
             firstIteration = false;
         }
@@ -174,6 +206,8 @@ public class JSONEncoder {
             writer.write(jSONToStringI.toJsonString(formatted, indent));
         } else if(object instanceof Set set) {
             addSet(set);
+        } else if(object instanceof Record) {
+            addRecord(object);
         } else {
             addObject(object);
         }
