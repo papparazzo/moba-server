@@ -20,12 +20,15 @@
 
 package moba.server.messages;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import moba.server.com.Dispatcher;
+import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.objects.ErrorData;
@@ -80,33 +83,33 @@ final public class MessageLoop {
                 }
             }
 
-            if(!handlers.containsKey(msg.getGroupId())) {
-                ErrorData err =
-                    new ErrorData(
-                        ErrorId.UNKNOWN_GROUP_ID,
-                        "handler for group <" + msg.getGroupId() + "> was not registered!"
-                    );
-
-                logger.log(Level.WARNING, err.toString());
-
-                dispatcher.send(new Message(ClientMessage.ERROR, err), msg.getEndpoint());
-                continue;
-            }
             try {
+                checkGroup(msg.getGroupId());
                 handlers.get(msg.getGroupId()).handleMsg(msg);
             } catch(ErrorException e) {
-                logger.log(Level.WARNING, "ErrorException! <{0}>", new Object[]{e.toString()});
-                dispatcher.send(new Message(ClientMessage.ERROR, e.getErrorData()), msg.getEndpoint());
+                handleException(e.getErrorId(), e, msg.getEndpoint());
+            } catch(IllegalArgumentException e) {
+                handleException(ErrorId.INVALID_DATA_SEND, e, msg.getEndpoint());
+            } catch(java.lang.ClassCastException | IOException | NullPointerException e) {
+                handleException(ErrorId.FAULTY_MESSAGE, e, msg.getEndpoint());
+            } catch(SQLException e) {
+                handleException(ErrorId.DATABASE_ERROR, e, msg.getEndpoint());
             } catch(Exception e) {
-                logger.log(Level.SEVERE, e.toString());
+                handleException(ErrorId.UNKNOWN_ERROR, e, msg.getEndpoint());
                 in.clear();
                 return true;
             }
         }
     }
 
-    protected void freeResources(long appId) {
+    private void checkGroup(int groupId)
+    throws ErrorException {
+        if(!handlers.containsKey(groupId)) {
+            throw new ErrorException(ErrorId.UNKNOWN_GROUP_ID, "no handler for group <" + groupId + ">!");
+        }
+    }
 
+    private void freeResources(long appId) {
         for(Integer integer: handlers.keySet()) {
             handlers.get(integer).freeResources(appId);
         }
@@ -137,5 +140,13 @@ final public class MessageLoop {
         freeResources(appId);
         dispatcher.removeEndpoint(msg.getEndpoint());
         dispatcher.broadcast(new Message(ServerMessage.CLIENT_CLOSED, appId));
+    }
+
+    private void handleException(ErrorId id, Throwable e, Endpoint ep) {
+        String message = e.toString();
+        String stack = e.getStackTrace()[0].toString();
+
+        logger.log(Level.SEVERE, "Exception! <" + message + "> -> " + stack);
+        dispatcher.send(new Message(ClientMessage.ERROR, new ErrorData(id, e.getMessage())), ep);
     }
 }
