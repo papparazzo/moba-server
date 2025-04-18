@@ -20,41 +20,7 @@
 
 package moba.server.datatypes.objects;
 
-import java.io.IOException;
-import java.util.HashMap;
-
 import moba.server.datatypes.enumerations.ErrorId;
-import moba.server.json.JSONEncoder;
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 
-public class ErrorData implements JSONToStringI {
-
-    protected final ErrorId errorId;
-    protected final String additionalMsg;
-
-    public ErrorData(ErrorId errorId, String additionalMsg) {
-        this.errorId = errorId;
-        this.additionalMsg = additionalMsg;
-    }
-
-    @Override
-    public String toString() {
-        return "[" + errorId.toString() + "] " + additionalMsg;
-    }
-
-    @Override
-    public String toJsonString(boolean formatted, int indent)
-    throws JSONException, IOException {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("errorId",      errorId);
-        map.put("additionalMsg", additionalMsg);
-
-        StringBuilder sb = new StringBuilder();
-        JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb, formatted);
-        encoder.encode(map, indent);
-        return sb.toString();
-    }
+public record ErrorData(ErrorId errorId, String additionalMsg) {
 }
