@@ -27,8 +27,8 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 
 import moba.server.database.Database;
-import moba.server.datatypes.enumerations.ErrorId;
-import moba.server.utilities.exceptions.ErrorException;
+import moba.server.datatypes.enumerations.ClientError;
+import moba.server.utilities.exceptions.ClientErrorException;
 
 public final class TrackLayoutLock extends AbstractLock {
 
@@ -69,63 +69,55 @@ public final class TrackLayoutLock extends AbstractLock {
 
     @Override
     public void tryLock(long appId, Object data)
-    throws ErrorException {
-        try {
-            long id = (long)data;
+    throws ClientErrorException, SQLException {
+        long id = (long)data;
 
-            if(isLockedByApp(appId, data)) {
-                return;
+        if(isLockedByApp(appId, data)) {
+            return;
+        }
+
+        Connection con = database.getConnection();
+        String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` IS NULL AND `id` = ? ";
+
+        try(PreparedStatement stmt = con.prepareStatement(q)) {
+            stmt.setLong(1, appId);
+            stmt.setLong(2, id);
+
+            getLogger().log(Level.INFO, stmt.toString());
+
+            if(stmt.executeUpdate() == 0) {
+                throw new ClientErrorException(ClientError.DATASET_LOCKED, "object is already locked");
             }
-
-            Connection con = database.getConnection();
-            String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` IS NULL AND `id` = ? ";
-
-            try(PreparedStatement stmt = con.prepareStatement(q)) {
-                stmt.setLong(1, appId);
-                stmt.setLong(2, id);
-
-                getLogger().log(Level.INFO, stmt.toString());
-
-                if(stmt.executeUpdate() == 0) {
-                    throw new ErrorException(ErrorId.DATASET_LOCKED, "object is already locked");
-                }
-            }
-        } catch(SQLException e) {
-            throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
         }
     }
 
     @Override
     public void unlock(long appId, Object data)
-    throws ErrorException {
-        try {
-            long id = (long)data;
+    throws ClientErrorException, SQLException {
+        long id = (long)data;
 
-            if(!isLockedByApp(appId, data)) {
-                return;
+        if(!isLockedByApp(appId, data)) {
+            return;
+        }
+
+        Connection con = database.getConnection();
+        String q = "UPDATE `TrackLayouts` SET `locked` = NULL WHERE `locked` = ? AND `id` = ? ";
+
+        try(PreparedStatement stmt = con.prepareStatement(q)) {
+            stmt.setLong(1, appId);
+            stmt.setLong(2, id);
+
+            getLogger().log(Level.INFO, stmt.toString());
+
+            if(stmt.executeUpdate() == 0) {
+                throw new ClientErrorException(ClientError.DATASET_MISSING, "no layout found with id <" + id + ">");
             }
-
-            Connection con = database.getConnection();
-            String q = "UPDATE `TrackLayouts` SET `locked` = NULL WHERE `locked` = ? AND `id` = ? ";
-
-            try(PreparedStatement stmt = con.prepareStatement(q)) {
-                stmt.setLong(1, appId);
-                stmt.setLong(2, id);
-
-                getLogger().log(Level.INFO, stmt.toString());
-
-                if(stmt.executeUpdate() == 0) {
-                    throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + id + ">");
-                }
-            }
-        } catch(SQLException e) {
-            throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
         }
     }
 
     @Override
     public boolean isLockedByApp(long appId, Object data)
-    throws ErrorException {
+    throws ClientErrorException, SQLException {
         var lockedBy = getIdOfLockingApp(data);
 
         getLogger().log(Level.INFO, "object is locked by <{1}>", new Object[]{lockedBy});
@@ -136,29 +128,25 @@ public final class TrackLayoutLock extends AbstractLock {
         if(lockedBy == appId) {
             return true;
         }
-        throw new ErrorException(ErrorId.DATASET_LOCKED, "object is locked by <" + lockedBy + ">");
+        throw new ClientErrorException(ClientError.DATASET_LOCKED, "object is locked by <" + lockedBy + ">");
     }
 
     private Long getIdOfLockingApp(Object data)
-    throws ErrorException {
-        try {
-            long id = (long)data;
-            Connection con = database.getConnection();
+    throws ClientErrorException, SQLException {
+        long id = (long)data;
+        Connection con = database.getConnection();
 
-            String q = "SELECT `locked` FROM `TrackLayouts` WHERE `Id` = ?";
+        String q = "SELECT `locked` FROM `TrackLayouts` WHERE `Id` = ?";
 
-            try(PreparedStatement stmt = con.prepareStatement(q)) {
-                stmt.setLong(1, id);
-                getLogger().log(Level.INFO, stmt.toString());
-                ResultSet rs = stmt.executeQuery();
-                if(!rs.next()) {
-                    throw new ErrorException(ErrorId.DATASET_MISSING, "no layout found with id <" + id + ">");
-                }
-                var val = rs.getLong("locked");
-                return rs.wasNull() ? null : val;
+        try(PreparedStatement stmt = con.prepareStatement(q)) {
+            stmt.setLong(1, id);
+            getLogger().log(Level.INFO, stmt.toString());
+            ResultSet rs = stmt.executeQuery();
+            if(!rs.next()) {
+                throw new ClientErrorException(ClientError.DATASET_MISSING, "no layout found with id <" + id + ">");
             }
-        } catch(SQLException e) {
-            throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
+            var val = rs.getLong("locked");
+            return rs.wasNull() ? null : val;
         }
     }
 }

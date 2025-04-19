@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 
 import moba.server.database.Database;
-import moba.server.datatypes.enumerations.ErrorId;
+import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.objects.TrackLayoutInfoData;
 import moba.server.datatypes.objects.TrackLayoutSymbolData;
 import java.io.IOException;
@@ -42,8 +42,9 @@ import moba.server.datatypes.objects.helper.ActiveLayout;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.LayoutMessage;
+import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.utilities.exceptions.SystemErrorException;
 import moba.server.utilities.lock.TrackLayoutLock;
-import moba.server.utilities.exceptions.ErrorException;
 import moba.server.utilities.logger.Loggable;
 
 public class Layout extends MessageHandlerA implements Loggable {
@@ -76,7 +77,7 @@ public class Layout extends MessageHandlerA implements Loggable {
 
     @Override
     public void handleMsg(Message msg)
-    throws ErrorException, SQLException {
+    throws ClientErrorException, SQLException, IOException, SystemErrorException {
         switch(LayoutMessage.fromId(msg.getMessageId())) {
             case GET_LAYOUTS_REQ          -> getLayouts(msg);
             case GET_LAYOUT_REQ           -> getLayout(msg, true);
@@ -117,7 +118,7 @@ public class Layout extends MessageHandlerA implements Loggable {
     }
 
     protected void deleteLayout(Message msg)
-    throws SQLException, ErrorException {
+    throws SQLException, ClientErrorException, IOException {
         long id = (Long)msg.getData();
         lock.isLockedByApp(msg.getEndpoint().getAppId(), id);
 
@@ -129,7 +130,7 @@ public class Layout extends MessageHandlerA implements Loggable {
             pstmt.setLong(2, id);
             getLogger().log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
             if(pstmt.executeUpdate() == 0) {
-                throw new ErrorException(ErrorId.DATASET_MISSING, "could not delete <" + id + ">");
+                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not delete <" + id + ">");
             }
         }
         if(id == activeLayout.getActiveLayout()) {
@@ -141,7 +142,7 @@ public class Layout extends MessageHandlerA implements Loggable {
 
     @SuppressWarnings("unchecked")
     protected void createLayout(Message msg)
-    throws SQLException, ErrorException {
+    throws SQLException, ClientErrorException, IOException {
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         boolean isActive = (boolean)map.get("active");
         long    currAppId = msg.getEndpoint().getAppId();
@@ -177,7 +178,7 @@ public class Layout extends MessageHandlerA implements Loggable {
 
     @SuppressWarnings("unchecked")
     protected void updateLayout(Message msg)
-    throws SQLException, ErrorException {
+    throws SQLException, ClientErrorException, IOException {
         Map<String, Object> map = (Map<String, Object>)msg.getData();
 
         long id = (Long)map.get("id");
@@ -200,7 +201,7 @@ public class Layout extends MessageHandlerA implements Loggable {
             stmt.setLong(5, id);
             getLogger().log(Level.INFO, stmt.toString());
             if(stmt.executeUpdate() == 0) {
-                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + id + ">");
+                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not update <" + id + ">");
             }
             if(active) {
                 // TODO: Check if auto-mode
@@ -211,21 +212,21 @@ public class Layout extends MessageHandlerA implements Loggable {
     }
 
     protected void unlockLayout(Message msg)
-    throws ErrorException {
+    throws ClientErrorException, SQLException {
         long id = activeLayout.getActiveLayout(msg.getData());
         lock.unlock(msg.getEndpoint().getAppId(), id);
         dispatcher.broadcast(new Message(LayoutMessage.UNLOCK_LAYOUT, id));
     }
 
     protected void lockLayout(Message msg)
-    throws ErrorException {
+    throws ClientErrorException, SQLException {
         long id = activeLayout.getActiveLayout(msg.getData());
         lock.tryLock(msg.getEndpoint().getAppId(), id);
         dispatcher.broadcast(new Message(LayoutMessage.LOCK_LAYOUT, id));
     }
 
     protected void getLayout(Message msg, boolean tryLock)
-    throws SQLException, ErrorException {
+    throws SQLException, ClientErrorException {
         long id = activeLayout.getActiveLayout(msg.getData());
 
         if(tryLock) {
@@ -261,13 +262,13 @@ public class Layout extends MessageHandlerA implements Loggable {
 
     @SuppressWarnings("unchecked")
     protected void saveLayout(Message msg)
-    throws SQLException, ErrorException {
+    throws SQLException, ClientErrorException {
 
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         long id = activeLayout.getActiveLayout(map.get("id"));
 
         if(!lock.isLockedByApp(msg.getEndpoint().getAppId(), id)) {
-            throw new ErrorException(ErrorId.DATASET_NOT_LOCKED, "layout <" + id + "> not locked");
+            throw new ClientErrorException(ClientError.DATASET_NOT_LOCKED, "layout <" + id + "> not locked");
         }
 
         Connection con = database.getConnection();
@@ -278,7 +279,7 @@ public class Layout extends MessageHandlerA implements Loggable {
             pstmt.setLong(1, id);
             getLogger().log(Level.INFO, pstmt.toString());
             if(pstmt.executeUpdate() == 0) {
-                throw new ErrorException(ErrorId.DATASET_MISSING, "could not save <" + id + ">");
+                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not save <" + id + ">");
             }
         }
 

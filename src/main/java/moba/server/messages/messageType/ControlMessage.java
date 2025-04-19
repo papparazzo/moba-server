@@ -19,9 +19,9 @@
  */
 package moba.server.messages.messageType;
 
-import moba.server.datatypes.enumerations.ErrorId;
+import moba.server.datatypes.enumerations.SystemError;
 import moba.server.messages.MessageType;
-import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.exceptions.SystemErrorException;
 
 public enum ControlMessage implements MessageType {
     GET_BLOCK_LIST_REQ        (1),
@@ -59,12 +59,15 @@ public enum ControlMessage implements MessageType {
     }
 
     public static ControlMessage fromId(int id)
-    throws ErrorException {
+    throws SystemErrorException {
         for(ControlMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }
         }
-        throw new ErrorException(ErrorId.UNKNOWN_MESSAGE_ID, "unknown msg [" + Long.toString(GROUP_ID) + ":" + Long.toString(id) + "].");
+        throw new SystemErrorException(
+            SystemError.UNKNOWN_MESSAGE_ID,
+            "unknown msg [" + Long.toString(GROUP_ID) + ":" + Long.toString(id) + "]."
+        );
     }
 }

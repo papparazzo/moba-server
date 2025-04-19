@@ -33,7 +33,7 @@ import java.util.logging.Level;
 import moba.server.com.Dispatcher;
 import moba.server.database.Database;
 import moba.server.datatypes.enumerations.DrivingDirection;
-import moba.server.datatypes.enumerations.ErrorId;
+import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.enumerations.SwitchStand;
 import moba.server.datatypes.enumerations.helper.CheckedEnum;
 import moba.server.datatypes.objects.BlockContactData;
@@ -44,7 +44,8 @@ import moba.server.datatypes.objects.helper.ActiveLayout;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.ControlMessage;
-import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.utilities.exceptions.SystemErrorException;
 import moba.server.utilities.lock.BlockLock;
 import moba.server.utilities.logger.Loggable;
 
@@ -81,7 +82,7 @@ public class Control extends MessageHandlerA implements Loggable {
 
     @Override
     public void handleMsg(Message msg)
-    throws ErrorException, SQLException {
+    throws ClientErrorException, SystemErrorException, SQLException {
         switch(ControlMessage.fromId(msg.getMessageId())) {
             case GET_BLOCK_LIST_REQ        -> getBlockList(msg);
             case SAVE_BLOCK_LIST           -> saveBlockList(msg);
@@ -95,7 +96,7 @@ public class Control extends MessageHandlerA implements Loggable {
     }
 
     protected void getBlockList(Message msg)
-    throws SQLException, ErrorException {
+    throws SQLException, ClientErrorException {
         long id = activeLayout.getActiveLayout(msg.getData());
 
         Connection con = database.getConnection();
@@ -142,14 +143,14 @@ public class Control extends MessageHandlerA implements Loggable {
 
     @SuppressWarnings("unchecked")
     protected void saveBlockList(Message msg)
-    throws SQLException, ErrorException {
+    throws SQLException, ClientErrorException {
 
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         long id = (long)map.get("id");
 
         /*
         if(!lock.isLockedByApp(msg.getEndpoint().getAppId(), id)) {
-            throw new ErrorException(ErrorId.DATASET_NOT_LOCKED, "layout <" + String.valueOf(id) + "> not locked");
+            throw new ClientErrorException(ClientError.DATASET_NOT_LOCKED, "layout <" + String.valueOf(id) + "> not locked");
         }
         */
 
@@ -163,7 +164,7 @@ public class Control extends MessageHandlerA implements Loggable {
             pstmt.setLong(1, id);
             getLogger().log(Level.INFO, pstmt.toString());
             if(pstmt.executeUpdate() == 0) {
-                throw new ErrorException(ErrorId.DATASET_MISSING, "could not save <" + id + ">");
+                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not save <" + id + ">");
             }
         }
 
@@ -217,7 +218,7 @@ Integer	trainId
     }
 
     protected void getSwitchStateList(Message msg)
-    throws SQLException, ErrorException {
+    throws SQLException, SystemErrorException, ClientErrorException {
         long id = activeLayout.getActiveLayout(msg.getData());
 
         Connection con = database.getConnection();
@@ -249,7 +250,7 @@ Integer	trainId
     }
 
     protected void getTrainList(Message msg)
-    throws SQLException, ErrorException {
+    throws SQLException, SystemErrorException, ClientErrorException {
         long id = activeLayout.getActiveLayout(msg.getData());
 
         Connection con = database.getConnection();
@@ -282,7 +283,7 @@ Integer	trainId
 
     @SuppressWarnings("unchecked")
     protected void pushTrain(Message msg)
-    throws SQLException, ErrorException {
+    throws SQLException, ClientErrorException {
         Connection con = database.getConnection();
 
         var data = (Map<String, Object>)msg.getData();
@@ -299,7 +300,7 @@ Integer	trainId
             pstmt.setLong(1, fromBlock);
             pstmt.setLong(2, trainId);
             if(pstmt.executeUpdate() != 1) {
-                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + trainId + ">");
+                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not update <" + trainId + ">");
             }
         }
 
@@ -311,7 +312,7 @@ Integer	trainId
             pstmt.setLong(1, trainId);
             pstmt.setLong(2, toBlock);
             if(pstmt.executeUpdate() != 1) {
-                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + trainId + ">");
+                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not update <" + trainId + ">");
             }
         }
 
@@ -323,17 +324,18 @@ Integer	trainId
             pstmt.setString(1, (String)data.get("direction"));
             pstmt.setLong(2, trainId);
             if(pstmt.executeUpdate() == 0) {
-                throw new ErrorException(ErrorId.DATASET_MISSING, "could not update <" + trainId + ">");
+                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not update <" + trainId + ">");
             }
         }
         dispatcher.broadcast(new Message(ControlMessage.PUSH_TRAIN, msg.getData()));
     }
 
-    protected void lockBlock(Message msg, boolean wait) {
+    protected void lockBlock(Message msg, boolean wait)
+    throws SQLException {
         try {
             blockLock.tryLock(msg.getEndpoint().getAppId(), msg.getData());
             dispatcher.send(new Message(ControlMessage.BLOCK_LOCKED, msg.getData()), msg.getEndpoint());
-        } catch(ErrorException ex) {
+        } catch(ClientErrorException ex) {
             if(!wait) {
                 dispatcher.send(new Message(ControlMessage.BLOCK_LOCKING_FAILED, msg.getData()), msg.getEndpoint());
                 return;
@@ -343,7 +345,7 @@ Integer	trainId
     }
 
     protected void unLockBlock(Message msg)
-    throws ErrorException {
+    throws ClientErrorException, SQLException {
         blockLock.unlock(msg.getEndpoint().getAppId(), msg.getData());
 
         if(!queue.isEmpty()) {

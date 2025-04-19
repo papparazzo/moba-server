@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2019 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -18,29 +18,25 @@
  *
  */
 
-package moba.server.datatypes.enumerations;
+package moba.server.utilities.exceptions;
 
-public enum ErrorId {
-    UNKNOWN_ERROR,
-    UNKNOWN_GROUP_ID,
-    UNKNOWN_MESSAGE_ID,
+import moba.server.datatypes.enumerations.ClientError;
 
-    DATABASE_ERROR,
+final public class ClientErrorException extends Exception {
 
-    DATASET_NOT_LOCKED,
-    DATASET_LOCKED,
-    DATASET_MISSING,
+    private final ClientError errorId;
 
-    FAULTY_MESSAGE,
+    public ClientErrorException(ClientError errorId, String message) {
+        super(message);
+        this.errorId = errorId;
+    }
 
-    INVALID_APP_ID,
-    INVALID_DATA_SEND,
-    INVALID_STATUS_CHANGE,
+    @Override
+    public String toString() {
+        return "[" + errorId.toString() + "] " + super.toString();
+    }
 
-    NO_DEFAULT_GIVEN,
-
-    SAME_ORIGIN_NEEDED,
-
-    SETTING_NOT_ALLOWED,
-    INVALID_VALUE_GIVEN
+    public ClientError getErrorId() {
+        return errorId;
+    }
 }

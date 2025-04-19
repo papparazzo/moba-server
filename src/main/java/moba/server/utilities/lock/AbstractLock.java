@@ -20,8 +20,10 @@
 
 package moba.server.utilities.lock;
 
-import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.exceptions.ClientErrorException;
 import moba.server.utilities.logger.Loggable;
+
+import java.sql.SQLException;
 
 public abstract class AbstractLock implements Loggable {
 
@@ -38,11 +40,11 @@ public abstract class AbstractLock implements Loggable {
     public abstract void resetOwn(long appId);
 
     public abstract void tryLock(long appId, Object data)
-    throws ErrorException;
+    throws ClientErrorException, SQLException;
 
     public abstract void unlock(long appId, Object data)
-    throws ErrorException;
+    throws ClientErrorException, SQLException;
 
     public abstract boolean isLockedByApp(long appId, Object data)
-    throws ErrorException;
+    throws ClientErrorException, SQLException;
 }

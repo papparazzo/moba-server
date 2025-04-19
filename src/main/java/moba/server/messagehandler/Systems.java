@@ -22,23 +22,24 @@ package moba.server.messagehandler;
 
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
+import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.enumerations.EmergencyTriggerReason;
-import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.enumerations.NoticeType;
 import moba.server.datatypes.enumerations.helper.CheckedEnum;
 import moba.server.datatypes.objects.ErrorData;
-import moba.server.datatypes.objects.NoticeData;
 import moba.server.datatypes.objects.helper.ActiveLayout;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.MessageQueue;
 import moba.server.messages.messageType.ClientMessage;
-import moba.server.messages.messageType.GuiMessage;
 import moba.server.messages.messageType.InternMessage;
 import moba.server.messages.messageType.SystemMessage;
-import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.utilities.exceptions.SystemErrorException;
 import moba.server.utilities.lock.TrackLayoutLock;
+
+import java.sql.SQLException;
 
 final public class Systems extends MessageHandlerA {
     private HardwareState status = HardwareState.ERROR;
@@ -68,7 +69,7 @@ final public class Systems extends MessageHandlerA {
 
     @Override
     public void handleMsg(Message msg)
-    throws ErrorException {
+    throws ClientErrorException, SystemErrorException, SQLException {
         switch(SystemMessage.fromId(msg.getMessageId())) {
             case SET_AUTOMATIC_MODE:
                 setAutomaticMode(msg);
@@ -109,12 +110,12 @@ final public class Systems extends MessageHandlerA {
     }
 
     private void setAutomaticMode(Message msg)
-    throws ErrorException {
+    throws ClientErrorException, SQLException, SystemErrorException {
         setAutomaticMode(msg, false);
     }
 
     private void setAutomaticMode(Message msg, boolean toggle)
-    throws ErrorException {
+    throws ClientErrorException, SQLException, SystemErrorException {
         if(status == HardwareState.ERROR || status == HardwareState.EMERGENCY_STOP || status == HardwareState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
             return;
@@ -169,7 +170,7 @@ final public class Systems extends MessageHandlerA {
     }
 
     private void triggerEmergencyStop(Message msg)
-    throws ErrorException {
+    throws ClientErrorException {
         if(status == HardwareState.ERROR || status == HardwareState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
             return;
@@ -194,7 +195,7 @@ final public class Systems extends MessageHandlerA {
     }
 
     private String getEmergencyStopReason(String reason)
-    throws ErrorException {
+    throws ClientErrorException {
         return switch(CheckedEnum.getFromString(EmergencyTriggerReason.class, reason)) {
             case CENTRAL_STATION                 -> "Auslösegrund: Es wurde ein Nothalt durch die CentralStation ausgelöst";
             case EXTERN                          -> "Auslösegrund: Externe Hardware";
@@ -285,7 +286,7 @@ final public class Systems extends MessageHandlerA {
             new Message(
                 ClientMessage.ERROR,
                 new ErrorData(
-                    ErrorId.INVALID_STATUS_CHANGE,
+                    ClientError.INVALID_STATUS_CHANGE,
                     "Current state is <" + status.toString() + ">"
                 )
             ),

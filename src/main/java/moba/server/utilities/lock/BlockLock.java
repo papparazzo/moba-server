@@ -27,8 +27,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import moba.server.database.Database;
-import moba.server.datatypes.enumerations.ErrorId;
-import moba.server.utilities.exceptions.ErrorException;
+import moba.server.datatypes.enumerations.ClientError;
+import moba.server.utilities.exceptions.ClientErrorException;
 
 public final class BlockLock extends AbstractLock {
 
@@ -70,128 +70,117 @@ public final class BlockLock extends AbstractLock {
     @Override
     @SuppressWarnings("unchecked")
     public void tryLock(long appId, Object data)
-    throws ErrorException {
-        try {
-            ArrayList<Long> list = (ArrayList<Long>)data;
+    throws ClientErrorException, SQLException {
 
-            if(isLockedByApp(appId, data)) {
-                throw new ErrorException(ErrorId.DATASET_LOCKED, "object is already locked");
+        ArrayList<Long> list = (ArrayList<Long>)data;
+
+        if(isLockedByApp(appId, data)) {
+            throw new ClientErrorException(ClientError.DATASET_LOCKED, "object is already locked");
+        }
+
+        Connection con = database.getConnection();
+        con.setAutoCommit(false);
+
+        String q =
+            "UPDATE `BlockSections` " +
+            "SET `locked` = ? " +
+            "WHERE `locked` IS NULL AND `id` IN (" + getPlaceHolderString(list.size()) + ")";
+
+        try(PreparedStatement stmt = con.prepareStatement(q)) {
+            stmt.setLong(1, appId);
+            int i = 1;
+            for(Long v : list) {
+                stmt.setLong(++i, v);
             }
 
-            Connection con = database.getConnection();
-            con.setAutoCommit(false);
+            getLogger().log(Level.INFO, stmt.toString());
 
-            String q =
-                "UPDATE `BlockSections` " +
-                "SET `locked` = ? " +
-                "WHERE `locked` IS NULL AND `id` IN (" + getPlaceHolderString(list.size()) + ")";
-
-            try(PreparedStatement stmt = con.prepareStatement(q)) {
-                stmt.setLong(1, appId);
-                int i = 1;
-                for(Long v : list) {
-                    stmt.setLong(++i, v);
-                }
-
-                getLogger().log(Level.INFO, stmt.toString());
-
-                if(stmt.executeUpdate() != list.size()) {
-                    con.rollback();
-                    throw new ErrorException(ErrorId.DATASET_LOCKED, "object is already locked");
-                }
-                con.commit();
+            if(stmt.executeUpdate() != list.size()) {
+                con.rollback();
+                throw new ClientErrorException(ClientError.DATASET_LOCKED, "object is already locked");
             }
-        } catch(SQLException e) {
-            throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
+            con.commit();
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void unlock(long appId, Object data)
-    throws ErrorException {
-       try {
-            ArrayList<Long> list = (ArrayList<Long>)data;
+    throws ClientErrorException, SQLException {
+        ArrayList<Long> list = (ArrayList<Long>)data;
 
-            if(!isLockedByApp(appId, data)) {
-                return;
+        if(!isLockedByApp(appId, data)) {
+            return;
+        }
+
+        Connection con = database.getConnection();
+        con.setAutoCommit(false);
+
+        String q =
+            "UPDATE `BlockSections` " +
+            "SET `locked` = NULL " +
+            "WHERE `locked` = ? AND `id` IN (" + getPlaceHolderString(list.size()) + ")";
+
+        try(PreparedStatement stmt = con.prepareStatement(q)) {
+            stmt.setLong(1, appId);
+            int i = 1;
+            for(Long v : list) {
+                stmt.setLong(++i, v);
             }
 
-            Connection con = database.getConnection();
-            con.setAutoCommit(false);
+            getLogger().log(Level.INFO, stmt.toString());
 
-            String q =
-                "UPDATE `BlockSections` " +
-                "SET `locked` = NULL " +
-                "WHERE `locked` = ? AND `id` IN (" + getPlaceHolderString(list.size()) + ")";
-
-            try(PreparedStatement stmt = con.prepareStatement(q)) {
-                stmt.setLong(1, appId);
-                int i = 1;
-                for(Long v : list) {
-                    stmt.setLong(++i, v);
-                }
-
-                getLogger().log(Level.INFO, stmt.toString());
-
-                if(stmt.executeUpdate() != list.size()) {
-                    con.rollback();
-                    throw new ErrorException(ErrorId.DATASET_MISSING, "no blocks found");
-                }
-                con.commit();
+            if(stmt.executeUpdate() != list.size()) {
+                con.rollback();
+                throw new ClientErrorException(ClientError.DATASET_MISSING, "no blocks found");
             }
-        } catch(SQLException e) {
-            throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
+            con.commit();
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public boolean isLockedByApp(long appId, Object data)
-    throws ErrorException {
-        try {
-            ArrayList<Long> list = (ArrayList<Long>)data;
+    throws ClientErrorException, SQLException {
+        ArrayList<Long> list = (ArrayList<Long>)data;
 
-            Connection con = database.getConnection();
+        Connection con = database.getConnection();
 
-            String q =
-                "SELECT `locked`, COUNT(*) AS `cnt` " +
-                "FROM `BlockSections` " +
-                "WHERE `Id` IN (" + getPlaceHolderString(list.size()) + ") GROUP BY `locked`";
+        String q =
+            "SELECT `locked`, COUNT(*) AS `cnt` " +
+            "FROM `BlockSections` " +
+            "WHERE `Id` IN (" + getPlaceHolderString(list.size()) + ") GROUP BY `locked`";
 
-            try(PreparedStatement stmt = con.prepareStatement(q)) {
-                int i = 0;
-                for(Long v : list) {
-                    stmt.setLong(++i, v);
-                }
-
-                getLogger().log(Level.INFO, stmt.toString());
-
-                ResultSet rs = stmt.executeQuery();
-
-                if(!rs.next()) {
-                    throw new ErrorException(ErrorId.DATASET_MISSING, "no record set found");
-                }
-                long lockedBy = rs.getLong("locked");
-                long cnt = rs.getLong("cnt");
-
-                // more than 1 found: parts are locked and parts are unlocked
-                if(rs.next()) {
-                    throw new ErrorException(ErrorId.DATASET_LOCKED, "object is locked");
-                }
-                if(cnt != list.size()) {
-                    throw new ErrorException(ErrorId.DATASET_MISSING, "no record set found");
-                }
-                if(lockedBy == 0) {
-                    return false;
-                }
-                if(lockedBy == appId) {
-                    return true;
-                }
-                throw new ErrorException(ErrorId.DATASET_LOCKED, "object is locked");
+        try(PreparedStatement stmt = con.prepareStatement(q)) {
+            int i = 0;
+            for(Long v : list) {
+                stmt.setLong(++i, v);
             }
-        } catch(SQLException e) {
-            throw new ErrorException(ErrorId.DATABASE_ERROR, e.getMessage());
+
+            getLogger().log(Level.INFO, stmt.toString());
+
+            ResultSet rs = stmt.executeQuery();
+
+            if(!rs.next()) {
+                throw new ClientErrorException(ClientError.DATASET_MISSING, "no record set found");
+            }
+            long lockedBy = rs.getLong("locked");
+            long cnt = rs.getLong("cnt");
+
+            // more than 1 found: parts are locked, and parts are unlocked
+            if(rs.next()) {
+                throw new ClientErrorException(ClientError.DATASET_LOCKED, "object is locked");
+            }
+            if(cnt != list.size()) {
+                throw new ClientErrorException(ClientError.DATASET_MISSING, "no record set found");
+            }
+            if(lockedBy == 0) {
+                return false;
+            }
+            if(lockedBy == appId) {
+                return true;
+            }
+            throw new ClientErrorException(ClientError.DATASET_LOCKED, "object is locked");
         }
     }
 

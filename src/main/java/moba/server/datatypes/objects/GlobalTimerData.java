@@ -22,10 +22,12 @@ package moba.server.datatypes.objects;
 
 import moba.server.datatypes.base.Time;
 import java.util.Map;
+
+import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.enumerations.Day;
-import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.helper.CheckedEnum;
-import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.utilities.exceptions.SystemErrorException;
 
 public class GlobalTimerData {
     protected PointOfTime modelTime = new PointOfTime();
@@ -94,7 +96,7 @@ public class GlobalTimerData {
     }
 
     public void fromJsonObject(Map<String, Object> map)
-    throws ErrorException {
+    throws SystemErrorException, ClientErrorException {
         @SuppressWarnings("unchecked")
         var pt = (Map<String, Object>)map.get("modelTime");
 
@@ -111,18 +113,18 @@ public class GlobalTimerData {
     }
 
     protected void validate()
-    throws ErrorException {
+    throws ClientErrorException {
 
         if(sunriseStartTime.getTime() > dayStartTime.getTime()) {
-            throw new ErrorException(ErrorId.INVALID_VALUE_GIVEN, "Tag vor Sonnenaufgang");
+            throw new ClientErrorException(ClientError.INVALID_VALUE_GIVEN, "Tag vor Sonnenaufgang");
         }
 
         if(dayStartTime.getTime() > sunsetStartTime.getTime()) {
-            throw new ErrorException(ErrorId.INVALID_VALUE_GIVEN, "Sonnenuntergang vor Tag");
+            throw new ClientErrorException(ClientError.INVALID_VALUE_GIVEN, "Sonnenuntergang vor Tag");
         }
 
         if(sunsetStartTime.getTime() > nightStartTime.getTime()) {
-            throw new ErrorException(ErrorId.INVALID_VALUE_GIVEN, "Nacht vor Sonnenuntergang");
+            throw new ClientErrorException(ClientError.INVALID_VALUE_GIVEN, "Nacht vor Sonnenuntergang");
         }
     }
 }

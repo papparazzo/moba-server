@@ -21,5 +21,4 @@
 package moba.server.datatypes.objects;
 
 public record ContactData(int moduleAddr, int contactNb) {
-
 }

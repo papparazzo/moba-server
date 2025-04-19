@@ -20,7 +20,6 @@
 
 package moba.server.messagehandler;
 
-import moba.server.datatypes.enumerations.ErrorId;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.objects.GlobalTimerData;
 import java.io.IOException;
@@ -34,7 +33,8 @@ import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.TimerMessage;
 import moba.server.utilities.config.Config;
-import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.utilities.exceptions.SystemErrorException;
 
 /*
  * https://www.laenderdaten.info/Europa/Deutschland/sonnenuntergang.php
@@ -75,7 +75,7 @@ public class Timer extends MessageHandlerA implements Runnable {
     @Override
     @SuppressWarnings("unchecked")
     public void handleMsg(Message msg)
-    throws ErrorException, IOException {
+    throws ClientErrorException, SystemErrorException, IOException {
         switch(TimerMessage.fromId(msg.getMessageId())) {
             case GET_GLOBAL_TIMER ->
                 dispatcher.send(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData), msg.getEndpoint());

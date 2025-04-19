@@ -23,11 +23,11 @@ package moba.server.datatypes.objects.helper;
 import java.io.IOException;
 import java.util.HashMap;
 import moba.server.com.Dispatcher;
-import moba.server.datatypes.enumerations.ErrorId;
+import moba.server.datatypes.enumerations.ClientError;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.LayoutMessage;
 import moba.server.utilities.config.Config;
-import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.exceptions.ClientErrorException;
 
 public class ActiveLayout {
 
@@ -50,27 +50,22 @@ public class ActiveLayout {
     }
 
     public long getActiveLayout(Object defaultId)
-    throws ErrorException {
+    throws ClientErrorException {
         if(defaultId != null) {
             return (long)defaultId;
         }
         if(activeLayout != null) {
             return activeLayout;
         }
-        throw new ErrorException(ErrorId.NO_DEFAULT_GIVEN, "no default-track-layout given");
+        throw new ClientErrorException(ClientError.NO_DEFAULT_GIVEN, "no default-track-layout given");
     }
 
     public void setActiveLayout(long activeLayout)
-    throws ErrorException {
-        try {
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("activeTrackLayoutId", activeLayout);
-            config.setSection("trackLayout", map);
-            config.writeFile();
-        } catch(IOException e) {
-            //dispatcher.dispatch(new Message(ClientMessage.ERROR, e.getErrorData(), msg.getEndpoint()));
-            throw new ErrorException(ErrorId.UNKNOWN_ERROR, e.getMessage());
-        }
+    throws IOException {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("activeTrackLayoutId", activeLayout);
+        config.setSection("trackLayout", map);
+        config.writeFile();
         dispatcher.broadcast(new Message(LayoutMessage.DEFAULT_LAYOUT_CHANGED, activeLayout));
         this.activeLayout = activeLayout;
     }

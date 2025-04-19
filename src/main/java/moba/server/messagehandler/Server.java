@@ -56,7 +56,7 @@ final public class Server extends MessageHandlerA {
 
     @Override
     public void handleMsg(Message msg)
-    throws ErrorException {
+    throws ClientErrorException, SystemErrorException, IOException {
         switch(ServerMessage.fromId(msg.getMessageId())) {
             case INFO_REQ            -> handleServerInfoReq(msg.getEndpoint());
             case CON_CLIENTS_REQ     -> handleClientsReq(msg.getEndpoint());
@@ -70,26 +70,22 @@ final public class Server extends MessageHandlerA {
     }
 
     private void sendToClient(Message msg, MessageType mType)
-    throws ErrorException {
+    throws ClientErrorException {
         Endpoint ep = dispatcher.getEndpointByAppId((long)msg.getData());
         if(ep == null) {
-            throw new ErrorException(ErrorId.INVALID_APP_ID, "app-id <" + msg.getData().toString() + "> is invalid");
+            throw new ClientErrorException(ClientError.INVALID_APP_ID, "app-id <" + msg.getData().toString() + "> is invalid");
         }
         dispatcher.send(new Message(mType, null), ep);
     }
 
     private void handleAddIpAddress(Message msg)
-    throws ErrorException {
+    throws IOException {
         String address = (String)msg.getData();
-        try {
-            this.allowList.add(address);
-            var list = allowList.getList();
-            config.setSection("common.serverConfig.allowedIPs", list);
-            config.writeFile();
-            dispatcher.broadcast(new Message(ServerMessage.SET_ALLOWED_IP_LIST, list));
-        } catch(Exception e) {
-            throw new ErrorException(ErrorId.UNKNOWN_ERROR, e.getMessage());
-        }
+        this.allowList.add(address);
+        var list = allowList.getList();
+        config.setSection("common.serverConfig.allowedIPs", list);
+        config.writeFile();
+        dispatcher.broadcast(new Message(ServerMessage.SET_ALLOWED_IP_LIST, list));
     }
 
     private void handleGetAllowedIpList(Endpoint endpoint) {
@@ -98,16 +94,16 @@ final public class Server extends MessageHandlerA {
 
     @SuppressWarnings("unchecked")
     private void handleSetAllowedIpList(Message message)
-    throws ErrorException {
-        try {
-            ArrayList<String> list = (ArrayList<String>)message.getData();
-            allowList.setList(list);
-            config.setSection("common.serverConfig.allowedIPs", list);
-            config.writeFile();
-            dispatcher.broadcast(new Message(ServerMessage.SET_ALLOWED_IP_LIST, list));
-        } catch(Exception e) {
-            throw new ErrorException(ErrorId.UNKNOWN_ERROR, e.getMessage());
-        }
+    throws IOException {
+        ArrayList<String> list = (ArrayList<String>)message.getData();
+        allowList.setList(list);
+        config.setSection("common.serverConfig.allowedIPs", list);
+        config.writeFile();
+        dispatcher.broadcast(new Message(ServerMessage.SET_ALLOWED_IP_LIST, list));
+    }
+
+    private void handleGetLogList(Endpoint endpoint) {
+        //dispatcher.send(new Message(ServerMessage.SET_LOG_LIST, loglist.getList()), endpoint);
     }
 
     private void handleClientsReq(Endpoint endpoint) {

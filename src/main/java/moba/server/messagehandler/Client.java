@@ -22,13 +22,14 @@ package moba.server.messagehandler;
 
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
-import moba.server.datatypes.enumerations.ErrorId;
+import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.objects.ErrorData;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.ServerMessage;
-import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.utilities.exceptions.SystemErrorException;
 
 public class Client extends MessageHandlerA {
 
@@ -43,7 +44,7 @@ public class Client extends MessageHandlerA {
 
     @Override
     public void handleMsg(Message msg)
-    throws ErrorException {
+    throws ClientErrorException, SystemErrorException {
         switch(ClientMessage.fromId(msg.getMessageId())) {
             case VOID     -> {}
             case ECHO_REQ -> dispatcher.send(new Message(ClientMessage.ECHO_RES, msg.getData()), msg.getEndpoint());
@@ -58,7 +59,7 @@ public class Client extends MessageHandlerA {
             dispatcher.send(
                 new Message(
                     ClientMessage.ERROR,
-                    new ErrorData(ErrorId.INVALID_DATA_SEND, "Endpoint <" + ep + "> already exists")
+                    new ErrorData(ClientError.INVALID_DATA_SEND, "Endpoint <" + ep + "> already exists")
                 ),
                 msg.getEndpoint()
             );

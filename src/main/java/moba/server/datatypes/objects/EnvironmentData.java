@@ -29,7 +29,7 @@ import moba.server.json.JSONEncoder;
 import moba.server.json.JSONException;
 import moba.server.json.JSONToStringI;
 import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
-import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.exceptions.ClientErrorException;
 
 public class EnvironmentData implements JSONToStringI {
     protected Switch thunderStorm = Switch.OFF;
@@ -41,7 +41,7 @@ public class EnvironmentData implements JSONToStringI {
     protected Switch aux03 = Switch.OFF;
 
     public void fromJsonObject(Map<String, Object> map)
-    throws ErrorException {
+    throws ClientErrorException {
         thunderStorm = Switch.getValue((String)map.get("thunderStorm"), thunderStorm);
         environmentSound = Switch.getValue((String)map.get("environmentSound"), environmentSound);
         wind =  Switch.getValue((String)map.get("wind"), wind);
