@@ -25,9 +25,8 @@ import java.util.Map;
 
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.enumerations.Day;
-import moba.server.datatypes.enumerations.helper.CheckedEnum;
+import moba.server.utilities.CheckedEnum;
 import moba.server.utilities.exceptions.ClientErrorException;
-import moba.server.utilities.exceptions.SystemErrorException;
 
 public class GlobalTimerData {
     protected PointOfTime modelTime = new PointOfTime();
@@ -96,7 +95,7 @@ public class GlobalTimerData {
     }
 
     public void fromJsonObject(Map<String, Object> map)
-    throws SystemErrorException, ClientErrorException {
+    throws ClientErrorException {
         @SuppressWarnings("unchecked")
         var pt = (Map<String, Object>)map.get("modelTime");
 

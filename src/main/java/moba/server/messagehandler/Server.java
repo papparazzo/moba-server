@@ -20,6 +20,7 @@
 
 package moba.server.messagehandler;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +28,7 @@ import java.util.HashMap;
 import moba.server.application.ServerApplication;
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
-import moba.server.datatypes.enumerations.ErrorId;
+import moba.server.datatypes.enumerations.ClientError;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.MessageType;
@@ -35,7 +36,7 @@ import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.AllowList;
 import moba.server.utilities.config.Config;
-import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.exceptions.ClientErrorException;
 
 final public class Server extends MessageHandlerA {
     private final ServerApplication app;
@@ -56,7 +57,7 @@ final public class Server extends MessageHandlerA {
 
     @Override
     public void handleMsg(Message msg)
-    throws ClientErrorException, SystemErrorException, IOException {
+    throws ClientErrorException, IOException {
         switch(ServerMessage.fromId(msg.getMessageId())) {
             case INFO_REQ            -> handleServerInfoReq(msg.getEndpoint());
             case CON_CLIENTS_REQ     -> handleClientsReq(msg.getEndpoint());

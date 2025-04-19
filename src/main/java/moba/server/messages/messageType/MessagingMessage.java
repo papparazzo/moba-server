@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2020 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -24,22 +24,16 @@ import moba.server.datatypes.enumerations.ClientError;
 import moba.server.messages.MessageType;
 import moba.server.utilities.exceptions.ClientErrorException;
 
-public enum ClientMessage implements MessageType {
-    VOID        (1),
-    ECHO_REQ    (2),
-    ECHO_RES    (3),
-    ERROR       (4),
-    START       (5),
-    CONNECTED   (6),
-    SHUTDOWN    (8),
-    RESET       (9),
-    SELF_TESTING(10);
+public enum MessagingMessage implements MessageType {
+    GET_INCIDENT_LIST(1),
+    SET_INCIDENT_LIST(2),
+    NOTIFY_INCIDENT  (3);
 
-    public final static int GROUP_ID = 2;
+    public final static int GROUP_ID = 9;
 
     private final int messageId;
 
-    ClientMessage(int msgId) {
+    MessagingMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -53,9 +47,9 @@ public enum ClientMessage implements MessageType {
         return messageId;
     }
 
-    public static ClientMessage fromId(int id)
+    public static MessagingMessage fromId(int id)
     throws ClientErrorException {
-        for(ClientMessage type : values()) {
+        for(MessagingMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }

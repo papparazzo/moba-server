@@ -31,7 +31,6 @@ import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.EnvironmentMessage;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.exceptions.ClientErrorException;
-import moba.server.utilities.exceptions.SystemErrorException;
 
 public class Environment extends MessageHandlerA {
     protected final Config config;
@@ -54,7 +53,7 @@ public class Environment extends MessageHandlerA {
     @Override
     @SuppressWarnings("unchecked")
     public void handleMsg(Message msg)
-    throws ClientErrorException, SystemErrorException, IOException {
+    throws ClientErrorException, IOException {
         switch(EnvironmentMessage.fromId(msg.getMessageId())) {
             case GET_ENVIRONMENT ->
                 dispatcher.send(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment), msg.getEndpoint());

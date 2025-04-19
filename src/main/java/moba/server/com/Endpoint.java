@@ -84,7 +84,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
 
     @Override
     public String toString() {
-        return id + ": " + socket.toString();
+        return appName + "[" + id + "]@" + socket.toString();
     }
 
     @Override
@@ -124,10 +124,10 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
             //         That's lead to a NullPointerException in PriorityBlockingQueue.add()
         } catch(Exception e) {
             getLogger().log(Level.INFO, "Endpoint #{0}: Exception, closing client... <{1}>", new Object[]{id, e.toString()});
-            msgQueue.add(new Message(InternMessage.CLIENT_SHUTDOWN, null, this));
+            msgQueue.add(new Message(InternMessage.CLIENT_SHUTDOWN, e.toString(), this));
         } catch(OutOfMemoryError e) {
             getLogger().log(Level.SEVERE, "Endpoint #{0}: OutOfMemoryError <{1}>", new Object[]{id, e.toString()});
-            msgQueue.add(new Message(InternMessage.CLIENT_SHUTDOWN, null, this));
+            msgQueue.add(new Message(InternMessage.CLIENT_SHUTDOWN, e.toString(), this));
         }
         getLogger().log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
     }

@@ -29,7 +29,6 @@ import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.exceptions.ClientErrorException;
-import moba.server.utilities.exceptions.SystemErrorException;
 
 public class Client extends MessageHandlerA {
 
@@ -44,7 +43,7 @@ public class Client extends MessageHandlerA {
 
     @Override
     public void handleMsg(Message msg)
-    throws ClientErrorException, SystemErrorException {
+    throws ClientErrorException {
         switch(ClientMessage.fromId(msg.getMessageId())) {
             case VOID     -> {}
             case ECHO_REQ -> dispatcher.send(new Message(ClientMessage.ECHO_RES, msg.getData()), msg.getEndpoint());

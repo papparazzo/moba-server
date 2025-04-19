@@ -24,6 +24,11 @@ package moba.server.datatypes.enumerations;
  * Client-Errors
  */
 public enum ClientError {
+    FAULTY_MESSAGE,
+
+    UNKNOWN_GROUP_ID,
+    UNKNOWN_MESSAGE_ID,
+
     DATASET_NOT_LOCKED,
     DATASET_LOCKED,
     DATASET_MISSING,

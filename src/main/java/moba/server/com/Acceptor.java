@@ -24,27 +24,39 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.MessageFormat;
 import java.util.logging.Level;
 
 import moba.server.messages.MessageQueue;
 import moba.server.utilities.AllowList;
+import moba.server.datatypes.objects.IncidentData;
+import moba.server.utilities.messaging.IncidentHandler;
 import moba.server.utilities.logger.Loggable;
 
 final public class Acceptor extends Thread implements Loggable, BackgroundHandlerInterface {
 
-    private ServerSocket       serverSocket = null;
-    private final MessageQueue msgQueue;
-    private final Dispatcher   dispatcher;
-    private final int          serverPort;
-    private final int          maxClients;
-    private final AllowList    allowList;
+    private ServerSocket          serverSocket = null;
+    private final MessageQueue    msgQueue;
+    private final Dispatcher      dispatcher;
+    private final int             serverPort;
+    private final int             maxClients;
+    private final AllowList       allowList;
+    private final IncidentHandler incidentHandler;
 
-    public Acceptor(MessageQueue msgQueue, Dispatcher dispatcher, int serverPort, int maxClients, AllowList allowList) {
-        this.msgQueue   = msgQueue;
-        this.dispatcher = dispatcher;
-        this.serverPort = serverPort;
-        this.maxClients = maxClients;
-        this.allowList  = allowList;
+    public Acceptor(
+        MessageQueue msgQueue,
+        Dispatcher dispatcher,
+        int serverPort,
+        int maxClients,
+        AllowList allowList,
+        IncidentHandler incidentHandler
+    ) {
+        this.msgQueue        = msgQueue;
+        this.dispatcher      = dispatcher;
+        this.serverPort      = serverPort;
+        this.maxClients      = maxClients;
+        this.allowList       = allowList;
+        this.incidentHandler = incidentHandler;
     }
 
     public void start() {
@@ -91,12 +103,21 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
                 }
                 if(dispatcher.getEndPointsCount() == maxClients) {
                     socket.close();
-                    getLogger().log(Level.WARNING, "Max amount of clients <{0}> connected!", new Object[]{maxClients});
+                    incidentHandler.add(
+                        new IncidentData(
+                            IncidentData.Level.WARNING,
+                            IncidentData.Type.SERVER,
+                            "Max amount of clients",
+                            MessageFormat.format("Max amount of clients <{0}> connected!", maxClients),
+                            "Acceptor.run()"
+                        )
+                    );
                     continue;
                 }
                 (new Endpoint(id, socket, msgQueue)).start();
             } catch (Exception e) {
                 getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+                // TODO IncidentData  loglist.add(new LogListEntry(e));
             }
         }
         getLogger().info("acceptor-thread terminated");

@@ -20,8 +20,8 @@
 
 package moba.server.datatypes.enumerations;
 
-import moba.server.datatypes.enumerations.helper.CheckedEnum;
-import moba.server.utilities.exceptions.SystemErrorException;
+import moba.server.utilities.CheckedEnum;
+import moba.server.utilities.exceptions.ClientErrorException;
 
 public enum Switch {
     ON,
@@ -31,7 +31,7 @@ public enum Switch {
     OFF;
 
     public static Switch getValue(String s, Switch def)
-    throws SystemErrorException {
+    throws ClientErrorException {
         Switch t = CheckedEnum.getFromString(Switch.class, s);
         if(t == Switch.UNSET) {
             return def;

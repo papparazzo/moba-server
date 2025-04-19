@@ -21,27 +21,28 @@
 package moba.server.messagehandler;
 
 import moba.server.com.Dispatcher;
+import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.Connectivity;
 import moba.server.datatypes.enumerations.HardwareState;
-import moba.server.datatypes.enumerations.NoticeType;
-import moba.server.datatypes.enumerations.helper.CheckedEnum;
-import moba.server.datatypes.objects.NoticeData;
-import moba.server.datatypes.enumerations.ErrorId;
+import moba.server.utilities.CheckedEnum;
+import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.MessageQueue;
-import moba.server.messages.messageType.GuiMessage;
 import moba.server.messages.messageType.InterfaceMessage;
 import moba.server.messages.messageType.InternMessage;
-import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.utilities.messaging.IncidentHandler;
 
-public class Interface extends MessageHandlerA {
+final public class Interface extends MessageHandlerA {
 
-    protected final MessageQueue msgQueueIn;
+    private final MessageQueue msgQueueIn;
+    private final IncidentHandler incidentHandler;
 
-    public Interface(Dispatcher dispatcher, MessageQueue msgQueueIn) {
-        this.dispatcher = dispatcher;
-        this.msgQueueIn = msgQueueIn;
+    public Interface(Dispatcher dispatcher, MessageQueue msgQueueIn, IncidentHandler incidentHandler) {
+        this.dispatcher      = dispatcher;
+        this.msgQueueIn      = msgQueueIn;
+        this.incidentHandler = incidentHandler;
     }
 
     @Override
@@ -51,10 +52,10 @@ public class Interface extends MessageHandlerA {
 
     @Override
     public void handleMsg(Message msg)
-    throws ErrorException {
+    throws ClientErrorException {
         switch(InterfaceMessage.fromId(msg.getMessageId())) {
             case CONNECTIVITY_STATE_CHANGED:
-                setConnectivity(CheckedEnum.getFromString(Connectivity.class, (String)msg.getData()));
+                setConnectivity(CheckedEnum.getFromString(Connectivity.class, (String)msg.getData()), msg.getEndpoint());
                 return;
 
             case CONTACT_TRIGGERED:
@@ -68,35 +69,21 @@ public class Interface extends MessageHandlerA {
         }
     }
 
-    private void setConnectivity(Connectivity connectivity) {
+    private void setConnectivity(Connectivity connectivity, Endpoint ep) {
         switch(connectivity) {
             case CONNECTED:
                 msgQueueIn.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
-                dispatcher.broadcast(
-                    new Message(
-                        GuiMessage.SYSTEM_NOTICE,
-                        new NoticeData(
-                            NoticeType.INFO,
-                            "Hardwareverbindung",
-                            "Die Verbindung zur Hardware wurde hergestellt"
-                        )
-                    )
-                );
+                addIncident(IncidentData.Level.NOTICE, "Die Verbindung zur Hardware wurde hergestellt", ep);
                 break;
 
             case ERROR:
                 msgQueueIn.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.ERROR));
-                dispatcher.broadcast(
-                    new Message(
-                        GuiMessage.SYSTEM_NOTICE,
-                        new NoticeData(
-                            NoticeType.ERROR,
-                            "Hardwareverbindung",
-                            "Die Verbindung zur Hardware wurde unterbrochen"
-                        )
-                    )
-                );
+                addIncident(IncidentData.Level.ERROR, "Die Verbindung zur Hardware wurde unterbrochen", ep);
                 break;
         }
+    }
+
+    private void addIncident(IncidentData.Level level, String message, Endpoint ep) {
+        incidentHandler.add(new IncidentData(level, IncidentData.Type.STATUS_CHANGE, "Hardwareverbindung", message, ep));
     }
 }

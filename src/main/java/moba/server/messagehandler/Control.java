@@ -35,7 +35,7 @@ import moba.server.database.Database;
 import moba.server.datatypes.enumerations.DrivingDirection;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.enumerations.SwitchStand;
-import moba.server.datatypes.enumerations.helper.CheckedEnum;
+import moba.server.utilities.CheckedEnum;
 import moba.server.datatypes.objects.BlockContactData;
 import moba.server.datatypes.objects.ContactData;
 import moba.server.datatypes.objects.SwitchStateData;
@@ -45,7 +45,6 @@ import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.ControlMessage;
 import moba.server.utilities.exceptions.ClientErrorException;
-import moba.server.utilities.exceptions.SystemErrorException;
 import moba.server.utilities.lock.BlockLock;
 import moba.server.utilities.logger.Loggable;
 
@@ -82,7 +81,7 @@ public class Control extends MessageHandlerA implements Loggable {
 
     @Override
     public void handleMsg(Message msg)
-    throws ClientErrorException, SystemErrorException, SQLException {
+    throws ClientErrorException, SQLException {
         switch(ControlMessage.fromId(msg.getMessageId())) {
             case GET_BLOCK_LIST_REQ        -> getBlockList(msg);
             case SAVE_BLOCK_LIST           -> saveBlockList(msg);
@@ -213,12 +212,12 @@ Integer	trainId
             }
         }
 
-        //dispatcher.dispatch(new Incident(LayoutMessage.LAYOUT_CHANGED, map));
+        //dispatcher.dispatch(new IncidentData(LayoutMessage.LAYOUT_CHANGED, map));
 
     }
 
     protected void getSwitchStateList(Message msg)
-    throws SQLException, SystemErrorException, ClientErrorException {
+    throws SQLException, ClientErrorException {
         long id = activeLayout.getActiveLayout(msg.getData());
 
         Connection con = database.getConnection();
@@ -250,7 +249,7 @@ Integer	trainId
     }
 
     protected void getTrainList(Message msg)
-    throws SQLException, SystemErrorException, ClientErrorException {
+    throws SQLException, ClientErrorException {
         long id = activeLayout.getActiveLayout(msg.getData());
 
         Connection con = database.getConnection();

@@ -24,7 +24,6 @@ import moba.server.messages.Message;
 import moba.server.messages.MessageQueue;
 import moba.server.messages.messageType.InternMessage;
 import moba.server.messages.messageType.ServerMessage;
-import moba.server.utilities.logger.Loggable;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,15 +34,18 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-final public class IPC extends Thread implements Loggable, BackgroundHandlerInterface {
+final public class IPC extends Thread implements BackgroundHandlerInterface {
 
     private final MessageQueue msgQueue;
     private final String       fifoFile;
+    private final Logger       logger;
 
-    public IPC(String fifoFile, MessageQueue msgQueue) {
+    public IPC(String fifoFile, MessageQueue msgQueue, Logger logger) {
         this.msgQueue = msgQueue;
         this.fifoFile = fifoFile;
+        this.logger   = logger;
     }
 
     public void halt() {
@@ -51,9 +53,9 @@ final public class IPC extends Thread implements Loggable, BackgroundHandlerInte
             interrupt();
             join(250);
         } catch(InterruptedException e) {
-            getLogger().log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
+            logger.log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
         }
-        getLogger().info("IPC successful stopped.");
+        logger.info("IPC successful stopped.");
     }
 
     public void start() {
@@ -77,7 +79,7 @@ final public class IPC extends Thread implements Loggable, BackgroundHandlerInte
 
     @Override
     public void run() {
-        getLogger().info("ipc-thread started");
+        logger.info("ipc-thread started");
 
         while(!isInterrupted()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(fifoFile))) {
@@ -86,10 +88,10 @@ final public class IPC extends Thread implements Loggable, BackgroundHandlerInte
                     handleAction(line);
                 }
             } catch (Exception e) {
-               getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+               logger.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
             }
         }
-        getLogger().info("ipc-thread terminated");
+        logger.info("ipc-thread terminated");
     }
 
     private void handleAction(String line) {
@@ -113,7 +115,7 @@ final public class IPC extends Thread implements Loggable, BackgroundHandlerInte
                 break;
 
             default:
-                getLogger().log(Level.WARNING, "unknown command <{0}> given", new Object[]{parts[0]});
+                logger.log(Level.WARNING, "unknown command <{0}> given", new Object[]{parts[0]});
          }
     }
 

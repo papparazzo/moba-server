@@ -20,9 +20,9 @@
 
 package moba.server.messages.messageType;
 
-import moba.server.datatypes.enumerations.SystemError;
+import moba.server.datatypes.enumerations.ClientError;
 import moba.server.messages.MessageType;
-import moba.server.utilities.exceptions.SystemErrorException;
+import moba.server.utilities.exceptions.ClientErrorException;
 
 public enum ServerMessage implements MessageType {
     NEW_CLIENT_STARTED   (1),
@@ -56,14 +56,14 @@ public enum ServerMessage implements MessageType {
     }
 
     public static ServerMessage fromId(int id)
-    throws SystemErrorException {
+    throws ClientErrorException {
         for(ServerMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }
         }
-        throw new SystemErrorException(
-            SystemError.UNKNOWN_MESSAGE_ID,
+        throw new ClientErrorException(
+            ClientError.UNKNOWN_MESSAGE_ID,
             "unknown msg [" + Long.toString(GROUP_ID) + ":" + Long.toString(id) + "]."
         );
     }

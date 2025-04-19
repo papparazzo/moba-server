@@ -25,9 +25,9 @@ import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.enumerations.EmergencyTriggerReason;
 import moba.server.datatypes.enumerations.HardwareState;
-import moba.server.datatypes.enumerations.NoticeType;
-import moba.server.datatypes.enumerations.helper.CheckedEnum;
+import moba.server.utilities.CheckedEnum;
 import moba.server.datatypes.objects.ErrorData;
+import moba.server.datatypes.objects.IncidentData;
 import moba.server.datatypes.objects.helper.ActiveLayout;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
@@ -36,8 +36,8 @@ import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
 import moba.server.messages.messageType.SystemMessage;
 import moba.server.utilities.exceptions.ClientErrorException;
-import moba.server.utilities.exceptions.SystemErrorException;
 import moba.server.utilities.lock.TrackLayoutLock;
+import moba.server.utilities.messaging.IncidentHandler;
 
 import java.sql.SQLException;
 
@@ -48,12 +48,20 @@ final public class Systems extends MessageHandlerA {
     private final MessageQueue msgQueue;
     private final ActiveLayout activeLayout;
     private final TrackLayoutLock lock;
+    private final IncidentHandler incidentHandler;
 
-    public Systems(Dispatcher dispatcher, TrackLayoutLock lock, ActiveLayout activeLayout, MessageQueue msgQueue) {
-        this.dispatcher   = dispatcher;
-        this.msgQueue     = msgQueue;
-        this.activeLayout = activeLayout;
-        this.lock         = lock;
+    public Systems(
+        Dispatcher dispatcher,
+        TrackLayoutLock lock,
+        ActiveLayout activeLayout,
+        MessageQueue msgQueue,
+        IncidentHandler incidentHandler
+    ) {
+        this.incidentHandler = incidentHandler;
+        this.dispatcher      = dispatcher;
+        this.msgQueue        = msgQueue;
+        this.activeLayout    = activeLayout;
+        this.lock            = lock;
         this.lock.resetAll();
     }
 
@@ -69,7 +77,7 @@ final public class Systems extends MessageHandlerA {
 
     @Override
     public void handleMsg(Message msg)
-    throws ClientErrorException, SystemErrorException, SQLException {
+    throws ClientErrorException, SQLException {
         switch(SystemMessage.fromId(msg.getMessageId())) {
             case SET_AUTOMATIC_MODE:
                 setAutomaticMode(msg);
@@ -110,12 +118,12 @@ final public class Systems extends MessageHandlerA {
     }
 
     private void setAutomaticMode(Message msg)
-    throws ClientErrorException, SQLException, SystemErrorException {
+    throws ClientErrorException, SQLException {
         setAutomaticMode(msg, false);
     }
 
     private void setAutomaticMode(Message msg, boolean toggle)
-    throws ClientErrorException, SQLException, SystemErrorException {
+    throws ClientErrorException, SQLException {
         if(status == HardwareState.ERROR || status == HardwareState.EMERGENCY_STOP || status == HardwareState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
             return;
@@ -140,16 +148,13 @@ final public class Systems extends MessageHandlerA {
 
         if(automaticMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
-            dispatcher.broadcast(
-                new Message(
-                    GuiMessage.SYSTEM_NOTICE,
-                    new NoticeData(
-                        NoticeType.INFO,
-                        "Automatik",
-                        "Die Hardware befindet sich im Automatikmodus"
-                    )
-                )
-            );
+            incidentHandler.add(new IncidentData(
+                IncidentData.Level.NOTICE,
+                IncidentData.Type.STATUS_CHANGE,
+                "Automatik an",
+                "Die Hardware befindet sich im Automatikmodus",
+                msg.getEndpoint()
+            ));
             return;
         }
 
@@ -161,12 +166,13 @@ final public class Systems extends MessageHandlerA {
         lock.resetOwn(0);
 
         msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
-        dispatcher.broadcast(
-            new Message(
-                GuiMessage.SYSTEM_NOTICE,
-                new NoticeData(NoticeType.INFO, "Automatik", "Automatikmodus wurde deaktiviert")
-            )
-        );
+        incidentHandler.add(new IncidentData(
+            IncidentData.Level.NOTICE,
+            IncidentData.Type.STATUS_CHANGE,
+            "Automatik aus",
+            "Automatikmodus wurde deaktiviert",
+            msg.getEndpoint()
+        ));
     }
 
     private void triggerEmergencyStop(Message msg)
@@ -180,28 +186,26 @@ final public class Systems extends MessageHandlerA {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
-
-        dispatcher.broadcast(
-            new Message(
-                GuiMessage.SYSTEM_NOTICE,
-                new NoticeData(
-                    NoticeType.WARNING,
-                    "Nothalt gedrückt",
-                    getEmergencyStopReason((String)msg.getData())
-                )
-            )
-        );
         msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.EMERGENCY_STOP));
+        setEmergencyStopReason(msg);
     }
 
-    private String getEmergencyStopReason(String reason)
+    private void setEmergencyStopReason(Message msg)
     throws ClientErrorException {
-        return switch(CheckedEnum.getFromString(EmergencyTriggerReason.class, reason)) {
-            case CENTRAL_STATION                 -> "Auslösegrund: Es wurde ein Nothalt durch die CentralStation ausgelöst";
-            case EXTERN                          -> "Auslösegrund: Externe Hardware";
-            case SELF_ACTING_BY_EXTERN_SWITCHING -> "Auslösegrund: Weichenstellung durch CS im Automatikmodus";
-            case SOFTWARE_MANUAL                 -> "Auslösegrund: Manuell durch Steuerungssoftware";
+        String reason = switch(CheckedEnum.getFromString(EmergencyTriggerReason.class, (String)msg.getData())) {
+            case CENTRAL_STATION                 -> "Es wurde ein Nothalt durch die CentralStation ausgelöst";
+            case EXTERN                          -> "Externe Hardware";
+            case SELF_ACTING_BY_EXTERN_SWITCHING -> "Weichenstellung durch CS im Automatikmodus";
+            case SOFTWARE_MANUAL                 -> "Manuell durch Steuerungssoftware";
         };
+
+        incidentHandler.add(new IncidentData(
+            IncidentData.Level.WARNING,
+            IncidentData.Type.STATUS_CHANGE,
+            "Nothalt gedrückt",
+            "Auslösegrund: " + reason,
+            msg.getEndpoint()
+        ));
     }
 
     private void releaseEmergencyStop(Message msg) {
@@ -215,18 +219,19 @@ final public class Systems extends MessageHandlerA {
             return;
         }
 
-        dispatcher.broadcast(
-            new Message(
-                GuiMessage.SYSTEM_NOTICE,
-                new NoticeData(NoticeType.INFO, "Nothaltfreigabe", "Der Nothalt wurde wieder freigegeben")
-            )
-        );
-
         if(automaticMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
         } else {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
         }
+        incidentHandler.add(new IncidentData(
+            IncidentData.Level.NOTICE,
+            IncidentData.Type.STATUS_CHANGE,
+            "Nothaltfreigabe",
+            "Der Nothalt wurde wieder freigegeben. " +
+            "Anlage wechselt in den " + (automaticMode ? "Automatikmodus" : "Manuellmodus"),
+            msg.getEndpoint()
+        ));
     }
 
     private void setStandByMode(Message msg) {
@@ -253,13 +258,14 @@ final public class Systems extends MessageHandlerA {
         }
 
         if(setStandByMode) {
-            dispatcher.broadcast(
-                new Message(
-                    GuiMessage.SYSTEM_NOTICE,
-                    new NoticeData(NoticeType.INFO, "Standby", "Anlage wird in den Standby-Modus geschickt")
-                )
-            );
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.STANDBY));
+            incidentHandler.add(new IncidentData(
+                IncidentData.Level.NOTICE,
+                IncidentData.Type.STATUS_CHANGE,
+                "Standby an",
+                "Anlage wird in den Standby-Modus geschickt",
+                msg.getEndpoint()
+            ));
             return;
         }
 
@@ -268,17 +274,20 @@ final public class Systems extends MessageHandlerA {
             return;
         }
 
-        dispatcher.broadcast(
-            new Message(
-                GuiMessage.SYSTEM_NOTICE,
-                new NoticeData(NoticeType.INFO, "Standby", "Die Anlage wird aus dem Standby-Modus geholt")
-            )
-        );
         if(automaticMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
         } else {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
         }
+
+        incidentHandler.add(new IncidentData(
+            IncidentData.Level.NOTICE,
+            IncidentData.Type.STATUS_CHANGE,
+            "Standby aus",
+            "Die Anlage wird aus dem Standby-Modus geholt" +
+            "Anlage wechselt in den " + (automaticMode ? "Automatikmodus" : "Manuellmodus"),
+            msg.getEndpoint()
+        ));
     }
 
     private void sendErrorMessage(Endpoint endpoint) {

@@ -29,8 +29,8 @@ import moba.server.com.Acceptor;
 import moba.server.com.BackgroundHandlerComposite;
 import moba.server.com.Dispatcher;
 import moba.server.database.Database;
-import moba.server.database.DatabaseException;
 import moba.server.datatypes.base.Version;
+import moba.server.datatypes.objects.IncidentData;
 import moba.server.datatypes.objects.helper.ActiveLayout;
 import moba.server.messagehandler.*;
 import moba.server.messages.MessageLoop;
@@ -39,8 +39,10 @@ import moba.server.utilities.AllowList;
 import moba.server.com.IPC;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.lock.TrackLayoutLock;
+import moba.server.utilities.messaging.IncidentHandler;
 import moba.server.utilities.logger.Loggable;
 import moba.server.utilities.logger.MessageLogger;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 final public class ServerApplication implements Loggable {
 
@@ -91,29 +93,31 @@ final public class ServerApplication implements Loggable {
         maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
         int port = (int)(long)config.getSection("common.serverConfig.port");
         var allowed = (ArrayList<String>)config.getSection("common.serverConfig.allowedIPs");
-        var logList = new LogList();
+        int maxEntries = (int)(long)config.getSection("common.serverConfig.maxIncidentEntries");
         AllowList allowList = new AllowList(maxClients, allowed);
+        CircularFifoQueue<IncidentData> list = new CircularFifoQueue<>(maxEntries);
 
         do {
             Dispatcher dispatcher = new Dispatcher(new MessageLogger(logger), logger);
             Database database = new Database((HashMap<String, Object>)config.getSection("common.database"));
-            MessageLoop  loop = new MessageLoop(dispatcher, logger);
             ActiveLayout activeLayout = new ActiveLayout(dispatcher, config);
             TrackLayoutLock lock = new TrackLayoutLock(database);
+            IncidentHandler incidentHandler = new IncidentHandler(logger, dispatcher, list);
 
             BackgroundHandlerComposite handler = new BackgroundHandlerComposite();
-            handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList));
-            handler.add(new IPC((String)config.getSection("common.serverConfig.ipc"), msgQueueIn));
+            handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList, incidentHandler));
+            handler.add(new IPC((String)config.getSection("common.serverConfig.ipc"), msgQueueIn, logger));
 
-                loop.addHandler(new Client(dispatcher));
-                loop.addHandler(new Server(dispatcher, this, allowList, config));
-                loop.addHandler(new Timer(dispatcher, config));
-                loop.addHandler(new Environment(dispatcher, config));
-                loop.addHandler(new Systems(dispatcher, lock, activeLayout, msgQueueIn));
-                loop.addHandler(new Layout(dispatcher, database, activeLayout));
-                loop.addHandler(new Interface(dispatcher, msgQueueIn));
-                loop.addHandler(new Control(dispatcher, database, activeLayout));
-                loop.addHandler(new Gui());
+            MessageLoop  loop = new MessageLoop(dispatcher, incidentHandler);
+            loop.addHandler(new Client(dispatcher));
+            loop.addHandler(new Server(dispatcher, this, allowList, config));
+            loop.addHandler(new Timer(dispatcher, config));
+            loop.addHandler(new Environment(dispatcher, config));
+            loop.addHandler(new Systems(dispatcher, lock, activeLayout, msgQueueIn, incidentHandler));
+            loop.addHandler(new Layout(dispatcher, database, activeLayout));
+            loop.addHandler(new Interface(dispatcher, msgQueueIn, incidentHandler));
+            loop.addHandler(new Control(dispatcher, database, activeLayout));
+            loop.addHandler(new Messaging(dispatcher, list));
 
             handler.start();
             restart = loop.loop(msgQueueIn);

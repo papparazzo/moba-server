@@ -20,8 +20,6 @@
 
 package moba.server.messages;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -29,23 +27,28 @@ import java.util.logging.Logger;
 
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
-import moba.server.datatypes.enumerations.ErrorId;
+import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.objects.ErrorData;
+import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
+import moba.server.messages.messageType.MessagingMessage;
 import moba.server.messages.messageType.ServerMessage;
-import moba.server.utilities.exceptions.ErrorException;
+import moba.server.utilities.exceptions.ClientErrorException;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 final public class MessageLoop {
 
     private final Map<Integer, MessageHandlerA> handlers   = new HashMap<>();
     private final Dispatcher                    dispatcher;
     private final Logger                        logger;
+    private final CircularFifoQueue<IncidentData> list;
 
-    public MessageLoop(Dispatcher dispatcher, Logger logger) {
+    public MessageLoop(Dispatcher dispatcher, Logger logger, CircularFifoQueue<IncidentData> list) {
         this.dispatcher = dispatcher;
         this.logger = logger;
+        this.list = list;
     }
 
     public void addHandler(MessageHandlerA msgHandler) {
@@ -53,7 +56,7 @@ final public class MessageLoop {
     }
 
     public boolean loop(MessageQueue in)
-    throws InterruptedException, ErrorException {
+    throws InterruptedException, ClientErrorException {
 
         while(true) {
             Message msg = in.take();
@@ -103,9 +106,9 @@ final public class MessageLoop {
     }
 
     private void checkGroup(int groupId)
-    throws ErrorException {
+    throws ClientErrorException {
         if(!handlers.containsKey(groupId)) {
-            throw new ErrorException(ErrorId.UNKNOWN_GROUP_ID, "no handler for group <" + groupId + ">!");
+            throw new ClientErrorException(ClientError.UNKNOWN_GROUP_ID, "no handler for group <" + groupId + ">!");
         }
     }
 

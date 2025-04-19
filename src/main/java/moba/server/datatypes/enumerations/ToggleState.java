@@ -20,8 +20,8 @@
 
 package moba.server.datatypes.enumerations;
 
-import moba.server.datatypes.enumerations.helper.CheckedEnum;
-import moba.server.utilities.exceptions.SystemErrorException;
+import moba.server.utilities.CheckedEnum;
+import moba.server.utilities.exceptions.ClientErrorException;
 
 public enum ToggleState {
     ON,
@@ -65,7 +65,7 @@ public enum ToggleState {
     }
 
     public static boolean getValue(String s, boolean def)
-    throws SystemErrorException {
+    throws ClientErrorException {
         ToggleState t = CheckedEnum.getFromString(ToggleState.class, s);
         switch(t) {
             case UNSET -> {
@@ -85,7 +85,7 @@ public enum ToggleState {
     }
 
     public static ToggleState getValue(String s, ToggleState def)
-    throws SystemErrorException {
+    throws ClientErrorException {
         ToggleState t = CheckedEnum.getFromString(ToggleState.class, s);
         return getValue(t, def);
     }

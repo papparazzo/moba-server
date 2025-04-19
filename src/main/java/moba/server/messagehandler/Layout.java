@@ -43,7 +43,6 @@ import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.LayoutMessage;
 import moba.server.utilities.exceptions.ClientErrorException;
-import moba.server.utilities.exceptions.SystemErrorException;
 import moba.server.utilities.lock.TrackLayoutLock;
 import moba.server.utilities.logger.Loggable;
 
@@ -77,7 +76,7 @@ public class Layout extends MessageHandlerA implements Loggable {
 
     @Override
     public void handleMsg(Message msg)
-    throws ClientErrorException, SQLException, IOException, SystemErrorException {
+    throws ClientErrorException, SQLException, IOException {
         switch(LayoutMessage.fromId(msg.getMessageId())) {
             case GET_LAYOUTS_REQ          -> getLayouts(msg);
             case GET_LAYOUT_REQ           -> getLayout(msg, true);
