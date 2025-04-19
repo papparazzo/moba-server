@@ -22,7 +22,6 @@ package moba.server.messages;
 
 import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.HardwareState;
-import moba.server.utilities.exceptions.ErrorException;
 
 public abstract class MessageHandlerA {
 

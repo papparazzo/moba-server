@@ -213,7 +213,7 @@ Integer	trainId
             }
         }
 
-        //dispatcher.dispatch(new Message(LayoutMessage.LAYOUT_CHANGED, map));
+        //dispatcher.dispatch(new Incident(LayoutMessage.LAYOUT_CHANGED, map));
 
     }
 

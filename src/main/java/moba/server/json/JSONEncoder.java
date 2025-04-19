@@ -21,15 +21,14 @@
 package moba.server.json;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Objects;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -69,13 +68,13 @@ public class JSONEncoder {
         encode(map);
     }
 
-    protected void addObject(Map map)
+    protected void addObject(Map<?, ?> map)
     throws IOException, JSONException {
         writer.write('{');
         if(map != null) {
             Iterator<?> iter = map.entrySet().iterator();
             while(iter.hasNext()) {
-                Map.Entry entry = (Map.Entry)iter.next();
+                Map.Entry<?, ?> entry = (Map.Entry<?, ?>)iter.next();
                 writer.write('"');
                 writer.write((String)entry.getKey());
                 writer.write("\":");
@@ -178,11 +177,11 @@ public class JSONEncoder {
     throws IOException, JSONException {
         if(object == null) {
             addNull();
-        } else if(object instanceof Map map) {
+        } else if(object instanceof Map<?, ?> map) {
             addObject(map);
         } else if(object instanceof Boolean boolean1) {
             addBoolean(boolean1);
-        } else if(object instanceof ArrayList arrayList) {
+        } else if(object instanceof Iterable<?> arrayList) {
             addArray(arrayList);
         } else if(object instanceof String string) {
             addString(string);
@@ -204,8 +203,6 @@ public class JSONEncoder {
             addInetAddr(inetAddress);
         } else if(object instanceof JSONToStringI jSONToStringI) {
             writer.write(jSONToStringI.toJsonString(formatted, indent));
-        } else if(object instanceof Set set) {
-            addSet(set);
         } else if(object instanceof Record) {
             addRecord(object);
         } else {
@@ -222,23 +219,11 @@ public class JSONEncoder {
         writer.write("false");
     }
 
-    protected void addArray(ArrayList arraylist)
-    throws IOException, JSONException {
-        writer.write('[');
-        for(int i = 0; i < arraylist.size(); ++i) {
-            if(i != 0) {
-                writer.write(',');
-            }
-            addJSONValue(arraylist.get(i));
-        }
-        writer.write(']');
-    }
-
-    protected void addSet(Set setList)
+    protected void addArray(Iterable<?> array)
     throws IOException, JSONException {
         writer.write('[');
         boolean fr = true;
-        for(Object item : setList) {
+        for(Object item : array) {
             if(!fr) {
                 writer.write(',');
             }
@@ -317,40 +302,5 @@ public class JSONEncoder {
     throws IOException {
         String str = addr.getHostAddress();
         addString(Objects.requireNonNullElse(str, "0.0.0.0"));
-    }
-
-    protected void addFormatStr(int indent)
-    throws IOException {
-        if(!formatted) {
-            return;
-        }
-
-        indent += indent * 4;
-        writer.write(System.lineSeparator());
-        for(int i = 0; i < indent; i++) {
-            write(' ');
-        }
-    }
-
-    protected void write(char c)
-    throws IOException {
-
-        switch(c) {
-            case '{', '[' -> {
-                writer.write(c);
-                addFormatStr(1);
-            }
-            case ',' -> {
-                writer.write(c);
-                addFormatStr(0);
-            }
-
-            case '}', ']' -> {
-                addFormatStr(-1);
-                writer.write(c);
-            }
-
-            default -> writer.write(c);
-        }
     }
 }

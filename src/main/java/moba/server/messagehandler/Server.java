@@ -65,7 +65,6 @@ final public class Server extends MessageHandlerA {
             case ADD_ALLOWED_IP      -> handleAddIpAddress(msg);
             case GET_ALLOWED_IP_LIST -> handleGetAllowedIpList(msg.getEndpoint());
             case SET_ALLOWED_IP_LIST -> handleSetAllowedIpList(msg);
-            case GET_LOG_LIST        -> handleGetLogList(msg.getEndpoint());
         }
     }
 
@@ -100,10 +99,6 @@ final public class Server extends MessageHandlerA {
         config.setSection("common.serverConfig.allowedIPs", list);
         config.writeFile();
         dispatcher.broadcast(new Message(ServerMessage.SET_ALLOWED_IP_LIST, list));
-    }
-
-    private void handleGetLogList(Endpoint endpoint) {
-        //dispatcher.send(new Message(ServerMessage.SET_LOG_LIST, loglist.getList()), endpoint);
     }
 
     private void handleClientsReq(Endpoint endpoint) {
