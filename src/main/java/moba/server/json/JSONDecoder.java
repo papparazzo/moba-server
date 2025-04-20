@@ -88,7 +88,7 @@ public class JSONDecoder {
                     key = nextKey();
 
                 default ->
-                    throw new JSONException("invalid key");
+                    throw new JSONException("invalid key: expected a '\"' or '}', got <" + c + "> instead!");
             }
             reader.checkNext(':');
 
@@ -106,7 +106,7 @@ public class JSONDecoder {
                 }
 
                 default -> 
-                    throw new JSONException("expected a ',' or '}'");
+                    throw new JSONException("expected a ',' or '}', got <" + c + "> instead!");
             }
         }
         throw new JSONException("maximum string-length of <" + JSONDecoder.MAX_STRING_LENGTH + "> reached!");
@@ -189,7 +189,7 @@ public class JSONDecoder {
 
                         case '"', '\\', '/' -> sb.append(c);
                         default ->
-                            throw new JSONException("invalid escape-sequence");
+                            throw new JSONException("invalid escape-sequence <"+ c +">");
                     }
                 }
 
@@ -227,7 +227,7 @@ public class JSONDecoder {
                 }
 
                 default ->
-                    throw new JSONException("expected ',' or ']'");
+                    throw new JSONException("expected ',' or ']', got <" + c + "> instead!");
             }
         }
     }
@@ -248,7 +248,7 @@ public class JSONDecoder {
                 sb.append(c);
                 continue;
             }
-            throw new JSONException("parsing error");
+            throw new JSONException("expected digit, '-' or 'e', 'E', '.' or 'x', 'X' but found <" + c + ">!");
         }
         throw new JSONException("maximum string-length of <" + JSONDecoder.MAX_STRING_LENGTH + "> reached!");
     }
@@ -262,7 +262,7 @@ public class JSONDecoder {
 
         char b = s.charAt(0);
         if(!Character.isDigit(b) && b != '-') {
-            throw new JSONException("parsing error, number starts not with digit or -");
+            throw new JSONException("number starts not with digit or -");
         }
 
         try {
@@ -275,7 +275,7 @@ public class JSONDecoder {
             }
             return Long.valueOf(s);
         } catch(NumberFormatException e) {
-            throw new JSONException("parsing, error could not determine value: <" + s + ">", e);
+            throw new JSONException("could not determine value: <" + s + ">", e);
         }
     }
 }
