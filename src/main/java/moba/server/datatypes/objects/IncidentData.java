@@ -19,31 +19,19 @@ public class IncidentData {
 
     public enum Type {
         EXCEPTION,
-        STATUS_CHANGE,     // Statusänderung
+        STATUS_CHANGE, // Statusänderung
         NOTICE,
-        CLIENT,
-        SERVER
+        CLIENT_ERROR,
+        SERVER_NOTICE         // Server-spezifische Nachrichten (z.B. Fehlermeldungen)
     }
 
     private final Level  level;
     private final Type   type;
     private final String caption;
     private final String message;
-    private final String origin;
+    private final String source;
     private final String timeStamp;
-
-    public IncidentData(Level level, Type type, String caption, String message, String origin) {
-        this.level = level;
-        this.type = type;
-        this.caption = caption;
-        this.message = message;
-        this.origin = origin;
-        this.timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSS ").format(new Date());
-    }
-
-    public IncidentData(Level level, Type type, String caption, String message, Endpoint origin) {
-        this(level, type, caption, message, origin.toString());
-    }
+    private final Endpoint origin;
 
     @SuppressWarnings("unchecked")
     public IncidentData(Message msg)
@@ -54,8 +42,34 @@ public class IncidentData {
         this.type = CheckedEnum.getFromString(Type.class, map.get("type"));
         this.caption = map.get("caption");
         this.message = map.get("message");
-        this.origin = msg.getEndpoint().toString();
+        this.source = map.get("source");
+        this.origin = msg.getEndpoint();
         this.timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSS ").format(new Date());
+    }
+
+    public IncidentData(Level level, Type type, String caption, String message, String source, Endpoint origin) {
+        this.level = level;
+        this.type = type;
+        this.caption = caption;
+        this.message = message;
+        this.source = source;
+        this.origin = origin;
+        this.timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSS ").format(new Date());
+    }
+
+    public IncidentData(Level level, Type type, String caption, String message, String source) {
+        this(level, type, caption, message, source, null);
+    }
+
+    public IncidentData(IncidentData.Type type, Throwable throwable, Endpoint origin) {
+        this(
+            Level.CRITICAL,
+            type,
+            getClassName(throwable) + "-Exception ",
+            throwable.getMessage(),
+            throwable.getStackTrace()[0].toString(),
+            origin
+        );
     }
 
     public IncidentData(Throwable throwable) {
@@ -63,21 +77,7 @@ public class IncidentData {
     }
 
     public IncidentData(IncidentData.Type type, Throwable throwable) {
-        this(type, "", throwable);
-    }
-
-    public IncidentData(IncidentData.Type type, String caption, Throwable throwable) {
-        this(
-            Level.CRITICAL,
-            type,
-            throwable.getClass().getName() + "-Exception " + caption,
-            throwable.toString(),
-            throwable.getStackTrace()[0].toString()
-        );
-    }
-
-    public IncidentData(IncidentData.Type type, String caption, Throwable throwable, Endpoint ep) {
-        this(type, (caption + " [" + ep.toString() + "]").trim(), throwable);
+        this(type, throwable, null);
     }
 
     public String toString() {
@@ -100,11 +100,20 @@ public class IncidentData {
         return message;
     }
 
-    public String getOrigin() {
+    public Endpoint getOrigin() {
         return origin;
     }
 
     public String getTimeStamp() {
         return timeStamp;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    private static String getClassName(Throwable throwable) {
+        String str = throwable.getClass().getName();
+        return str.substring(str.lastIndexOf(".") + 1);
     }
 }
