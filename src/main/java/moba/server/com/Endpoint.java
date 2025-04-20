@@ -84,7 +84,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
 
     @Override
     public String toString() {
-        return appName + "[" + id + "]@" + socket.toString();
+        return appName + "#" + id + "@" + socket.toString();
     }
 
     @Override

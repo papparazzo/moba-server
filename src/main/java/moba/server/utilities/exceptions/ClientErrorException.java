@@ -31,9 +31,8 @@ final public class ClientErrorException extends Exception {
         this.errorId = errorId;
     }
 
-    @Override
-    public String toString() {
-        return "[" + errorId.toString() + "] " + super.toString();
+    public String getMessage() {
+        return "[" + errorId.toString() + "]: " + super.getMessage();
     }
 
     public ClientError getErrorId() {
