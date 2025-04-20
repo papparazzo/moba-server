@@ -106,7 +106,7 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
                     incidentHandler.add(
                         new IncidentData(
                             IncidentData.Level.WARNING,
-                            IncidentData.Type.SERVER,
+                            IncidentData.Type.SERVER_NOTICE,
                             "Max amount of clients",
                             MessageFormat.format("Max amount of clients <{0}> connected!", maxClients),
                             "Acceptor.run()"

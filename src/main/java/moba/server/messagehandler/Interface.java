@@ -84,6 +84,13 @@ final public class Interface extends MessageHandlerA {
     }
 
     private void addIncident(IncidentData.Level level, String message, Endpoint ep) {
-        incidentHandler.add(new IncidentData(level, IncidentData.Type.STATUS_CHANGE, "Hardwareverbindung", message, ep));
+        incidentHandler.add(new IncidentData(
+            level,
+            IncidentData.Type.STATUS_CHANGE,
+            "Hardwareverbindung",
+            message,
+            "Interface.addIncident()",
+            ep
+        ));
     }
 }

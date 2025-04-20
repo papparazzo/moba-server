@@ -22,8 +22,6 @@ package moba.server.messages;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
@@ -33,22 +31,19 @@ import moba.server.datatypes.objects.ErrorData;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
-import moba.server.messages.messageType.MessagingMessage;
 import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.exceptions.ClientErrorException;
-import org.apache.commons.collections4.queue.CircularFifoQueue;
+import moba.server.utilities.messaging.IncidentHandler;
 
 final public class MessageLoop {
 
     private final Map<Integer, MessageHandlerA> handlers   = new HashMap<>();
     private final Dispatcher                    dispatcher;
-    private final Logger                        logger;
-    private final CircularFifoQueue<IncidentData> list;
+    private final IncidentHandler               incidentHandler;
 
-    public MessageLoop(Dispatcher dispatcher, Logger logger, CircularFifoQueue<IncidentData> list) {
-        this.dispatcher = dispatcher;
-        this.logger = logger;
-        this.list = list;
+    public MessageLoop(Dispatcher dispatcher, IncidentHandler incidentHandler) {
+        this.dispatcher      = dispatcher;
+        this.incidentHandler = incidentHandler;
     }
 
     public void addHandler(MessageHandlerA msgHandler) {
@@ -64,12 +59,26 @@ final public class MessageLoop {
             if(msg.getGroupId() == InternMessage.GROUP_ID) {
                 switch(InternMessage.fromId(msg.getMessageId())) {
                     case SERVER_RESET -> {
+                        incidentHandler.add(new IncidentData(
+                            IncidentData.Level.NOTICE,
+                            IncidentData.Type.SERVER_NOTICE,
+                            "Server Neustart (reset)",
+                            "Neustart der Serverapplikation aufgrund eines Server-Resets",
+                            "moba-server:ServerApplication.run()"
+                        ));
                         in.clear();
                         resetHandler();
                         return true;
                     }
 
                     case SERVER_SHUTDOWN -> {
+                        incidentHandler.add(new IncidentData(
+                            IncidentData.Level.NOTICE,
+                            IncidentData.Type.SERVER_NOTICE,
+                            "Server Shutdown",
+                            "Shutdown der Serverapplikation",
+                            "moba-server:ServerApplication.run()"
+                        ));
                         shutdownHandler();
                         return false;
                     }
@@ -89,16 +98,22 @@ final public class MessageLoop {
             try {
                 checkGroup(msg.getGroupId());
                 handlers.get(msg.getGroupId()).handleMsg(msg);
-            } catch(ErrorException e) {
-                handleException(e.getErrorId(), e, msg.getEndpoint());
-            } catch(IllegalArgumentException e) {
-                handleException(ErrorId.INVALID_DATA_SEND, e, msg.getEndpoint());
-            } catch(java.lang.ClassCastException | IOException | NullPointerException e) {
-                handleException(ErrorId.FAULTY_MESSAGE, e, msg.getEndpoint());
-            } catch(SQLException e) {
-                handleException(ErrorId.DATABASE_ERROR, e, msg.getEndpoint());
-            } catch(Exception e) {
-                handleException(ErrorId.UNKNOWN_ERROR, e, msg.getEndpoint());
+            } catch(ClientErrorException e) {
+                ClientError id = e.getErrorId();
+                Endpoint ep = msg.getEndpoint();
+                dispatcher.send(new Message(ClientMessage.ERROR, new ErrorData(id, e.getMessage())), ep);
+                incidentHandler.add(
+                    new IncidentData(IncidentData.Type.CLIENT_ERROR, e, ep)
+                );
+            } catch(Throwable e) {
+                incidentHandler.add(new IncidentData(IncidentData.Type.EXCEPTION, e, msg.getEndpoint()));
+                incidentHandler.add(new IncidentData(
+                    IncidentData.Level.CRITICAL,
+                    IncidentData.Type.SERVER_NOTICE,
+                    "Serverneustart (reset)",
+                    "Neustart der Serverapplikation aufgrund eines Fehlers",
+                    "moba-server:ServerApplication.run()")
+                );
                 in.clear();
                 return true;
             }
@@ -140,16 +155,17 @@ final public class MessageLoop {
 
     private void handleClientClose(Message msg) {
         long appId = msg.getEndpoint().getAppId();
+
+        incidentHandler.add(new IncidentData(
+            IncidentData.Level.NOTICE,
+            IncidentData.Type.CLIENT_ERROR,
+            "Client-Shutdown",
+            "Client \""  + msg.getEndpoint().toString() + "\" wird Aufgrund von \"" + msg.getData() + "\" beendet",
+            "moba-server:ServerApplication.handleClientClose()"
+        ));
+
         freeResources(appId);
         dispatcher.removeEndpoint(msg.getEndpoint());
         dispatcher.broadcast(new Message(ServerMessage.CLIENT_CLOSED, appId));
-    }
-
-    private void handleException(ErrorId id, Throwable e, Endpoint ep) {
-        String message = e.toString();
-        String stack = e.getStackTrace()[0].toString();
-
-        logger.log(Level.SEVERE, "Exception! <" + message + "> -> " + stack);
-        dispatcher.send(new Message(ClientMessage.ERROR, new ErrorData(id, e.getMessage())), ep);
     }
 }
