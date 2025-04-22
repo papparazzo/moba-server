@@ -20,8 +20,9 @@
 
 package moba.server.datatypes.enumerations;
 
-public enum NoticeType {
-    INFO,
-    WARNING,
-    ERROR
+public enum IncidentLevel {
+    CRITICAL,  // schwerwiegende Ausnahme, moba-server wird neu gestartet
+    ERROR,     // Fehlerhafte Nachrichten vom Client: Ungültige Nachrichten-Id, Falscher Nachrichtenaufbau
+    WARNING,   // Nothalt ausgelöst, Probleme im Automatikbetrieb
+    NOTICE
 }

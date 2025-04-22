@@ -60,7 +60,7 @@ final public class Messaging extends MessageHandlerA {
 
     private void handleNotifyIncident(Message msg)
     throws ClientErrorException {
-        dispatcher.broadcast(new Message(MessagingMessage.NOTIFY_INCIDENT, msg.getData()));
         list.add(new IncidentData(msg));
+        dispatcher.broadcast(new Message(MessagingMessage.NOTIFY_INCIDENT, msg.getData()));
     }
 }

@@ -65,11 +65,11 @@ final public class IPC extends Thread implements BackgroundHandlerInterface {
             File f = new File(fifoFile);
             if(!f.exists()) {
                 new ProcessBuilder("bash", "-c", "mkfifo " + fifoFile).inheritIO().start();
-            }
-
-            var attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
-            if(!attr.isOther()) {
-                throw new RuntimeException("<" + fifoFile + "> is not a named pipe");
+            } else {
+                var attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
+                if(!attr.isOther()) {
+                    throw new RuntimeException("<" + fifoFile + "> is not a named pipe");
+                }
             }
         } catch(IOException e) {
             throw new RuntimeException(e);

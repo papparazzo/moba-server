@@ -27,6 +27,8 @@ import java.net.Socket;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 
+import moba.server.datatypes.enumerations.IncidentLevel;
+import moba.server.datatypes.enumerations.IncidentType;
 import moba.server.messages.MessageQueue;
 import moba.server.utilities.AllowList;
 import moba.server.datatypes.objects.IncidentData;
@@ -105,8 +107,8 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
                     socket.close();
                     incidentHandler.add(
                         new IncidentData(
-                            IncidentData.Level.WARNING,
-                            IncidentData.Type.SERVER_NOTICE,
+                            IncidentLevel.WARNING,
+                            IncidentType.SERVER_NOTICE,
                             "Max amount of clients",
                             MessageFormat.format("Max amount of clients <{0}> connected!", maxClients),
                             "Acceptor.run()"
@@ -117,7 +119,7 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
                 (new Endpoint(id, socket, msgQueue)).start();
             } catch (Exception e) {
                 getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
-                // TODO IncidentData  loglist.add(new LogListEntry(e));
+                incidentHandler.add(new IncidentData(e));
             }
         }
         getLogger().info("acceptor-thread terminated");

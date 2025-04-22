@@ -128,7 +128,7 @@ public final class TrackLayoutLock extends AbstractLock {
         if(lockedBy == appId) {
             return true;
         }
-        throw new ClientErrorException(ClientError.DATASET_LOCKED, "object is locked by <" + lockedBy + ">");
+        throw new ClientErrorException(ClientError.DATASET_LOCKED, "object is already locked by <" + lockedBy + ">");
     }
 
     private Long getIdOfLockingApp(Object data)
@@ -143,7 +143,7 @@ public final class TrackLayoutLock extends AbstractLock {
             getLogger().log(Level.INFO, stmt.toString());
             ResultSet rs = stmt.executeQuery();
             if(!rs.next()) {
-                throw new ClientErrorException(ClientError.DATASET_MISSING, "no layout found with id <" + id + ">");
+                throw new ClientErrorException(ClientError.DATASET_MISSING, "No layout found with id <" + id + "> for determining lock-state");
             }
             var val = rs.getLong("locked");
             return rs.wasNull() ? null : val;

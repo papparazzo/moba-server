@@ -22,9 +22,7 @@ package moba.server.messagehandler;
 
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
-import moba.server.datatypes.enumerations.ClientError;
-import moba.server.datatypes.enumerations.EmergencyTriggerReason;
-import moba.server.datatypes.enumerations.HardwareState;
+import moba.server.datatypes.enumerations.*;
 import moba.server.utilities.CheckedEnum;
 import moba.server.datatypes.objects.ErrorData;
 import moba.server.datatypes.objects.IncidentData;
@@ -130,7 +128,7 @@ final public class Systems extends MessageHandlerA {
         }
 
         if(toggle) {
-            if(!automaticMode) {
+            if(automaticMode) {
                 lock.tryLock(0, activeLayout.getActiveLayout());
             }
             automaticMode = !automaticMode;
@@ -140,7 +138,7 @@ final public class Systems extends MessageHandlerA {
                 sendErrorMessage(msg.getEndpoint());
                 return;
             }
-            if(!setAutomaticMode) {
+            if(setAutomaticMode) {
                 lock.tryLock(0, activeLayout.getActiveLayout());
             }
             automaticMode = setAutomaticMode;
@@ -149,10 +147,11 @@ final public class Systems extends MessageHandlerA {
         if(automaticMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
             incidentHandler.add(new IncidentData(
-                IncidentData.Level.NOTICE,
-                IncidentData.Type.STATUS_CHANGE,
+                IncidentLevel.NOTICE,
+                IncidentType.STATUS_CHANGED,
                 "Automatik an",
                 "Die Hardware befindet sich im Automatikmodus",
+                "Systems.setAutomaticMode()",
                 msg.getEndpoint()
             ));
             return;
@@ -167,10 +166,11 @@ final public class Systems extends MessageHandlerA {
 
         msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
         incidentHandler.add(new IncidentData(
-            IncidentData.Level.NOTICE,
-            IncidentData.Type.STATUS_CHANGE,
+            IncidentLevel.NOTICE,
+            IncidentType.STATUS_CHANGED,
             "Automatik aus",
             "Automatikmodus wurde deaktiviert",
+            "Systems.setAutomaticMode()",
             msg.getEndpoint()
         ));
     }
@@ -200,10 +200,11 @@ final public class Systems extends MessageHandlerA {
         };
 
         incidentHandler.add(new IncidentData(
-            IncidentData.Level.WARNING,
-            IncidentData.Type.STATUS_CHANGE,
+            IncidentLevel.WARNING,
+            IncidentType.STATUS_CHANGED,
             "Nothalt gedrückt",
             "Auslösegrund: " + reason,
+            "Systems.setEmergencyStopReason()",
             msg.getEndpoint()
         ));
     }
@@ -225,11 +226,12 @@ final public class Systems extends MessageHandlerA {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
         }
         incidentHandler.add(new IncidentData(
-            IncidentData.Level.NOTICE,
-            IncidentData.Type.STATUS_CHANGE,
+            IncidentLevel.NOTICE,
+            IncidentType.STATUS_CHANGED,
             "Nothaltfreigabe",
             "Der Nothalt wurde wieder freigegeben. " +
             "Anlage wechselt in den " + (automaticMode ? "Automatikmodus" : "Manuellmodus"),
+            "Systems.releaseEmergencyStop()",
             msg.getEndpoint()
         ));
     }
@@ -260,10 +262,11 @@ final public class Systems extends MessageHandlerA {
         if(setStandByMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.STANDBY));
             incidentHandler.add(new IncidentData(
-                IncidentData.Level.NOTICE,
-                IncidentData.Type.STATUS_CHANGE,
+                IncidentLevel.NOTICE,
+                IncidentType.STATUS_CHANGED,
                 "Standby an",
                 "Anlage wird in den Standby-Modus geschickt",
+                "Systems.setStandByMode()",
                 msg.getEndpoint()
             ));
             return;
@@ -281,11 +284,12 @@ final public class Systems extends MessageHandlerA {
         }
 
         incidentHandler.add(new IncidentData(
-            IncidentData.Level.NOTICE,
-            IncidentData.Type.STATUS_CHANGE,
+            IncidentLevel.NOTICE,
+            IncidentType.STATUS_CHANGED,
             "Standby aus",
             "Die Anlage wird aus dem Standby-Modus geholt" +
             "Anlage wechselt in den " + (automaticMode ? "Automatikmodus" : "Manuellmodus"),
+            "Systems.setStandByMode()",
             msg.getEndpoint()
         ));
     }

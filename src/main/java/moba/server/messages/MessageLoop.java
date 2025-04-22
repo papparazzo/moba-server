@@ -27,6 +27,8 @@ import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.enumerations.HardwareState;
+import moba.server.datatypes.enumerations.IncidentLevel;
+import moba.server.datatypes.enumerations.IncidentType;
 import moba.server.datatypes.objects.ErrorData;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.messageType.ClientMessage;
@@ -60,8 +62,8 @@ final public class MessageLoop {
                 switch(InternMessage.fromId(msg.getMessageId())) {
                     case SERVER_RESET -> {
                         incidentHandler.add(new IncidentData(
-                            IncidentData.Level.NOTICE,
-                            IncidentData.Type.SERVER_NOTICE,
+                            IncidentLevel.NOTICE,
+                            IncidentType.SERVER_NOTICE,
                             "Server Neustart (reset)",
                             "Neustart der Serverapplikation aufgrund eines Server-Resets",
                             "moba-server:ServerApplication.run()"
@@ -73,9 +75,9 @@ final public class MessageLoop {
 
                     case SERVER_SHUTDOWN -> {
                         incidentHandler.add(new IncidentData(
-                            IncidentData.Level.NOTICE,
-                            IncidentData.Type.SERVER_NOTICE,
-                            "Server Shutdown",
+                            IncidentLevel.NOTICE,
+                            IncidentType.SERVER_NOTICE,
+                            "Server shutdown",
                             "Shutdown der Serverapplikation",
                             "moba-server:ServerApplication.run()"
                         ));
@@ -102,16 +104,14 @@ final public class MessageLoop {
                 ClientError id = e.getErrorId();
                 Endpoint ep = msg.getEndpoint();
                 dispatcher.send(new Message(ClientMessage.ERROR, new ErrorData(id, e.getMessage())), ep);
-                incidentHandler.add(
-                    new IncidentData(IncidentData.Type.CLIENT_ERROR, e, ep)
-                );
+                incidentHandler.add(new IncidentData(IncidentType.CLIENT_ERROR, e, ep));
             } catch(Throwable e) {
-                incidentHandler.add(new IncidentData(IncidentData.Type.EXCEPTION, e, msg.getEndpoint()));
+                incidentHandler.add(new IncidentData(IncidentType.EXCEPTION, e, msg.getEndpoint()));
                 incidentHandler.add(new IncidentData(
-                    IncidentData.Level.CRITICAL,
-                    IncidentData.Type.SERVER_NOTICE,
-                    "Serverneustart (reset)",
-                    "Neustart der Serverapplikation aufgrund eines Fehlers",
+                    IncidentLevel.CRITICAL,
+                    IncidentType.SERVER_NOTICE,
+                    "Restart of the server (reset)",
+                    "Restart of the server application due to an error",
                     "moba-server:ServerApplication.run()")
                 );
                 in.clear();
@@ -157,11 +157,12 @@ final public class MessageLoop {
         long appId = msg.getEndpoint().getAppId();
 
         incidentHandler.add(new IncidentData(
-            IncidentData.Level.NOTICE,
-            IncidentData.Type.CLIENT_ERROR,
-            "Client-Shutdown",
-            "Client \""  + msg.getEndpoint().toString() + "\" wird Aufgrund von \"" + msg.getData() + "\" beendet",
-            "moba-server:ServerApplication.handleClientClose()"
+            IncidentLevel.NOTICE,
+            IncidentType.CLIENT_ERROR,
+            "Client shutdown",
+            "Client is terminated. Reason: \"" + msg.getData() + "\"",
+            "moba-server:ServerApplication.handleClientClose()",
+            msg.getEndpoint()
         ));
 
         freeResources(appId);

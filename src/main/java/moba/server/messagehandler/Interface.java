@@ -24,6 +24,8 @@ import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.Connectivity;
 import moba.server.datatypes.enumerations.HardwareState;
+import moba.server.datatypes.enumerations.IncidentLevel;
+import moba.server.datatypes.enumerations.IncidentType;
 import moba.server.utilities.CheckedEnum;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.Message;
@@ -73,20 +75,20 @@ final public class Interface extends MessageHandlerA {
         switch(connectivity) {
             case CONNECTED:
                 msgQueueIn.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
-                addIncident(IncidentData.Level.NOTICE, "Die Verbindung zur Hardware wurde hergestellt", ep);
+                addIncident(IncidentLevel.NOTICE, "Die Verbindung zur Hardware wurde hergestellt", ep);
                 break;
 
             case ERROR:
                 msgQueueIn.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.ERROR));
-                addIncident(IncidentData.Level.ERROR, "Die Verbindung zur Hardware wurde unterbrochen", ep);
+                addIncident(IncidentLevel.ERROR, "Die Verbindung zur Hardware wurde unterbrochen", ep);
                 break;
         }
     }
 
-    private void addIncident(IncidentData.Level level, String message, Endpoint ep) {
+    private void addIncident(IncidentLevel level, String message, Endpoint ep) {
         incidentHandler.add(new IncidentData(
             level,
-            IncidentData.Type.STATUS_CHANGE,
+            IncidentType.STATUS_CHANGED,
             "Hardwareverbindung",
             message,
             "Interface.addIncident()",
