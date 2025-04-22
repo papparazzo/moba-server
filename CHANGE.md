@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### [2.0.0] - 2025-04-22
+#### Fixed
+- create IPC-fifo-file if not exists 
+
+#### Changed 
+- Exception-Handling refactored
+
+#### Removed
+- GUI-Message replaced by Messaging
+
+
 ### [1.7.1] - 2025-04-12
 #### Fixed
 - Typo fixed (SOFTWARE_MANUEL -> SOFTWARE_MANUEL)
