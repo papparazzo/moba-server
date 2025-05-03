@@ -55,7 +55,7 @@ final public class IPC extends Thread implements BackgroundHandlerInterface {
         } catch(InterruptedException e) {
             logger.log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
         }
-        logger.info("IPC successful stopped.");
+        logger.info("ipc-thread successful stopped.");
     }
 
     public void start() {
@@ -65,6 +65,7 @@ final public class IPC extends Thread implements BackgroundHandlerInterface {
             File f = new File(fifoFile);
             if(!f.exists()) {
                 new ProcessBuilder("bash", "-c", "mkfifo " + fifoFile).inheritIO().start();
+                new ProcessBuilder("bash", "-c", "chmod 666 " + fifoFile).inheritIO().start();
             } else {
                 var attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
                 if(!attr.isOther()) {
