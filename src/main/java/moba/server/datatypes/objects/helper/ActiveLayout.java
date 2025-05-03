@@ -66,7 +66,7 @@ public class ActiveLayout {
         map.put("activeTrackLayoutId", activeLayout);
         config.setSection("trackLayout", map);
         config.writeFile();
-        dispatcher.broadcast(new Message(LayoutMessage.DEFAULT_LAYOUT_CHANGED, activeLayout));
+        dispatcher.sendGroup(new Message(LayoutMessage.DEFAULT_LAYOUT_CHANGED, activeLayout));
         this.activeLayout = activeLayout;
     }
 }

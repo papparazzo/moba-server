@@ -44,7 +44,7 @@ final public class IncidentHandler {
     public synchronized void add(IncidentData incident) {
         logger.log(convertLevel(incident.getLevel()), incident.toString());
         list.add(incident);
-        dispatcher.broadcast(new Message(MessagingMessage.NOTIFY_INCIDENT, incident));
+        dispatcher.sendGroup(new Message(MessagingMessage.NOTIFY_INCIDENT, incident));
     }
 
     private Level convertLevel(IncidentLevel level) {

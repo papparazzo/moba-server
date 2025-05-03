@@ -67,7 +67,7 @@ final public class Interface extends MessageHandlerA {
             case SET_LOCO_DIRECTION:
             case SET_LOCO_FUNCTION:
             case SWITCH_ACCESSORY_DECODERS:
-                dispatcher.broadcast(msg);
+                dispatcher.sendGroup(msg);
         }
     }
 

@@ -55,12 +55,12 @@ final public class Messaging extends MessageHandlerA {
     }
 
     private void handleGetMessageList(Endpoint endpoint) {
-        dispatcher.send(new Message(MessagingMessage.SET_INCIDENT_LIST, list), endpoint);
+        dispatcher.sendSingle(new Message(MessagingMessage.SET_INCIDENT_LIST, list), endpoint);
     }
 
     private void handleNotifyIncident(Message msg)
     throws ClientErrorException {
         list.add(new IncidentData(msg));
-        dispatcher.broadcast(new Message(MessagingMessage.NOTIFY_INCIDENT, msg.getData()));
+        dispatcher.sendGroup(new Message(MessagingMessage.NOTIFY_INCIDENT, msg.getData()));
     }
 }

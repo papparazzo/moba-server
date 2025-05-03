@@ -56,16 +56,16 @@ public class Environment extends MessageHandlerA {
     throws ClientErrorException, IOException {
         switch(EnvironmentMessage.fromId(msg.getMessageId())) {
             case GET_ENVIRONMENT ->
-                dispatcher.send(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment), msg.getEndpoint());
+                dispatcher.sendSingle(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment), msg.getEndpoint());
 
             case SET_ENVIRONMENT -> {
                 environment.fromJsonObject((Map<String, Object>)msg.getData());
                 storeData();
-                dispatcher.broadcast(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment));
+                dispatcher.sendGroup(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment));
             }
 
             case SET_AMBIENCE, SET_AMBIENT_LIGHT ->
-                dispatcher.broadcast(msg);
+                dispatcher.sendGroup(msg);
         }
     }
 

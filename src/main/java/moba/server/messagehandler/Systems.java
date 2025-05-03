@@ -102,7 +102,7 @@ final public class Systems extends MessageHandlerA {
                 break;
 
             case GET_HARDWARE_STATE:
-                dispatcher.send(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString()), msg.getEndpoint());
+                dispatcher.sendSingle(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString()), msg.getEndpoint());
                 break;
 
             case HARDWARE_SHUTDOWN:
@@ -295,7 +295,7 @@ final public class Systems extends MessageHandlerA {
     }
 
     private void sendErrorMessage(Endpoint endpoint) {
-        dispatcher.send(
+        dispatcher.sendSingle(
             new Message(
                 ClientMessage.ERROR,
                 new ErrorData(
@@ -310,6 +310,6 @@ final public class Systems extends MessageHandlerA {
     @Override
     public void hardwareStateChanged(HardwareState state) {
         status = state;
-        dispatcher.broadcast(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString()));
+        dispatcher.sendGroup(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString()));
     }
 }

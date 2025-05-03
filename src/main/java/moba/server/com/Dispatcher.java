@@ -158,7 +158,7 @@ public class Dispatcher {
         return null;
     }
 
-    public void send(Message message, Endpoint endpoint) {
+    public void sendSingle(Message message, Endpoint endpoint) {
         try {
             if(endpoint == null) {
                 return;
@@ -174,7 +174,7 @@ public class Dispatcher {
         }
     }
 
-    public void broadcast(Message message) {
+    public void sendGroup(Message message) {
         try {
             int grpId = message.getGroupId();
             int msgId = message.getMessageId();
@@ -182,6 +182,20 @@ public class Dispatcher {
 
             sendBroadCastMessage(grpId, msgId, data, grpId);
             sendBroadCastMessage(grpId, msgId, data, -1);
+        } catch(IOException | JSONException e) {
+            logger.log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
+        }
+    }
+
+    public void sendAll(Message message) {
+        try {
+            int grpId = message.getGroupId();
+            int msgId = message.getMessageId();
+            String data = getMessageData(message);
+
+            for(Endpoint ep : allEndpoints) {
+                sendMessage(grpId, msgId, data, ep);
+            }
         } catch(IOException | JSONException e) {
             logger.log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
         }

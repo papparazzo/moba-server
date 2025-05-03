@@ -75,7 +75,7 @@ final public class Server extends MessageHandlerA {
         if(ep == null) {
             throw new ClientErrorException(ClientError.INVALID_APP_ID, "app-id <" + msg.getData().toString() + "> is invalid");
         }
-        dispatcher.send(new Message(mType, null), ep);
+        dispatcher.sendSingle(new Message(mType, null), ep);
     }
 
     private void handleAddIpAddress(Message msg)
@@ -85,11 +85,11 @@ final public class Server extends MessageHandlerA {
         var list = allowList.getList();
         config.setSection("common.serverConfig.allowedIPs", list);
         config.writeFile();
-        dispatcher.broadcast(new Message(ServerMessage.SET_ALLOWED_IP_LIST, list));
+        dispatcher.sendGroup(new Message(ServerMessage.SET_ALLOWED_IP_LIST, list));
     }
 
     private void handleGetAllowedIpList(Endpoint endpoint) {
-        dispatcher.send(new Message(ServerMessage.SET_ALLOWED_IP_LIST, allowList.getList()), endpoint);
+        dispatcher.sendSingle(new Message(ServerMessage.SET_ALLOWED_IP_LIST, allowList.getList()), endpoint);
     }
 
     @SuppressWarnings("unchecked")
@@ -99,11 +99,11 @@ final public class Server extends MessageHandlerA {
         allowList.setList(list);
         config.setSection("common.serverConfig.allowedIPs", list);
         config.writeFile();
-        dispatcher.broadcast(new Message(ServerMessage.SET_ALLOWED_IP_LIST, list));
+        dispatcher.sendGroup(new Message(ServerMessage.SET_ALLOWED_IP_LIST, list));
     }
 
     private void handleClientsReq(Endpoint endpoint) {
-        dispatcher.send(new Message(ServerMessage.CON_CLIENTS_RES, dispatcher.getEndpoints()), endpoint);
+        dispatcher.sendSingle(new Message(ServerMessage.CON_CLIENTS_RES, dispatcher.getEndpoints()), endpoint);
     }
 
     private void handleServerInfoReq(Endpoint ep) {
@@ -126,6 +126,6 @@ final public class Server extends MessageHandlerA {
         map.put("fwType",            java.lang.System.getProperty("java.vm.vendor", ""));
         map.put("fwVersion",         java.lang.System.getProperty("java.version", ""));
 
-        dispatcher.send(new Message(ServerMessage.INFO_RES, map), ep);
+        dispatcher.sendSingle(new Message(ServerMessage.INFO_RES, map), ep);
     }
 }

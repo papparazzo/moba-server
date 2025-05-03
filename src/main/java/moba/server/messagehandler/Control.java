@@ -136,7 +136,7 @@ public class Control extends MessageHandlerA implements Loggable {
                     trainId
                 ));
             }
-            dispatcher.send(new Message(ControlMessage.GET_BLOCK_LIST_RES, arraylist), msg.getEndpoint());
+            dispatcher.sendSingle(new Message(ControlMessage.GET_BLOCK_LIST_RES, arraylist), msg.getEndpoint());
         }
     }
 
@@ -244,7 +244,7 @@ Integer	trainId
                     CheckedEnum.getFromString(SwitchStand.class, rs.getString("SwitchStand"))
                 ));
             }
-            dispatcher.send(new Message(ControlMessage.GET_SWITCH_STAND_LIST_RES, arraylist), msg.getEndpoint());
+            dispatcher.sendSingle(new Message(ControlMessage.GET_SWITCH_STAND_LIST_RES, arraylist), msg.getEndpoint());
         }
     }
 
@@ -276,7 +276,7 @@ Integer	trainId
                     CheckedEnum.getFromString(DrivingDirection.class, rs.getString("DrivingDirection"))
                 ));
             }
-            dispatcher.send(new Message(ControlMessage.GET_TRAIN_LIST_RES, arraylist), msg.getEndpoint());
+            dispatcher.sendSingle(new Message(ControlMessage.GET_TRAIN_LIST_RES, arraylist), msg.getEndpoint());
         }
     }
 
@@ -326,17 +326,17 @@ Integer	trainId
                 throw new ClientErrorException(ClientError.DATASET_MISSING, "could not update <" + trainId + ">");
             }
         }
-        dispatcher.broadcast(new Message(ControlMessage.PUSH_TRAIN, msg.getData()));
+        dispatcher.sendGroup(new Message(ControlMessage.PUSH_TRAIN, msg.getData()));
     }
 
     protected void lockBlock(Message msg, boolean wait)
     throws SQLException {
         try {
             blockLock.tryLock(msg.getEndpoint().getAppId(), msg.getData());
-            dispatcher.send(new Message(ControlMessage.BLOCK_LOCKED, msg.getData()), msg.getEndpoint());
+            dispatcher.sendSingle(new Message(ControlMessage.BLOCK_LOCKED, msg.getData()), msg.getEndpoint());
         } catch(ClientErrorException ex) {
             if(!wait) {
-                dispatcher.send(new Message(ControlMessage.BLOCK_LOCKING_FAILED, msg.getData()), msg.getEndpoint());
+                dispatcher.sendSingle(new Message(ControlMessage.BLOCK_LOCKING_FAILED, msg.getData()), msg.getEndpoint());
                 return;
             }
             queue.add(msg);

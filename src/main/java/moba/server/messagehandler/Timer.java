@@ -77,12 +77,12 @@ public class Timer extends MessageHandlerA implements Runnable {
     throws ClientErrorException, IOException {
         switch(TimerMessage.fromId(msg.getMessageId())) {
             case GET_GLOBAL_TIMER ->
-                dispatcher.send(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData), msg.getEndpoint());
+                dispatcher.sendSingle(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData), msg.getEndpoint());
 
             case SET_GLOBAL_TIMER -> {
                 timerData.fromJsonObject((Map<String, Object>)msg.getData());
                 storeData();
-                dispatcher.broadcast(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData));
+                dispatcher.sendGroup(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData));
             }
         }
     }
@@ -95,7 +95,7 @@ public class Timer extends MessageHandlerA implements Runnable {
             }
 
             if(timerData.setTick()) {
-                dispatcher.broadcast(new Message(TimerMessage.GLOBAL_TIMER_EVENT, timerData.getModelTime()));
+                dispatcher.sendGroup(new Message(TimerMessage.GLOBAL_TIMER_EVENT, timerData.getModelTime()));
             }
 
         } catch(Exception ignored) {

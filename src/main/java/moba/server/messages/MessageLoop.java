@@ -103,7 +103,7 @@ final public class MessageLoop {
             } catch(ClientErrorException e) {
                 ClientError id = e.getErrorId();
                 Endpoint ep = msg.getEndpoint();
-                dispatcher.send(new Message(ClientMessage.ERROR, new ErrorData(id, e.getMessage())), ep);
+                dispatcher.sendSingle(new Message(ClientMessage.ERROR, new ErrorData(id, e.getMessage())), ep);
                 incidentHandler.add(new IncidentData(IncidentType.CLIENT_ERROR, e, ep));
             } catch(Throwable e) {
                 incidentHandler.add(new IncidentData(IncidentType.EXCEPTION, e, msg.getEndpoint()));
@@ -134,14 +134,14 @@ final public class MessageLoop {
     }
 
     private void resetHandler() {
-        dispatcher.getEndpoints().forEach((ep) -> dispatcher.send(new Message(ClientMessage.RESET, null), ep));
+        dispatcher.sendAll(new Message(ClientMessage.RESET, null));
         for(Integer integer: handlers.keySet()) {
             handlers.get(integer).shutdown();
         }
     }
 
     private void shutdownHandler() {
-        dispatcher.getEndpoints().forEach((ep) -> dispatcher.send(new Message(ClientMessage.SHUTDOWN, null), ep));
+        dispatcher.sendAll(new Message(ClientMessage.SHUTDOWN, null));
         for(Integer integer: handlers.keySet()) {
             handlers.get(integer).shutdown();
         }
@@ -167,6 +167,6 @@ final public class MessageLoop {
 
         freeResources(appId);
         dispatcher.removeEndpoint(msg.getEndpoint());
-        dispatcher.broadcast(new Message(ServerMessage.CLIENT_CLOSED, appId));
+        dispatcher.sendGroup(new Message(ServerMessage.CLIENT_CLOSED, appId));
     }
 }

@@ -46,16 +46,16 @@ public class Client extends MessageHandlerA {
     throws ClientErrorException {
         switch(ClientMessage.fromId(msg.getMessageId())) {
             case VOID     -> {}
-            case ECHO_REQ -> dispatcher.send(new Message(ClientMessage.ECHO_RES, msg.getData()), msg.getEndpoint());
+            case ECHO_REQ -> dispatcher.sendSingle(new Message(ClientMessage.ECHO_RES, msg.getData()), msg.getEndpoint());
             case START    -> handleClientStart(msg);
-            case ERROR    -> dispatcher.broadcast(msg);
+            case ERROR    -> dispatcher.sendGroup(msg);
         }
     }
 
     protected void handleClientStart(Message msg) {
         Endpoint ep = msg.getEndpoint();
         if(!dispatcher.addEndpoint(ep)) {
-            dispatcher.send(
+            dispatcher.sendSingle(
                 new Message(
                     ClientMessage.ERROR,
                     new ErrorData(ClientError.INVALID_DATA_SEND, "Endpoint <" + ep + "> already exists")
@@ -64,8 +64,8 @@ public class Client extends MessageHandlerA {
             );
             return;
         }
-        dispatcher.send(new Message(ClientMessage.CONNECTED, ep.getAppId()), ep);
-        dispatcher.broadcast(new Message(ServerMessage.NEW_CLIENT_STARTED, ep));
+        dispatcher.sendSingle(new Message(ClientMessage.CONNECTED, ep.getAppId()), ep);
+        dispatcher.sendGroup(new Message(ServerMessage.NEW_CLIENT_STARTED, ep));
     }
 }
 
