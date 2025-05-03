@@ -139,7 +139,6 @@ public class Dispatcher {
     }
 
     public void resetDispatcher() {
-
         for(Endpoint allEndpoint: allEndpoints) {
             shutDownEndpoint(allEndpoint);
         }
@@ -150,9 +149,9 @@ public class Dispatcher {
     }
 
     public Endpoint getEndpointByAppId(long appID) {
-        for(Endpoint item : allEndpoints) {
-            if(item.getAppId() == appID) {
-                return item;
+        for(Endpoint ep : allEndpoints) {
+            if(ep.getAppId() == appID) {
+                return ep;
             }
         }
         return null;

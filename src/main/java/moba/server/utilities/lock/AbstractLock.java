@@ -27,15 +27,8 @@ import java.sql.SQLException;
 
 public abstract class AbstractLock implements Loggable {
 
-    protected static final int APP_SERVER_ID = 1;
-
-    public enum LockState {
-        LOCKED_BY_OWN_APP,
-        LOCKED_BY_OTHER_APP,
-        UNLOCKED
-    }
-
-    public abstract void resetAll();
+    public abstract void resetAll()
+    throws SQLException;
 
     public abstract void resetOwn(long appId);
 

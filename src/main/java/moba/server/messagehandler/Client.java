@@ -30,7 +30,7 @@ import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.exceptions.ClientErrorException;
 
-public class Client extends MessageHandlerA {
+final public class Client extends MessageHandlerA {
 
     public Client(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
@@ -52,7 +52,7 @@ public class Client extends MessageHandlerA {
         }
     }
 
-    protected void handleClientStart(Message msg) {
+    private void handleClientStart(Message msg) {
         Endpoint ep = msg.getEndpoint();
         if(!dispatcher.addEndpoint(ep)) {
             dispatcher.sendSingle(
