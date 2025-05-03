@@ -54,7 +54,8 @@ public class Control extends MessageHandlerA implements Loggable {
     protected final Queue<Message> queue;
     protected final ActiveLayout   activeLayout;
 
-    public Control(Dispatcher dispatcher, Database database, ActiveLayout activeLayout) {
+    public Control(Dispatcher dispatcher, Database database, ActiveLayout activeLayout)
+    throws SQLException {
         this.dispatcher = dispatcher;
         this.database   = database;
         this.blockLock  = new BlockLock(database);
@@ -70,12 +71,14 @@ public class Control extends MessageHandlerA implements Loggable {
     }
 
     @Override
-    public void shutdown() {
+    public void shutdown()
+    throws SQLException {
         blockLock.resetAll();
     }
 
     @Override
-    public void freeResources(long appId) {
+    public void freeResources(long appId)
+    throws SQLException {
         blockLock.resetOwn(appId);
     }
 

@@ -54,7 +54,7 @@ final public class Systems extends MessageHandlerA {
         ActiveLayout activeLayout,
         MessageQueue msgQueue,
         IncidentHandler incidentHandler
-    ) {
+    ) throws SQLException {
         this.incidentHandler = incidentHandler;
         this.dispatcher      = dispatcher;
         this.msgQueue        = msgQueue;
@@ -69,7 +69,8 @@ final public class Systems extends MessageHandlerA {
     }
 
     @Override
-    public void shutdown() {
+    public void shutdown()
+    throws SQLException {
         lock.resetAll();
     }
 

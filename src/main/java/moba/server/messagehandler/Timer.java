@@ -66,7 +66,8 @@ public class Timer extends MessageHandlerA implements Runnable {
     }
 
     @Override
-    public void shutdown() {
+    public void shutdown()
+    throws Exception {
         super.shutdown();
         isRunning = false;
     }

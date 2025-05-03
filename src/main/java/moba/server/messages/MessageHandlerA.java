@@ -23,6 +23,8 @@ package moba.server.messages;
 import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.HardwareState;
 
+import java.sql.SQLException;
+
 public abstract class MessageHandlerA {
 
     protected Dispatcher dispatcher = null;
@@ -30,12 +32,14 @@ public abstract class MessageHandlerA {
     public abstract void handleMsg(Message msg)
     throws Exception;
 
-    public void freeResources(long appId) {
+    public void freeResources(long appId)
+    throws SQLException {
     }
 
     public abstract int getGroupId();
 
-    public void shutdown() {
+    public void shutdown()
+    throws Exception {
     }
 
     public void hardwareStateChanged(HardwareState state) {

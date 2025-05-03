@@ -30,7 +30,8 @@ public abstract class AbstractLock implements Loggable {
     public abstract void resetAll()
     throws SQLException;
 
-    public abstract void resetOwn(long appId);
+    public abstract void resetOwn(long appId)
+    throws SQLException;
 
     public abstract void tryLock(long appId, Object data)
     throws ClientErrorException, SQLException;

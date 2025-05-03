@@ -20,6 +20,7 @@
 
 package moba.server.messages;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,51 +54,36 @@ final public class MessageLoop {
     }
 
     public boolean loop(MessageQueue in)
-    throws InterruptedException, ClientErrorException {
+    throws InterruptedException {
 
         while(true) {
             Message msg = in.take();
+            try {
+                if(msg.getGroupId() == InternMessage.GROUP_ID) {
+                    switch(InternMessage.fromId(msg.getMessageId())) {
+                        case SERVER_RESET -> {
+                            in.clear();
+                            resetHandler();
+                            return true;
+                        }
 
-            if(msg.getGroupId() == InternMessage.GROUP_ID) {
-                switch(InternMessage.fromId(msg.getMessageId())) {
-                    case SERVER_RESET -> {
-                        incidentHandler.add(new IncidentData(
-                            IncidentLevel.NOTICE,
-                            IncidentType.SERVER_NOTICE,
-                            "Server Neustart (reset)",
-                            "Neustart der Serverapplikation aufgrund eines Server-Resets",
-                            "moba-server:ServerApplication.run()"
-                        ));
-                        in.clear();
-                        resetHandler();
-                        return true;
-                    }
+                        case SERVER_SHUTDOWN -> {
+                            shutdownHandler();
+                            return false;
+                        }
 
-                    case SERVER_SHUTDOWN -> {
-                        incidentHandler.add(new IncidentData(
-                            IncidentLevel.NOTICE,
-                            IncidentType.SERVER_NOTICE,
-                            "Server shutdown",
-                            "Shutdown der Serverapplikation",
-                            "moba-server:ServerApplication.run()"
-                        ));
-                        shutdownHandler();
-                        return false;
-                    }
+                        case SET_HARDWARE_STATE -> {
+                            hardwareStateChangedHandler((HardwareState)msg.getData());
+                            continue;
+                        }
 
-                    case SET_HARDWARE_STATE -> {
-                        hardwareStateChangedHandler((HardwareState)msg.getData());
-                        continue;
-                    }
-
-                    case CLIENT_SHUTDOWN -> {
-                        handleClientClose(msg);
-                        continue;
+                        case CLIENT_SHUTDOWN -> {
+                            handleClientClose(msg);
+                            continue;
+                        }
                     }
                 }
-            }
 
-            try {
                 checkGroup(msg.getGroupId());
                 handlers.get(msg.getGroupId()).handleMsg(msg);
             } catch(ClientErrorException e) {
@@ -127,20 +113,37 @@ final public class MessageLoop {
         }
     }
 
-    private void freeResources(long appId) {
+    private void freeResources(long appId)
+    throws SQLException {
         for(Integer integer: handlers.keySet()) {
             handlers.get(integer).freeResources(appId);
         }
     }
 
-    private void resetHandler() {
+    private void resetHandler()
+    throws Exception{
+        incidentHandler.add(new IncidentData(
+            IncidentLevel.NOTICE,
+            IncidentType.SERVER_NOTICE,
+            "Server Neustart (reset)",
+            "Neustart der Serverapplikation aufgrund eines Server-Resets",
+            "moba-server:ServerApplication.run()"
+        ));
         dispatcher.sendAll(new Message(ClientMessage.RESET, null));
         for(Integer integer: handlers.keySet()) {
             handlers.get(integer).shutdown();
         }
     }
 
-    private void shutdownHandler() {
+    private void shutdownHandler()
+    throws Exception {
+        incidentHandler.add(new IncidentData(
+            IncidentLevel.NOTICE,
+            IncidentType.SERVER_NOTICE,
+            "Server shutdown",
+            "Shutdown der Serverapplikation",
+            "moba-server:ServerApplication.run()"
+        ));
         dispatcher.sendAll(new Message(ClientMessage.SHUTDOWN, null));
         for(Integer integer: handlers.keySet()) {
             handlers.get(integer).shutdown();
@@ -153,7 +156,8 @@ final public class MessageLoop {
         }
     }
 
-    private void handleClientClose(Message msg) {
+    private void handleClientClose(Message msg)
+    throws SQLException {
         long appId = msg.getEndpoint().getAppId();
 
         incidentHandler.add(new IncidentData(

@@ -39,31 +39,25 @@ public final class TrackLayoutLock extends AbstractLock {
     }
 
     @Override
-    public void resetAll() {
-        try {
-            Connection con = database.getConnection();
+    public void resetAll()
+    throws SQLException {
+        Connection con = database.getConnection();
 
-            try(PreparedStatement stmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL")) {
-                stmt.executeUpdate();
-                getLogger().log(Level.INFO, stmt.toString());
-            }
-        } catch(SQLException e) {
-            getLogger().log(Level.WARNING, e.toString());
+        try(PreparedStatement stmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL")) {
+            stmt.executeUpdate();
+            getLogger().log(Level.INFO, stmt.toString());
         }
     }
 
     @Override
-    public void resetOwn(long appId) {
-        try {
-            Connection con = database.getConnection();
+    public void resetOwn(long appId)
+    throws SQLException {
+        Connection con = database.getConnection();
 
-            try(PreparedStatement stmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL WHERE `Locked` = ?")) {
-                stmt.setLong(1, appId);
-                stmt.executeUpdate();
-                getLogger().log(Level.INFO, stmt.toString());
-            }
-        } catch(SQLException e) {
-            getLogger().log(Level.WARNING, e.toString());
+        try(PreparedStatement stmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL WHERE `Locked` = ?")) {
+            stmt.setLong(1, appId);
+            stmt.executeUpdate();
+            getLogger().log(Level.INFO, stmt.toString());
         }
     }
 

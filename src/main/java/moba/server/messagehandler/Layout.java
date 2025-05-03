@@ -51,7 +51,8 @@ public class Layout extends MessageHandlerA implements Loggable {
     protected TrackLayoutLock lock;
     protected ActiveLayout    activeLayout;
 
-    public Layout(Dispatcher dispatcher, Database database, ActiveLayout activeLayout) {
+    public Layout(Dispatcher dispatcher, Database database, ActiveLayout activeLayout)
+    throws SQLException {
         this.database     = database;
         this.dispatcher   = dispatcher;
         this.activeLayout = activeLayout;
@@ -65,12 +66,14 @@ public class Layout extends MessageHandlerA implements Loggable {
     }
 
     @Override
-    public void shutdown() {
+    public void shutdown()
+    throws SQLException {
         lock.resetAll();
     }
 
     @Override
-    public void freeResources(long appId) {
+    public void freeResources(long appId)
+    throws SQLException {
         lock.resetOwn(appId);
     }
 
