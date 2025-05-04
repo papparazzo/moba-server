@@ -45,7 +45,7 @@ final public class Client extends MessageHandlerA {
     public void handleMsg(Message msg)
     throws ClientErrorException {
         switch(ClientMessage.fromId(msg.getMessageId())) {
-            case VOID     -> {}
+            case PING     -> {}
             case ECHO_REQ -> dispatcher.sendSingle(new Message(ClientMessage.ECHO_RES, msg.getData()), msg.getEndpoint());
             case START    -> handleClientStart(msg);
             case ERROR    -> dispatcher.sendGroup(msg);

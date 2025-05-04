@@ -25,7 +25,7 @@ import moba.server.messages.MessageType;
 import moba.server.utilities.exceptions.ClientErrorException;
 
 public enum ClientMessage implements MessageType {
-    VOID        (1),
+    PING        (1),
     ECHO_REQ    (2),
     ECHO_RES    (3),
     ERROR       (4),

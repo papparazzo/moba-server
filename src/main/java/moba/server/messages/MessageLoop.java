@@ -55,7 +55,6 @@ final public class MessageLoop {
 
     public boolean loop(MessageQueue in)
     throws InterruptedException {
-
         while(true) {
             Message msg = in.take();
             try {
@@ -160,14 +159,27 @@ final public class MessageLoop {
     throws SQLException {
         long appId = msg.getEndpoint().getAppId();
 
-        incidentHandler.add(new IncidentData(
-            IncidentLevel.NOTICE,
-            IncidentType.CLIENT_ERROR,
-            "Client shutdown",
-            "Client is terminated. Reason: \"" + msg.getData() + "\"",
-            "moba-server:ServerApplication.handleClientClose()",
-            msg.getEndpoint()
-        ));
+        String data = (String)msg.getData();
+
+        if(Objects.equals(data, "")) {
+            incidentHandler.add(new IncidentData(
+                IncidentLevel.NOTICE,
+                IncidentType.CLIENT_NOTICE,
+                "Client closed",
+                "Client was closed",
+                "moba-server:ServerApplication.handleClientClose()",
+                msg.getEndpoint()
+            ));
+        } else {
+            incidentHandler.add(new IncidentData(
+                IncidentLevel.ERROR,
+                IncidentType.CLIENT_ERROR,
+                "Client shutdown",
+                "Client was terminated. Reason: \"" + msg.getData() + "\"",
+                "moba-server:ServerApplication.handleClientClose()",
+                msg.getEndpoint()
+            ));
+        }
 
         freeResources(appId);
         dispatcher.removeEndpoint(msg.getEndpoint());

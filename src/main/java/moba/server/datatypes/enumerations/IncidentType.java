@@ -23,7 +23,7 @@ package moba.server.datatypes.enumerations;
 public enum IncidentType {
     EXCEPTION,
     STATUS_CHANGED,       // Statusänderung
-    NOTICE,
+    CLIENT_NOTICE,
     CLIENT_ERROR,
     SERVER_NOTICE         // Server-spezifische Nachrichten (z.B. Fehlermeldungen)
 }

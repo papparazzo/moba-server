@@ -55,7 +55,7 @@ final public class IPC extends Thread implements BackgroundHandlerInterface {
         } catch(InterruptedException e) {
             logger.log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
         }
-        logger.info("ipc-thread successful stopped.");
+        logger.info("ipc-thread stopped.");
     }
 
     public void start() {

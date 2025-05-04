@@ -85,7 +85,7 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
         } catch(InterruptedException e) {
             getLogger().log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
         }
-        getLogger().info("Acceptor successful stopped.");
+        getLogger().info("acceptor-thread stopped.");
     }
 
     @Override
