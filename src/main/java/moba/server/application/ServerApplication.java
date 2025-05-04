@@ -29,6 +29,7 @@ import moba.server.com.Acceptor;
 import moba.server.com.BackgroundHandlerComposite;
 import moba.server.com.Dispatcher;
 import moba.server.com.IPC;
+import moba.server.com.KeepAlive;
 import moba.server.utilities.Database;
 import moba.server.datatypes.base.Version;
 import moba.server.datatypes.objects.IncidentData;
@@ -94,6 +95,7 @@ final public class ServerApplication implements Loggable {
         int port = (int)(long)config.getSection("common.serverConfig.port");
         var allowed = (ArrayList<String>)config.getSection("common.serverConfig.allowedIPs");
         int maxEntries = (int)(long)config.getSection("common.serverConfig.maxIncidentEntries");
+        int keepAlivePingIntervall = (int)(long)config.getSection("common.serverConfig.keepAlivePingIntervall");
         AllowList allowList = new AllowList(maxClients, allowed);
         CircularFifoQueue<IncidentData> list = new CircularFifoQueue<>(maxEntries);
 
@@ -107,6 +109,7 @@ final public class ServerApplication implements Loggable {
             BackgroundHandlerComposite handler = new BackgroundHandlerComposite();
             handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList, incidentHandler));
             handler.add(new IPC((String)config.getSection("common.serverConfig.ipc"), msgQueueIn, logger));
+            handler.add(new KeepAlive(dispatcher, keepAlivePingIntervall, logger));
 
             MessageLoop  loop = new MessageLoop(dispatcher, incidentHandler);
             loop.addHandler(new Client(dispatcher, msgQueueIn));
