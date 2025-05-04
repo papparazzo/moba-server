@@ -28,7 +28,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
-import moba.server.database.Database;
+import moba.server.utilities.Database;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.objects.TrackLayoutInfoData;
 import moba.server.datatypes.objects.TrackLayoutSymbolData;

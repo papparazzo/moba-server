@@ -26,7 +26,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
-import moba.server.database.Database;
+import moba.server.utilities.Database;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.utilities.exceptions.ClientErrorException;
 

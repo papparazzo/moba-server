@@ -31,7 +31,7 @@ import java.util.Queue;
 import java.util.logging.Level;
 
 import moba.server.com.Dispatcher;
-import moba.server.database.Database;
+import moba.server.utilities.Database;
 import moba.server.datatypes.enumerations.DrivingDirection;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.enumerations.SwitchStand;

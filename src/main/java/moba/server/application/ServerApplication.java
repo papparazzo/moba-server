@@ -29,7 +29,7 @@ import moba.server.com.Acceptor;
 import moba.server.com.BackgroundHandlerComposite;
 import moba.server.com.Dispatcher;
 import moba.server.com.IPC;
-import moba.server.database.Database;
+import moba.server.utilities.Database;
 import moba.server.datatypes.base.Version;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.datatypes.objects.helper.ActiveLayout;
