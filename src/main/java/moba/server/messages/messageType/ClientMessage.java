@@ -33,7 +33,8 @@ public enum ClientMessage implements MessageType {
     CONNECTED   (6),
     SHUTDOWN    (8),
     RESET       (9),
-    SELF_TESTING(10);
+    SELF_TESTING(10),
+    CLOSING     (11);
 
     public final static int GROUP_ID = 2;
 

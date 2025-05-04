@@ -109,7 +109,7 @@ final public class ServerApplication implements Loggable {
             handler.add(new IPC((String)config.getSection("common.serverConfig.ipc"), msgQueueIn, logger));
 
             MessageLoop  loop = new MessageLoop(dispatcher, incidentHandler);
-            loop.addHandler(new Client(dispatcher));
+            loop.addHandler(new Client(dispatcher, msgQueueIn));
             loop.addHandler(new Server(dispatcher, this, allowList, config));
             loop.addHandler(new Timer(dispatcher, config));
             loop.addHandler(new Environment(dispatcher, config));

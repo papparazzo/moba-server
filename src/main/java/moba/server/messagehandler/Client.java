@@ -26,13 +26,18 @@ import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.objects.ErrorData;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
+import moba.server.messages.MessageQueue;
 import moba.server.messages.messageType.ClientMessage;
+import moba.server.messages.messageType.InternMessage;
 import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.exceptions.ClientErrorException;
 
 final public class Client extends MessageHandlerA {
 
-    public Client(Dispatcher dispatcher) {
+    private final MessageQueue msgQueue;
+
+    public Client(Dispatcher dispatcher, MessageQueue msgQueue) {
+        this.msgQueue = msgQueue;
         this.dispatcher = dispatcher;
     }
 
@@ -49,6 +54,7 @@ final public class Client extends MessageHandlerA {
             case ECHO_REQ -> dispatcher.sendSingle(new Message(ClientMessage.ECHO_RES, msg.getData()), msg.getEndpoint());
             case START    -> handleClientStart(msg);
             case ERROR    -> dispatcher.sendGroup(msg);
+            case CLOSING  -> msgQueue.add(new Message(InternMessage.CLIENT_SHUTDOWN, "", msg.getEndpoint()));
         }
     }
 
