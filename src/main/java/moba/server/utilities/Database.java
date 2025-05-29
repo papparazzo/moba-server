@@ -24,6 +24,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 public final class Database {
 
@@ -33,14 +34,17 @@ public final class Database {
     private final String pwd;
     private final String url;
 
+    private final Logger logger;
+
     public enum ConnectorType {
         MARIADB_CONNECTOR,
         MYSQL_CONNECTOR,
         SQLITE_CONNECTOR
     }
 
-    public Database(HashMap<String, Object> map)
+    public Database(HashMap<String, Object> map, Logger logger)
     throws SQLException {
+        this.logger = logger;
 
         if(map == null) {
             throw new SQLException("invalid connection-data");
@@ -56,13 +60,15 @@ public final class Database {
             default                -> throw new SQLException("unsupported connector-type");
         }
         connection = DriverManager.getConnection(url, usr, pwd);
+        this.logger.info("connected to database <" + map.get("db") + "> as user <" + usr + ">");
     }
 
     public Connection getConnection()
     throws SQLException {
         if(!connection.isValid(0)) {
-           connection.close();
-           connection = DriverManager.getConnection(url, usr, pwd);
+            logger.warning("connection to database lost, reconnecting...");
+            connection.close();
+            connection = DriverManager.getConnection(url, usr, pwd);
         }
         return connection;
     }
