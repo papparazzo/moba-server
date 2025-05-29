@@ -100,7 +100,7 @@ public class GlobalTimerData {
         var pt = (Map<String, Object>)map.get("modelTime");
 
         modelTime.setDay(CheckedEnum.getFromString(Day.class, (String)pt.get("day")));
-        modelTime.setTime(((Long)pt.get("time")).intValue());
+        modelTime.setTime(new Time(((Long)pt.get("time")).intValue()));
 
         setMultiplicator(((Long)map.get("multiplicator")).intValue());
 

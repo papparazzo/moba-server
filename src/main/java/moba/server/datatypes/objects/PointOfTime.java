@@ -31,16 +31,16 @@ public class PointOfTime {
         day = val;
     }
 
-    public void setTime(int val) {
-        time = new Time(val);
+    public void setTime(Time val) {
+        time = val;
     }
 
     public Day getDay() {
         return day;
     }
 
-    public int getTime() {
-        return time.getTime();
+    public Time getTime() {
+        return time;
     }
 
     public boolean setTick(int multiplicator) {
