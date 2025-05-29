@@ -28,7 +28,7 @@ public class TimeTest {
     public void testSetValue_int() {
         int val = 0;
         Time instance = new Time();
-        instance.setTime(val);
+        instance.setTimeInMinutes(val);
     }
 
 
@@ -36,7 +36,7 @@ public class TimeTest {
     public void testGetValue() {
         Time instance = new Time();
         int expResult = 0;
-        int result = instance.getTime();
+        int result = instance.getTimeInMinutes();
         assertEquals(expResult, result);
     }
 }

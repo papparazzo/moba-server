@@ -21,39 +21,45 @@
 package moba.server.datatypes.base;
 
 public class Time {
-    protected int time;
+    protected int timeInMinutes;
 
     public Time() {
     }
 
     public Time(int time)
     throws IllegalArgumentException {
-        setTime(time);
+        setTimeInMinutes(time);
     }
 
-    public final void setTime(int time)
+    public final void setTimeInMinutes(int timeInMinutes)
     throws IllegalArgumentException {
-        if(time < 0 || time > ((60 * 24) - 1)) {
+        if(timeInMinutes < 0 || timeInMinutes > ((60 * 24) - 1)) {
             throw new IllegalArgumentException();
         }
-        this.time = time;
+        this.timeInMinutes = timeInMinutes;
     }
 
-    public final boolean appendTime(int time)
+    public final boolean appendTime(int minutes)
     throws IllegalArgumentException {
-        if(time < 1) {
+        if(minutes < 1) {
             throw new IllegalArgumentException("invalid time diff given");
         }
 
-        this.time = (this.time + time) % (60 * 24);
-        return this.time < time;
+        this.timeInMinutes = (this.timeInMinutes + minutes) % (60 * 24);
+        return this.timeInMinutes < minutes;
     }
 
-    public int getTime() {
-        return time;
+    public int getTimeInMinutes() {
+        return timeInMinutes;
+    }
+
+    public String getTime() {
+        int hours = timeInMinutes / 60;
+        int minutes = timeInMinutes % 60;
+        return String.format("%02d:%02d", hours, minutes);
     }
 
     public boolean isFullHour() {
-        return (time % 60 == 0);
+        return (timeInMinutes % 60 == 0);
     }
 }

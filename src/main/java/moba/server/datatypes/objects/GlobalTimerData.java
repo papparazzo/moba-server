@@ -63,7 +63,7 @@ public class GlobalTimerData {
     }
 
     public int getNightStartTime() {
-        return nightStartTime.getTime();
+        return nightStartTime.getTimeInMinutes();
     }
 
     public void setNightStartTime(int val) {
@@ -71,7 +71,7 @@ public class GlobalTimerData {
     }
 
     public int getSunriseStartTime() {
-        return sunriseStartTime.getTime();
+        return sunriseStartTime.getTimeInMinutes();
     }
 
     public void setSunriseStartTime(int val) {
@@ -79,7 +79,7 @@ public class GlobalTimerData {
     }
 
     public int getDayStartTime() {
-        return dayStartTime.getTime();
+        return dayStartTime.getTimeInMinutes();
     }
 
     public void setDayStartTime(int val) {
@@ -87,7 +87,7 @@ public class GlobalTimerData {
     }
 
     public int getSunsetStartTime() {
-        return sunsetStartTime.getTime();
+        return sunsetStartTime.getTimeInMinutes();
     }
 
     public void setSunsetStartTime(int val) {
@@ -114,15 +114,15 @@ public class GlobalTimerData {
     protected void validate()
     throws ClientErrorException {
 
-        if(sunriseStartTime.getTime() > dayStartTime.getTime()) {
+        if(sunriseStartTime.getTimeInMinutes() > dayStartTime.getTimeInMinutes()) {
             throw new ClientErrorException(ClientError.INVALID_VALUE_GIVEN, "Tag vor Sonnenaufgang");
         }
 
-        if(dayStartTime.getTime() > sunsetStartTime.getTime()) {
+        if(dayStartTime.getTimeInMinutes() > sunsetStartTime.getTimeInMinutes()) {
             throw new ClientErrorException(ClientError.INVALID_VALUE_GIVEN, "Sonnenuntergang vor Tag");
         }
 
-        if(sunsetStartTime.getTime() > nightStartTime.getTime()) {
+        if(sunsetStartTime.getTimeInMinutes() > nightStartTime.getTimeInMinutes()) {
             throw new ClientErrorException(ClientError.INVALID_VALUE_GIVEN, "Nacht vor Sonnenuntergang");
         }
     }
