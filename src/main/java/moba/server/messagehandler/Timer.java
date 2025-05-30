@@ -23,15 +23,23 @@ package moba.server.messagehandler;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.objects.GlobalTimerData;
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 import moba.server.com.Dispatcher;
+import moba.server.datatypes.objects.PointOfTime;
+import moba.server.datatypes.objects.TrackLayoutInfoData;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.TimerMessage;
+import moba.server.utilities.Database;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.exceptions.ClientErrorException;
 
@@ -47,12 +55,14 @@ public class Timer extends MessageHandlerA implements Runnable {
     protected Config          config;
     protected final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     protected GlobalTimerData timerData = null;
+    protected Database        database;
 
     protected volatile boolean isRunning = false;
 
-    public Timer(Dispatcher dispatcher, Config config) {
+    public Timer(Dispatcher dispatcher, Config config, Database database) {
         this.dispatcher = dispatcher;
         this.config = config;
+        this.database = database;
         this.scheduler.scheduleWithFixedDelay(this, 1, 1, TimeUnit.SECONDS);
         this.timerData = (GlobalTimerData)config.getSection("globalTimer.globalTimer");
         if(timerData == null) {
