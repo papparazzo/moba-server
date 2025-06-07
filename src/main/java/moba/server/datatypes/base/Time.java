@@ -54,6 +54,12 @@ public class Time {
     }
 
     public String getTime() {
+        return getTime(0);
+    }
+
+    public String getTime(int offsetInMinutes) {
+        int timeInMinutes = this.timeInMinutes + offsetInMinutes;
+
         int hours = timeInMinutes / 60;
         int minutes = timeInMinutes % 60;
         return String.format("%02d:%02d", hours, minutes);
