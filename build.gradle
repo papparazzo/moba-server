@@ -26,12 +26,13 @@ dependencies {
     //testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // This dependency is used by the application.
-    implementation 'com.google.guava:guava:33.4.0-jre'
-    implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
-    implementation 'org.yaml:snakeyaml:2.0'
-    implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
+    implementation 'com.google.guava:guava:33.4.0-jre'                  // com.google.common.base.Enums
     implementation 'commons-cli:commons-cli:1.9.0'
-    implementation 'org.apache.commons:commons-collections4:4.5.0-M3'
+    implementation 'org.apache.commons:commons-collections4:4.5.0-M3'  // IP Allowlist
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.5'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
+    implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
+    implementation 'org.yaml:snakeyaml:2.0'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
