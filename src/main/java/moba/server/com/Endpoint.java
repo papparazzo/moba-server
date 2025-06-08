@@ -42,6 +42,7 @@ import moba.server.messages.Message;
 import moba.server.messages.MessageQueue;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
+import moba.server.utilities.exceptions.ClientClosingException;
 import moba.server.utilities.logger.Loggable;
 
 public class Endpoint extends Thread implements JSONToStringI, Loggable {
@@ -119,9 +120,8 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
             while(!isInterrupted()) {
                 msgQueue.add(getNextMessage());
             }
-        } catch(NullPointerException e) {
-            // noop -> getNextMessage returns null, when closing is set to true.
-            //         That's lead to a NullPointerException in PriorityBlockingQueue.add()
+        } catch(ClientClosingException e) {
+            getLogger().log(Level.INFO, "Endpoint #{0}: Closing client... <{1}>", new Object[]{id, e.toString()});
         } catch(Exception e) {
             getLogger().log(Level.INFO, "Endpoint #{0}: Exception, closing client... <{1}>", new Object[]{id, e.toString()});
             msgQueue.add(new Message(InternMessage.CLIENT_SHUTDOWN, e.toString(), this));
@@ -166,7 +166,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
             return new Message(groupId, msgId, decoder.decode(), this);
         } catch(IOException e) {
             if(closing) {
-                return null;
+                throw new ClientClosingException();
             }
             throw new IOException(e);
         }
