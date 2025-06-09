@@ -114,7 +114,7 @@ final public class ServerApplication implements Loggable {
             MessageLoop  loop = new MessageLoop(dispatcher, incidentHandler);
             loop.addHandler(new Client(dispatcher, msgQueueIn));
             loop.addHandler(new Server(dispatcher, this, allowList, config));
-            loop.addHandler(new Timer(dispatcher, config));
+            loop.addHandler(new Timer(dispatcher, config, database));
             loop.addHandler(new Environment(dispatcher, config));
             loop.addHandler(new Systems(dispatcher, lock, activeLayout, msgQueueIn, incidentHandler));
             loop.addHandler(new Layout(dispatcher, database, activeLayout));
