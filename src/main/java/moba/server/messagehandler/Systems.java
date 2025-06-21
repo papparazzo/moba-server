@@ -197,6 +197,7 @@ final public class Systems extends MessageHandlerA {
             case CENTRAL_STATION                 -> "Es wurde ein Nothalt durch die CentralStation ausgelöst";
             case EXTERN                          -> "Externe Hardware";
             case SELF_ACTING_BY_EXTERN_SWITCHING -> "Weichenstellung durch CS im Automatikmodus";
+            case SOFTWARE_ERROR                  -> "Automatisch durch Softwarefehler";
             case SOFTWARE_MANUAL                 -> "Manuell durch Steuerungssoftware";
         };
 
