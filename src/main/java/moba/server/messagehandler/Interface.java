@@ -22,10 +22,7 @@ package moba.server.messagehandler;
 
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
-import moba.server.datatypes.enumerations.Connectivity;
-import moba.server.datatypes.enumerations.HardwareState;
-import moba.server.datatypes.enumerations.IncidentLevel;
-import moba.server.datatypes.enumerations.IncidentType;
+import moba.server.datatypes.enumerations.*;
 import moba.server.utilities.CheckedEnum;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.Message;
@@ -35,6 +32,10 @@ import moba.server.messages.messageType.InterfaceMessage;
 import moba.server.messages.messageType.InternMessage;
 import moba.server.utilities.exceptions.ClientErrorException;
 import moba.server.utilities.messaging.IncidentHandler;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 final public class Interface extends MessageHandlerA {
 
@@ -60,13 +61,16 @@ final public class Interface extends MessageHandlerA {
                 setConnectivity(CheckedEnum.getFromString(Connectivity.class, (String)msg.getData()), msg.getEndpoint());
                 return;
 
-            case CONTACT_TRIGGERED:
-            case SET_BRAKE_VECTOR:
-            case RESET_BRAKE_VECTOR: 
-            case SET_LOCO_SPEED:
-            case SET_LOCO_DIRECTION:
-            case SET_LOCO_FUNCTION:
-            case SWITCH_ACCESSORY_DECODERS:
+            case SWITCH_ROUTE:
+                addactionList();
+                return;
+
+            case ROUTE_SWITCHED:
+            case ROUTE_RELEASED:
+            case BLOCK_RELEASED:
+            case SET_ACTION_LIST:
+            case REPLACE_ACTION_LIST:
+            case DELETE_ACTION_LIST:
                 dispatcher.sendGroup(msg);
         }
     }
@@ -95,4 +99,33 @@ final public class Interface extends MessageHandlerA {
             ep
         ));
     }
+
+
+
+    private void addactionList() {
+
+        HashMap<String, Object> action = new HashMap<>();
+        //action.put("action", type);
+        action.put("data", 64);
+
+        ArrayList<HashMap<String, Object>> actions = new ArrayList<>();
+        actions.add(action);
+
+        ArrayList<ArrayList<HashMap<String, Object>>> actionslist = new ArrayList<>();
+        actionslist.add(actions);
+
+
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("localId",   16410);
+        data.put("trigger",   null);
+        data.put("actionLists", actionslist);
+
+
+        var msg = new Message(InterfaceMessage.SET_ACTION_LIST, data);
+
+
+        dispatcher.sendGroup(msg);
+    }
+
+
 }

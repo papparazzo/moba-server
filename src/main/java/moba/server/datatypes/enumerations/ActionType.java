@@ -1,0 +1,20 @@
+package moba.server.datatypes.enumerations;
+
+public enum ActionType {
+    DELAY,
+
+    LOCO_HALT,
+    LOCO_SPEED,
+    LOCO_DIRECTION_BACKWARD,
+    LOCO_DIRECTION_FORWARD,
+
+    LOCO_FUNCTION_ON,
+    LOCO_FUNCTION_OFF,
+    SWITCHING_RED,
+    SWITCHING_GREEN,
+
+    SEND_SWITCH_ROUTE,
+    SEND_ROUTE_SWITCHED,
+    SEND_ROUTE_RELEASED,
+    SEND_BLOCK_RELEASED
+};
