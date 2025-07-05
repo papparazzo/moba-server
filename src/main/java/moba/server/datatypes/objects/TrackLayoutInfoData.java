@@ -19,17 +19,9 @@
  */
 package moba.server.datatypes.objects;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 
-import moba.server.json.JSONEncoder;
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
-
-public class TrackLayoutInfoData implements JSONToStringI {
+public class TrackLayoutInfoData {
     protected long    id;
     protected String  name;
     protected String  description;
@@ -77,11 +69,11 @@ public class TrackLayoutInfoData implements JSONToStringI {
         return description;
     }
 
-    public Date getModificationDate() {
+    public Date getModified() {
         return modified;
     }
 
-    public Date getCreationDate() {
+    public Date getCreated() {
         return created;
     }
 
@@ -89,25 +81,7 @@ public class TrackLayoutInfoData implements JSONToStringI {
         return active;
     }
 
-    @Override
-    public String toJsonString(boolean formatted, int indent)
-    throws IOException, JSONException {
-        HashMap<String, Object> map = new HashMap<>();
-
-        SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-
-        map.put("id",          id);
-        map.put("name",        name);
-        map.put("description", description);
-        map.put("created",     df.format(created));
-        map.put("modified",    df.format(modified));
-        map.put("active",      active);
-        map.put("locked",      locked);
-
-        StringBuilder sb = new StringBuilder();
-        JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb, formatted);
-        encoder.encode(map);
-        return sb.toString();
+    public long getLocked() {
+        return locked;
     }
 }

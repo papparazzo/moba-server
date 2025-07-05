@@ -198,7 +198,7 @@ public class Layout extends MessageHandlerA implements Loggable {
         try (PreparedStatement stmt = con.prepareStatement(q)) {
             stmt.setString(1, tl.getName());
             stmt.setString(2, tl.getDescription());
-            stmt.setDate(3, new java.sql.Date(tl.getModificationDate().getTime()));
+            stmt.setDate(3, new java.sql.Date(tl.getModified().getTime()));
             stmt.setLong(4, appId);
             stmt.setLong(5, id);
             getLogger().log(Level.INFO, stmt.toString());
