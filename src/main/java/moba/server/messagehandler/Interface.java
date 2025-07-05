@@ -22,7 +22,10 @@ package moba.server.messagehandler;
 
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
-import moba.server.datatypes.enumerations.*;
+import moba.server.datatypes.enumerations.Connectivity;
+import moba.server.datatypes.enumerations.HardwareState;
+import moba.server.datatypes.enumerations.IncidentLevel;
+import moba.server.datatypes.enumerations.IncidentType;
 import moba.server.utilities.CheckedEnum;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.Message;
