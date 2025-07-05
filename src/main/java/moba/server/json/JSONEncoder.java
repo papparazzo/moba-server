@@ -113,11 +113,19 @@ public class JSONEncoder {
                 continue;
             }
 
-            if(!methodName.startsWith("get") || methodName.length() < 4) {
-                continue;
+            String key = "";
+
+            if(methodName.startsWith("get") && methodName.length() > 3) {
+                key = methodName.substring(3);
             }
 
-            String key = methodName.substring(3);
+            if(methodName.startsWith("is") && methodName.length() > 2) {
+                key = methodName.substring(2);
+            }
+
+            if(key.isEmpty()) {
+                continue;
+            }
 
             key = 
                 key.substring(0, 1).toLowerCase(Locale.ROOT) +
