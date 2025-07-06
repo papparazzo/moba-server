@@ -45,8 +45,12 @@ public class Time {
             throw new IllegalArgumentException("invalid time diff given");
         }
 
-        this.timeInMinutes = (this.timeInMinutes + minutes) % (60 * 24);
-        return this.timeInMinutes < minutes;
+        timeInMinutes = (timeInMinutes + minutes) % (60 * 24);
+        return timeInMinutes < minutes;
+    }
+
+    public boolean hasDayChange(int minutes) {
+        return ((timeInMinutes + minutes) % (60 * 24)) < minutes;
     }
 
     public int getTimeInMinutes() {
