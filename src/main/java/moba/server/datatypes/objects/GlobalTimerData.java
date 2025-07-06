@@ -29,7 +29,7 @@ import moba.server.utilities.CheckedEnum;
 import moba.server.utilities.exceptions.ClientErrorException;
 
 public class GlobalTimerData {
-    protected PointOfTime modelTime = new PointOfTime();
+    protected PointInTime modelTime = new PointInTime();
 
     protected int  multiplicator = 4;
 
@@ -38,11 +38,11 @@ public class GlobalTimerData {
     protected Time dayStartTime = new Time();
     protected Time sunsetStartTime = new Time();
 
-    public void setModelTime(PointOfTime val) {
+    public void setModelTime(PointInTime val) {
         modelTime = val;
     }
 
-    public PointOfTime getModelTime() {
+    public PointInTime getModelTime() {
         return modelTime;
     }
 

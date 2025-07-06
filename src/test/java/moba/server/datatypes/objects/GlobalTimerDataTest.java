@@ -53,13 +53,13 @@ class GlobalTimerDataTest {
 
     @Test
     void testSetAndGetModelTime() {
-        PointOfTime pointOfTime = new PointOfTime();
+        PointInTime pointOfTime = new PointInTime();
         pointOfTime.setDay(Day.MONDAY);
         pointOfTime.setTime(new Time(720)); // 12:00
 
         globalTimerData.setModelTime(pointOfTime);
         
-        PointOfTime retrievedTime = globalTimerData.getModelTime();
+        PointInTime retrievedTime = globalTimerData.getModelTime();
         assertEquals(Day.MONDAY, retrievedTime.getDay());
         assertEquals(720, retrievedTime.getTime().getTimeInMinutes());
     }
@@ -67,7 +67,7 @@ class GlobalTimerDataTest {
     @Test
     void testSetTick() {
         // Setup initial state
-        PointOfTime pointOfTime = new PointOfTime();
+        PointInTime pointOfTime = new PointInTime();
         pointOfTime.setDay(Day.MONDAY);
         pointOfTime.setTime(new Time(1436)); // 23:56
         globalTimerData.setModelTime(pointOfTime);
@@ -78,7 +78,7 @@ class GlobalTimerDataTest {
         assertEquals(Day.TUESDAY, globalTimerData.getModelTime().getDay());
         
         // Reset and test tick that should not change the day
-        pointOfTime = new PointOfTime();
+        pointOfTime = new PointInTime();
         pointOfTime.setDay(Day.MONDAY);
         pointOfTime.setTime(new Time(720)); // 12:00
         globalTimerData.setModelTime(pointOfTime);
