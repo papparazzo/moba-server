@@ -20,38 +20,41 @@
 
 package moba.server.datatypes.objects;
 
-import moba.server.datatypes.enumerations.ActionType;
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-import moba.server.messages.Message;
-import moba.server.messages.messageType.InterfaceMessage;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class ActionListCollection implements JSONToStringI {
+public class ActionListCollection {
 
-    private ArrayList<ActionList> actionslist = new ArrayList<>();
+    private Integer localId = null;
+    private Integer trigger = null;
 
-    public ActionListCollection addactionList(ActionList list) {
+    private final ArrayList<ActionList> actionslist = new ArrayList<>();
+
+    public ActionListCollection(int localId, int trigger) {
+        this.localId = localId;
+        this.trigger = trigger;
+    }
+
+    public ActionListCollection(int localId) {
+        this.localId = localId;
+    }
+
+    public ActionListCollection() {
+    }
+
+    public ActionListCollection addActionList(ActionList list) {
         actionslist.add(list);
         return this;
     }
 
+    public Integer getLocalId() {
+        return localId;
+    }
 
-    @Override
-    public String toJsonString(boolean formatted, int indent) throws JSONException, IOException {
-                HashMap<String, Object> data = new HashMap<>();
-        data.put("localId",   16410);
-        data.put("trigger",   null);
-        data.put("actionLists", actionslist);
+    public Integer getTrigger() {
+        return trigger;
+    }
 
-
-        var msg = new Message(InterfaceMessage.SET_ACTION_LIST, data);
-
-
-
-        return "";
+    public ArrayList<ActionList> getActionLists() {
+        return actionslist;
     }
 }

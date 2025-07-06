@@ -53,4 +53,8 @@ public class ActionList {
         actions.add(action);
         return this;
     }
+
+    public ArrayList<HashMap<String, Object>> getActions() {
+        return actions;
+    }
 }
