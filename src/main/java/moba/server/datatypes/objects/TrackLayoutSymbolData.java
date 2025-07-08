@@ -17,6 +17,7 @@
  *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
+
 package moba.server.datatypes.objects;
 
 public record TrackLayoutSymbolData(
