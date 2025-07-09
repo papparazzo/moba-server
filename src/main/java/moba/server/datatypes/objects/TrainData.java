@@ -28,4 +28,11 @@ public record TrainData(
     int speed,
     DrivingDirection drivingDirection
 ) {
+    public TrainData withDrivingDirection(DrivingDirection drivingDirection) {
+        return new TrainData(id, address, speed, drivingDirection);
+    }
+
+    public TrainData withSpeed(int speed) {
+        return new TrainData(id, address, speed, drivingDirection);
+    }
 }
