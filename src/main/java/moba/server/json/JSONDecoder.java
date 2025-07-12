@@ -78,9 +78,6 @@ public class JSONDecoder {
             c = reader.next();
             switch(c) {
                 case '}' -> {
-                    if(!map.isEmpty())  {
-                        throw new JSONException("expected new key");
-                    }
                     return map;
                 }
 
