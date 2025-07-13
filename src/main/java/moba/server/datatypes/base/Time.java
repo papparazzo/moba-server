@@ -20,7 +20,12 @@
 
 package moba.server.datatypes.base;
 
-public class Time {
+import moba.server.json.JSONException;
+import moba.server.json.JSONToStringI;
+
+import java.io.IOException;
+
+public class Time implements JSONToStringI {
     protected int timeInMinutes;
 
     public Time() {
@@ -71,5 +76,16 @@ public class Time {
 
     public boolean isFullHour() {
         return (timeInMinutes % 60 == 0);
+    }
+
+    @Override
+    public String toString() {
+        return getTime();
+    }
+
+    @Override
+    public String toJsonString(boolean formated, int indent)
+    throws JSONException, IOException {
+        return '"' + getTime() + '"';
     }
 }
