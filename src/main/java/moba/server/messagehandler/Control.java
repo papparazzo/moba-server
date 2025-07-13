@@ -226,11 +226,11 @@ Integer	trainId
         Connection con = database.getConnection();
 
         String q =
-            "SELECT `SwitchDrive`.`Id`, `SwitchDrive`.`SwitchStand`, " +
+            "SELECT `SwitchDrives`.`Id`, `SwitchDrives`.`SwitchStand`, " +
             "`TrackLayoutSymbols`.`XPos`, `TrackLayoutSymbols`.`YPos` " +
-            "FROM SwitchDrive " +
+            "FROM SwitchDrives " +
             "LEFT JOIN `TrackLayoutSymbols` " +
-            "ON `TrackLayoutSymbols`.`Id` = `SwitchDrive`.`Id` " +
+            "ON `TrackLayoutSymbols`.`Id` = `SwitchDrives`.`Id` " +
             "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
