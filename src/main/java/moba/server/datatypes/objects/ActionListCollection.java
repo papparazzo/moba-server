@@ -25,14 +25,10 @@ import java.util.ArrayList;
 public class ActionListCollection {
 
     private Integer localId = null;
-    private Integer trigger = null;
 
-    private final ArrayList<ActionList> actionslist = new ArrayList<>();
+    private final ArrayList<ActionList> actionList = new ArrayList<>();
 
-    public ActionListCollection(int localId, int trigger) {
-        this.localId = localId;
-        this.trigger = trigger;
-    }
+    private final ArrayList<ActionTriggerList> triggerList = new ArrayList<>();
 
     public ActionListCollection(int localId) {
         this.localId = localId;
@@ -42,7 +38,12 @@ public class ActionListCollection {
     }
 
     public ActionListCollection addActionList(ActionList list) {
-        actionslist.add(list);
+        actionList.add(list);
+        return this;
+    }
+
+    public ActionListCollection addTriggerList(ActionTriggerList list) {
+        triggerList.add(list);
         return this;
     }
 
@@ -50,11 +51,11 @@ public class ActionListCollection {
         return localId;
     }
 
-    public Integer getTrigger() {
-        return trigger;
+    public ArrayList<ActionList> getActionList() {
+        return actionList;
     }
 
-    public ArrayList<ActionList> getActionLists() {
-        return actionslist;
+    public ArrayList<ActionTriggerList> getTriggerList() {
+        return triggerList;
     }
 }

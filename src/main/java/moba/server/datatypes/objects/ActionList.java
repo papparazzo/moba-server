@@ -27,7 +27,7 @@ import java.util.HashMap;
 
 public class ActionList {
 
-    private ArrayList<HashMap<String, Object>> actions = new ArrayList<>();
+    private final ArrayList<HashMap<String, Object>> actions = new ArrayList<>();
 
     public ActionList() {}
 
@@ -46,12 +46,19 @@ public class ActionList {
         return this;
     }
 
-    public ActionList addAction(ActionType actionType, int data) {
+    public  <T> ActionList addAction(ActionType actionType, T data) {
         HashMap<String, Object> action = new HashMap<>();
         action.put("action", actionType);
         action.put("data", data);
         actions.add(action);
         return this;
+    }
+
+    public ActionList addActionOnCondition(ActionType actionType, boolean condition) {
+        if(!condition) {
+            return this;
+        }
+        return addAction(actionType);
     }
 
     public ArrayList<HashMap<String, Object>> getActions() {
