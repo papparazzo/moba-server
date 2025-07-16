@@ -23,10 +23,28 @@ package moba.server.routing;
 import java.util.Vector;
 
 public class Router {
-/*
-    public Vector<Edges> getRoute(int fromBlock, int toBlock) {
-        return null;
-    }
-*/
 
+    // Liefert alle gesperrten Block-Ids zurück
+    public Vector<Integer> getRoute(int fromBlock, int toBlock) {
+        Vector<Integer> v = new Vector<>();
+
+        switch(toBlock) {
+            case 411:
+                v.add(424);
+                v.add(467);
+                v.add(411);
+                break;
+            case 296:
+                v.add(411);
+                v.add(318);
+                v.add(218);
+                v.add(296);
+                break;
+            case 424:
+                v.add(296);
+                v.add(424);
+                break;
+        }
+        return v;
+    }
 }

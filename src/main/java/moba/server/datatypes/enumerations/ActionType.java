@@ -1,6 +1,7 @@
 package moba.server.datatypes.enumerations;
 
 public enum ActionType {
+    CHECK_NEXT,
     DELAY,
 
     LOCO_HALT,

@@ -31,6 +31,8 @@ import java.util.Queue;
 import java.util.logging.Level;
 
 import moba.server.com.Dispatcher;
+import moba.server.routing.Router;
+import moba.server.routing.TrainRun;
 import moba.server.utilities.Database;
 import moba.server.datatypes.enumerations.DrivingDirection;
 import moba.server.datatypes.enumerations.ClientError;
@@ -218,7 +220,7 @@ Integer	trainId
         //dispatcher.dispatch(new IncidentData(LayoutMessage.LAYOUT_CHANGED, map));
 
     }
-
+    @Deprecated
     protected void getSwitchStateList(Message msg)
     throws SQLException, ClientErrorException {
         long id = activeLayout.getActiveLayout(msg.getData());
@@ -251,9 +253,12 @@ Integer	trainId
         }
     }
 
+    @Deprecated
     protected void getTrainList(Message msg)
     throws SQLException, ClientErrorException {
         long id = activeLayout.getActiveLayout(msg.getData());
+
+        // Stell den aktuellen IST-Zustand (wo befindet sich welcher Zug) da!
 
         Connection con = database.getConnection();
         String q =
@@ -274,6 +279,7 @@ Integer	trainId
             while(rs.next()) {
                 arraylist.add(new TrainData(
                     rs.getInt("Id"),
+                    0,
                     rs.getInt("Address"),
                     rs.getInt("Speed"),
                     CheckedEnum.getFromString(DrivingDirection.class, rs.getString("DrivingDirection"))
@@ -286,6 +292,19 @@ Integer	trainId
     @SuppressWarnings("unchecked")
     protected void pushTrain(Message msg)
     throws SQLException, ClientErrorException {
+        Router router = new Router();
+
+        int block = (int)(long)msg.getData();
+
+
+        TrainRun runner = new TrainRun(dispatcher, router, database);
+        runner.feed(1, block,1);
+
+
+
+
+       /*
+
         Connection con = database.getConnection();
 
         var data = (Map<String, Object>)msg.getData();
@@ -318,6 +337,8 @@ Integer	trainId
             }
         }
 
+        // TODO Das hier per Api setzen!
+
         q =
             "UPDATE `Trains` SET `Trains`.`DrivingDirection` = ? " +
             "WHERE `Trains`.`Id` = ?";
@@ -329,7 +350,8 @@ Integer	trainId
                 throw new ClientErrorException(ClientError.DATASET_MISSING, "could not update <" + trainId + ">");
             }
         }
-        dispatcher.sendGroup(new Message(ControlMessage.PUSH_TRAIN, msg.getData()));
+       // dispatcher.sendGroup(new Message(ControlMessage.PUSH_TRAIN, msg.getData()));
+        */
     }
 
     protected void lockBlock(Message msg, boolean wait)

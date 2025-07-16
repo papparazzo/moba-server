@@ -22,46 +22,118 @@ package moba.server.routing;
 
 import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.ActionType;
-import moba.server.datatypes.objects.ActionList;
-import moba.server.datatypes.objects.ActionListCollection;
+import moba.server.datatypes.objects.*;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.InterfaceMessage;
+import moba.server.repositories.Blocklist;
+import moba.server.repositories.Trainlist;
+import moba.server.utilities.Database;
+import moba.server.utilities.exceptions.ClientErrorException;
+
+import java.sql.SQLException;
+import java.util.Objects;
+import java.util.Vector;
 
 public class TrainRun {
     private final Dispatcher dispatcher;
 
     private final Router routing;
 
-    public TrainRun(Dispatcher dispatcher, Router routing) {
+    private final Trainlist trainlist;
+
+    private final Blocklist blocklist;
+
+    private final int layoutId = 10;
+
+    public TrainRun(Dispatcher dispatcher, Router routing, Database database) {
         this.dispatcher = dispatcher;
         this.routing = routing;
+
+        blocklist = new Blocklist(database);
+        trainlist = new Trainlist(database);
     }
 
-    public void fillUp() {
-        var v = routing.getRoute(1, 2);
-    }
+    // Hier muss sich der Zug an dieser Position befinden
+    public void feed(int fromBlock, int toBlock, int trainId)
+    throws SQLException, ClientErrorException {
 
+        var blocks = blocklist.getBlockList(layoutId);
+        var trains = trainlist.getTrainList(layoutId);
+        
+        // ACHTUNG: Wie viele Schleifer?
 
-    public void d() {
-        ActionList actionList = new ActionList();
-/*
-                while(rs.next()) {
-            int localId = rs.getInt("LocalId");
-            if(rs.getBoolean("SwitchOn")) {
-                actionList.addAction(ActionType.SWITCHING_GREEN, localId);
+        Vector<Integer> v = routing.getRoute(fromBlock, toBlock);
+
+        var localId = trains.get(trainId).address();
+
+        var last = v.lastElement();
+        var first = v.firstElement();
+
+        ActionListCollection actionLists = new ActionListCollection(localId);
+
+        int previousBlock = 0;
+
+        for(Integer i : v) {
+            BlockContactData c = blocks.get(i);
+
+            if(Objects.equals(first, i)) {
+                // first block:
+                //     - block-contact: no actions!
+                //     - brake-trigger: no actions!
+
+                // FIXME: Hier gibt es im Moment nichts tun! Achtung: Schleifer vom letzen Wagen berücksichtigen!
+                //actionLists.addTriggerList(new ActionTriggerList(c.brakeTriggerContact()));
+                //actionLists.addTriggerList(new ActionTriggerList(c.blockContact()));
+            } else if(!Objects.equals(i, last)) {
+                // nth block:
+                //     - block-contact: release previous block if passed!
+                //     - brake-trigger: no actions!
+
+                actionLists.addTriggerList(new ActionTriggerList(c.brakeTriggerContact()));
+                actionLists.addTriggerList(
+                    new ActionTriggerList(c.blockContact()).
+                        addActionList(new ActionList(ActionType.SEND_BLOCK_RELEASED, previousBlock))
+                );
             } else {
-                actionList.addAction(ActionType.SWITCHING_RED, localId);
+                // last block:
+                //     - block-contact:
+                //           * delay 1-second
+                //           * halt lok
+                //           * release previous block if passed!
+                //     - brake-trigger: stop lok
+
+                actionLists.addTriggerList(
+                    new ActionTriggerList(c.blockContact()).
+                        addActionList(
+                            (new ActionList(ActionType.SEND_BLOCK_RELEASED, previousBlock)).
+                                addAction(ActionType.DELAY, 1000).
+                                addAction(ActionType.LOCO_HALT)//.
+                                //addActionOnCondition(ActionType.CHECK_NEXT, last != toBlock)
+                        )
+                );
+                actionLists.addTriggerList(
+                    new ActionTriggerList(c.brakeTriggerContact()).
+                        addActionList(new ActionList(ActionType.LOCO_SPEED, 0))
+                );
             }
+            previousBlock = i;
         }
-*/
-        ActionListCollection collection = new ActionListCollection();
-        collection.addActionList(actionList);
 
-        dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, collection));
+        actionLists.addActionList(
+            new ActionList().
+                addAction(ActionType.LOCO_FUNCTION_ON, "HEADLIGHTS").
+                addAction(ActionType.LOCO_FUNCTION_ON, "OPERATION_SOUNDS").
+                addAction(ActionType.DELAY, 2000).
+                addAction(ActionType.LOCO_SPEED, 391)
+        );
 
-
+        dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, actionLists));
     }
 
-
-
+    // Hier ist es egal, wo der Zug sich gerade befindet!
+    public void feed(int toBlock, int trainId)
+    throws SQLException, ClientErrorException {
+        var trains = trainlist.getTrainList(layoutId);
+        feed(trains.get(trainId).blockId(), toBlock, trainId);
+    }
 }

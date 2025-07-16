@@ -26,7 +26,7 @@ public class ActionListCollection {
 
     private Integer localId = null;
 
-    private final ArrayList<ActionList> actionList = new ArrayList<>();
+    private ActionList actionList = null;
 
     private final ArrayList<ActionTriggerList> triggerList = new ArrayList<>();
 
@@ -38,7 +38,7 @@ public class ActionListCollection {
     }
 
     public ActionListCollection addActionList(ActionList list) {
-        actionList.add(list);
+        actionList = list;
         return this;
     }
 
@@ -51,7 +51,8 @@ public class ActionListCollection {
         return localId;
     }
 
-    public ArrayList<ActionList> getActionList() {
+    public ActionList getActionList() {
+        // FIXME: Null oder lieber Leere ActionList??
         return actionList;
     }
 
