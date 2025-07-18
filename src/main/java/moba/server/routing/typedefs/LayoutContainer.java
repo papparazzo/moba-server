@@ -20,5 +20,10 @@
 
 package moba.server.routing.typedefs;
 
-public class LayoutContainer {
+import moba.server.routing.Position;
+
+import java.util.HashMap;
+
+public class LayoutContainer extends HashMap<Position, Object> {
+
 }
