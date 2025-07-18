@@ -23,6 +23,7 @@ package moba.server.repositories;
 import moba.server.routing.LayoutSymbol;
 import moba.server.routing.Position;
 import moba.server.routing.Symbol;
+import moba.server.routing.typedefs.LayoutContainer;
 import moba.server.utilities.Database;
 import moba.server.utilities.exceptions.ClientErrorException;
 
@@ -32,23 +33,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 
-public class LayoutContainer {
+public class Layout {
 
     protected final Database database;
 
-    public LayoutContainer(Database database) {
+    public Layout(Database database) {
         this.database = database;
     }
 
 
-    protected HashMap<Position, Object> getLayout()
+    protected LayoutContainer getLayout()
     throws SQLException, ClientErrorException {
         long id = 10; //activeLayout.getActiveLayout(msg.getData());
 
 
         Connection con = database.getConnection();
 
-        HashMap<Position, Object> map = new HashMap<>();
+        LayoutContainer map = new LayoutContainer();
 
         String q =
             "SELECT `Id`, `XPos`, `YPos`, `Symbol` " +
