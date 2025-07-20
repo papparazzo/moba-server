@@ -80,19 +80,16 @@ public class Symbol {
     }
 
     boolean isStartSymbol() {
-        if((symbolFix & Direction.LEFT.getWeight()) == 1) {
+        if((symbolFix & Direction.LEFT.getDirection()) == 1) {
             return true;
         }
-        if((symbolFix & Direction.TOP_LEFT.getWeight()) == 1) {
+        if((symbolFix & Direction.TOP_LEFT.getDirection()) == 1) {
             return true;
         }
-        if((symbolFix & Direction.TOP.getWeight()) == 1) {
+        if((symbolFix & Direction.TOP.getDirection()) == 1) {
             return true;
         }
-        if((symbolFix & Direction.TOP_RIGHT.getWeight()) == 1) {
-            return true;
-        }
-        return false;
+        return (symbolFix & Direction.TOP_RIGHT.getDirection()) == 1;
     }
 
 
