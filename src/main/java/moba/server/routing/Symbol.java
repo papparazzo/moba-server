@@ -114,23 +114,19 @@ public class Symbol {
         this.symbolDyn = symbol;
     }
 
-
-public boolean check(byte i, byte b) {
-    while(i-- != 0) {
-        if(symbolFix == b) {
-            return true;
+    public boolean check(byte i, byte b) {
+        while(i-- != 0) {
+            if(symbolFix == b) {
+                return true;
+            }
+            b = (byte)((b << 1) | (b >> 7));
         }
-        b = (b << 1) | (b >> 7);
+        return false;
     }
-    return false;
-}
 
-
-
-
-public boolean check(Symbol symbol) {
-    return check(8, symbol.symbolFix);
-}
+    public boolean check(Symbol symbol) {
+        return check((byte)8, symbol.symbolFix);
+    }
 
 public boolean isEnd() {
     return check(8, SymbolType::END);
