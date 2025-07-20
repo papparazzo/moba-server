@@ -31,7 +31,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 
 public class Layout {
 
@@ -45,7 +44,6 @@ public class Layout {
     protected LayoutContainer getLayout()
     throws SQLException, ClientErrorException {
         long id = 10; //activeLayout.getActiveLayout(msg.getData());
-
 
         Connection con = database.getConnection();
 
@@ -75,5 +73,4 @@ public class Layout {
         }
         return map;
     }
-
 }
