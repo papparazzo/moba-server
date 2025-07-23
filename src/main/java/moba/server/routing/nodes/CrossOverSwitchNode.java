@@ -20,6 +20,8 @@
 
 package moba.server.routing.nodes;
 
+import moba.server.datatypes.enumerations.SwitchStand;
+
 public class CrossOverSwitchNode extends Node {
 
     protected Node outTop;
@@ -27,12 +29,16 @@ public class CrossOverSwitchNode extends Node {
     protected Node inBottom;
     protected Node inLeft;
 
+    public CrossOverSwitchNode(int id, SwitchStand switchStand) {
+        super(id, switchStand);
+    }
+
     public CrossOverSwitchNode(int id) {
         super(id);
     }
 
     @Override
-    void setJunctionNode(Direction dir, Node node)
+    public void setJunctionNode(Direction dir, Node node)
     throws NodeException {
         switch(dir) {
             case TOP:

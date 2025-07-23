@@ -18,33 +18,11 @@
  *
  */
 
-package moba.server.routing.nodes;
+package moba.server.routing.typedefs;
 
-import moba.server.datatypes.enumerations.SwitchStand;
+import moba.server.routing.nodes.Node;
 
-public abstract class Node {
+import java.util.HashMap;
 
-    protected int id;
-    protected SwitchStand currentState;
-
-    public Node(int id, SwitchStand switchStand) {
-        this.id = id;
-        this.currentState = switchStand;
-    }
-
-    public Node(int id) {
-        this(id, SwitchStand.STRAIGHT_1);
-    }
-
-    abstract public Node getJunctionNode(Node node) throws NodeException;
-    abstract public Node getJunctionNode(Direction dir) throws NodeException;
-    abstract public void setJunctionNode(Direction dir, Node node) throws NodeException;
-
-    void turn(SwitchStand stand) {
-        currentState = stand;
-    }
-
-    int getId() {
-        return id;
-    }
+public class SwitchNodeMap extends HashMap<Integer, Node> {
 }

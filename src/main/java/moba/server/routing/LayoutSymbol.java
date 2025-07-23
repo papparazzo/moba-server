@@ -1,4 +1,4 @@
 package moba.server.routing;
 
-public record LayoutSymbol(long id, Symbol symbol) {
+public record LayoutSymbol(int id, Symbol symbol) {
 }

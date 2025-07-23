@@ -32,22 +32,88 @@ public enum Direction {
     LEFT        (64),
     TOP_LEFT    (128);
 
-    private final int weight;
+    private final int direction;
 
-    Direction(int weight) {
-        this.weight = weight;
+    Direction(int direction) {
+        this.direction = direction;
     }
 
-    public int getWeight() {
-        return weight;
+    public int getDirection() {
+        return direction;
     }
 
-    public static Direction fromId(int id) {
+    public static Direction fromId(int direction) {
         for(Direction type : values()) {
-            if(type.weight == id) {
+            if(type.direction == direction) {
                 return type;
             }
         }
-        throw new IllegalArgumentException("unknown direction id [" + id + "].");
+        throw new IllegalArgumentException("unknown direction [" + direction + "].");
+    }
+
+    public Direction next() {
+        return this == UNSET ? TOP : values()[this.ordinal() + 1];
+    }
+
+    public Direction previous() {
+        return this == UNSET ? BOTTOM : values()[this.ordinal() - 1];
+    }
+
+    public Direction next(int steps) {
+        Direction dir = this;
+        for(int i = 0; i < steps; i++) {
+            dir = dir.next();
+        }
+        return dir;
+    }
+
+    public Direction previous(int steps) {
+        Direction dir = this;
+        for(int i = 0; i < steps; i++) {
+            dir = dir.previous();
+        }
+        return dir;
+    }
+
+    /**
+    * Die Distanz zwischen zwei Verbindungspunkten muss mindestens 3 Bits betragen, damit
+    * zwei 2 Verbindungspunkte (auch als Teil einer Weiche) ein gültiges Gleis bilden.
+    * Zu einem Verbindungspunkt "dirIn" kommen nur 3 mögliche Verbindungspunkte "dirOut" infrage:
+    * 1. Der komplementäre Verbindungspunkt (also ein gerades Gleis)
+    * 2. Der komplementäre Verbindungspunkt + 1 Bit (also rechts gebogenes Gleis)
+    * 3. Der komplementäre Verbindungspunkt - 1 Bit (also links gebogenes Gleis)
+    *
+    * @return DistanceType
+    */
+    public DistanceType getDistanceType(Direction dirOut) {
+        var dirInCom = getComplementaryDirection();
+
+        if(dirOut == dirInCom) {
+            return DistanceType.STRAIGHT;
+        }
+
+        if(dirOut == dirInCom.next()) {
+            return DistanceType.RIGHT_BEND;
+        }
+
+        if(dirOut == dirInCom.previous()) {
+            return DistanceType.LEFT_BEND;
+        }
+
+        return DistanceType.INVALID;
+    }
+
+    public Direction getComplementaryDirection() {
+        return switch(this) {
+            case TOP -> BOTTOM;
+            case TOP_RIGHT -> BOTTOM_LEFT;
+            case RIGHT -> LEFT;
+            case BOTTOM_RIGHT -> TOP_LEFT;
+            case BOTTOM -> TOP;
+            case BOTTOM_LEFT -> TOP_RIGHT;
+            case LEFT -> RIGHT;
+            case TOP_LEFT -> BOTTOM_RIGHT;
+            default -> UNSET;
+        };
     }
 }

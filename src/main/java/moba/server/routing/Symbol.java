@@ -31,19 +31,14 @@ public class Symbol {
         this.symbolFix = symbol;
         this.symbolDyn = symbol;
 
-       // if(isSymbol() && !isValidSymbol()) {
-       //     throw new IllegalArgumentException("Invalid symbol given");
-       // }
+        if(isSymbol() && !isValidSymbol()) {
+            throw new IllegalArgumentException("Invalid symbol given");
+        }
     }
 
     public boolean isSymbol() {
         return symbolFix != 0;
     }
-
-
-    /*
-
-
 
     byte getType() {
         return symbolFix;
@@ -69,8 +64,8 @@ public class Symbol {
         symbolDyn = (byte)((symbolDyn << count) | (symbolDyn >> (-count & 7)));
     }
 
-    public byte getDistance(Symbol symbol) {
-        for(byte i = 0; i < 8; ++i) {
+    public int getDistance(Symbol symbol) {
+        for(int i = 0; i < 8; ++i) {
             if(symbolFix == symbol.symbolFix) {
                 return i;
             }
@@ -91,12 +86,6 @@ public class Symbol {
         }
         return (symbolFix & Direction.TOP_RIGHT.getDirection()) == 1;
     }
-
-
-
-
-
-
 
     public boolean isValidSymbol() {
         return isTrack() || isSwitch();
@@ -128,153 +117,153 @@ public class Symbol {
         return check((byte)8, symbol.symbolFix);
     }
 
-public boolean isEnd() {
-    return check(8, SymbolType::END);
-}
-
-public boolean isStraight() {
-    return check(4, SymbolType::STRAIGHT);
-}
-
-public boolean isCrossOver() {
-    return check(2, SymbolType::CROSS_OVER);
-}
-
-public boolean isBend() {
-    return check(8, SymbolType::BEND);
-}
-
-public boolean isTrack() {
-    if(isStraight()) {
-        return true;
+    public boolean isEnd() {
+        return check((byte)8, (byte)SymbolType.END.getWeight());
     }
-    if(isCrossOver()) {
-        return true;
+    
+    public boolean isStraight() {
+        return check((byte)4, (byte)SymbolType.STRAIGHT.getWeight());
     }
-    if(isBend()) {
-        return true;
+    
+    public boolean isCrossOver() {
+        return check((byte)2, (byte)SymbolType.CROSS_OVER.getWeight());
     }
-    if(isEnd()) {
-        return true;
+    
+    public boolean isBend() {
+        return check((byte)8, (byte)SymbolType.BEND.getWeight());
     }
-    return false;
-}
-
-public boolean isCrossOverSwitch() {
-    return check(4, SymbolType::CROSS_OVER_SWITCH);
-}
-
-public boolean isLeftSwitch() {
-    return check(8, SymbolType::LEFT_SWITCH);
-}
-
-public boolean isRightSwitch() {
-    return check(8, SymbolType::RIGHT_SWITCH);
-}
-
-public boolean isSimpleSwitch() {
-    if(isRightSwitch()) {
-        return true;
-    }
-    if(isLeftSwitch()) {
-        return true;
-    }
-    return false;
-}
-
-public boolean isThreeWaySwitch() {
-    return check(8, SymbolType::THREE_WAY_SWITCH);
-}
-
-public boolean isSwitch() {
-    if(isCrossOverSwitch()) {
-        return true;
-    }
-    if(isSimpleSwitch()) {
-        return true;
-    }
-    if(isThreeWaySwitch()) {
-        return true;
-    }
-    return false;
-}
-
-byte getJunctionsCount() {
-    return countJunctions(symbolFix);
-}
-
-byte getOpenJunctionsCount() {
-    return countJunctions(symbolDyn);
-}
-
-Direction getNextJunction() {
-    return getNextJunction(Direction.TOP_LEFT);
-}
-
-Direction getNextJunction(Direction start) {
-    return nextJunction(symbolFix, start);
-}
-
-public boolean hasOpenJunctionsLeft() {
-    return static_cast<bool>(symbolDyn);
-}
-
-Direction getNextOpenJunction(Direction start) {
-    return nextJunction(symbolDyn, start);
-}
-
-void reset() {
-    symbolDyn = symbolFix;
-}
-
-public boolean isJunctionSet(Direction dir) {
-    return symbolDyn & static_cast<byte>(dir);
-}
-
-public boolean areJunctionsSet(byte junctions) {
-    return (junctions == (symbolDyn & junctions));
-}
-
-public boolean isOpenJunctionSet(Direction dir) {
-    return symbolFix & static_cast<byte>(dir);
-}
-
-public boolean areOpenJunctionsSet(byte junctions) {
-    return (junctions == (symbolFix & junctions));
-}
-
-public boolean removeJunction(Direction dir) {
-     if(!(symbolDyn & static_cast<byte>(dir))) {
-         return false;
-     }
-     symbolDyn &= ~static_cast<byte>(dir);
-     return true;
-}
-
-byte countJunctions(byte symbol) {
-    byte counter = 0;
-    var b = static_cast<byte>(Direction::TOP);
-    for(byte i = 0; i < 8; ++i) {
-        if(symbol & b) {
-            ++counter;
+    
+    public boolean isTrack() {
+        if(isStraight()) {
+            return true;
         }
-        b <<= 1;
-    }
-    return counter;
-}
-
-Direction nextJunction(byte symbol, Direction start) {
-    var b = static_cast<byte>(start);
-    for(byte i = 0; i < 8; ++i) {
-        b = (b << 1) | (b >> 7);
-        if(symbol & b) {
-            return static_cast<Direction>(b);
+        if(isCrossOver()) {
+            return true;
         }
+        if(isBend()) {
+            return true;
+        }
+        return isEnd();
     }
-    return Direction::UNSET;
-}
-//}
-//        throw std::invalid_argument("invalid symbol given");
-//    }*/
+
+    public boolean isCrossOverSwitch() {
+        return check((byte)4, (byte)SymbolType.CROSS_OVER_SWITCH.getWeight());
+    }
+    
+    public boolean isLeftSwitch() {
+        return check((byte)8, (byte)SymbolType.LEFT_SWITCH.getWeight());
+    }
+    
+    public boolean isRightSwitch() {
+        return check((byte)8, (byte)SymbolType.RIGHT_SWITCH.getWeight());
+    }
+
+    public boolean isSimpleSwitch() {
+        if(isRightSwitch()) {
+            return true;
+        }
+        if(isLeftSwitch()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isThreeWaySwitch() {
+        return check((byte)8, (byte)SymbolType.THREE_WAY_SWITCH.getWeight());
+    }
+
+    public boolean isSwitch() {
+        if(isCrossOverSwitch()) {
+            return true;
+        }
+        if(isSimpleSwitch()) {
+            return true;
+        }
+        if(isThreeWaySwitch()) {
+            return true;
+        }
+        return false;
+    }
+
+    public byte getJunctionsCount() {
+        return countJunctions(symbolFix);
+    }
+
+    public byte getOpenJunctionsCount() {
+        return countJunctions(symbolDyn);
+    }
+
+    public Direction getNextJunction() {
+        return getNextJunction(Direction.TOP_LEFT);
+    }
+
+    public Direction getNextJunction(Direction start) {
+        return nextJunction(symbolFix, start);
+    }
+
+    public boolean hasOpenJunctionsLeft() {
+        return symbolDyn != 0;
+    }
+
+    public Direction getNextOpenJunction(Direction start) {
+        return nextJunction(symbolDyn, start);
+    }
+
+    public Direction getNextOpenJunction() {
+        return getNextOpenJunction(Direction.TOP_LEFT);
+    }
+
+    void reset() {
+        symbolDyn = symbolFix;
+    }
+
+    public boolean isJunctionSet(Direction dir) {
+        return ((symbolDyn & (byte)(dir.getDirection())) != 0);
+    }
+
+    public boolean areJunctionsSet(byte junctions) {
+        return (junctions == (symbolDyn & junctions));
+    }
+
+    public boolean isOpenJunctionSet(Direction dir) {
+        return ((symbolFix & (byte)(dir.getDirection())) != 0);
+    }
+
+    public boolean areOpenJunctionsSet(byte junctions) {
+        return (junctions == (symbolFix & junctions));
+    }
+
+    public boolean removeJunction(Direction dir) {
+        if(!isJunctionSet(dir)) {
+            return false;
+        }
+        byte x = (byte)(dir.getDirection());
+
+        symbolDyn &= ~x;
+        return true;
+    }
+
+    byte countJunctions(byte symbol) {
+        byte counter = 0;
+        byte b = (byte)(Direction.TOP.getDirection());
+        for(byte i = 0; i < 8; ++i) {
+            if((symbol & b) == b) {
+                ++counter;
+            }
+            b <<= 1;
+        }
+        return counter;
+    }
+
+    Direction nextJunction(byte symbol, Direction start) {
+        byte b = (byte)start.getDirection();
+        for(byte i = 0; i < 8; ++i) {
+            b = (byte)((b << 1) | (b >> 7));
+            if((symbol & b) == b) {
+                return Direction.fromId(b);
+            }
+        }
+        return Direction.UNSET;
+    }
 }
 

@@ -64,7 +64,7 @@ public class BlockNode extends Node {
     }
 
     @Override
-    Node getJunctionNode(Node node)
+    public Node getJunctionNode(Node node)
     throws NodeException {
         if(node == in) {
             return out;
@@ -76,7 +76,7 @@ public class BlockNode extends Node {
     }
 
     @Override
-    Node getJunctionNode(Direction dir)
+    public Node getJunctionNode(Direction dir)
     throws NodeException {
         return switch(dir) {
             case TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> out;
