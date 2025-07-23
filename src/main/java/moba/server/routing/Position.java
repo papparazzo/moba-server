@@ -18,6 +18,10 @@ final public class Position {
         this.y = y;
     }
 
+    public Position(Position pos) {
+        this(pos.x, pos.y);
+    }
+
     public Position() {
         this(0, 0);
     }
@@ -59,8 +63,8 @@ final public class Position {
     }
 
     /**
-     * setzt den Cursor (Position) in die Richtung welche mit Direction
-     * angegeben ist. Beispiel: Direction RIGHT -> x einen weiter nach rechts
+     * setzt den Cursor (Position) in die Richtung, welche mit Direction
+     * angegeben ist. Beispiel: Direction RIGHT → x einen weiter nach rechts
      */
     public void setNewPosition(Direction dir) {
         switch(dir) {

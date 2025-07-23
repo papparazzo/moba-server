@@ -28,6 +28,10 @@ public class SimpleSwitchNode extends Node {
     protected Node outStraight;
     protected Node outBend;
 
+    public SimpleSwitchNode(int id, SwitchStand switchStand) {
+        super(id, switchStand);
+    }
+
     public SimpleSwitchNode(int id) {
         super(id);
     }

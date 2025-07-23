@@ -29,6 +29,19 @@ public class BlockNode extends Node {
         super(id);
     }
 
+    public BlockNode(int id, TrainData train) {
+        super(id);
+        this.train = train;
+    }
+
+    public void setTrain(TrainData train) {
+        this.train = train;
+    }
+
+    public TrainData getTrain() {
+        return train;
+    }
+
     @Override
     public void setJunctionNode(Direction dir, Node node)
     throws NodeException {

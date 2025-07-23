@@ -29,6 +29,10 @@ public class ThreeWaySwitchNode extends Node {
     protected Node outBendLeft;
     protected Node outBendRight;
 
+    public ThreeWaySwitchNode(int id, SwitchStand switchStand) {
+        super(id, switchStand);
+    }
+
     public ThreeWaySwitchNode(int id) {
         super(id);
     }
