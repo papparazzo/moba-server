@@ -101,9 +101,15 @@ public class LayoutParser {
         fetchBlockNodes(dir2, pos);
     }
 
-    public void fetchBlockNodes(Direction curDir, Position curPos) {
-        Direction startDir = curDir;
-        Position startPos = new Position(curPos);
+    public void fetchBlockNodes(int curDir, Position curPos) {
+        var startDir = curDir;
+        var startPos = new Position(curPos);
+
+        System.out.println("=======================");
+        System.out.println("fetchBlockNodes: ");
+        System.out.println("Pos:       " + curPos);
+        System.out.println("Dir:       " + curDir);
+        System.out.println("=======================");
 
         while(true) {
             // Schritt weiter zum nächsten Symbol
@@ -111,7 +117,8 @@ public class LayoutParser {
 
             // Symbol von der aktuellen Position im Gleisplan
             LayoutSymbol curSymbol = layout.get(curPos);
-            var compDir = curDir.getComplementaryDirection();
+
+            var compDir = Direction.getComplementaryDirection(curDir);
 
             curSymbol.symbol().removeJunction(compDir);
 
@@ -180,10 +187,10 @@ public class LayoutParser {
 
             startNode.junctions().get(startDir).setJunction(curNode.node());
 
-            Direction dir;
+            int dir;
 
             while((dir = sym.getNextOpenJunction()) != Direction.UNSET) {
-                curNode.junctions().put(dir.next(offset), new NodeCallback(dir, newNode));
+                curNode.junctions().put(Direction.shift(dir, offset), new NodeCallback(dir, newNode));
                 sym.removeJunction(dir);
             }
 
@@ -191,15 +198,15 @@ public class LayoutParser {
 
             while((dir = sym.getNextOpenJunction()) != Direction.UNSET) {
                 sym.removeJunction(dir);
-                if(dir.next(offset) == compDir) {
+                if(Direction.shift(dir, offset) == compDir) {
                     curNode.junctions().get(compDir).setJunction(startNode.node());
                     continue;
                 }
 
                 // Prüfen, ob Junction noch existiert. Bei einer Kehrschleife kann
                 // diese durch Rekursion bereits gelöscht worden sein
-                if(curSymbol.symbol().removeJunction(dir.next(offset))) {
-                    fetchBlockNodes(dir.next(offset), startPos);
+                if(curSymbol.symbol().removeJunction(Direction.shift(dir, offset))) {
+                    fetchBlockNodes(Direction.shift(dir, offset), curPos);
                 }
             }
             return;

@@ -37,19 +37,19 @@ public class SimpleSwitchNode extends Node {
     }
 
     @Override
-    public void setJunctionNode(Direction dir, Node node)
+    public void setJunctionNode(int dir, Node node)
     throws NodeException {
         switch(dir) {
-            case TOP:
+            case Direction.TOP:
                 outStraight = node;
                 return;
 
-            case TOP_LEFT:
-            case TOP_RIGHT:
+            case Direction.TOP_LEFT:
+            case Direction.TOP_RIGHT:
                 outBend = node;
                 return;
 
-            case BOTTOM:
+            case Direction.BOTTOM:
                 in = node;
                 return;
 
@@ -83,12 +83,12 @@ public class SimpleSwitchNode extends Node {
     }
 
     @Override
-    public Node getJunctionNode(Direction dir)
+    public Node getJunctionNode(int dir)
     throws NodeException {
         return switch(dir) {
-            case TOP                 -> outStraight;
-            case TOP_LEFT, TOP_RIGHT -> outBend;
-            case BOTTOM              -> in;
+            case Direction.TOP                           -> outStraight;
+            case Direction.TOP_LEFT, Direction.TOP_RIGHT -> outBend;
+            case Direction.BOTTOM                        -> in;
             default                  -> throw new NodeException("invalid direction given!");
         };
     }

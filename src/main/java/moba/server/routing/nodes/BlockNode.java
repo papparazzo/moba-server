@@ -43,20 +43,20 @@ public class BlockNode extends Node {
     }
 
     @Override
-    public void setJunctionNode(Direction dir, Node node)
+    public void setJunctionNode(int dir, Node node)
     throws NodeException {
         switch(dir) {
-            case TOP:
-            case TOP_RIGHT:
-            case RIGHT:
-            case BOTTOM_RIGHT:
+            case Direction.TOP:
+            case Direction.TOP_RIGHT:
+            case Direction.RIGHT:
+            case Direction.BOTTOM_RIGHT:
                 out = node;
                 return;
 
-            case BOTTOM:
-            case BOTTOM_LEFT:
-            case LEFT:
-            case TOP_LEFT:
+            case Direction.BOTTOM:
+            case Direction.BOTTOM_LEFT:
+            case Direction.LEFT:
+            case Direction.TOP_LEFT:
                 in = node;
                 return;
         }
@@ -76,11 +76,11 @@ public class BlockNode extends Node {
     }
 
     @Override
-    public Node getJunctionNode(Direction dir)
+    public Node getJunctionNode(int dir)
     throws NodeException {
         return switch(dir) {
-            case TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> out;
-            case BOTTOM, BOTTOM_LEFT, LEFT, TOP_LEFT -> in;
+            case Direction.TOP, Direction.TOP_RIGHT, Direction.RIGHT, Direction.BOTTOM_RIGHT -> out;
+            case Direction.BOTTOM, Direction.BOTTOM_LEFT, Direction.LEFT, Direction.TOP_LEFT -> in;
             default -> throw new NodeException("invalid direction given!");
         };
     }

@@ -20,12 +20,11 @@
 
 package moba.server.routing.typedefs;
 
-import moba.server.routing.nodes.Direction;
 import moba.server.routing.nodes.Node;
 
 import java.util.HashMap;
 
-public record NodeJunctions(HashMap<Direction, NodeCallback> junctions, Node node) {
+public record NodeJunctions(HashMap<Integer, NodeCallback> junctions, Node node) {
 
     public NodeJunctions withNode(Node node) {
         return new NodeJunctions(junctions, node);

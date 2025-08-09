@@ -3,14 +3,14 @@ package moba.server.routing;
 import moba.server.routing.nodes.Direction;
 
 public enum SymbolType {
-    END              (Direction.TOP.getDirection()),
-    STRAIGHT         (Direction.TOP.getDirection() | Direction.BOTTOM.getDirection()),
-    RIGHT_SWITCH     (Direction.TOP.getDirection() | Direction.BOTTOM.getDirection() | Direction.TOP_RIGHT.getDirection()),
-    CROSS_OVER_SWITCH(Direction.TOP.getDirection() | Direction.BOTTOM.getDirection() | Direction.TOP_RIGHT.getDirection() | Direction.BOTTOM_LEFT.getDirection()),
-    LEFT_SWITCH      (Direction.TOP.getDirection() | Direction.BOTTOM.getDirection() | Direction.TOP_LEFT.getDirection()),
-    THREE_WAY_SWITCH (Direction.TOP.getDirection() | Direction.BOTTOM.getDirection() | Direction.TOP_LEFT.getDirection() | Direction.TOP_RIGHT.getDirection()),
-    CROSS_OVER       (Direction.TOP.getDirection() | Direction.BOTTOM.getDirection() | Direction.RIGHT.getDirection() | Direction.LEFT.getDirection()),
-    BEND             (Direction.TOP.getDirection() | Direction.BOTTOM_LEFT.getDirection());
+    END              (Direction.TOP),
+    STRAIGHT         (Direction.TOP | Direction.BOTTOM),
+    RIGHT_SWITCH     (Direction.TOP | Direction.BOTTOM | Direction.TOP_RIGHT),
+    CROSS_OVER_SWITCH(Direction.TOP | Direction.BOTTOM | Direction.TOP_RIGHT | Direction.BOTTOM_LEFT),
+    LEFT_SWITCH      (Direction.TOP | Direction.BOTTOM | Direction.TOP_LEFT),
+    THREE_WAY_SWITCH (Direction.TOP | Direction.BOTTOM | Direction.TOP_LEFT | Direction.TOP_RIGHT),
+    CROSS_OVER       (Direction.TOP | Direction.BOTTOM | Direction.RIGHT | Direction.LEFT),
+    BEND             (Direction.TOP | Direction.BOTTOM_LEFT);
 
     private final int weight;
 

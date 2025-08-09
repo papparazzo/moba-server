@@ -37,8 +37,8 @@ public abstract class Node {
     }
 
     abstract public Node getJunctionNode(Node node) throws NodeException;
-    abstract public Node getJunctionNode(Direction dir) throws NodeException;
-    abstract public void setJunctionNode(Direction dir, Node node) throws NodeException;
+    abstract public Node getJunctionNode(int dir) throws NodeException;
+    abstract public void setJunctionNode(int dir, Node node) throws NodeException;
 
     void turn(SwitchStand stand) {
         currentState = stand;

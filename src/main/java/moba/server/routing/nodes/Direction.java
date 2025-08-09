@@ -20,91 +20,20 @@
 
 package moba.server.routing.nodes;
 
-public enum Direction {
-    UNSET       (0),
-    TOP         (1),
-    TOP_RIGHT   (2),
-    RIGHT       (4),
-    BOTTOM_RIGHT(8),
+public final class Direction {
+    public static final int UNSET        =   0;
+    public static final int TOP          =   1;
+    public static final int TOP_RIGHT    =   2;
+    public static final int RIGHT        =   4;
+    public static final int BOTTOM_RIGHT =   8;
 
-    BOTTOM      (16),
-    BOTTOM_LEFT (32),
-    LEFT        (64),
-    TOP_LEFT    (128);
+    public static final int BOTTOM       =  16;
+    public static final int BOTTOM_LEFT  =  32;
+    public static final int LEFT         =  64;
+    public static final int TOP_LEFT     = 128;
 
-    private final int direction;
-
-    Direction(int direction) {
-        this.direction = direction;
-    }
-
-    public int getDirection() {
-        return direction;
-    }
-
-    public static Direction fromId(int direction) {
-        for(Direction type : values()) {
-            if(type.direction == direction) {
-                return type;
-            }
-        }
-        throw new IllegalArgumentException("unknown direction [" + direction + "].");
-    }
-
-    public Direction next() {
-        return this == UNSET ? TOP : values()[this.ordinal() + 1];
-    }
-
-    public Direction previous() {
-        return this == UNSET ? BOTTOM : values()[this.ordinal() - 1];
-    }
-
-    public Direction next(int steps) {
-        Direction dir = this;
-        for(int i = 0; i < steps; i++) {
-            dir = dir.next();
-        }
-        return dir;
-    }
-
-    public Direction previous(int steps) {
-        Direction dir = this;
-        for(int i = 0; i < steps; i++) {
-            dir = dir.previous();
-        }
-        return dir;
-    }
-
-    /**
-    * Die Distanz zwischen zwei Verbindungspunkten muss mindestens 3 Bits betragen, damit
-    * zwei 2 Verbindungspunkte (auch als Teil einer Weiche) ein gültiges Gleis bilden.
-    * Zu einem Verbindungspunkt "dirIn" kommen nur 3 mögliche Verbindungspunkte "dirOut" infrage:
-    * 1. Der komplementäre Verbindungspunkt (also ein gerades Gleis)
-    * 2. Der komplementäre Verbindungspunkt + 1 Bit (also rechts gebogenes Gleis)
-    * 3. Der komplementäre Verbindungspunkt - 1 Bit (also links gebogenes Gleis)
-    *
-    * @return DistanceType
-    */
-    public DistanceType getDistanceType(Direction dirOut) {
-        var dirInCom = getComplementaryDirection();
-
-        if(dirOut == dirInCom) {
-            return DistanceType.STRAIGHT;
-        }
-
-        if(dirOut == dirInCom.next()) {
-            return DistanceType.RIGHT_BEND;
-        }
-
-        if(dirOut == dirInCom.previous()) {
-            return DistanceType.LEFT_BEND;
-        }
-
-        return DistanceType.INVALID;
-    }
-
-    public Direction getComplementaryDirection() {
-        return switch(this) {
+    public static int getComplementaryDirection(int direction) {
+        return switch(direction) {
             case TOP -> BOTTOM;
             case TOP_RIGHT -> BOTTOM_LEFT;
             case RIGHT -> LEFT;
@@ -116,4 +45,16 @@ public enum Direction {
             default -> UNSET;
         };
     }
+
+    public static int shift(int direction, int steps) {
+        if(direction == UNSET) {
+            return UNSET;
+        }
+
+        for(int i = 0; i < steps; i++) {
+            direction = ((direction << 1) | (direction >> 7)) & 255;
+        }
+        return direction;
+    }
 }
+

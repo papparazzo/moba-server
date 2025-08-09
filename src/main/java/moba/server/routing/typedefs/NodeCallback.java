@@ -20,15 +20,14 @@
 
 package moba.server.routing.typedefs;
 
-import moba.server.routing.nodes.Direction;
 import moba.server.routing.nodes.Node;
 
 final public class NodeCallback {
 
-    private final Direction dir;
+    private final int dir;
     private final Node node;
 
-    public NodeCallback(Direction dir, Node node) {
+    public NodeCallback(int dir, Node node) {
         this.dir = dir;
         this.node = node;
     }

@@ -201,8 +201,8 @@ public class Symbol {
         return nextJunction(symbolFix, start);
     }
 
-    public boolean hasOpenJunctionsLeft() {
-        return symbolDyn != 0;
+    public int getNextOpenJunction() {
+        return getNextOpenJunction(Direction.TOP_LEFT);
     }
 
     public Direction getNextOpenJunction(Direction start) {
@@ -225,15 +225,11 @@ public class Symbol {
         return (junctions == (symbolDyn & junctions));
     }
 
-    public boolean isOpenJunctionSet(Direction dir) {
-        return ((symbolFix & (byte)(dir.getDirection())) != 0);
+    public boolean isJunctionSet(int dir) {
+        return ((symbolDyn & dir) == dir);
     }
 
-    public boolean areOpenJunctionsSet(byte junctions) {
-        return (junctions == (symbolFix & junctions));
-    }
-
-    public boolean removeJunction(Direction dir) {
+    public boolean removeJunction(int dir) {
         if(!isJunctionSet(dir)) {
             return false;
         }

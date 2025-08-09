@@ -38,22 +38,22 @@ public class CrossOverSwitchNode extends Node {
     }
 
     @Override
-    public void setJunctionNode(Direction dir, Node node)
+    public void setJunctionNode(int dir, Node node)
     throws NodeException {
         switch(dir) {
-            case TOP:
+            case Direction.TOP:
                 outTop = node;
                 return;
 
-            case TOP_RIGHT:
+            case Direction.TOP_RIGHT:
                 outRight = node;
                 return;
 
-            case BOTTOM:
+            case Direction.BOTTOM:
                 inBottom = node;
                 return;
 
-            case BOTTOM_LEFT:
+            case Direction.BOTTOM_LEFT:
                 inLeft = node;
                 return;
         }
@@ -82,13 +82,13 @@ public class CrossOverSwitchNode extends Node {
     }
 
     @Override
-    Node getJunctionNode(Direction dir)
+    public Node getJunctionNode(int dir)
     throws NodeException {
         return switch(dir) {
-            case TOP -> outTop;
-            case TOP_RIGHT -> outRight;
-            case BOTTOM -> inBottom;
-            case BOTTOM_LEFT -> inLeft;
+            case Direction.TOP -> outTop;
+            case Direction.TOP_RIGHT -> outRight;
+            case Direction.BOTTOM -> inBottom;
+            case Direction.BOTTOM_LEFT -> inLeft;
             default -> throw new NodeException("invalid direction given!");
         };
     }
