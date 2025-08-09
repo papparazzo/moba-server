@@ -20,10 +20,15 @@
 
 package moba.server.routing.nodes;
 
-public class BlockNode extends Node {
+import moba.server.datatypes.enumerations.DrivingDirection;
+import moba.server.datatypes.objects.TrainData;
 
-    protected Node in = null;
-    protected Node out = null;
+final public class BlockNode extends Node {
+
+    private Node in = null;
+    private Node out = null;
+
+    private TrainData train = null;
 
     public BlockNode(int id) {
         super(id);

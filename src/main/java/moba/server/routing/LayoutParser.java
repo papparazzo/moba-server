@@ -21,6 +21,7 @@
 package moba.server.routing;
 
 import moba.server.datatypes.objects.BlockContactData;
+import moba.server.datatypes.objects.Position;
 import moba.server.routing.nodes.*;
 import moba.server.routing.typedefs.*;
 
@@ -69,7 +70,6 @@ public class LayoutParser {
         }
 
         var firstBlockContact = blockContacts.entrySet().iterator().next();
-
 
         Position pos = firstBlockContact.getKey();
 

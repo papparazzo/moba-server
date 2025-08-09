@@ -20,7 +20,7 @@
 
 package moba.server.routing.typedefs;
 
-import moba.server.routing.Position;
+import moba.server.datatypes.objects.Position;
 
 import java.util.HashMap;
 

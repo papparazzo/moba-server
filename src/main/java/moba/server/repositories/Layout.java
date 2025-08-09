@@ -20,12 +20,11 @@
 
 package moba.server.repositories;
 
+import moba.server.datatypes.objects.Position;
 import moba.server.routing.LayoutSymbol;
-import moba.server.routing.Position;
 import moba.server.routing.Symbol;
 import moba.server.routing.typedefs.LayoutContainer;
 import moba.server.utilities.Database;
-import moba.server.utilities.exceptions.ClientErrorException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,9 +39,8 @@ public class Layout {
         this.database = database;
     }
 
-
-    protected LayoutContainer getLayout()
-    throws SQLException, ClientErrorException {
+    public LayoutContainer getLayout()
+    throws SQLException {
         long id = 10; //activeLayout.getActiveLayout(msg.getData());
 
         Connection con = database.getConnection();

@@ -61,7 +61,7 @@ public class CrossOverSwitchNode extends Node {
     }
 
     @Override
-    Node getJunctionNode(Node node)
+    public Node getJunctionNode(Node node)
     throws NodeException {
         if(node != outTop && node != outRight && node != inBottom && node != inLeft) {
             throw new NodeException("invalid node given!");

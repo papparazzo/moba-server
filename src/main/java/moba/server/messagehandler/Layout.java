@@ -46,10 +46,11 @@ import moba.server.utilities.exceptions.ClientErrorException;
 import moba.server.utilities.lock.TrackLayoutLock;
 import moba.server.utilities.logger.Loggable;
 
-public class Layout extends MessageHandlerA implements Loggable {
-    protected Database        database;
-    protected TrackLayoutLock lock;
-    protected ActiveLayout    activeLayout;
+public final class Layout extends MessageHandlerA implements Loggable {
+    private final Database        database;
+    private final TrackLayoutLock lock;
+    private final ActiveLayout    activeLayout;
+    private boolean               isRunning = false;
 
     public Layout(Dispatcher dispatcher, Database database, ActiveLayout activeLayout)
     throws SQLException {
@@ -78,6 +79,11 @@ public class Layout extends MessageHandlerA implements Loggable {
     }
 
     @Override
+    public void hardwareStateChanged(HardwareState state) {
+        isRunning = (state == HardwareState.AUTOMATIC);
+    }
+
+    @Override
     public void handleMsg(Message msg)
     throws ClientErrorException, SQLException, IOException {
         switch(LayoutMessage.fromId(msg.getMessageId())) {
@@ -93,7 +99,7 @@ public class Layout extends MessageHandlerA implements Loggable {
         }
     }
 
-    protected void getLayouts(Message msg)
+    private void getLayouts(Message msg)
     throws SQLException {
         String q = "SELECT * FROM `TrackLayouts`;";
 
@@ -119,7 +125,7 @@ public class Layout extends MessageHandlerA implements Loggable {
         dispatcher.sendSingle(new Message(LayoutMessage.GET_LAYOUTS_RES, arraylist), msg.getEndpoint());
     }
 
-    protected void deleteLayout(Message msg)
+    private void deleteLayout(Message msg)
     throws SQLException, ClientErrorException, IOException {
         long id = (Long)msg.getData();
         lock.isLockedByApp(msg.getEndpoint().getAppId(), id);
@@ -143,7 +149,7 @@ public class Layout extends MessageHandlerA implements Loggable {
     }
 
     @SuppressWarnings("unchecked")
-    protected void createLayout(Message msg)
+    private void createLayout(Message msg)
     throws SQLException, ClientErrorException, IOException {
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         boolean isActive = (boolean)map.get("active");
@@ -179,7 +185,7 @@ public class Layout extends MessageHandlerA implements Loggable {
     }
 
     @SuppressWarnings("unchecked")
-    protected void updateLayout(Message msg)
+    private void updateLayout(Message msg)
     throws SQLException, ClientErrorException, IOException {
         Map<String, Object> map = (Map<String, Object>)msg.getData();
 
@@ -213,21 +219,21 @@ public class Layout extends MessageHandlerA implements Loggable {
         }
     }
 
-    protected void unlockLayout(Message msg)
+    private void unlockLayout(Message msg)
     throws ClientErrorException, SQLException {
         long id = activeLayout.getActiveLayout(msg.getData());
         lock.unlock(msg.getEndpoint().getAppId(), id);
         dispatcher.sendGroup(new Message(LayoutMessage.UNLOCK_LAYOUT, id));
     }
 
-    protected void lockLayout(Message msg)
+    private void lockLayout(Message msg)
     throws ClientErrorException, SQLException {
         long id = activeLayout.getActiveLayout(msg.getData());
         lock.tryLock(msg.getEndpoint().getAppId(), id);
         dispatcher.sendGroup(new Message(LayoutMessage.LOCK_LAYOUT, id));
     }
 
-    protected void getLayout(Message msg, boolean tryLock)
+    private void getLayout(Message msg, boolean tryLock)
     throws SQLException, ClientErrorException {
         long id = activeLayout.getActiveLayout(msg.getData());
 
@@ -263,7 +269,7 @@ public class Layout extends MessageHandlerA implements Loggable {
     }
 
     @SuppressWarnings("unchecked")
-    protected void saveLayout(Message msg)
+    private void saveLayout(Message msg)
     throws SQLException, ClientErrorException {
 
         Map<String, Object> map = (Map<String, Object>)msg.getData();
@@ -320,7 +326,7 @@ public class Layout extends MessageHandlerA implements Loggable {
         dispatcher.sendGroup(new Message(LayoutMessage.LAYOUT_CHANGED, id));
     }
 
-    protected Date getCreationDate(long id)
+    private Date getCreationDate(long id)
     throws SQLException {
         String q = "SELECT `CreationDate` FROM `TrackLayouts` WHERE `Id` = ?;";
         Connection con = database.getConnection();

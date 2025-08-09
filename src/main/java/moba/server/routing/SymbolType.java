@@ -12,19 +12,19 @@ public enum SymbolType {
     CROSS_OVER       (Direction.TOP | Direction.BOTTOM | Direction.RIGHT | Direction.LEFT),
     BEND             (Direction.TOP | Direction.BOTTOM_LEFT);
 
-    private final int weight;
+    private final int value;
 
-    SymbolType(int weight) {
-        this.weight = weight;
+    SymbolType(int value) {
+        this.value = value;
     }
 
-    public int getWeight() {
-        return weight;
+    public int getValue() {
+        return value;
     }
 
     public static SymbolType fromId(int id) {
         for(SymbolType type : values()) {
-            if(type.weight == id) {
+            if(type.value == id) {
                 return type;
             }
         }

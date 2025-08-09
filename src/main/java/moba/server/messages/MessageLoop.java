@@ -176,7 +176,7 @@ final public class MessageLoop {
                 IncidentLevel.ERROR,
                 IncidentType.CLIENT_ERROR,
                 "Client shutdown",
-                "Client was terminated. Reason: \"" + msg.getData() + "\"",
+                "Client was terminated. Reason: \"" + data + "\"",
                 "moba-server:ServerApplication.handleClientClose()",
                 msg.getEndpoint()
             ));
