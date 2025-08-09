@@ -24,10 +24,14 @@ import moba.server.routing.nodes.Direction;
 
 public class Symbol {
 
-    protected byte symbolFix;
-    protected byte symbolDyn;
+    protected int symbolFix;
+    protected int symbolDyn;
 
-    public Symbol(byte symbol) {
+    public Symbol(Symbol symbol) {
+        this(symbol.symbolFix);
+    }
+
+    public Symbol(int symbol) {
         this.symbolFix = symbol;
         this.symbolDyn = symbol;
 
@@ -40,99 +44,16 @@ public class Symbol {
         return symbolFix != 0;
     }
 
-    byte getType() {
+    /// /
+    public int getSymbol() {
         return symbolFix;
     }
-
-    public void rotateLeft() {
-        rotateLeft((byte) 1);
-    }
-
-    public void rotateLeft(byte count) {
-        count &= 7;
-        symbolFix = (byte)((symbolFix >> count) | (symbolFix << (-count & 7)));
-        symbolDyn = (byte)((symbolDyn >> count) | (symbolDyn << (-count & 7)));
-    }
-
-    public void rotateRight() {
-        rotateLeft((byte) 1);
-    }
-
-    public void rotateRight(byte count) {
-        count &= 7;
-        symbolFix = (byte)((symbolFix << count) | (symbolFix >> (-count & 7)));
-        symbolDyn = (byte)((symbolDyn << count) | (symbolDyn >> (-count & 7)));
-    }
-
-    public int getDistance(Symbol symbol) {
-        for(int i = 0; i < 8; ++i) {
-            if(symbolFix == symbol.symbolFix) {
-                return i;
-            }
-            symbol.rotateRight((byte) 1);
-        }
-        throw new IllegalArgumentException("given symbol does not match");
-    }
-
-    boolean isStartSymbol() {
-        if((symbolFix & Direction.LEFT.getDirection()) == 1) {
-            return true;
-        }
-        if((symbolFix & Direction.TOP_LEFT.getDirection()) == 1) {
-            return true;
-        }
-        if((symbolFix & Direction.TOP.getDirection()) == 1) {
-            return true;
-        }
-        return (symbolFix & Direction.TOP_RIGHT.getDirection()) == 1;
-    }
+    ///
 
     public boolean isValidSymbol() {
         return isTrack() || isSwitch();
     }
 
-    public byte getSymbolFix() {
-        return symbolFix;
-    }
-
-    public byte getSymbolDyn() {
-        return symbolDyn;
-    }
-
-    public void setSymbolDyn(byte symbol) {
-        this.symbolDyn = symbol;
-    }
-
-    public boolean check(byte i, byte b) {
-        while(i-- != 0) {
-            if(symbolFix == b) {
-                return true;
-            }
-            b = (byte)((b << 1) | (b >> 7));
-        }
-        return false;
-    }
-
-    public boolean check(Symbol symbol) {
-        return check((byte)8, symbol.symbolFix);
-    }
-
-    public boolean isEnd() {
-        return check((byte)8, (byte)SymbolType.END.getWeight());
-    }
-    
-    public boolean isStraight() {
-        return check((byte)4, (byte)SymbolType.STRAIGHT.getWeight());
-    }
-    
-    public boolean isCrossOver() {
-        return check((byte)2, (byte)SymbolType.CROSS_OVER.getWeight());
-    }
-    
-    public boolean isBend() {
-        return check((byte)8, (byte)SymbolType.BEND.getWeight());
-    }
-    
     public boolean isTrack() {
         if(isStraight()) {
             return true;
@@ -146,30 +67,20 @@ public class Symbol {
         return isEnd();
     }
 
-    public boolean isCrossOverSwitch() {
-        return check((byte)4, (byte)SymbolType.CROSS_OVER_SWITCH.getWeight());
-    }
-    
-    public boolean isLeftSwitch() {
-        return check((byte)8, (byte)SymbolType.LEFT_SWITCH.getWeight());
-    }
-    
-    public boolean isRightSwitch() {
-        return check((byte)8, (byte)SymbolType.RIGHT_SWITCH.getWeight());
+    public boolean isStraight() {
+        return check(4, SymbolType.STRAIGHT.getValue());
     }
 
-    public boolean isSimpleSwitch() {
-        if(isRightSwitch()) {
-            return true;
-        }
-        if(isLeftSwitch()) {
-            return true;
-        }
-        return false;
+    public boolean isCrossOver() {
+        return check(2, SymbolType.CROSS_OVER.getValue());
     }
 
-    public boolean isThreeWaySwitch() {
-        return check((byte)8, (byte)SymbolType.THREE_WAY_SWITCH.getWeight());
+    public boolean isBend() {
+        return check(8, SymbolType.BEND.getValue());
+    }
+
+    public boolean isEnd() {
+        return check(8, SymbolType.END.getValue());
     }
 
     public boolean isSwitch() {
@@ -179,25 +90,38 @@ public class Symbol {
         if(isSimpleSwitch()) {
             return true;
         }
-        if(isThreeWaySwitch()) {
-            return true;
-        }
-        return false;
+        return isThreeWaySwitch();
     }
 
-    public byte getJunctionsCount() {
-        return countJunctions(symbolFix);
+    public boolean isCrossOverSwitch() {
+        return check(4, SymbolType.CROSS_OVER_SWITCH.getValue());
     }
 
-    public byte getOpenJunctionsCount() {
-        return countJunctions(symbolDyn);
+    public boolean isSimpleSwitch() {
+        return isRightSwitch() || isLeftSwitch();
     }
 
-    public Direction getNextJunction() {
+    public boolean isLeftSwitch() {
+        return check(8, SymbolType.LEFT_SWITCH.getValue());
+    }
+
+    public boolean isRightSwitch() {
+        return check(8, SymbolType.RIGHT_SWITCH.getValue());
+    }
+
+    public boolean isThreeWaySwitch() {
+        return check(8, SymbolType.THREE_WAY_SWITCH.getValue());
+    }
+
+    public void reset() {
+        symbolDyn = symbolFix;
+    }
+
+    public int getNextJunction() {
         return getNextJunction(Direction.TOP_LEFT);
     }
 
-    public Direction getNextJunction(Direction start) {
+    public int getNextJunction(int start) {
         return nextJunction(symbolFix, start);
     }
 
@@ -205,24 +129,20 @@ public class Symbol {
         return getNextOpenJunction(Direction.TOP_LEFT);
     }
 
-    public Direction getNextOpenJunction(Direction start) {
+    public int getNextOpenJunction(int start) {
         return nextJunction(symbolDyn, start);
     }
 
-    public Direction getNextOpenJunction() {
-        return getNextOpenJunction(Direction.TOP_LEFT);
-    }
+    public int getDistance(Symbol symbol) {
+        int x = symbol.symbolFix;
 
-    void reset() {
-        symbolDyn = symbolFix;
-    }
-
-    public boolean isJunctionSet(Direction dir) {
-        return ((symbolDyn & (byte)(dir.getDirection())) != 0);
-    }
-
-    public boolean areJunctionsSet(byte junctions) {
-        return (junctions == (symbolDyn & junctions));
+        for(int i = 0; i < 8; ++i) {
+            if(symbolFix == x) {
+                return i;
+            }
+            x = rotateRight(x);
+        }
+        throw new IllegalArgumentException("given symbol does not match");
     }
 
     public boolean isJunctionSet(int dir) {
@@ -233,33 +153,33 @@ public class Symbol {
         if(!isJunctionSet(dir)) {
             return false;
         }
-        byte x = (byte)(dir.getDirection());
 
-        symbolDyn &= ~x;
+        symbolDyn &= ~dir;
         return true;
     }
 
-    byte countJunctions(byte symbol) {
-        byte counter = 0;
-        byte b = (byte)(Direction.TOP.getDirection());
-        for(byte i = 0; i < 8; ++i) {
-            if((symbol & b) == b) {
-                ++counter;
+    private boolean check(int i, int t) {
+        while(i-- != 0) {
+            if(symbolFix == t) {
+                return true;
             }
-            b <<= 1;
+            t = rotateRight(t);
         }
-        return counter;
+        return false;
     }
 
-    Direction nextJunction(byte symbol, Direction start) {
-        byte b = (byte)start.getDirection();
+    private int nextJunction(int symbol, int start) {
         for(byte i = 0; i < 8; ++i) {
-            b = (byte)((b << 1) | (b >> 7));
-            if((symbol & b) == b) {
-                return Direction.fromId(b);
+            start = rotateRight(start);
+            if((symbol & start) == start) {
+                return start;
             }
         }
         return Direction.UNSET;
+    }
+
+    private int rotateRight(int symbol) {
+        return ((symbol << 1) | (symbol >> 7)) & 255;
     }
 }
 

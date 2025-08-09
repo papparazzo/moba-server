@@ -85,7 +85,7 @@ public class LayoutParser {
 
 
         NodeJunctions junctions = new NodeJunctions(new HashMap<>(), block);
-        nodes.put(pos, junctions);
+        nodes.put(new Position(pos), junctions);
 
         junctions.junctions().put(dir1, new NodeCallback(dir1, block));
         junctions.junctions().put(dir2, new NodeCallback(dir2, block));
@@ -158,23 +158,22 @@ public class LayoutParser {
             if(block != null) {
                 // ...aktueller Knoten ist ein Block
                 var bNode = createBlock(curSymbol.id(), block);
-                sym = curSymbol.symbol();
-                sym.reset();
+                sym = new Symbol(curSymbol.symbol());
                 blockNodeMap.put(block.blockContact(), bNode);
                 newNode = bNode;
             } else {
                 // ...aktueller Knoten ist eine Weiche
                 if(curSymbol.symbol().isLeftSwitch()) {
-                    sym = new Symbol((byte)SymbolType.LEFT_SWITCH.getWeight());
+                    sym = new Symbol(SymbolType.LEFT_SWITCH.getValue());
                     newNode = new SimpleSwitchNode(curSymbol.id(), switchState.switchStand());
                 } else if(curSymbol.symbol().isRightSwitch()) {
-                    sym = new Symbol((byte)SymbolType.RIGHT_SWITCH.getWeight());
+                    sym = new Symbol(SymbolType.RIGHT_SWITCH.getValue());
                     newNode = new SimpleSwitchNode(curSymbol.id(), switchState.switchStand());
                 } else if(curSymbol.symbol().isCrossOverSwitch()) {
-                    sym = new Symbol((byte)SymbolType.CROSS_OVER_SWITCH.getWeight());
+                    sym = new Symbol(SymbolType.CROSS_OVER_SWITCH.getValue());
                     newNode = new CrossOverSwitchNode(curSymbol.id(), switchState.switchStand());
                 } else if(curSymbol.symbol().isThreeWaySwitch()) {
-                    sym = new Symbol((byte)SymbolType.THREE_WAY_SWITCH.getWeight());
+                    sym = new Symbol(SymbolType.THREE_WAY_SWITCH.getValue());
                     newNode = new ThreeWaySwitchNode(curSymbol.id(), switchState.switchStand());
                 } else {
                     throw new NodeException("");
@@ -182,7 +181,8 @@ public class LayoutParser {
                 switcheNodeMap.put(switchState.id(), newNode);
             }
 
-            curNode = curNode.withNode(newNode);
+            curNode = nodes.computeIfAbsent(new Position(curPos), k -> new NodeJunctions(new HashMap<>(), newNode));
+
             int offset = curSymbol.symbol().getDistance(sym);
 
             startNode.junctions().get(startDir).setJunction(curNode.node());

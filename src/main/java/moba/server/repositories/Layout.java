@@ -63,8 +63,8 @@ public class Layout {
                         rs.getLong("YPos")
                     ),
                     new LayoutSymbol(
-                        rs.getLong("Id"),
-                        new Symbol(rs.getByte("Symbol"))
+                        rs.getInt("Id"),
+                        new Symbol(rs.getInt("Symbol"))
                     )
                 );
             }
