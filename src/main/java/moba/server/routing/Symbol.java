@@ -143,13 +143,12 @@ public class Symbol {
         return ((symbolDyn & dir) == dir);
     }
 
-    public boolean removeJunction(int dir) {
+    public void removeJunction(int dir) {
         if(!isJunctionSet(dir)) {
-            return false;
+            throw new IllegalArgumentException("given junction is not set");
         }
 
         symbolDyn &= ~dir;
-        return true;
     }
 
     private boolean check(int i, int t) {
@@ -169,7 +168,7 @@ public class Symbol {
                 return start;
             }
         }
-        return Direction.UNSET;
+        throw new IllegalArgumentException("no next junction found");
     }
 
     private int rotateRight(int symbol) {

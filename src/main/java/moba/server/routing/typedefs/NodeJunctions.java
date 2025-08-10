@@ -22,11 +22,5 @@ package moba.server.routing.typedefs;
 
 import moba.server.routing.nodes.Node;
 
-import java.util.HashMap;
-
-public record NodeJunctions(HashMap<Integer, NodeCallback> junctions, Node node) {
-
-    public NodeJunctions withNode(Node node) {
-        return new NodeJunctions(junctions, node);
-    }
+public record NodeJunctions(Node node, int offset) {
 }

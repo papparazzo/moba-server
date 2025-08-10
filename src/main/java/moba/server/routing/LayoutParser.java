@@ -41,18 +41,10 @@ final public class LayoutParser {
 
     private final BlockNodeMap blockNodeMap = new BlockNodeMap();
 
-    public SwitchNodeMap getSwitchMap() {
-        return switcheNodeMap;
-    }
-
-    public BlockNodeMap getBlockMap() {
-        return blockNodeMap;
-    }
-
     // INTERN
     private final NodeJunctionsMap nodes = new NodeJunctionsMap();
 
-    public void parse(
+    public LayoutParser(
         LayoutContainer layout,
         BlockContactDataMap blockContacts,
         SwitchStandMap switchStates,
@@ -62,11 +54,20 @@ final public class LayoutParser {
         this.blockContacts = blockContacts;
         this.switchStates = switchStates;
         this.trainList = trainList;
-
         if(blockContacts.isEmpty()) {
             throw new LayoutParserException("no blocks found");
         }
+    }
 
+    public SwitchNodeMap getSwitchMap() {
+        return switcheNodeMap;
+    }
+
+    public BlockNodeMap getBlockMap() {
+        return blockNodeMap;
+    }
+
+    public void parse() {
         var firstBlockContact = blockContacts.entrySet().iterator().next();
 
         Position pos = firstBlockContact.getKey();
@@ -99,7 +100,8 @@ final public class LayoutParser {
         fetchBlockNodes(dir2, pos);
     }
 
-    public void fetchBlockNodes(int curDir, Position curPos) {
+    private void fetchBlockNodes(Position curPos, int curDir) {
+        // "curPos" ist immer eine Weiche oder ein Block!
         var startDir = curDir;
         var startPos = new Position(curPos);
 
@@ -114,14 +116,17 @@ final public class LayoutParser {
             curPos.setNewPosition(curDir);
 
             // Symbol von der aktuellen Position im Gleisplan
-            LayoutSymbol curSymbol = layout.get(curPos);
+            System.out.println("Pos:       " + curPos);
+            LayoutSymbol tmp   = layout.get(curPos);
+            Symbol curSymbol   = tmp.symbol();
+            int    curSymbolId = tmp.id();
 
             var compDir = Direction.getComplementaryDirection(curDir);
 
-            curSymbol.symbol().removeJunction(compDir);
+            curSymbol.removeJunction(compDir);
 
-            // Ist das Symbo ein Prellbock?
-            if(curSymbol.symbol().isEnd()) {
+            // Ist das Symbol ein Prellbock?
+            if(curSymbol.isEnd()) {
                 return;
             }
 
@@ -130,10 +135,11 @@ final public class LayoutParser {
 
             // Prüfen, ob das Symbol keine Weiche und kein Block ist
             if(block == null && switchState == null) {
-                // Wenn das Symbol gerades Gleis oder Kreuzung dann einfach weiter in Richtung
-                if(curSymbol.symbol().isBend()) {
-                    curDir = curSymbol.symbol().getNextOpenJunction(curDir);
+                if(curSymbol.isBend()) {
+                    // Wenn das Symbol eine Kurve darstellt, ist eine neue Richtung zu bestimmen.
+                    curDir = curSymbol.getNextOpenJunction(curDir);
                 }
+                curSymbol.removeJunction(curDir);
                 continue;
             }
 
@@ -143,68 +149,66 @@ final public class LayoutParser {
             // Existiert an aktueller Stelle schon ein Knoten?
             NodeJunctions curNode = nodes.get(curPos);
             if(curNode != null) {
-                //... wenn ja, diesen mit dem Startknoten verbinden und Funktion verlassen
-                startNode.junctions().get(startDir).setJunction(curNode.node());
-                curNode.junctions().get(compDir).setJunction(startNode.node());
-                curSymbol.symbol().removeJunction(curDir);
+                //… wenn ja, diesen mit dem Startknoten verbinden und Funktion verlassen
+                startNode.node().setJunctionNode(Direction.shift(startDir, startNode.offset()), curNode.node());
+                startNode.node().setJunctionNode(Direction.shift(compDir, startNode.offset()), curNode.node());
+                curSymbol.removeJunction(curDir);
                 return;
             }
 
+            // Ein Knoten existiert hier noch nicht, neu erzeugen …
             Node newNode;
-            Symbol sym;
+            Symbol newSymbol;
 
             if(block != null) {
-                // ...aktueller Knoten ist ein Block
-                var bNode = createBlock(curSymbol.id(), block);
-                sym = new Symbol(curSymbol.symbol());
-                blockNodeMap.put(block.blockContact(), bNode);
-                newNode = bNode;
+                // … aktueller Knoten ist ein Block
+                var newBlockNode = new BlockNode(curSymbolId);
+                newBlockNode.setTrain(trainList.get(block.trainId()));
+
+                newSymbol = new Symbol(curSymbol);
+                blockNodeMap.put(block.blockContact(), newBlockNode);
+                newNode = newBlockNode;
             } else {
-                // ...aktueller Knoten ist eine Weiche
-                if(curSymbol.symbol().isLeftSwitch()) {
-                    sym = new Symbol(SymbolType.LEFT_SWITCH.getValue());
-                    newNode = new SimpleSwitchNode(curSymbol.id(), switchState.switchStand());
-                } else if(curSymbol.symbol().isRightSwitch()) {
-                    sym = new Symbol(SymbolType.RIGHT_SWITCH.getValue());
-                    newNode = new SimpleSwitchNode(curSymbol.id(), switchState.switchStand());
-                } else if(curSymbol.symbol().isCrossOverSwitch()) {
-                    sym = new Symbol(SymbolType.CROSS_OVER_SWITCH.getValue());
-                    newNode = new CrossOverSwitchNode(curSymbol.id(), switchState.switchStand());
-                } else if(curSymbol.symbol().isThreeWaySwitch()) {
-                    sym = new Symbol(SymbolType.THREE_WAY_SWITCH.getValue());
-                    newNode = new ThreeWaySwitchNode(curSymbol.id(), switchState.switchStand());
+                // … aktueller Knoten ist eine Weiche
+                if(curSymbol.isLeftSwitch()) {
+                    newSymbol = new Symbol(SymbolType.LEFT_SWITCH.getValue());
+                    newNode = new SimpleSwitchNode(curSymbolId, switchState.switchStand());
+                } else if(curSymbol.isRightSwitch()) {
+                    newSymbol = new Symbol(SymbolType.RIGHT_SWITCH.getValue());
+                    newNode = new SimpleSwitchNode(curSymbolId, switchState.switchStand());
+                } else if(curSymbol.isCrossOverSwitch()) {
+                    newSymbol = new Symbol(SymbolType.CROSS_OVER_SWITCH.getValue());
+                    newNode = new CrossOverSwitchNode(curSymbolId, switchState.switchStand());
+                } else if(curSymbol.isThreeWaySwitch()) {
+                    newSymbol = new Symbol(SymbolType.THREE_WAY_SWITCH.getValue());
+                    newNode = new ThreeWaySwitchNode(curSymbolId, switchState.switchStand());
                 } else {
-                    throw new NodeException("");
+                    throw new NodeException("Invalid symbol found!");
                 }
                 switcheNodeMap.put(switchState.id(), newNode);
             }
 
-            curNode = nodes.computeIfAbsent(new Position(curPos), k -> new NodeJunctions(new HashMap<>(), newNode));
+            int offset = curSymbol.getDistance(newSymbol);
 
-            int offset = curSymbol.symbol().getDistance(sym);
-
-            startNode.junctions().get(startDir).setJunction(curNode.node());
+            NodeJunctions junctions = new NodeJunctions(newNode, offset);
+            nodes.put(new Position(curPos), junctions);
 
             int dir;
 
-            while((dir = sym.getNextOpenJunction()) != Direction.UNSET) {
-                curNode.junctions().put(Direction.shift(dir, offset), new NodeCallback(dir, newNode));
-                sym.removeJunction(dir);
-            }
+            while((dir = newSymbol.getNextOpenJunction()) != Direction.UNSET) {
+                newSymbol.removeJunction(dir);
+                int shiftedDir = Direction.shift(dir, offset);
 
-            sym.reset();
-
-            while((dir = sym.getNextOpenJunction()) != Direction.UNSET) {
-                sym.removeJunction(dir);
-                if(Direction.shift(dir, offset) == compDir) {
-                    curNode.junctions().get(compDir).setJunction(startNode.node());
+                if(shiftedDir == compDir) {
+                    junctions.node().setJunctionNode(dir, startNode.node());
                     continue;
                 }
 
                 // Prüfen, ob Junction noch existiert. Bei einer Kehrschleife kann
                 // diese durch Rekursion bereits gelöscht worden sein
-                if(curSymbol.symbol().removeJunction(Direction.shift(dir, offset))) {
-                    fetchBlockNodes(Direction.shift(dir, offset), curPos);
+                if(curSymbol.isJunctionSet(shiftedDir)) {
+                    curSymbol.removeJunction(shiftedDir);
+                    fetchBlockNodes(curPos, shiftedDir);
                 }
             }
             return;
