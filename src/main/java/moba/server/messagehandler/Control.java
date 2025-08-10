@@ -220,6 +220,7 @@ Integer	trainId
         //dispatcher.dispatch(new IncidentData(LayoutMessage.LAYOUT_CHANGED, map));
 
     }
+
     @Deprecated
     protected void getSwitchStateList(Message msg)
     throws SQLException, ClientErrorException {

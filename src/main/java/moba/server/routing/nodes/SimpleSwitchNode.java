@@ -89,7 +89,7 @@ public class SimpleSwitchNode extends Node {
             case Direction.TOP                           -> outStraight;
             case Direction.TOP_LEFT, Direction.TOP_RIGHT -> outBend;
             case Direction.BOTTOM                        -> in;
-            default                  -> throw new NodeException("invalid direction given!");
+            default                                      -> throw new NodeException("invalid direction given!");
         };
     }
 }

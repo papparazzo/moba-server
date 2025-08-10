@@ -44,12 +44,6 @@ public class Symbol {
         return symbolFix != 0;
     }
 
-    /// /
-    public int getSymbol() {
-        return symbolFix;
-    }
-    ///
-
     public boolean isValidSymbol() {
         return isTrack() || isSwitch();
     }

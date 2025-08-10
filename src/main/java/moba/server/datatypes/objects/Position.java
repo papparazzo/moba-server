@@ -42,18 +42,6 @@ final public class Position {
         this(pos.x, pos.y);
     }
 
-    public Position() {
-        this(0, 0);
-    }
-
-    public long getX() {
-        return x;
-    }
-
-    public long getY() {
-        return y;
-    }
-
     @Override
     public String toString() {
         return "Position{x=" + x + ", y=" + y + '}';
@@ -74,16 +62,6 @@ final public class Position {
     @Override
     public int hashCode() {
         return Objects.hash(x, y);
-    }
-
-    public Position getDistance(Position pos) {
-        return new Position(pos.x - x, pos.y - y);
-    }
-
-    public Position grow(Position pos) {
-        x = Math.max(pos.x, x);
-        y = Math.max(pos.y, y);
-        return new Position(x, y);
     }
 
     /**

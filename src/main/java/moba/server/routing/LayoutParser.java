@@ -25,18 +25,16 @@ import moba.server.datatypes.objects.Position;
 import moba.server.routing.nodes.*;
 import moba.server.routing.typedefs.*;
 
-import java.util.HashMap;
-
-public class LayoutParser {
+final public class LayoutParser {
 
     // IN
-    private LayoutContainer layout;
+    private final LayoutContainer layout;
 
-    private BlockContactDataMap blockContacts;
+    private final BlockContactDataMap blockContacts;
 
-    private SwitchStandMap switchStates;
+    private final SwitchStandMap switchStates;
 
-    private TrainList trainList;
+    private final TrainList trainList;
 
     // OUT
     private final SwitchNodeMap switcheNodeMap = new SwitchNodeMap();
