@@ -20,7 +20,13 @@
 
 package moba.server.routing.typedefs;
 
+import moba.server.routing.nodes.Direction;
 import moba.server.routing.nodes.Node;
 
-public record NodeJunctions(Node node, int offset) {
+public record NodeJunction(Node node, int offset) {
+
+    public void setCounterpartNode(int dir, Node otherNode) {
+        int shiftedDir = Direction.shift(8 - dir, offset);
+        node.setJunctionNode(shiftedDir, otherNode);
+    }
 }

@@ -24,5 +24,5 @@ import moba.server.datatypes.objects.Position;
 
 import java.util.HashMap;
 
-public class NodeJunctionsMap extends HashMap<Position, NodeJunctions> {
+public class NodeJunctionsMap extends HashMap<Position, NodeJunction> {
 }
