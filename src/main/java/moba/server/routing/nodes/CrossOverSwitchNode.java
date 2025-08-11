@@ -22,19 +22,15 @@ package moba.server.routing.nodes;
 
 import moba.server.datatypes.enumerations.SwitchStand;
 
-public class CrossOverSwitchNode extends Node {
+final public class CrossOverSwitchNode extends Node {
 
-    protected Node outTop;
-    protected Node outRight;
-    protected Node inBottom;
-    protected Node inLeft;
+    private Node outTop;
+    private Node outRight;
+    private Node inBottom;
+    private Node inLeft;
 
-    public CrossOverSwitchNode(int id, SwitchStand switchStand) {
-        super(id, switchStand);
-    }
-
-    public CrossOverSwitchNode(int id) {
-        super(id);
+    public CrossOverSwitchNode(SwitchStand switchStand) {
+        super(switchStand);
     }
 
     @Override
@@ -79,18 +75,6 @@ public class CrossOverSwitchNode extends Node {
         }
 
         return null;
-    }
-
-    @Override
-    public Node getJunctionNode(int dir)
-    throws NodeException {
-        return switch(dir) {
-            case Direction.TOP -> outTop;
-            case Direction.TOP_RIGHT -> outRight;
-            case Direction.BOTTOM -> inBottom;
-            case Direction.BOTTOM_LEFT -> inLeft;
-            default -> throw new NodeException("invalid direction given!");
-        };
     }
 
     Node getInNode() {

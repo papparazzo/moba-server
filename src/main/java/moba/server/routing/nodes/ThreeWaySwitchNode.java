@@ -22,19 +22,15 @@ package moba.server.routing.nodes;
 
 import moba.server.datatypes.enumerations.SwitchStand;
 
-public class ThreeWaySwitchNode extends Node {
+final public class ThreeWaySwitchNode extends Node {
 
-    protected Node in;
-    protected Node outStraight;
-    protected Node outBendLeft;
-    protected Node outBendRight;
+    private Node in;
+    private Node outStraight;
+    private Node outBendLeft;
+    private Node outBendRight;
 
-    public ThreeWaySwitchNode(int id, SwitchStand switchStand) {
-        super(id, switchStand);
-    }
-
-    public ThreeWaySwitchNode(int id) {
-        super(id);
+    public ThreeWaySwitchNode(SwitchStand switchStand) {
+        super(switchStand);
     }
 
     @Override
@@ -94,17 +90,5 @@ public class ThreeWaySwitchNode extends Node {
         }
 
         return null;
-    }
-
-    @Override
-    public Node getJunctionNode(int dir)
-    throws NodeException {
-        return switch(dir) {
-            case Direction.TOP       -> outStraight;
-            case Direction.TOP_LEFT  -> outBendLeft;
-            case Direction.TOP_RIGHT -> outBendRight;
-            case Direction.BOTTOM    -> in;
-            default        -> throw new NodeException("invalid direction given!");
-        };
     }
 }

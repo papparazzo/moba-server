@@ -30,12 +30,12 @@ final public class BlockNode extends Node {
 
     private TrainData train = null;
 
-    public BlockNode(int id) {
-        super(id);
+    public BlockNode() {
+        super();
     }
 
-    public BlockNode(int id, TrainData train) {
-        super(id);
+    public BlockNode(TrainData train) {
+        super();
         this.train = train;
     }
 

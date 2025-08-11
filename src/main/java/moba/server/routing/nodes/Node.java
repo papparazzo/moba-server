@@ -24,27 +24,20 @@ import moba.server.datatypes.enumerations.SwitchStand;
 
 public abstract class Node {
 
-    protected int id;
     protected SwitchStand currentState;
 
-    public Node(int id, SwitchStand switchStand) {
-        this.id = id;
+    public Node(SwitchStand switchStand) {
         this.currentState = switchStand;
     }
 
-    public Node(int id) {
-        this(id, SwitchStand.STRAIGHT_1);
+    public Node() {
+        this(SwitchStand.STRAIGHT_1);
     }
 
     abstract public Node getJunctionNode(Node node) throws NodeException;
-    abstract public Node getJunctionNode(int dir) throws NodeException;
     abstract public void setJunctionNode(int dir, Node node) throws NodeException;
 
     void turn(SwitchStand stand) {
         currentState = stand;
-    }
-
-    int getId() {
-        return id;
     }
 }

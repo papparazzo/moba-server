@@ -22,18 +22,14 @@ package moba.server.routing.nodes;
 
 import moba.server.datatypes.enumerations.SwitchStand;
 
-public class SimpleSwitchNode extends Node {
+final public class SimpleSwitchNode extends Node {
 
-    protected Node in;
-    protected Node outStraight;
-    protected Node outBend;
+    private Node in;
+    private Node outStraight;
+    private Node outBend;
 
-    public SimpleSwitchNode(int id, SwitchStand switchStand) {
-        super(id, switchStand);
-    }
-
-    public SimpleSwitchNode(int id) {
-        super(id);
+    public SimpleSwitchNode(SwitchStand switchStand) {
+        super(switchStand);
     }
 
     @Override
@@ -80,16 +76,5 @@ public class SimpleSwitchNode extends Node {
             return outStraight;
         }
         return null;
-    }
-
-    @Override
-    public Node getJunctionNode(int dir)
-    throws NodeException {
-        return switch(dir) {
-            case Direction.TOP                           -> outStraight;
-            case Direction.TOP_LEFT, Direction.TOP_RIGHT -> outBend;
-            case Direction.BOTTOM                        -> in;
-            default                                      -> throw new NodeException("invalid direction given!");
-        };
     }
 }
