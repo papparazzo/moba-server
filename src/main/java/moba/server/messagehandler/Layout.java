@@ -256,10 +256,13 @@ public final class Layout extends MessageHandlerA implements Loggable {
             ResultSet rs = stmt.executeQuery();
             arraylist = new ArrayList<>();
             while(rs.next()) {
+
+                    // rs.getLong("XPos"),
+                  //  rs.getLong("YPos"),
+
+
                 arraylist.add(new TrackLayoutSymbolData(
                     rs.getLong("Id"),
-                    rs.getLong("XPos"),
-                    rs.getLong("YPos"),
                     rs.getLong("Symbol")
                 ));
             }

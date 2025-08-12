@@ -21,8 +21,6 @@ package moba.server.datatypes.objects;
 
 public record BlockContactData(
     int id,
-    int xPos,
-    int yPos,
     ContactData brakeTriggerContact,
     ContactData blockContact,
     Integer trainId

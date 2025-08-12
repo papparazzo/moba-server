@@ -24,8 +24,6 @@ import moba.server.datatypes.enumerations.SwitchStand;
 
 public record SwitchStateData(
     int id,
-    int xPos,
-    int yPos,
     SwitchStand switchStand
 ) {
 }

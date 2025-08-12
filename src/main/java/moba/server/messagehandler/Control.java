@@ -134,8 +134,6 @@ public class Control extends MessageHandlerA implements Loggable {
 
                 arraylist.add(new BlockContactData(
                     rs.getInt("Id"),
-                    rs.getInt("XPos"),
-                    rs.getInt("YPos"),
                     new ContactData(rs.getInt("TriggerModulAddress"), rs.getInt("TriggerModulContactNumber")),
                     new ContactData(rs.getInt("BlockModulAddress"), rs.getInt("BlockModulContactNumber")),
                     trainId
@@ -243,10 +241,11 @@ Integer	trainId
             ResultSet rs = pstmt.executeQuery();
             arraylist = new ArrayList<>();
             while(rs.next()) {
+                //    rs.getInt("XPos"),
+                //    rs.getInt("YPos"),
+
                 arraylist.add(new SwitchStateData(
                     rs.getInt("Id"),
-                    rs.getInt("XPos"),
-                    rs.getInt("YPos"),
                     CheckedEnum.getFromString(SwitchStand.class, rs.getString("SwitchStand"))
                 ));
             }

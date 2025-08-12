@@ -22,8 +22,6 @@ package moba.server.datatypes.objects;
 
 public record TrackLayoutSymbolData(
     long id,
-    long xPos,
-    long yPos,
     long symbol
 ) {
 }
