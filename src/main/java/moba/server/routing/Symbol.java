@@ -27,10 +27,6 @@ public class Symbol {
     protected int symbolFix;
     protected int symbolDyn;
 
-    public Symbol(Symbol symbol) {
-        this(symbol.symbolFix);
-    }
-
     public Symbol(int symbol) {
         this.symbolFix = symbol;
         this.symbolDyn = symbol;
@@ -40,25 +36,29 @@ public class Symbol {
         }
     }
 
+    public boolean hasOpenJunctionsLeft() {
+        return symbolDyn != 0;
+    }
+
     public boolean isSymbol() {
         return symbolFix != 0;
     }
 
     public boolean isValidSymbol() {
-        return isTrack() || isSwitch();
-    }
-
-    public boolean isTrack() {
-        if(isStraight()) {
+        if(isTrack()) {
+            return true;
+        }
+        if(isSwitch()) {
             return true;
         }
         if(isCrossOver()) {
             return true;
         }
-        if(isBend()) {
-            return true;
-        }
         return isEnd();
+    }
+
+    public boolean isTrack() {
+        return isStraight() || isBend();
     }
 
     public boolean isStraight() {
@@ -107,20 +107,12 @@ public class Symbol {
         return check(8, SymbolType.THREE_WAY_SWITCH.getValue());
     }
 
-    public void reset() {
-        symbolDyn = symbolFix;
-    }
-
     public int getNextJunction() {
         return getNextJunction(Direction.TOP_LEFT);
     }
 
     public int getNextJunction(int start) {
         return nextJunction(symbolFix, start);
-    }
-
-    public int getNextOpenJunction() {
-        return getNextOpenJunction(Direction.TOP_LEFT);
     }
 
     public int getNextOpenJunction(int start) {
@@ -168,7 +160,8 @@ public class Symbol {
                 return start;
             }
         }
-        throw new IllegalArgumentException("no next junction found");
+        return Direction.UNSET;
+//        throw new IllegalArgumentException("no next junction found");
     }
 
     private int rotateRight(int symbol) {
