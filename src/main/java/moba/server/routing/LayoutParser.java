@@ -100,7 +100,7 @@ public class LayoutParser {
         int dir = Direction.TOP;
 
         while((dir = endSymbol.getNextOpenJunction(dir)) != Direction.UNSET) {
-            fetchBlockNodes(new LocationVector(startPos.getPosition(), dir));
+            fetchBlockNodes(new LocationVector(endPos.getPosition(), dir));
         }
     }
 

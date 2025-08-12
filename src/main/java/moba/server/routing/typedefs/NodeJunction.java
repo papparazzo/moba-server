@@ -26,7 +26,7 @@ import moba.server.routing.nodes.Node;
 public record NodeJunction(Node node, int offset) {
 
     public void setCounterpartNode(int dir, Node otherNode) {
-        int shiftedDir = Direction.shift(8 - dir, offset);
+        int shiftedDir = Direction.shift(dir, 8 - offset);
         node.setJunctionNode(shiftedDir, otherNode);
     }
 }
