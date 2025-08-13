@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import moba.server.com.Dispatcher;
-import moba.server.datatypes.objects.helper.ActiveLayout;
+import moba.server.utilities.ActiveLayout;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.LayoutMessage;

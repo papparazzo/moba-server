@@ -42,7 +42,7 @@ import moba.server.datatypes.objects.BlockContactData;
 import moba.server.datatypes.objects.ContactData;
 import moba.server.datatypes.objects.SwitchStateData;
 import moba.server.datatypes.objects.TrainData;
-import moba.server.datatypes.objects.helper.ActiveLayout;
+import moba.server.utilities.ActiveLayout;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.ControlMessage;

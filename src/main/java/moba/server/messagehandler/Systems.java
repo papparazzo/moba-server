@@ -26,7 +26,7 @@ import moba.server.datatypes.enumerations.*;
 import moba.server.utilities.CheckedEnum;
 import moba.server.datatypes.objects.ErrorData;
 import moba.server.datatypes.objects.IncidentData;
-import moba.server.datatypes.objects.helper.ActiveLayout;
+import moba.server.utilities.ActiveLayout;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.MessageQueue;

@@ -33,7 +33,7 @@ import moba.server.com.KeepAlive;
 import moba.server.utilities.Database;
 import moba.server.datatypes.base.Version;
 import moba.server.datatypes.objects.IncidentData;
-import moba.server.datatypes.objects.helper.ActiveLayout;
+import moba.server.utilities.ActiveLayout;
 import moba.server.messagehandler.*;
 import moba.server.messages.MessageLoop;
 import moba.server.messages.MessageQueue;

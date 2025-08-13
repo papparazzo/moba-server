@@ -18,7 +18,7 @@
  *
  */
 
-package moba.server.datatypes.objects.helper;
+package moba.server.utilities;
 
 import java.io.IOException;
 import java.util.HashMap;
