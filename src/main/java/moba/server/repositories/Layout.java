@@ -21,7 +21,7 @@
 package moba.server.repositories;
 
 import moba.server.datatypes.objects.Position;
-import moba.server.routing.LayoutSymbol;
+import moba.server.routing.typedefs.LayoutSymbol;
 import moba.server.routing.Symbol;
 import moba.server.routing.typedefs.LayoutContainer;
 import moba.server.utilities.Database;

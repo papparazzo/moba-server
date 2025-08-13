@@ -21,7 +21,6 @@
 package moba.server.routing.typedefs;
 
 import moba.server.datatypes.objects.Position;
-import moba.server.routing.LayoutSymbol;
 
 import java.util.HashMap;
 
