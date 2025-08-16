@@ -1,7 +1,5 @@
 package moba.server.routing;
 
-import moba.server.routing.nodes.Direction;
-
 public enum SymbolType {
     END              (Direction.TOP),
     STRAIGHT         (Direction.TOP | Direction.BOTTOM),

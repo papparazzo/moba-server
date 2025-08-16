@@ -20,9 +20,9 @@
 
 package moba.server.routing.typedefs;
 
-import moba.server.routing.nodes.Node;
+import moba.server.routing.nodes.NodeInterface;
 
 import java.util.HashMap;
 
-public class SwitchNodeMap extends HashMap<Integer, Node> {
+public class SwitchNodeMap extends HashMap<Long, NodeInterface> {
 }

@@ -20,7 +20,7 @@
 
 package moba.server.datatypes.objects;
 
-import moba.server.routing.nodes.Direction;
+import moba.server.routing.Direction;
 
 import java.util.Objects;
 

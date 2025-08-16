@@ -20,55 +20,49 @@
 
 package moba.server.repositories;
 
-import moba.server.datatypes.objects.Position;
-import moba.server.routing.typedefs.LayoutSymbol;
-import moba.server.routing.Symbol;
-import moba.server.routing.typedefs.LayoutContainer;
+import moba.server.datatypes.enumerations.SwitchStand;
+import moba.server.datatypes.collections.SwitchStateMap;
+import moba.server.utilities.CheckedEnum;
 import moba.server.utilities.Database;
+import moba.server.utilities.exceptions.ClientErrorException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Layout {
-
+public class SwitchStateRepository {
     protected final Database database;
 
-    public Layout(Database database) {
+    public SwitchStateRepository(Database database) {
         this.database = database;
     }
 
-    public LayoutContainer getLayout()
-    throws SQLException {
-        long id = 10; //activeLayout.getActiveLayout(msg.getData());
+    public SwitchStateMap getSwitchStateList(long id)
+    throws SQLException, ClientErrorException {
 
         Connection con = database.getConnection();
 
-        LayoutContainer map = new LayoutContainer();
-
         String q =
-            "SELECT `Id`, `XPos`, `YPos`, `Symbol` " +
-            "FROM `TrackLayoutSymbols` WHERE `TrackLayoutId` = ?";
+            "SELECT `SwitchDrives`.`Id`, `SwitchDrives`.`SwitchStand` " +
+            "FROM SwitchDrives " +
+            "LEFT JOIN `TrackLayoutSymbols` " +
+            "ON `TrackLayoutSymbols`.`Id` = `SwitchDrives`.`Id` " +
+            "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
 
-        try (PreparedStatement stmt = con.prepareStatement(q)) {
-            stmt.setLong(1, id);
-          //  getLogger().log(Level.INFO, stmt.toString());
+        try (PreparedStatement pstmt = con.prepareStatement(q)) {
+            pstmt.setLong(1, id);
 
-            ResultSet rs = stmt.executeQuery();
+            SwitchStateMap map = new SwitchStateMap();
+
+            ResultSet rs = pstmt.executeQuery();
             while(rs.next()) {
                 map.put(
-                    new Position(
-                        rs.getLong("XPos"),
-                        rs.getLong("YPos")
-                    ),
-                    new LayoutSymbol(
-                        rs.getInt("Id"),
-                        new Symbol(rs.getInt("Symbol"))
-                    )
+                    rs.getLong("Id"),
+                    CheckedEnum.getFromString(SwitchStand.class, rs.getString("SwitchStand"))
                 );
             }
+            return map;
         }
-        return map;
     }
 }

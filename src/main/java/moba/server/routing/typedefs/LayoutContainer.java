@@ -21,9 +21,10 @@
 package moba.server.routing.typedefs;
 
 import moba.server.datatypes.objects.Position;
+import moba.server.datatypes.objects.TrackLayoutSymbolData;
 
 import java.util.HashMap;
 
-public class LayoutContainer extends HashMap<Position, LayoutSymbol> {
+public class LayoutContainer extends HashMap<Position, TrackLayoutSymbolData> {
 
 }

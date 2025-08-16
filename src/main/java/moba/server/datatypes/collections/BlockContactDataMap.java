@@ -18,11 +18,11 @@
  *
  */
 
-package moba.server.routing.typedefs;
+package moba.server.datatypes.collections;
 
-import moba.server.datatypes.objects.TrainData;
+import moba.server.datatypes.objects.BlockContactData;
 
 import java.util.HashMap;
 
-public class TrainList extends HashMap<Integer, TrainData> {
+public class BlockContactDataMap extends HashMap<Long, BlockContactData> {
 }

@@ -20,8 +20,6 @@
 
 package moba.server.routing;
 
-import moba.server.routing.nodes.Direction;
-
 public class Symbol {
 
     protected int symbolFix;

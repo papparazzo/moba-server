@@ -28,6 +28,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
+import moba.server.datatypes.enumerations.HardwareState;
+import moba.server.repositories.LayoutRepository;
+import moba.server.routing.typedefs.LayoutContainer;
 import moba.server.utilities.Database;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.objects.TrackLayoutInfoData;
@@ -130,6 +133,13 @@ public final class Layout extends MessageHandlerA implements Loggable {
         long id = (Long)msg.getData();
         lock.isLockedByApp(msg.getEndpoint().getAppId(), id);
 
+        if(isRunning && id == activeLayout.getActiveLayout()) {
+            throw new ClientErrorException(
+                ClientError.OPERATION_NOT_ALLOWED,
+                "cannot delete active layout <" + id + "> while running"
+            );
+        }
+
         Connection con = database.getConnection();
         String q = "DELETE FROM `TrackLayouts` WHERE (`locked` IS NULL OR `locked` = ?) AND `id` = ? ";
 
@@ -142,7 +152,6 @@ public final class Layout extends MessageHandlerA implements Loggable {
             }
         }
         if(id == activeLayout.getActiveLayout()) {
-            // TODO: Check if auto-mode
             activeLayout.setActiveLayout(-1);
         }
         dispatcher.sendGroup(new Message(LayoutMessage.DELETE_LAYOUT, id));
@@ -241,34 +250,17 @@ public final class Layout extends MessageHandlerA implements Loggable {
             lock.tryLock(msg.getEndpoint().getAppId(), id);
         }
 
+        LayoutRepository layoutRepository = new LayoutRepository(database);
+
+        LayoutContainer layoutContainer = layoutRepository.getLayout(id);
+
         Connection con = database.getConnection();
 
         HashMap<String, Object> map = new HashMap<>();
         map.put("id", id);
+        map.put("symbols", layoutContainer);
 
-        String q = "SELECT `Id`, `XPos`, `YPos`, `Symbol` FROM `TrackLayoutSymbols` WHERE `TrackLayoutId` = ?";
-
-        try (PreparedStatement stmt = con.prepareStatement(q)) {
-            stmt.setLong(1, id);
-            getLogger().log(Level.INFO, stmt.toString());
-
-            ArrayList<TrackLayoutSymbolData> arraylist;
-            ResultSet rs = stmt.executeQuery();
-            arraylist = new ArrayList<>();
-            while(rs.next()) {
-
-                    // rs.getLong("XPos"),
-                  //  rs.getLong("YPos"),
-
-
-                arraylist.add(new TrackLayoutSymbolData(
-                    rs.getLong("Id"),
-                    rs.getLong("Symbol")
-                ));
-            }
-            map.put("symbols", arraylist);
-            dispatcher.sendSingle(new Message(LayoutMessage.GET_LAYOUT_RES, map), msg.getEndpoint());
-        }
+        dispatcher.sendSingle(new Message(LayoutMessage.GET_LAYOUT_RES, map), msg.getEndpoint());
     }
 
     @SuppressWarnings("unchecked")

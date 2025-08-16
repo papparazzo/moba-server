@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2025 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2021 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -20,10 +20,10 @@
 
 package moba.server.routing.typedefs;
 
-import moba.server.datatypes.objects.BlockContactData;
-import moba.server.datatypes.objects.Position;
+import moba.server.datatypes.enumerations.SwitchStand;
 
-import java.util.HashMap;
-
-public class BlockContactDataMap extends HashMap<Position, BlockContactData> {
+public record SwitchStateData(
+    long id,
+    SwitchStand switchStand
+) {
 }

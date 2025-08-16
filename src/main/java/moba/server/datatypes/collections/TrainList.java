@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2021 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2025 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -18,12 +18,11 @@
  *
  */
 
-package moba.server.datatypes.objects;
+package moba.server.datatypes.collections;
 
-import moba.server.datatypes.enumerations.SwitchStand;
+import moba.server.datatypes.objects.TrainData;
 
-public record SwitchStateData(
-    int id,
-    SwitchStand switchStand
-) {
+import java.util.HashMap;
+
+public class TrainList extends HashMap<Long, TrainData> {
 }

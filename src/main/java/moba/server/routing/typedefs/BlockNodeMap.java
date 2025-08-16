@@ -20,10 +20,9 @@
 
 package moba.server.routing.typedefs;
 
-import moba.server.datatypes.objects.ContactData;
 import moba.server.routing.nodes.BlockNode;
 
 import java.util.HashMap;
 
-public class BlockNodeMap extends HashMap<ContactData, BlockNode> {
+public class BlockNodeMap extends HashMap<Long, BlockNode> {
 }

@@ -20,10 +20,9 @@
 
 package moba.server.repositories;
 
-import moba.server.datatypes.enumerations.SwitchStand;
-import moba.server.datatypes.objects.Position;
-import moba.server.datatypes.objects.SwitchStateData;
-import moba.server.routing.typedefs.SwitchStandMap;
+import moba.server.datatypes.collections.TrainList;
+import moba.server.datatypes.enumerations.DrivingDirection;
+import moba.server.datatypes.objects.TrainData;
 import moba.server.utilities.CheckedEnum;
 import moba.server.utilities.Database;
 import moba.server.utilities.exceptions.ClientErrorException;
@@ -33,42 +32,43 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class SwitchStateList {
+public class TrainlistRepository {
     protected final Database database;
 
-    public SwitchStateList(Database database) {
+    public TrainlistRepository(Database database) {
         this.database = database;
     }
 
-    public SwitchStandMap getSwitchStateList(long id)
+    public TrainList getTrainList(long id)
     throws SQLException, ClientErrorException {
 
+        // Stell den aktuellen IST-Zustand (wo befindet sich welcher Zug) da!
         Connection con = database.getConnection();
-
         String q =
-            "SELECT `SwitchDrives`.`Id`, `SwitchDrives`.`SwitchStand`, " +
-            "`TrackLayoutSymbols`.`XPos`, `TrackLayoutSymbols`.`YPos` " +
-            "FROM SwitchDrives " +
+            "SELECT Trains.Id, `BlockSections`.`Id` AS BlockId , Address, Speed, DrivingDirection " +
+            "FROM Trains " +
+            "LEFT JOIN BlockSections " +
+            "ON BlockSections.TrainId = Trains.Id " +
             "LEFT JOIN `TrackLayoutSymbols` " +
-            "ON `TrackLayoutSymbols`.`Id` = `SwitchDrives`.`Id` " +
+            "ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` " +
             "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setLong(1, id);
 
-            SwitchStandMap map = new SwitchStandMap();
-
+            TrainList map = new TrainList();
             ResultSet rs = pstmt.executeQuery();
+
             while(rs.next()) {
                 map.put(
-                    new Position(
-                        rs.getInt("XPos"),
-                        rs.getInt("YPos")
-                    ),
-                    new SwitchStateData(
-                        rs.getInt("Id"),
-                        CheckedEnum.getFromString(SwitchStand.class, rs.getString("SwitchStand"))
-                ));
+                    rs.getLong("Id"),
+                    new TrainData(
+                        rs.getInt("BlockId"),
+                        rs.getInt("Address"),
+                        rs.getInt("Speed"),
+                        CheckedEnum.getFromString(DrivingDirection.class, rs.getString("DrivingDirection"))
+                    )
+                );
             }
             return map;
         }
