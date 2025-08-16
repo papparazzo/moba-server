@@ -20,7 +20,11 @@
 
 package moba.server.routing;
 
+import moba.server.datatypes.collections.BlockContactDataMap;
+import moba.server.datatypes.collections.SwitchStateMap;
+import moba.server.datatypes.enumerations.SwitchStand;
 import moba.server.datatypes.objects.Position;
+import moba.server.datatypes.objects.TrackLayoutSymbolData;
 import moba.server.routing.nodes.*;
 import moba.server.routing.typedefs.*;
 
@@ -30,7 +34,7 @@ public class LayoutParser {
 
     private final BlockContactDataMap blockContacts;
 
-    private final SwitchStandMap switchStates;
+    private final SwitchStateMap switchStates;
 
     // OUT
     private final SwitchNodeMap switcheNodeMap = new SwitchNodeMap();
@@ -43,7 +47,7 @@ public class LayoutParser {
     public LayoutParser(
         LayoutContainer layout,
         BlockContactDataMap blockContacts,
-        SwitchStandMap switchStates
+        SwitchStateMap switchStates
     ) {
         this.layout = layout;
         this.blockContacts = blockContacts;
@@ -64,17 +68,25 @@ public class LayoutParser {
     public void parse() {
 
         // Position des ersten Blockkontaktes
-        Position startPos = blockContacts.entrySet().iterator().next().getKey();
+        long id = blockContacts.entrySet().iterator().next().getKey();
 
-        Symbol curSymbol = layout.get(startPos).symbol();
+        Position startPos  = getPositionFromId(id);
+        Symbol   curSymbol = layout.get(startPos).symbol();
 
         int dir1 = curSymbol.getNextJunction();
-
         fetchBlockNodes(new LocationVector(startPos, dir1));
 
         int dir2 = curSymbol.getNextJunction(dir1);
-
         fetchBlockNodes(new LocationVector(startPos, dir2));
+    }
+
+    private Position getPositionFromId(long id) {
+        for(var entry : layout.entrySet()) {
+            if(entry.getValue().id() == id) {
+                return entry.getKey();
+            }
+        }
+        throw new LayoutParserException("no position found for id " + id);
     }
 
     private void fetchBlockNodes(LocationVector startPos) {
@@ -110,10 +122,12 @@ public class LayoutParser {
             pos.step();
 
             // Symbol von der aktuellen Position im Gleisplan
-            Symbol curSymbol = layout.get(pos.getPosition()).symbol();
+            TrackLayoutSymbolData curSymbolData = layout.get(pos.getPosition());
+            Symbol curSymbol = curSymbolData.symbol();
+
 
             // Prüfen, ob das Symbol eine Weiche oder ein Block ist
-            if(blockContacts.containsKey(pos.getPosition()) || switchStates.containsKey(pos.getPosition())) {
+            if(blockContacts.containsKey(curSymbolData.id()) || switchStates.containsKey(curSymbolData.id())) {
                 if(curSymbol.hasOpenJunctionsLeft()) {
                    return pos;
                 }
@@ -141,35 +155,28 @@ public class LayoutParser {
             return nodes.get(curPos);
         }
 
-        var curSymbol = layout.get(curPos).symbol();
-        var block = blockContacts.get(curPos);
-        var switchState = switchStates.get(curPos);
+        TrackLayoutSymbolData curSymbolData = layout.get(curPos);
+        Symbol                curSymbol   = curSymbolData.symbol();
+        long                  id          = curSymbolData.id();
+        SwitchStand           switchState = switchStates.get(id);
 
         // Ein Knoten existiert hier noch nicht, neu erzeugen …
-        Node newNode;
+        NodeInterface newNode;
         Symbol newSymbol;
 
         // … aktueller Knoten ist eine Weiche
         if(curSymbol.isLeftSwitch()) {
             newSymbol = new Symbol(SymbolType.LEFT_SWITCH.getValue());
-            newNode = new SimpleSwitchNode(switchState.switchStand());
-            switcheNodeMap.put(switchState.id(), newNode);
+            newNode = new SwitchNode(id, switchState);
+            switcheNodeMap.put(id, newNode);
         } else if(curSymbol.isRightSwitch()) {
             newSymbol = new Symbol(SymbolType.RIGHT_SWITCH.getValue());
-            newNode = new SimpleSwitchNode(switchState.switchStand());
-            switcheNodeMap.put(switchState.id(), newNode);
-        } else if(curSymbol.isCrossOverSwitch()) {
-            newSymbol = new Symbol(SymbolType.CROSS_OVER_SWITCH.getValue());
-            newNode = new CrossOverSwitchNode(switchState.switchStand());
-            switcheNodeMap.put(switchState.id(), newNode);
-        } else if(curSymbol.isThreeWaySwitch()) {
-            newSymbol = new Symbol(SymbolType.THREE_WAY_SWITCH.getValue());
-            newNode = new ThreeWaySwitchNode(switchState.switchStand());
-            switcheNodeMap.put(switchState.id(), newNode);
+            newNode = new SwitchNode(id, switchState);
+            switcheNodeMap.put(id, newNode);
         } else if(curSymbol.isTrack()){
             newSymbol = new Symbol(SymbolType.STRAIGHT.getValue());
-            newNode = new BlockNode();
-            blockNodeMap.put(block.blockContact(), (BlockNode)newNode);
+            newNode = new BlockNode(id);
+            blockNodeMap.put(id, (BlockNode)newNode);
         } else {
             throw new NodeException("Invalid symbol found!");
         }

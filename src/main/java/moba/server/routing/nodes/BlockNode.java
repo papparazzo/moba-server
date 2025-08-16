@@ -21,22 +21,19 @@
 package moba.server.routing.nodes;
 
 import moba.server.datatypes.enumerations.DrivingDirection;
+import moba.server.datatypes.enumerations.SwitchStand;
 import moba.server.datatypes.objects.TrainData;
+import moba.server.routing.Direction;
 
-final public class BlockNode extends Node {
+final public class BlockNode extends AbstractNode {
 
-    private Node in = null;
-    private Node out = null;
+    private NodeInterface in = null;
+    private NodeInterface out = null;
 
     private TrainData train = null;
 
-    public BlockNode() {
-        super();
-    }
-
-    public BlockNode(TrainData train) {
-        super();
-        this.train = train;
+    public BlockNode(long id) {
+        super(id, SwitchStand.STRAIGHT);
     }
 
     public void setTrain(TrainData train) {
@@ -48,7 +45,7 @@ final public class BlockNode extends Node {
     }
 
     @Override
-    public void setJunctionNode(int dir, Node node)
+    public void setJunctionNode(int dir, NodeInterface node)
     throws NodeException {
         switch(dir) {
             case Direction.TOP:
@@ -68,9 +65,12 @@ final public class BlockNode extends Node {
         throw new NodeException("invalid direction given!");
     }
 
-    @Override
-    public Node getJunctionNode(Node node)
+    public NodeInterface getJunctionNode(SwitchStand switchStand, NodeInterface node)
     throws NodeException {
+        if(switchStand != SwitchStand.STRAIGHT) {
+            return null;
+        }
+
         if(node == in) {
             return out;
         }
@@ -80,13 +80,80 @@ final public class BlockNode extends Node {
         throw new NodeException("invalid node given!");
     }
 
-    @Override
-    public Node getJunctionNode(int dir)
-    throws NodeException {
-        return switch(dir) {
-            case Direction.TOP, Direction.TOP_RIGHT, Direction.RIGHT, Direction.BOTTOM_RIGHT -> out;
-            case Direction.BOTTOM, Direction.BOTTOM_LEFT, Direction.LEFT, Direction.TOP_LEFT -> in;
-            default -> throw new NodeException("invalid direction given!");
-        };
+    public NodeInterface getIn() {
+        return in;
     }
+
+    public NodeInterface getOut() {
+        return out;
+    }
+
+    public void turn(SwitchStand stand) {
+        throw new NodeException("cannot turn block node!");
+    }
+
+/*
+    boolean isOut(NodeInterface b) {
+        return b == out;
+    }
+
+     boolean isBlocked() {
+        return train != null;
+    }
+
+    BlockNode pushTrain() {
+        if(!isBlocked()) {
+            throw new NodeException("block not blocked!");
+        }
+
+        BlockNode nextBlock;
+
+        if(train.drivingDirection() == DrivingDirection.FORWARD) {
+            nextBlock = getNextBlock(out);
+        } else {
+            nextBlock = getNextBlock(in);
+        }
+
+        if(nextBlock != null) {
+            nextBlock.setTrain(train);
+            train = null;
+        }
+        return nextBlock;
+    }
+
+
+    BlockNode getNextBlock(NodeInterface nextNode) {
+        if(nextNode == null) {
+            return null;
+        }
+
+        NodeInterface curNode = this;
+        NodeInterface afterNextNode;
+
+        while(true) {
+            afterNextNode = nextNode.getJunctionNode(curNode);
+            if(afterNextNode == null) {
+                return null;
+            }
+
+            var nextBlock = (BlockNode)(nextNode);
+            if(nextBlock != null) {
+                if(nextBlock.isBlocked()) {
+                    return null;
+                }
+
+                if(train != null) {
+                    return nextBlock;
+                }
+                if(nextBlock.isOut(curNode)) {
+                    train = train.withDrivingDirection(DrivingDirection.BACKWARD);
+                } else {
+                    train = train.withDrivingDirection(DrivingDirection.FORWARD);
+                }
+                return nextBlock;
+            }
+            curNode = nextNode;
+            nextNode = afterNextNode;
+        }
+    }*/
 };

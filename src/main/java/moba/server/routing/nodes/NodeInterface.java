@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2025 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -18,12 +18,18 @@
  *
  */
 
-package moba.server.datatypes.objects;
+package moba.server.routing.nodes;
 
-import moba.server.routing.Symbol;
+import moba.server.datatypes.enumerations.SwitchStand;
 
-public record TrackLayoutSymbolData(
-    long id,
-    Symbol symbol
-) {
+public interface NodeInterface {
+    NodeInterface getJunctionNode(NodeInterface node) throws NodeException;
+
+    NodeInterface getJunctionNode(SwitchStand switchStand, NodeInterface node) throws NodeException;
+
+    void setJunctionNode(int dir, NodeInterface node) throws NodeException;
+
+    void turn(SwitchStand stand);
+
+    long getId();
 }

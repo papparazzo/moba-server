@@ -22,22 +22,24 @@ package moba.server.routing.nodes;
 
 import moba.server.datatypes.enumerations.SwitchStand;
 
-public abstract class Node {
+public abstract class AbstractNode implements NodeInterface {
 
     protected SwitchStand currentState;
 
-    public Node(SwitchStand switchStand) {
-        this.currentState = switchStand;
+    protected long id;
+
+    protected AbstractNode(long id, SwitchStand switchStand) {
+        currentState = switchStand;
+        this.id = id;
     }
 
-    public Node() {
-        this(SwitchStand.STRAIGHT_1);
+    public NodeInterface getJunctionNode(NodeInterface node) throws NodeException {
+        return this.getJunctionNode(currentState, node);
     }
 
-    abstract public Node getJunctionNode(Node node) throws NodeException;
-    abstract public void setJunctionNode(int dir, Node node) throws NodeException;
+    abstract public NodeInterface getJunctionNode(SwitchStand switchStand, NodeInterface node) throws NodeException;
 
-    void turn(SwitchStand stand) {
-        currentState = stand;
+    public long getId() {
+        return id;
     }
 }

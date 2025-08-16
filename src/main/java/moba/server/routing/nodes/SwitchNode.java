@@ -21,20 +21,20 @@
 package moba.server.routing.nodes;
 
 import moba.server.datatypes.enumerations.SwitchStand;
+import moba.server.routing.Direction;
 
-final public class ThreeWaySwitchNode extends Node {
+final public class SwitchNode extends AbstractNode {
 
-    private Node in;
-    private Node outStraight;
-    private Node outBendLeft;
-    private Node outBendRight;
+    private NodeInterface in;
+    private NodeInterface outStraight;
+    private NodeInterface outBend;
 
-    public ThreeWaySwitchNode(SwitchStand switchStand) {
-        super(switchStand);
+    public SwitchNode(long id, SwitchStand switchStand) {
+        super(id, switchStand);
     }
 
     @Override
-    public void setJunctionNode(int dir, Node node)
+    public void setJunctionNode(int dir, NodeInterface node)
     throws NodeException {
         switch(dir) {
             case Direction.TOP:
@@ -42,11 +42,8 @@ final public class ThreeWaySwitchNode extends Node {
                 return;
 
             case Direction.TOP_LEFT:
-                outBendLeft = node;
-                return;
-
             case Direction.TOP_RIGHT:
-                outBendRight = node;
+                outBend = node;
                 return;
 
             case Direction.BOTTOM:
@@ -59,36 +56,32 @@ final public class ThreeWaySwitchNode extends Node {
     }
 
     @Override
-    public Node getJunctionNode(Node node)
+    public NodeInterface getJunctionNode(SwitchStand switchStand, NodeInterface node)
     throws NodeException {
-        if(node != in && node != outStraight && node != outBendLeft && node != outBendRight) {
+        if(node != in && node != outStraight && node != outBend) {
             throw new NodeException("invalid node given!");
         }
 
-        if(node == in && currentState == SwitchStand.BEND_2) {
-            return outBendLeft;
+        if(node == outStraight && switchStand == SwitchStand.STRAIGHT) {
+            return in;
         }
 
-        if(node == in && currentState == SwitchStand.BEND_1) {
-            return outBendRight;
+        if(node == outBend && switchStand == SwitchStand.BEND) {
+            return in;
         }
 
-        if(node == in) {
+        if(node == in && switchStand == SwitchStand.BEND) {
+            return outBend;
+        }
+
+        if(node == in && switchStand == SwitchStand.STRAIGHT) {
             return outStraight;
         }
 
-        if(node == outBendLeft && currentState == SwitchStand.BEND_2) {
-            return in;
-        }
-
-        if(node == outBendRight && currentState == SwitchStand.BEND_1) {
-            return in;
-        }
-
-        if(node == outStraight && (currentState == SwitchStand.STRAIGHT_1 || currentState == SwitchStand.STRAIGHT_2)) {
-            return in;
-        }
-
         return null;
+    }
+
+    public void turn(SwitchStand stand) {
+        currentState = stand;
     }
 }

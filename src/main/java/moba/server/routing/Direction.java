@@ -18,7 +18,7 @@
  *
  */
 
-package moba.server.routing.nodes;
+package moba.server.routing;
 
 public final class Direction {
     public static final int UNSET        =   0;

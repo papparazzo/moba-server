@@ -18,12 +18,11 @@
  *
  */
 
-package moba.server.routing.typedefs;
+package moba.server.datatypes.collections;
 
-import moba.server.datatypes.objects.Position;
-import moba.server.datatypes.objects.SwitchStateData;
+import moba.server.datatypes.enumerations.SwitchStand;
 
 import java.util.HashMap;
 
-public class SwitchStandMap extends HashMap<Position, SwitchStateData> {
+public class SwitchStateMap extends HashMap<Long, SwitchStand> {
 }
