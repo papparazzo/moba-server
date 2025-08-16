@@ -35,7 +35,7 @@ public class ActionList {
         addAction(actionType);
     }
 
-    public ActionList(ActionType actionType, int data) {
+    public ActionList(ActionType actionType, long data) {
         addAction(actionType, data);
     }
 
@@ -46,7 +46,7 @@ public class ActionList {
         return this;
     }
 
-    public  <T> ActionList addAction(ActionType actionType, T data) {
+    public <T> ActionList addAction(ActionType actionType, T data) {
         HashMap<String, Object> action = new HashMap<>();
         action.put("action", actionType);
         action.put("data", data);

@@ -20,28 +20,27 @@
 
 package moba.server.messagehandler;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-import java.util.logging.Level;
 
 import moba.server.com.Dispatcher;
+import moba.server.datatypes.collections.BlockContactDataMap;
+import moba.server.datatypes.collections.SwitchStateMap;
+import moba.server.datatypes.collections.TrainList;
+import moba.server.datatypes.objects.ActionListCollection;
+import moba.server.datatypes.objects.TrainData;
+import moba.server.messages.messageType.InterfaceMessage;
+import moba.server.repositories.BlockListRepository;
+import moba.server.repositories.LayoutRepository;
+import moba.server.repositories.SwitchStateRepository;
+import moba.server.repositories.TrainlistRepository;
+import moba.server.routing.LayoutParser;
 import moba.server.routing.Router;
 import moba.server.routing.TrainRun;
+import moba.server.routing.typedefs.*;
 import moba.server.utilities.Database;
-import moba.server.datatypes.enumerations.DrivingDirection;
-import moba.server.datatypes.enumerations.ClientError;
-import moba.server.datatypes.enumerations.SwitchStand;
-import moba.server.utilities.CheckedEnum;
-import moba.server.datatypes.objects.BlockContactData;
-import moba.server.datatypes.objects.ContactData;
-import moba.server.datatypes.objects.SwitchStateData;
-import moba.server.datatypes.objects.TrainData;
 import moba.server.utilities.ActiveLayout;
 import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
@@ -101,46 +100,11 @@ public class Control extends MessageHandlerA implements Loggable {
 
     protected void getBlockList(Message msg)
     throws SQLException, ClientErrorException {
+        BlockListRepository blocklistRepository = new BlockListRepository(database);
         long id = activeLayout.getActiveLayout(msg.getData());
 
-        Connection con = database.getConnection();
-
-        String q =
-            "SELECT `BlockSections`.`Id`, `BlockSections`.`TrainId`, " +
-            "`TrackLayoutSymbols`.`XPos`, `TrackLayoutSymbols`.`YPos`, " +
-            "`TriggerContact`.`ModulAddress` AS `TriggerModulAddress`, " +
-            "`TriggerContact`.`ContactNumber` AS `TriggerModulContactNumber`, " +
-            "`BlockContact`.`ModulAddress` AS `BlockModulAddress`, " +
-            "`BlockContact`.`ContactNumber` AS `BlockModulContactNumber` " +
-            "FROM `BlockSections` " +
-            "LEFT JOIN `FeedbackContacts` AS `TriggerContact` " +
-            "ON `BrakeTriggerContactId` = `TriggerContact`.`Id` " +
-            "LEFT JOIN `FeedbackContacts` AS `BlockContact` " +
-            "ON `BlockContactId` = `BlockContact`.`Id` " +
-            "LEFT JOIN `TrackLayoutSymbols` " +
-            "ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` " +
-            "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
-
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, id);
-
-            ArrayList<BlockContactData> arraylist;
-            ResultSet rs = pstmt.executeQuery();
-            arraylist = new ArrayList<>();
-            
-            while(rs.next()) {
-                Integer trainId = rs.getInt("TrainId");
-                trainId = rs.wasNull() ? null : trainId;
-
-                arraylist.add(new BlockContactData(
-                    rs.getInt("Id"),
-                    new ContactData(rs.getInt("TriggerModulAddress"), rs.getInt("TriggerModulContactNumber")),
-                    new ContactData(rs.getInt("BlockModulAddress"), rs.getInt("BlockModulContactNumber")),
-                    trainId
-                ));
-            }
-            dispatcher.sendSingle(new Message(ControlMessage.GET_BLOCK_LIST_RES, arraylist), msg.getEndpoint());
-        }
+        BlockContactDataMap blockContactDataMap = blocklistRepository.getBlockList(id);
+        dispatcher.sendSingle(new Message(ControlMessage.GET_BLOCK_LIST_RES, blockContactDataMap), msg.getEndpoint());
     }
 
     @SuppressWarnings("unchecked")
@@ -155,154 +119,67 @@ public class Control extends MessageHandlerA implements Loggable {
             throw new ClientErrorException(ClientError.DATASET_NOT_LOCKED, "layout <" + String.valueOf(id) + "> not locked");
         }
         */
-
-       //// map.get("blockContacts");
-
-        Connection con = database.getConnection();
-
-        String stmt = "UPDATE `TrackLayouts` SET `ModificationDate` = NOW() WHERE `Id` = ? ";
-
-        try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
-            pstmt.setLong(1, id);
-            getLogger().log(Level.INFO, pstmt.toString());
-            if(pstmt.executeUpdate() == 0) {
-                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not save <" + id + ">");
-            }
-        }
-
-        stmt =
-            "DELETE `BlockSections`.* " +
-            "FROM `BlockSections` " +
-            "LEFT JOIN `TrackLayoutSymbols` ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` "    +
-            "WHERE `TrackLayoutId` = ?";
-
-        try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-            pstmt.setLong(1, id);
-            getLogger().log(Level.INFO, pstmt.toString());
-            pstmt.executeUpdate();
-        }
-
-        ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
-
-        for(Object item : arrayList) {
-            Map<String, Object> block = (Map<String, Object>)item;
-
-            stmt =
-                "INSERT INTO `BlockSections` " +
-                "(`Id`, `BrakeTriggerContactId`, `BlockContactId`, `TrainId`, `Locked`) " +
-                "SELECT `Id`, ?, ?, ?, ? " +
-                "FROM `TrackLayoutSymbols` " +
-                "WHERE TrackLayoutSymbols.XPos = ? AND TrackLayoutSymbols.YPos = ?";
-
-            try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-/*
-
-Integer	xPos
-Integer	yPos
-ContactData	brakeTriggerContact
-ContactData	blockContact
-Integer	trainId
-
-*/
-
-                pstmt.setLong(1, (long)block.get("symbol"));
-
-                pstmt.setLong(2, id);
-                pstmt.setLong(3, (long)block.get("xPos"));
-                pstmt.setLong(4, (long)block.get("yPos"));
-                getLogger().log(Level.INFO, pstmt.toString());
-                pstmt.executeUpdate();
-            }
-        }
+        BlockListRepository blocklist = new BlockListRepository(database);
 
         //dispatcher.dispatch(new IncidentData(LayoutMessage.LAYOUT_CHANGED, map));
-
     }
 
-    @Deprecated
     protected void getSwitchStateList(Message msg)
     throws SQLException, ClientErrorException {
+        SwitchStateRepository switchStateRepository = new SwitchStateRepository(database);
         long id = activeLayout.getActiveLayout(msg.getData());
-
-        Connection con = database.getConnection();
-
-        String q =
-            "SELECT `SwitchDrives`.`Id`, `SwitchDrives`.`SwitchStand`, " +
-            "`TrackLayoutSymbols`.`XPos`, `TrackLayoutSymbols`.`YPos` " +
-            "FROM SwitchDrives " +
-            "LEFT JOIN `TrackLayoutSymbols` " +
-            "ON `TrackLayoutSymbols`.`Id` = `SwitchDrives`.`Id` " +
-            "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
-
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, id);
-
-            ArrayList<SwitchStateData> arraylist;
-            ResultSet rs = pstmt.executeQuery();
-            arraylist = new ArrayList<>();
-            while(rs.next()) {
-                //    rs.getInt("XPos"),
-                //    rs.getInt("YPos"),
-
-                arraylist.add(new SwitchStateData(
-                    rs.getInt("Id"),
-                    CheckedEnum.getFromString(SwitchStand.class, rs.getString("SwitchStand"))
-                ));
-            }
-            dispatcher.sendSingle(new Message(ControlMessage.GET_SWITCH_STAND_LIST_RES, arraylist), msg.getEndpoint());
-        }
+        SwitchStateMap switchStateList = switchStateRepository.getSwitchStateList(id);
+        dispatcher.sendSingle(new Message(ControlMessage.GET_SWITCH_STAND_LIST_RES, switchStateList), msg.getEndpoint());
     }
 
-    @Deprecated
     protected void getTrainList(Message msg)
     throws SQLException, ClientErrorException {
+        TrainlistRepository trainlistRepository = new TrainlistRepository(database);
         long id = activeLayout.getActiveLayout(msg.getData());
-
-        // Stell den aktuellen IST-Zustand (wo befindet sich welcher Zug) da!
-
-        Connection con = database.getConnection();
-        String q =
-            "SELECT Trains.Id, Address, Speed, DrivingDirection " +
-            "FROM Trains " +
-            "LEFT JOIN BlockSections " +
-            "ON BlockSections.TrainId = Trains.Id " +
-            "LEFT JOIN `TrackLayoutSymbols` " +
-            "ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` " +
-            "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
-
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, id);
-
-            ArrayList<TrainData> arraylist;
-            ResultSet rs = pstmt.executeQuery();
-            arraylist = new ArrayList<>();
-            while(rs.next()) {
-                arraylist.add(new TrainData(
-                    rs.getInt("Id"),
-                    0,
-                    rs.getInt("Address"),
-                    rs.getInt("Speed"),
-                    CheckedEnum.getFromString(DrivingDirection.class, rs.getString("DrivingDirection"))
-                ));
-            }
-            dispatcher.sendSingle(new Message(ControlMessage.GET_TRAIN_LIST_RES, arraylist), msg.getEndpoint());
-        }
+        TrainList trainList = trainlistRepository.getTrainList(id);
+        dispatcher.sendSingle(new Message(ControlMessage.GET_TRAIN_LIST_RES, trainList), msg.getEndpoint());
     }
 
     @SuppressWarnings("unchecked")
     protected void pushTrain(Message msg)
     throws SQLException, ClientErrorException {
-        Router router = new Router();
 
-        int block = (int)(long)msg.getData();
-
-
-        TrainRun runner = new TrainRun(dispatcher, router, database);
-        runner.feed(1, block, 1);
+        //long id = activeLayout.getActiveLayout(msg.getData());
+        long id = 10;
 
 
+        TrainlistRepository trainList = new TrainlistRepository(database);
 
+        LayoutRepository layout = new LayoutRepository(database);
+        BlockListRepository blocklist = new BlockListRepository(database);
+        BlockContactDataMap blockContacts = blocklist.getBlockList(id);
 
+        SwitchStateRepository switchState = new SwitchStateRepository(database);
+
+        LayoutParser parser = new LayoutParser(
+            layout.getLayout(id),
+            blockContacts,
+            switchState.getSwitchStateList(id)
+        );
+
+        parser.parse();
+
+        BlockNodeMap blocks = parser.getBlockMap();
+        SwitchNodeMap switches = parser.getSwitchMap();
+
+        Router router = new Router(blocks);
+
+        TrainRun runner = new TrainRun(blockContacts, router);
+
+        long trainId = 1;
+
+        TrainData train = trainList.getTrainList(id).get(trainId);
+
+        int toBlockId = (int)(long)msg.getData();
+
+        ActionListCollection actionLists = runner.getActionList(train, toBlockId);
+        dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, actionLists));
+         
        /*
 
         Connection con = database.getConnection();

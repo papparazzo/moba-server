@@ -21,8 +21,6 @@
 package moba.server.datatypes.enumerations;
 
 public enum SwitchStand {
-    STRAIGHT_1,
-    BEND_1,
-    STRAIGHT_2,
-    BEND_2
+    STRAIGHT,
+    BEND
 }

@@ -20,31 +20,69 @@
 
 package moba.server.routing;
 
+import moba.server.datatypes.enumerations.SwitchStand;
+import moba.server.routing.nodes.BlockNode;
+import moba.server.routing.nodes.NodeInterface;
+import moba.server.routing.typedefs.BlockNodeMap;
+import moba.server.routing.typedefs.SwitchStateData;
+
 import java.util.Vector;
 
-public class Router {
+final public class Router {
 
-    // Liefert alle gesperrten Block-Ids zurück
-    public Vector<Integer> getRoute(int fromBlock, int toBlock) {
-        Vector<Integer> v = new Vector<>();
+    private final BlockNodeMap blocks;
 
-        switch(toBlock) {
-            case 411:
-                v.add(424);
-                v.add(467);
-                v.add(411);
-                break;
-            case 296:
-                v.add(411);
-                v.add(318);
-                v.add(218);
-                v.add(296);
-                break;
-            case 424:
-                v.add(296);
-                v.add(424);
-                break;
+    private Vector<SwitchStateData> routeMap;
+
+    public Router(BlockNodeMap blocks) {
+        this.blocks = blocks;
+    }
+
+    private boolean fetchNextNode(NodeInterface origin, NodeInterface next, long fromBlock, long toBlock)
+    {
+        if(next == null) {
+            return false;
         }
-        return v;
+
+        if(next.getId() == fromBlock) {
+            return false;
+        }
+
+        if(next.getId() == toBlock) {
+            routeMap.add(new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
+            return true;
+        }
+
+        if(fetchNextNode(next, next.getJunctionNode(SwitchStand.STRAIGHT, origin), fromBlock, toBlock)) {
+            routeMap.add(new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
+            return true;
+        }
+
+        if(fetchNextNode(next, next.getJunctionNode(SwitchStand.BEND, origin), fromBlock, toBlock)) {
+            routeMap.add(new SwitchStateData(next.getId(), SwitchStand.BEND));
+            return true;
+        }
+
+        return false;
+    }
+
+    Vector<SwitchStateData> getRoute(long fromBlock, long toBlock) {
+        routeMap = new Vector<>();
+
+        BlockNode block = blocks.get(fromBlock);
+
+        if(block == null) {
+            throw new IllegalArgumentException("start-block <" + fromBlock + "> not found");
+        }
+
+        if(fetchNextNode(block, block.getIn(), fromBlock, toBlock)) {
+            return routeMap;
+        }
+
+        if(fetchNextNode(block, block.getOut(), fromBlock, toBlock)) {
+            return routeMap;
+        }
+
+        throw new IllegalArgumentException("no route found from <" + fromBlock + "> to <" + toBlock + ">");
     }
 }

@@ -23,17 +23,16 @@ package moba.server.datatypes.objects;
 import moba.server.datatypes.enumerations.DrivingDirection;
 
 public record TrainData(
-    int id,
     int blockId,
     int address,
     int speed,
     DrivingDirection drivingDirection
 ) {
     public TrainData withDrivingDirection(DrivingDirection drivingDirection) {
-        return new TrainData(id, blockId, address, speed, drivingDirection);
+        return new TrainData(blockId, address, speed, drivingDirection);
     }
 
     public TrainData withSpeed(int speed) {
-        return new TrainData(id, blockId, address, speed, drivingDirection);
+        return new TrainData(blockId, address, speed, drivingDirection);
     }
 }

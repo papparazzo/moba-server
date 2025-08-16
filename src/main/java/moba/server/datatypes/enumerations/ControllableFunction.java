@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2023 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2025 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -18,14 +18,19 @@
  *
  */
 
-package moba.server.datatypes.objects;
+package moba.server.datatypes.enumerations;
 
-import moba.server.datatypes.enumerations.DrivingDirection;
+public enum ControllableFunction {
+    HEADLIGHTS,
 
-public record PushTrainData(
-    int fromBlock,
-    int toBlock,
-    int trainId,
-    DrivingDirection direction
-) {
+    PANTO,
+    SMOKE_UNIT,
+    HORN,
+    WHISTLE_LONG,
+    BELL,
+
+    OPERATING_SOUNDS,
+
+    REAR_PANTO,
+    FRONT_PANTO
 }

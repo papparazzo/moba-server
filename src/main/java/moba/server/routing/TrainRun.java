@@ -20,61 +20,49 @@
 
 package moba.server.routing;
 
-import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.ActionType;
 import moba.server.datatypes.objects.*;
-import moba.server.messages.Message;
-import moba.server.messages.messageType.InterfaceMessage;
-import moba.server.repositories.Blocklist;
-import moba.server.repositories.Trainlist;
-import moba.server.utilities.Database;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.datatypes.collections.BlockContactDataMap;
+import moba.server.routing.typedefs.SwitchStateData;
 
-import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Vector;
 
 public class TrainRun {
-    private final Dispatcher dispatcher;
 
     private final Router routing;
 
-    private final Trainlist trainlist;
 
-    private final Blocklist blocklist;
+    private final BlockContactDataMap blockContacts;
 
-    private final int layoutId = 10;
-
-    public TrainRun(Dispatcher dispatcher, Router routing, Database database) {
-        this.dispatcher = dispatcher;
+    public TrainRun(BlockContactDataMap blockContacts, Router routing) {
+        this.blockContacts = blockContacts;
         this.routing = routing;
-
-        blocklist = new Blocklist(database);
-        trainlist = new Trainlist(database);
     }
 
-    // Hier muss sich der Zug an dieser Position befinden
-    public void feed(int fromBlock, int toBlock, int trainId)
-    throws SQLException, ClientErrorException {
+    public ActionListCollection getActionList(TrainData train, int toBlock) {
 
-        var blocks = blocklist.getBlockList(layoutId);
-        var trains = trainlist.getTrainList(layoutId);
+        int fromBlock = train.blockId();
 
-        // ACHTUNG: Wie viele Schleifer?
+        // TODO: ACHTUNG: Wie viele Schleifer?
 
-        Vector<Integer> v = routing.getRoute(fromBlock, toBlock);
+        Vector<SwitchStateData> v = routing.getRoute(fromBlock, toBlock);
 
-        var localId = trains.get(trainId).address();
 
         var last = v.lastElement();
         var first = v.firstElement();
 
-        ActionListCollection actionLists = new ActionListCollection(localId);
+        ActionListCollection actionLists = new ActionListCollection(train.address());
 
-        int previousBlock = 0;
+        long previousBlock = 0;
 
-        for(Integer i : v) {
-            BlockContactData c = blocks.get(i);
+        for(SwitchStateData i : v) {
+            BlockContactData c = blockContacts.get(i.id());
+
+            if(c == null) {
+                // FIXME: Wenn c == null dann Weiche und kein Block!!
+                continue;
+            }
 
             if(Objects.equals(first, i)) {
                 // first block:
@@ -116,24 +104,17 @@ public class TrainRun {
                         addActionList(new ActionList(ActionType.LOCO_SPEED, 0))
                 );
             }
-            previousBlock = i;
+            previousBlock = i.id();
         }
 
         actionLists.addActionList(
             new ActionList().
                 addAction(ActionType.LOCO_FUNCTION_ON, "HEADLIGHTS").
                 addAction(ActionType.LOCO_FUNCTION_ON, "OPERATION_SOUNDS").
+                // … warten, bis Motor warmgelaufen ist :o)
                 addAction(ActionType.DELAY, 2000).
                 addAction(ActionType.LOCO_SPEED, 391)
         );
-
-        dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, actionLists));
-    }
-
-    // Hier ist es egal, wo der Zug sich gerade befindet!
-    public void feed(int toBlock, int trainId)
-    throws SQLException, ClientErrorException {
-        var trains = trainlist.getTrainList(layoutId);
-        feed(trains.get(trainId).blockId(), toBlock, trainId);
+        return actionLists;
     }
 }

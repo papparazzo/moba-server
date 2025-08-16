@@ -67,21 +67,7 @@ public enum ToggleState {
     public static boolean getValue(String s, boolean def)
     throws ClientErrorException {
         ToggleState t = CheckedEnum.getFromString(ToggleState.class, s);
-        switch(t) {
-            case UNSET -> {
-                return def;
-            }
-
-            case ON -> {
-                return true;
-            }
-
-            case OFF -> {
-                return false;
-            }
-
-            default -> throw new UnsupportedOperationException("Not supported yet.");
-        }
+        return getValue(t, def);
     }
 
     public static ToggleState getValue(String s, ToggleState def)
