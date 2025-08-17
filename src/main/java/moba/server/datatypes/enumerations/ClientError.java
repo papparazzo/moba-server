@@ -40,5 +40,6 @@ public enum ClientError {
     NO_DEFAULT_GIVEN,
 
     SETTING_NOT_ALLOWED, // Setzten der Werte (z.B. im automatic-Modus) nicht möglich
+    OPERATION_NOT_ALLOWED, // Setzten der Werte (z.B. im automatic-Modus) nicht möglich
     INVALID_VALUE_GIVEN
 }
