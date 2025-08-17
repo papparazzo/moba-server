@@ -23,6 +23,7 @@ package moba.server.routing;
 import moba.server.datatypes.enumerations.ActionType;
 import moba.server.datatypes.objects.*;
 import moba.server.datatypes.collections.BlockContactDataMap;
+import moba.server.routing.router.SimpleRouter;
 import moba.server.routing.typedefs.SwitchStateData;
 
 import java.util.Objects;
@@ -30,12 +31,12 @@ import java.util.Vector;
 
 public class TrainRun {
 
-    private final Router routing;
+    private final SimpleRouter routing;
 
 
     private final BlockContactDataMap blockContacts;
 
-    public TrainRun(BlockContactDataMap blockContacts, Router routing) {
+    public TrainRun(BlockContactDataMap blockContacts, SimpleRouter routing) {
         this.blockContacts = blockContacts;
         this.routing = routing;
     }
