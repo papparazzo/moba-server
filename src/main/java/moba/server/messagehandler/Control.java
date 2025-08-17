@@ -37,7 +37,7 @@ import moba.server.repositories.LayoutRepository;
 import moba.server.repositories.SwitchStateRepository;
 import moba.server.repositories.TrainlistRepository;
 import moba.server.routing.LayoutParser;
-import moba.server.routing.Router;
+import moba.server.routing.router.SimpleRouter;
 import moba.server.routing.TrainRun;
 import moba.server.routing.typedefs.*;
 import moba.server.utilities.Database;
@@ -167,7 +167,7 @@ public class Control extends MessageHandlerA implements Loggable {
         BlockNodeMap blocks = parser.getBlockMap();
         SwitchNodeMap switches = parser.getSwitchMap();
 
-        Router router = new Router(blocks);
+        SimpleRouter router = new SimpleRouter(blocks);
 
         TrainRun runner = new TrainRun(blockContacts, router);
 
