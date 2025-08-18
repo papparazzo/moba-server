@@ -60,17 +60,19 @@ final public class SimpleRouter {
 
         if(ctrS == null) {
             return new RoutingListItem(ctrB, new SwitchStateData(next.getId(), SwitchStand.BEND));
-        } else if(ctrB == null) {
-            return new RoutingListItem(ctrS, new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
-        } else if(ctrS.getCount() > ctrB.getCount()) {
-            return new RoutingListItem(ctrB, new SwitchStateData(next.getId(), SwitchStand.BEND));
-        } else {
+        }
+
+        if(ctrB == null) {
             return new RoutingListItem(ctrS, new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
         }
+
+        if(ctrS.getCount() > ctrB.getCount()) {
+            return new RoutingListItem(ctrB, new SwitchStateData(next.getId(), SwitchStand.BEND));
+        }
+        return new RoutingListItem(ctrS, new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
     }
 
-    public Vector<SwitchStateData> getRoute(long fromBlock, long toBlock) {
-        routeMap = new Vector<>();
+    public RoutingListItem getRoute(long fromBlock, long toBlock) {
 
         BlockNode block = blocks.get(fromBlock);
 
@@ -87,8 +89,16 @@ final public class SimpleRouter {
         }
 
         if(itemL == null) {
-            //return itemR;
+            return itemR;
         }
-        return routeMap;
+
+        if(itemR == null) {
+            return itemL;
+        }
+
+        if(itemL.getCount() > itemR.getCount()) {
+            return itemR;
+        }
+        return itemL;
     }
 }
