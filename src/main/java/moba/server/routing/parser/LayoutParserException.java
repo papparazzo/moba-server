@@ -18,7 +18,7 @@
  *
  */
 
-package moba.server.routing;
+package moba.server.routing.parser;
 
 public class LayoutParserException extends RuntimeException {
     public LayoutParserException(String message) {

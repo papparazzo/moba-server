@@ -18,14 +18,20 @@
  *
  */
 
-package moba.server.routing;
+package moba.server.routing.parser;
 
 import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.datatypes.collections.SwitchStateMap;
 import moba.server.datatypes.enumerations.SwitchStand;
 import moba.server.datatypes.objects.Position;
 import moba.server.datatypes.objects.TrackLayoutSymbolData;
-import moba.server.routing.nodes.*;
+import moba.server.routing.Direction;
+import moba.server.routing.Symbol;
+import moba.server.routing.SymbolType;
+import moba.server.routing.nodes.BlockNode;
+import moba.server.routing.nodes.NodeException;
+import moba.server.routing.nodes.NodeInterface;
+import moba.server.routing.nodes.SwitchNode;
 import moba.server.routing.typedefs.*;
 
 public class LayoutParser {
@@ -71,7 +77,7 @@ public class LayoutParser {
         long id = blockContacts.entrySet().iterator().next().getKey();
 
         Position startPos  = getPositionFromId(id);
-        Symbol   curSymbol = layout.get(startPos).symbol();
+        Symbol curSymbol = layout.get(startPos).symbol();
 
         int dir1 = curSymbol.getNextJunction();
         fetchBlockNodes(new LocationVector(startPos, dir1));

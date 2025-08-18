@@ -23,16 +23,12 @@ package moba.server.routing;
 import moba.server.datatypes.enumerations.ActionType;
 import moba.server.datatypes.objects.*;
 import moba.server.datatypes.collections.BlockContactDataMap;
+import moba.server.routing.router.RoutingListItem;
 import moba.server.routing.router.SimpleRouter;
-import moba.server.routing.typedefs.SwitchStateData;
-
-import java.util.Objects;
-import java.util.Vector;
 
 public class TrainRun {
 
     private final SimpleRouter routing;
-
 
     private final BlockContactDataMap blockContacts;
 
@@ -43,29 +39,28 @@ public class TrainRun {
 
     public ActionListCollection getActionList(TrainData train, int toBlock) {
 
-        int fromBlock = train.blockId();
+        long fromBlock = train.blockId();
 
         // TODO: ACHTUNG: Wie viele Schleifer?
-
-        Vector<SwitchStateData> v = routing.getRoute(fromBlock, toBlock);
-
-
-        var last = v.lastElement();
-        var first = v.firstElement();
+        RoutingListItem itemList = routing.getRoute(fromBlock, toBlock);
 
         ActionListCollection actionLists = new ActionListCollection(train.address());
 
+        boolean first = true;
         long previousBlock = 0;
 
-        for(SwitchStateData i : v) {
-            BlockContactData c = blockContacts.get(i.id());
+        while(itemList != null) {
+
+            BlockContactData c = blockContacts.get(itemList.switchStateData().id());
 
             if(c == null) {
+                // ggf. Weiche schalten!
                 // FIXME: Wenn c == null dann Weiche und kein Block!!
                 continue;
             }
 
-            if(Objects.equals(first, i)) {
+            if(first) {
+                first = false;
                 // first block:
                 //     - block-contact: no actions!
                 //     - brake-trigger: no actions!
@@ -73,7 +68,7 @@ public class TrainRun {
                 // FIXME: Hier gibt es im Moment nichts tun! Achtung: Schleifer vom letzen Wagen berücksichtigen!
                 //actionLists.addTriggerList(new ActionTriggerList(c.brakeTriggerContact()));
                 //actionLists.addTriggerList(new ActionTriggerList(c.blockContact()));
-            } else if(!Objects.equals(i, last)) {
+            } else if(itemList.successor() != null) {
                 // nth block:
                 //     - block-contact: release previous block if passed!
                 //     - brake-trigger: no actions!
@@ -105,7 +100,9 @@ public class TrainRun {
                         addActionList(new ActionList(ActionType.LOCO_SPEED, 0))
                 );
             }
-            previousBlock = i.id();
+            previousBlock = itemList.switchStateData().id();
+
+            itemList = itemList.successor();
         }
 
         actionLists.addActionList(
