@@ -18,11 +18,12 @@
  *
  */
 
-package moba.server.datatypes.collections;
+package moba.server.datatypes.objects;
 
-import moba.server.datatypes.objects.SwitchData;
+import moba.server.datatypes.enumerations.SwitchStand;
 
-import java.util.HashMap;
-
-public class SwitchStateMap extends HashMap<Long, SwitchData> {
+public record SwitchData(
+    long address,
+    SwitchStand stand
+) {
 }

@@ -25,7 +25,7 @@ import moba.server.utilities.exceptions.ClientErrorException;
 
 public enum InterfaceMessage implements MessageType {
     CONNECTIVITY_STATE_CHANGED(1),
-    SWITCH_ROUTE              (2),
+    PUSH_TRAIN                (2),
 	ROUTE_SWITCHED            (3),
 	ROUTE_RELEASED            (4),
 	BLOCK_RELEASED            (5),

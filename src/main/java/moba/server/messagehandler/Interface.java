@@ -60,7 +60,7 @@ final public class Interface extends MessageHandlerA {
                 setConnectivity(CheckedEnum.getFromString(Connectivity.class, (String)msg.getData()), msg.getEndpoint());
                 return;
 
-            case SWITCH_ROUTE:
+            case PUSH_TRAIN:
                 return;
 
             case ROUTE_SWITCHED:

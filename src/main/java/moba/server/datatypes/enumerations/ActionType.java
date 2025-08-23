@@ -1,7 +1,6 @@
 package moba.server.datatypes.enumerations;
 
 public enum ActionType {
-    CHECK_NEXT,
     DELAY,
 
     LOCO_HALT,
@@ -14,7 +13,7 @@ public enum ActionType {
     SWITCHING_RED,
     SWITCHING_GREEN,
 
-    SEND_SWITCH_ROUTE,
+    SEND_PUSH_TRAIN,
     SEND_ROUTE_SWITCHED,
     SEND_ROUTE_RELEASED,
     SEND_BLOCK_RELEASED

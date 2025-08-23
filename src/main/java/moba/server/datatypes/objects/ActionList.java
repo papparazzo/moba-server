@@ -35,7 +35,7 @@ public class ActionList {
         addAction(actionType);
     }
 
-    public ActionList(ActionType actionType, long data) {
+    public <T> ActionList(ActionType actionType, T data) {
         addAction(actionType, data);
     }
 
