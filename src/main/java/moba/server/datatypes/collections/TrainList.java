@@ -20,9 +20,9 @@
 
 package moba.server.datatypes.collections;
 
-import moba.server.datatypes.objects.TrainData;
+import moba.server.datatypes.objects.Train;
 
 import java.util.HashMap;
 
-public class TrainList extends HashMap<Long, TrainData> {
+public class TrainList extends HashMap<Long, Train> {
 }

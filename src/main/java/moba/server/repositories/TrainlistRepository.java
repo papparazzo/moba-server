@@ -22,7 +22,7 @@ package moba.server.repositories;
 
 import moba.server.datatypes.collections.TrainList;
 import moba.server.datatypes.enumerations.DrivingDirection;
-import moba.server.datatypes.objects.TrainData;
+import moba.server.datatypes.objects.Train;
 import moba.server.utilities.CheckedEnum;
 import moba.server.utilities.Database;
 import moba.server.utilities.exceptions.ClientErrorException;
@@ -62,7 +62,7 @@ public class TrainlistRepository {
             while(rs.next()) {
                 map.put(
                     rs.getLong("Id"),
-                    new TrainData(
+                    new Train(
                         rs.getInt("BlockId"),
                         rs.getInt("Address"),
                         rs.getInt("Speed"),

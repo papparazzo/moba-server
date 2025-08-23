@@ -20,9 +20,8 @@
 
 package moba.server.routing.nodes;
 
-import moba.server.datatypes.enumerations.DrivingDirection;
 import moba.server.datatypes.enumerations.SwitchStand;
-import moba.server.datatypes.objects.TrainData;
+import moba.server.datatypes.objects.Train;
 import moba.server.routing.Direction;
 
 final public class BlockNode extends AbstractNode {
@@ -30,17 +29,17 @@ final public class BlockNode extends AbstractNode {
     private NodeInterface in = null;
     private NodeInterface out = null;
 
-    private TrainData train = null;
+    private Train train = null;
 
     public BlockNode(long id) {
         super(id, SwitchStand.STRAIGHT);
     }
 
-    public void setTrain(TrainData train) {
+    public void setTrain(Train train) {
         this.train = train;
     }
 
-    public TrainData getTrain() {
+    public Train getTrain() {
         return train;
     }
 
