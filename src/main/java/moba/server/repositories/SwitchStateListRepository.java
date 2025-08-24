@@ -22,6 +22,7 @@ package moba.server.repositories;
 
 import moba.server.datatypes.enumerations.SwitchStand;
 import moba.server.datatypes.collections.SwitchStateMap;
+import moba.server.datatypes.objects.SwitchData;
 import moba.server.utilities.CheckedEnum;
 import moba.server.utilities.Database;
 import moba.server.utilities.exceptions.ClientErrorException;
@@ -31,10 +32,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class SwitchStateRepository {
+public class SwitchStateListRepository {
     protected final Database database;
 
-    public SwitchStateRepository(Database database) {
+    public SwitchStateListRepository(Database database) {
         this.database = database;
     }
 
@@ -44,7 +45,7 @@ public class SwitchStateRepository {
         Connection con = database.getConnection();
 
         String q =
-            "SELECT `SwitchDrives`.`Id`, `SwitchDrives`.`SwitchStand` " +
+            "SELECT `SwitchDrives`.`Id`, `SwitchDrives`.`SwitchStand`, `SwitchDrives`.`Address` " +
             "FROM SwitchDrives " +
             "LEFT JOIN `TrackLayoutSymbols` " +
             "ON `TrackLayoutSymbols`.`Id` = `SwitchDrives`.`Id` " +
@@ -59,7 +60,10 @@ public class SwitchStateRepository {
             while(rs.next()) {
                 map.put(
                     rs.getLong("Id"),
-                    CheckedEnum.getFromString(SwitchStand.class, rs.getString("SwitchStand"))
+                    new SwitchData(
+                        rs.getLong("Address"),
+                        CheckedEnum.getFromString(SwitchStand.class, rs.getString("SwitchStand"))
+                    )
                 );
             }
             return map;
