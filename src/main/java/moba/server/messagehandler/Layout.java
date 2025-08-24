@@ -34,7 +34,6 @@ import moba.server.routing.typedefs.LayoutContainer;
 import moba.server.utilities.Database;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.objects.TrackLayoutInfoData;
-import moba.server.datatypes.objects.TrackLayoutSymbolData;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -165,7 +164,7 @@ public final class Layout extends MessageHandlerA implements Loggable {
         long    currAppId = msg.getEndpoint().getAppId();
 
         if(isActive) {
-            lock.isLockedByApp(msg.getEndpoint().getAppId(), activeLayout);
+            lock.isLockedByApp(msg.getEndpoint().getAppId(), activeLayout.getActiveLayout());
         }
 
         TrackLayoutInfoData tl = new TrackLayoutInfoData((String)map.get("name"), (String)map.get("description"), currAppId, isActive);
@@ -253,8 +252,6 @@ public final class Layout extends MessageHandlerA implements Loggable {
         LayoutRepository layoutRepository = new LayoutRepository(database);
 
         LayoutContainer layoutContainer = layoutRepository.getLayout(id);
-
-        Connection con = database.getConnection();
 
         HashMap<String, Object> map = new HashMap<>();
         map.put("id", id);
