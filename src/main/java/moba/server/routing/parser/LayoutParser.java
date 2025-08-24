@@ -22,8 +22,8 @@ package moba.server.routing.parser;
 
 import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.datatypes.collections.SwitchStateMap;
-import moba.server.datatypes.enumerations.SwitchStand;
 import moba.server.datatypes.objects.Position;
+import moba.server.datatypes.objects.SwitchData;
 import moba.server.datatypes.objects.TrackLayoutSymbolData;
 import moba.server.routing.Direction;
 import moba.server.routing.Symbol;
@@ -43,8 +43,6 @@ public class LayoutParser {
     private final SwitchStateMap switchStates;
 
     // OUT
-    private final SwitchNodeMap switcheNodeMap = new SwitchNodeMap();
-
     private final BlockNodeMap blockNodeMap = new BlockNodeMap();
 
     // INTERN
@@ -61,10 +59,6 @@ public class LayoutParser {
         if(blockContacts.isEmpty()) {
             throw new LayoutParserException("no blocks found");
         }
-    }
-
-    public SwitchNodeMap getSwitchMap() {
-        return switcheNodeMap;
     }
 
     public BlockNodeMap getBlockMap() {
@@ -162,9 +156,9 @@ public class LayoutParser {
         }
 
         TrackLayoutSymbolData curSymbolData = layout.get(curPos);
-        Symbol                curSymbol   = curSymbolData.symbol();
-        long                  id          = curSymbolData.id();
-        SwitchStand           switchState = switchStates.get(id);
+        Symbol                curSymbol  = curSymbolData.symbol();
+        long                  id         = curSymbolData.id();
+        SwitchData            switchData = switchStates.get(id);
 
         // Ein Knoten existiert hier noch nicht, neu erzeugen …
         NodeInterface newNode;
@@ -173,12 +167,10 @@ public class LayoutParser {
         // … aktueller Knoten ist eine Weiche
         if(curSymbol.isLeftSwitch()) {
             newSymbol = new Symbol(SymbolType.LEFT_SWITCH.getValue());
-            newNode = new SwitchNode(id, switchState);
-            switcheNodeMap.put(id, newNode);
+            newNode = new SwitchNode(id, switchData.stand());
         } else if(curSymbol.isRightSwitch()) {
             newSymbol = new Symbol(SymbolType.RIGHT_SWITCH.getValue());
-            newNode = new SwitchNode(id, switchState);
-            switcheNodeMap.put(id, newNode);
+            newNode = new SwitchNode(id, switchData.stand());
         } else if(curSymbol.isTrack()){
             newSymbol = new Symbol(SymbolType.STRAIGHT.getValue());
             newNode = new BlockNode(id);
