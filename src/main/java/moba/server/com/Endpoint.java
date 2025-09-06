@@ -162,7 +162,11 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
             byte[] buffer = new byte[size];
             int len = dataInputStream.read(buffer, 0, size);
 
-            JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderBytes(buffer, len)));
+            if(len != size) {
+                throw new IOException("unexpected end of stream");
+            }
+
+            JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderBytes(buffer)));
             return new Message(groupId, msgId, decoder.decode(), this);
         } catch(IOException e) {
             if(closing) {
