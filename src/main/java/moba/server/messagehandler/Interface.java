@@ -60,12 +60,6 @@ final public class Interface extends MessageHandlerA {
                 setConnectivity(CheckedEnum.getFromString(Connectivity.class, (String)msg.getData()), msg.getEndpoint());
                 return;
 
-            case PUSH_TRAIN:
-                return;
-
-            case ROUTE_SWITCHED:
-            case ROUTE_RELEASED:
-            case BLOCK_RELEASED:
             case SET_ACTION_LIST:
             case REPLACE_ACTION_LIST:
             case DELETE_ACTION_LIST:

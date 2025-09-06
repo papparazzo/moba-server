@@ -29,16 +29,15 @@ public enum ControlMessage implements MessageType {
     SAVE_BLOCK_LIST           (3),
     GET_SWITCH_STAND_LIST_REQ (4),
     GET_SWITCH_STAND_LIST_RES (5),
-//    SAVE_SWITCH_STAND_LIST    (6),
+    // SAVE_SWITCH_STAND_LIST    (6),
     GET_TRAIN_LIST_REQ        (7),
     GET_TRAIN_LIST_RES        (8),
-//    SAVE_TRAIN_LIST           (9),
-    LOCK_BLOCK               (10),
-    LOCK_BLOCK_WAITING       (11),
-    BLOCK_LOCKED             (12),
-    BLOCK_LOCKING_FAILED     (13),
-    UNLOCK_BLOCK             (14),
-    PUSH_TRAIN               (15);
+    // SAVE_TRAIN_LIST           (9),
+
+	ROUTE_SWITCHED            (10),
+	ROUTE_RELEASED            (11),
+	BLOCK_RELEASED            (12),
+    PUSH_TRAIN                (13);
 
     public final static int GROUP_ID = 10;
 

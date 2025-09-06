@@ -46,14 +46,13 @@ import moba.server.messages.Message;
 import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.ControlMessage;
 import moba.server.utilities.exceptions.ClientErrorException;
-import moba.server.utilities.lock.BlockLock;
 import moba.server.utilities.logger.Loggable;
 
-public class Control extends MessageHandlerA implements Loggable {
-    protected final Database       database;
-    protected final BlockLock      blockLock;
-    protected final Queue<Message> queue;
-    protected final ActiveLayout   activeLayout;
+final public class Control extends MessageHandlerA implements Loggable {
+    private final Database     database;
+    private final ActiveLayout activeLayout;
+    private final Interlock    interlock;
+    private final TrainRunner  trainRunner;
 
     public Control(Dispatcher dispatcher, Database database, ActiveLayout activeLayout)
     throws SQLException {
@@ -91,14 +90,15 @@ public class Control extends MessageHandlerA implements Loggable {
             case SAVE_BLOCK_LIST           -> saveBlockList(msg);
             case GET_SWITCH_STAND_LIST_REQ -> getSwitchStateList(msg);
             case GET_TRAIN_LIST_REQ        -> getTrainList(msg);
-            case LOCK_BLOCK                -> lockBlock(msg, false);
-            case LOCK_BLOCK_WAITING        -> lockBlock(msg, true);
-            case UNLOCK_BLOCK              -> unLockBlock(msg);
+
+            case ROUTE_SWITCHED            -> routeSwitched(msg);
+            case ROUTE_RELEASED            -> releaseRoute(msg);
+            case BLOCK_RELEASED            -> releaseBlock(msg);
             case PUSH_TRAIN                -> pushTrain(msg);
         }
     }
 
-    protected void getBlockList(Message msg)
+    private void getBlockList(Message msg)
     throws SQLException, ClientErrorException {
         BlockListRepository blocklistRepository = new BlockListRepository(database);
         long id = activeLayout.getActiveLayout(msg.getData());
@@ -108,8 +108,7 @@ public class Control extends MessageHandlerA implements Loggable {
     }
 
     @SuppressWarnings("unchecked")
-    protected void saveBlockList(Message msg)
-    throws SQLException, ClientErrorException {
+    private void saveBlockList(Message msg) {
 
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         long id = (long)map.get("id");
@@ -124,15 +123,15 @@ public class Control extends MessageHandlerA implements Loggable {
         //dispatcher.dispatch(new IncidentData(LayoutMessage.LAYOUT_CHANGED, map));
     }
 
-    protected void getSwitchStateList(Message msg)
+    private void getSwitchStateList(Message msg)
     throws SQLException, ClientErrorException {
-        SwitchStateRepository switchStateRepository = new SwitchStateRepository(database);
+        SwitchStateListRepository switchStateRepository = new SwitchStateListRepository(database);
         long id = activeLayout.getActiveLayout(msg.getData());
         SwitchStateMap switchStateList = switchStateRepository.getSwitchStateList(id);
         dispatcher.sendSingle(new Message(ControlMessage.GET_SWITCH_STAND_LIST_RES, switchStateList), msg.getEndpoint());
     }
 
-    protected void getTrainList(Message msg)
+    private void getTrainList(Message msg)
     throws SQLException, ClientErrorException {
         TrainlistRepository trainlistRepository = new TrainlistRepository(database);
         long id = activeLayout.getActiveLayout(msg.getData());

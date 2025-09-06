@@ -25,13 +25,9 @@ import moba.server.utilities.exceptions.ClientErrorException;
 
 public enum InterfaceMessage implements MessageType {
     CONNECTIVITY_STATE_CHANGED(1),
-    PUSH_TRAIN                (2),
-	ROUTE_SWITCHED            (3),
-	ROUTE_RELEASED            (4),
-	BLOCK_RELEASED            (5),
-	SET_ACTION_LIST           (6),
-	REPLACE_ACTION_LIST       (7),
-	DELETE_ACTION_LIST        (8);
+	SET_ACTION_LIST           (2),
+	REPLACE_ACTION_LIST       (3),
+	DELETE_ACTION_LIST        (4);
 
     public final static int GROUP_ID = 6;
 

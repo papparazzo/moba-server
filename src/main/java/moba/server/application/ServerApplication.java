@@ -25,6 +25,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import moba.server.actionhandler.Interlock;
+import moba.server.actionhandler.TrainRunner;
+import moba.server.actionhandler.TrainRunnerInitializer;
 import moba.server.com.Acceptor;
 import moba.server.com.BackgroundHandlerComposite;
 import moba.server.com.Dispatcher;
@@ -105,6 +108,8 @@ final public class ServerApplication implements Loggable {
             ActiveLayout activeLayout = new ActiveLayout(dispatcher, config);
             TrackLayoutLock lock = new TrackLayoutLock(database);
             IncidentHandler incidentHandler = new IncidentHandler(logger, dispatcher, list);
+            TrainRunner trainRunner = (new TrainRunnerInitializer(database)).getTrainRunner(activeLayout.getActiveLayout());
+            Interlock interlock = new Interlock(database);
 
             BackgroundHandlerComposite handler = new BackgroundHandlerComposite();
             handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList, incidentHandler));
@@ -119,7 +124,7 @@ final public class ServerApplication implements Loggable {
             loop.addHandler(new Systems(dispatcher, lock, activeLayout, msgQueueIn, incidentHandler));
             loop.addHandler(new Layout(dispatcher, database, activeLayout));
             loop.addHandler(new Interface(dispatcher, msgQueueIn, incidentHandler));
-            loop.addHandler(new Control(dispatcher, database, activeLayout));
+            loop.addHandler(new Control(dispatcher, database, activeLayout, interlock, trainRunner));
             loop.addHandler(new Messaging(dispatcher, list));
 
             handler.start();
