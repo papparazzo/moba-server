@@ -21,6 +21,7 @@
 package moba.server.routing.router;
 
 import moba.server.datatypes.enumerations.SwitchStand;
+import moba.server.datatypes.objects.TrainDestination;
 import moba.server.routing.nodes.BlockNode;
 import moba.server.routing.nodes.NodeInterface;
 import moba.server.routing.typedefs.BlockNodeMap;
@@ -36,6 +37,49 @@ final public class SimpleRouter {
 
     public SimpleRouter(BlockNodeMap blocks) {
         this.blocks = blocks;
+    }
+
+    public RoutingListItem getRoute(TrainDestination destination) {
+        // Limitations:
+        // Güterzug
+        // Oberleitung
+        // Fahrtrichtung nur vorwärts
+        // Rangierzug
+
+        long fromBlock = destination.trainId().blockId();
+        long toBlock = destination.destinationBlockId();
+
+        BlockNode block = blocks.get(fromBlock);
+
+        if(block == null) {
+            throw new IllegalArgumentException("start-block <" + fromBlock + "> not found");
+        }
+
+        if(toBlock == fromBlock) {
+            // Zug befindet sich bereits in diesem Block.
+            return null;
+        }
+
+        // TODO Hier noch die Fahrtrichtung berücksichtigen...
+        RoutingListItem itemL = fetchNextNode(block, block.getIn(), fromBlock, toBlock);
+        RoutingListItem itemR = fetchNextNode(block, block.getOut(), fromBlock, toBlock);
+
+        if(itemL == null && itemR == null) {
+            throw new IllegalArgumentException("no route found from <" + fromBlock + "> to <" + toBlock + ">");
+        }
+
+        if(itemL == null) {
+            return itemR;
+        }
+
+        if(itemR == null) {
+            return itemL;
+        }
+
+        if(itemL.getCount() > itemR.getCount()) {
+            return itemR;
+        }
+        return itemL;
     }
 
     private RoutingListItem fetchNextNode(NodeInterface origin, NodeInterface next, long fromBlock, long toBlock) {
@@ -70,35 +114,5 @@ final public class SimpleRouter {
             return new RoutingListItem(ctrB, new SwitchStateData(next.getId(), SwitchStand.BEND));
         }
         return new RoutingListItem(ctrS, new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
-    }
-
-    public RoutingListItem getRoute(long fromBlock, long toBlock) {
-
-        BlockNode block = blocks.get(fromBlock);
-
-        if(block == null) {
-            throw new IllegalArgumentException("start-block <" + fromBlock + "> not found");
-        }
-
-        // TODO Hier noch die Fahrtrichtung berücksichtigen...
-        RoutingListItem itemL = fetchNextNode(block, block.getIn(), fromBlock, toBlock);
-        RoutingListItem itemR = fetchNextNode(block, block.getOut(), fromBlock, toBlock);
-
-        if(itemL == null && itemR == null) {
-            throw new IllegalArgumentException("no route found from <" + fromBlock + "> to <" + toBlock + ">");
-        }
-
-        if(itemL == null) {
-            return itemR;
-        }
-
-        if(itemR == null) {
-            return itemL;
-        }
-
-        if(itemL.getCount() > itemR.getCount()) {
-            return itemR;
-        }
-        return itemL;
     }
 }
