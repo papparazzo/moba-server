@@ -29,8 +29,9 @@ import java.util.logging.Level;
 import moba.server.utilities.Database;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.utilities.logger.Loggable;
 
-public final class TrackLayoutLock extends AbstractLock {
+public final class TrackLayoutLock implements Loggable {
 
     private final Database database;
 
@@ -38,7 +39,6 @@ public final class TrackLayoutLock extends AbstractLock {
         this.database = database;
     }
 
-    @Override
     public void resetAll()
     throws SQLException {
         Connection con = database.getConnection();
@@ -49,7 +49,6 @@ public final class TrackLayoutLock extends AbstractLock {
         }
     }
 
-    @Override
     public void resetOwn(long appId)
     throws SQLException {
         Connection con = database.getConnection();
@@ -61,12 +60,9 @@ public final class TrackLayoutLock extends AbstractLock {
         }
     }
 
-    @Override
-    public void tryLock(long appId, Object data)
+    public void tryLock(long appId, long id)
     throws ClientErrorException, SQLException {
-        long id = (long)data;
-
-        if(isLockedByApp(appId, data)) {
+        if(isLockedByApp(appId, id)) {
             return;
         }
 
@@ -85,12 +81,9 @@ public final class TrackLayoutLock extends AbstractLock {
         }
     }
 
-    @Override
-    public void unlock(long appId, Object data)
+    public void unlock(long appId, long id)
     throws ClientErrorException, SQLException {
-        long id = (long)data;
-
-        if(!isLockedByApp(appId, data)) {
+        if(!isLockedByApp(appId, id)) {
             return;
         }
 
@@ -109,10 +102,9 @@ public final class TrackLayoutLock extends AbstractLock {
         }
     }
 
-    @Override
-    public boolean isLockedByApp(long appId, Object data)
+    public boolean isLockedByApp(long appId, long id)
     throws ClientErrorException, SQLException {
-        var lockedBy = getIdOfLockingApp(data);
+        var lockedBy = getIdOfLockingApp(id);
 
         getLogger().log(Level.INFO, "object is locked by <{1}>", new Object[]{lockedBy});
 
@@ -125,9 +117,9 @@ public final class TrackLayoutLock extends AbstractLock {
         throw new ClientErrorException(ClientError.DATASET_LOCKED, "object is already locked by <" + lockedBy + ">");
     }
 
-    private Long getIdOfLockingApp(Object data)
+    private Long getIdOfLockingApp(long id)
     throws ClientErrorException, SQLException {
-        long id = (long)data;
+
         Connection con = database.getConnection();
 
         String q = "SELECT `locked` FROM `TrackLayouts` WHERE `Id` = ?";

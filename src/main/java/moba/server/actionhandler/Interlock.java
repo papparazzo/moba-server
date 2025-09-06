@@ -32,13 +32,13 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
 
-final public class Blocker implements Loggable {
+final public class Interlock implements Loggable {
 
     private final Database database;
 
     private final HashMap<Long, Boolean> routeStatusList = new HashMap<>();
 
-    public Blocker(Database database) {
+    public Interlock(Database database) {
         this.database = database;
     }
 
