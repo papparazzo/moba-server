@@ -22,14 +22,12 @@ dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    //testImplementation 'org.junit.platform:junit-platform-engine:+'
-    //testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // This dependency is used by the application.
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
     implementation 'com.google.guava:guava:33.4.0-jre'                  // com.google.common.base.Enums
     implementation 'commons-cli:commons-cli:1.9.0'
     implementation 'org.apache.commons:commons-collections4:4.5.0-M3'  // IP Allowlist
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.5'
     implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
     implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
     implementation 'org.yaml:snakeyaml:2.0'
@@ -38,7 +36,7 @@ dependencies {
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -47,12 +45,37 @@ application {
     mainClass = 'moba.server.App'
 }
 
-tasks.named('test') {
-    // Use JUnit Platform for unit tests.
+tasks.named('test', Test) {
     useJUnitPlatform()
+
+    maxHeapSize = '1G'
+
+    testLogging {
+        events "passed"
+    }
 }
 
-version = "2.1.0-0000"
+ext.getVersion = { ->
+    def build = project['version.build'].toInteger()
+    def newBuild = build + 1
+
+    // Update gradle.properties file
+    def gradleProps = new File(project.rootDir, 'gradle.properties')
+    def props = new Properties()
+    props.load(new FileInputStream(gradleProps))
+    props.setProperty('version.build', newBuild.toString())
+    props.store(new FileOutputStream(gradleProps), null)
+
+    project['version.build'] = newBuild.toString()
+
+    return project['version.major'] + '.' +
+           project['version.minor'] + '.' +
+           project['version.patch'] + '-' +
+           String.format("%04d", build)
+
+}
+
+version = ext.getVersion()
 
 jar {
     manifest {
@@ -69,3 +92,5 @@ jar {
         )
     }
 }
+
+
