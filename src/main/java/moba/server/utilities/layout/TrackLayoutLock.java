@@ -18,7 +18,7 @@
  *
  */
 
-package moba.server.utilities.lock;
+package moba.server.utilities.layout;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,7 +28,7 @@ import java.util.logging.Level;
 
 import moba.server.utilities.Database;
 import moba.server.datatypes.enumerations.ClientError;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 import moba.server.utilities.logger.Loggable;
 
 public final class TrackLayoutLock implements Loggable {
@@ -43,6 +43,7 @@ public final class TrackLayoutLock implements Loggable {
     throws SQLException {
         Connection con = database.getConnection();
 
+        // noinspection SqlWithoutWhere
         try(PreparedStatement stmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL")) {
             stmt.executeUpdate();
             getLogger().log(Level.INFO, stmt.toString());

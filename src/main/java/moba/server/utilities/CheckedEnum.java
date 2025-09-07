@@ -2,7 +2,7 @@ package moba.server.utilities;
 
 import com.google.common.base.Enums;
 import moba.server.datatypes.enumerations.ClientError;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 
 public class CheckedEnum {
 

@@ -31,18 +31,16 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import moba.server.datatypes.base.Version;
-import moba.server.json.JSONDecoder;
-import moba.server.json.JSONEncoder;
+import moba.server.json.JsonDecoder;
 import moba.server.json.JsonException;
 import moba.server.json.JsonSerializerInterface;
-import moba.server.json.streamreader.JSONStreamReaderBytes;
-import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
-import moba.server.json.stringreader.JSONStringReader;
+import moba.server.json.streamreader.JsonStreamReaderBytes;
+import moba.server.json.stringreader.JsonStringReader;
 import moba.server.messages.Message;
 import moba.server.messages.MessageQueue;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
-import moba.server.utilities.exceptions.ClientClosingException;
+import moba.server.exceptions.ClientClosingException;
 import moba.server.utilities.logger.Loggable;
 
 public class Endpoint extends Thread implements JsonSerializerInterface<HashMap<String, Object>>, Loggable {
@@ -161,7 +159,7 @@ public class Endpoint extends Thread implements JsonSerializerInterface<HashMap<
                 throw new IOException("unexpected end of stream");
             }
 
-            JSONDecoder decoder = new JSONDecoder(new JSONStringReader(new JSONStreamReaderBytes(buffer)));
+            JsonDecoder decoder = new JsonDecoder(new JsonStringReader(new JsonStreamReaderBytes(buffer)));
             return new Message(groupId, msgId, decoder.decode(), this);
         } catch(IOException e) {
             if(closing) {

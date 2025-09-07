@@ -24,15 +24,15 @@ import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.objects.ErrorData;
+import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
-import moba.server.messages.MessageHandlerA;
 import moba.server.messages.MessageQueue;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
 import moba.server.messages.messageType.ServerMessage;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 
-final public class Client extends MessageHandlerA {
+final public class Client extends AbstractMessageHandler {
 
     private final MessageQueue msgQueue;
 

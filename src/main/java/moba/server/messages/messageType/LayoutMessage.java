@@ -20,10 +20,10 @@
 package moba.server.messages.messageType;
 
 import moba.server.datatypes.enumerations.ClientError;
-import moba.server.messages.MessageType;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.messages.MessageTypeInterface;
+import moba.server.exceptions.ClientErrorException;
 
-public enum LayoutMessage implements MessageType {
+public enum LayoutMessage implements MessageTypeInterface {
     GET_LAYOUTS_REQ         (1),
     GET_LAYOUTS_RES         (2),
     DELETE_LAYOUT           (3),

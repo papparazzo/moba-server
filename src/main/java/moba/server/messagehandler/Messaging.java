@@ -23,15 +23,15 @@ package moba.server.messagehandler;
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
 import moba.server.datatypes.objects.IncidentData;
+import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
-import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.MessagingMessage;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.io.IOException;
 
-final public class Messaging extends MessageHandlerA {
+final public class Messaging extends AbstractMessageHandler {
 
     private final CircularFifoQueue<IncidentData> list;
 

@@ -21,22 +21,11 @@
 package moba.server.json;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 import moba.server.json.streamwriter.JsonStreamWriterStringBuilder;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Nested;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -78,7 +67,7 @@ class JsonEncoderTest {
     @Test
     void testJsonNull()
     throws IOException, JsonException {
-        assertNull(encode(null));
+        assertEquals("null", encode(null));
     }
 
     @Test

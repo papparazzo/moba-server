@@ -34,42 +34,28 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import moba.server.json.streamwriter.JSONStreamWriterI;
+import moba.server.json.streamwriter.JsonStreamWriterInterface;
 
-public class JSONEncoder {
-    protected boolean formatted;
-    protected int     indent = 0;
+public class JsonEncoder {
 
-    protected JSONStreamWriterI writer;
+    protected JsonStreamWriterInterface writer;
 
-    public JSONEncoder(JSONStreamWriterI writer)
-    throws IOException {
-        this(writer, false);
-    }
-
-    public JSONEncoder(JSONStreamWriterI writer, boolean formatted)
+    public JsonEncoder(JsonStreamWriterInterface writer)
     throws IOException {
         if(writer == null) {
             throw new IOException("stream-writer not set");
         }
-        this.formatted = formatted;
         this.writer = writer;
     }
 
-    public void encode(Object map)
-    throws IOException, JSONException {
-        addJSONValue(map);
+    public void encode(Object value)
+    throws IOException, JsonException {
+        addJSONValue(value);
         writer.close();
     }
 
-    public void encode(Object map, int indent)
-    throws IOException, JSONException {
-        this.indent = indent;
-        encode(map);
-    }
-
     protected void addObject(Map<?, ?> map)
-    throws IOException, JSONException {
+    throws IOException, JsonException {
         writer.write('{');
         if(map != null) {
             Iterator<?> iter = map.entrySet().iterator();
@@ -88,7 +74,7 @@ public class JSONEncoder {
     }
 
     protected void addObject(Object object)
-    throws IOException, JSONException {
+    throws IOException, JsonException {
         writer.write('{');
 
         Class<?> cls = object.getClass();
@@ -141,7 +127,7 @@ public class JSONEncoder {
             try {
                 addJSONValue(method.invoke(object));
             } catch (IllegalAccessException | InvocationTargetException exception) {
-                throw new JSONException("error in invoking method <" + methodName + ">", exception);
+                throw new JsonException("error in invoking method <" + methodName + ">", exception);
             }
             firstIteration = false;
         }
@@ -149,7 +135,7 @@ public class JSONEncoder {
     }
 
     protected void addRecord(Object object)
-    throws IOException, JSONException {
+    throws IOException, JsonException {
         writer.write('{');
 
         Class<?> cls = object.getClass();
@@ -174,7 +160,7 @@ public class JSONEncoder {
             try {
                 addJSONValue(field.get(object));
             } catch (IllegalAccessException exception) {
-                throw new JSONException("error in invoking method <" + key + ">", exception);
+                throw new JsonException("error in invoking method <" + key + ">", exception);
             }
             firstIteration = false;
         }
@@ -182,7 +168,7 @@ public class JSONEncoder {
     }
 
     protected void addJSONValue(Object object)
-    throws IOException, JSONException {
+    throws IOException, JsonException {
         if(object == null) {
             addNull();
         } else if(object instanceof Map<?, ?> map) {
@@ -209,8 +195,8 @@ public class JSONEncoder {
             addString(object.toString());
         } else if(object instanceof InetAddress inetAddress) {
             addInetAddr(inetAddress);
-        } else if(object instanceof JSONToStringI jSONToStringI) {
-            writer.write(jSONToStringI.toJsonString(formatted, indent));
+        } else if(object instanceof JsonSerializerInterface jSONToStringI) {
+            addJSONValue(jSONToStringI.toJson());
         } else if(object instanceof Record) {
             addRecord(object);
         } else {
@@ -228,7 +214,7 @@ public class JSONEncoder {
     }
 
     protected void addArray(Iterable<?> array)
-    throws IOException, JSONException {
+    throws IOException, JsonException {
         writer.write('[');
         boolean fr = true;
         for(Object item : array) {
@@ -242,7 +228,7 @@ public class JSONEncoder {
     }
 
     protected void addArray(Object[] array)
-    throws IOException, JSONException {
+    throws IOException, JsonException {
         writer.write('[');
         boolean fr = true;
         for(Object item : array) {

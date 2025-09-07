@@ -23,6 +23,7 @@ package moba.server.json;
 import java.io.IOException;
 
 public interface JsonSerializerInterface<T> {
+
     T toJson()
     throws JsonException, IOException;
 }

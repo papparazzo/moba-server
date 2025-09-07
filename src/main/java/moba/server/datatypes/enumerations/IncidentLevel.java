@@ -22,7 +22,7 @@ package moba.server.datatypes.enumerations;
 
 public enum IncidentLevel {
     CRITICAL,  // schwerwiegende Ausnahme, moba-server wird neu gestartet
-    ERROR,     // Fehlerhafte Nachrichten vom Client: Ungültige Nachrichten-Id, Falscher Nachrichtenaufbau
+    ERROR,     // Fehlerhafte Nachrichten vom Client: Ungültige Nachrichten-Id, falscher Nachrichtenaufbau
     WARNING,   // Nothalt ausgelöst, Probleme im Automatikbetrieb
-    NOTICE
+    NOTICE     // Freigabe Nothalt
 }

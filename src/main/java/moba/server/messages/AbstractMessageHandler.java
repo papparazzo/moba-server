@@ -25,7 +25,7 @@ import moba.server.datatypes.enumerations.HardwareState;
 
 import java.sql.SQLException;
 
-public abstract class MessageHandlerA {
+public abstract class AbstractMessageHandler {
 
     protected Dispatcher dispatcher = null;
 

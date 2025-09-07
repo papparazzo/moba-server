@@ -29,16 +29,16 @@ import moba.server.application.ServerApplication;
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.ClientError;
+import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
-import moba.server.messages.MessageHandlerA;
-import moba.server.messages.MessageType;
+import moba.server.messages.MessageTypeInterface;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.ServerMessage;
 import moba.server.utilities.AllowList;
 import moba.server.utilities.config.Config;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 
-final public class Server extends MessageHandlerA {
+final public class Server extends AbstractMessageHandler {
     private final ServerApplication app;
     private final AllowList allowList;
     private final Config config;
@@ -69,7 +69,7 @@ final public class Server extends MessageHandlerA {
         }
     }
 
-    private void sendToClient(Message msg, MessageType mType)
+    private void sendToClient(Message msg, MessageTypeInterface mType)
     throws ClientErrorException {
         Endpoint ep = dispatcher.getEndpointByAppId((long)msg.getData());
         if(ep == null) {

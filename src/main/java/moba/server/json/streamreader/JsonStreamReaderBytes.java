@@ -22,12 +22,12 @@ package moba.server.json.streamreader;
 
 import java.io.IOException;
 
-public final class JSONStreamReaderBytes implements JSONStreamReaderI {
+public final class JsonStreamReaderBytes implements JsonStreamReaderInterface {
 
     private final byte[] data;
     private int index = 0;
 
-    public JSONStreamReaderBytes(byte[] input) {
+    public JsonStreamReaderBytes(byte[] input) {
         data = input;
     }
 

@@ -21,13 +21,13 @@
 package moba.server.json.stringreader;
 
 import java.io.IOException;
-import moba.server.json.streamreader.JSONStreamReaderI;
+import moba.server.json.streamreader.JsonStreamReaderInterface;
 
-public class JSONStringReader {
-    private final JSONStreamReaderI reader;
+public class JsonStringReader {
+    private final JsonStreamReaderInterface reader;
     private char lastChar = 0;
 
-    public JSONStringReader(JSONStreamReaderI reader) {
+    public JsonStringReader(JsonStreamReaderInterface reader) {
         this.reader = reader;
     }
 

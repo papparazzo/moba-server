@@ -36,12 +36,12 @@ import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
 import moba.server.messages.messageType.ServerMessage;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 import moba.server.utilities.messaging.IncidentHandler;
 
 final public class MessageLoop {
 
-    private final Map<Integer, MessageHandlerA> handlers   = new HashMap<>();
+    private final Map<Integer, AbstractMessageHandler> handlers   = new HashMap<>();
     private final Dispatcher                    dispatcher;
     private final IncidentHandler               incidentHandler;
 
@@ -50,7 +50,7 @@ final public class MessageLoop {
         this.incidentHandler = incidentHandler;
     }
 
-    public void addHandler(MessageHandlerA msgHandler) {
+    public void addHandler(AbstractMessageHandler msgHandler) {
         handlers.put(msgHandler.getGroupId(), msgHandler);
     }
 

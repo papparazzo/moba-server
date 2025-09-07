@@ -25,56 +25,56 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import moba.server.json.stringreader.JSONStringReader;
+import moba.server.json.stringreader.JsonStringReader;
 
-public class JSONDecoder {
-    protected JSONStringReader reader;
+public class JsonDecoder {
+    protected JsonStringReader reader;
     protected static final int  MAX_STRING_LENGTH = 1024;
 
-    public JSONDecoder(JSONStringReader reader) {
+    public JsonDecoder(JsonStringReader reader) {
         this.reader = reader;
     }
 
     public Object decode()
-    throws JSONException, IOException {
+    throws JsonException, IOException {
         return nextValue();
     }
 
     protected String nextKey()
-    throws JSONException, IOException {
+    throws JsonException, IOException {
         char c;
         StringBuilder sb = new StringBuilder();
 
-        for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
+        for(int i = 0; i < JsonDecoder.MAX_STRING_LENGTH; ++i) {
             c = reader.next();
 
             if(
                 Character.isWhitespace(c) || 
                 !(Character.isLetterOrDigit(c) || c == '_' || c == '"')
             ) {
-                throw new JSONException("key contains invalid char!");
+                throw new JsonException("key contains invalid char!");
             }
 
             if(c == '"') {
                 String s = sb.toString().trim();
                 if(s.isEmpty()) {
-                    throw new JSONException("key is empty");
+                    throw new JsonException("key is empty");
                 }
                 return s;
             }
             sb.append(c);
         }
-        throw new JSONException("maximum string-length of <" + JSONDecoder.MAX_STRING_LENGTH + "> reached!");
+        throw new JsonException("maximum string-length of <" + JsonDecoder.MAX_STRING_LENGTH + "> reached!");
     }
 
     protected Map<String, Object> nextObject()
-    throws JSONException, IOException {
+    throws JsonException, IOException {
         Map<String, Object> map = new HashMap<>();
         String key;
         char c;
         reader.checkNext('{');
 
-        for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
+        for(int i = 0; i < JsonDecoder.MAX_STRING_LENGTH; ++i) {
             c = reader.next();
             switch(c) {
                 case '}' -> {
@@ -85,12 +85,12 @@ public class JSONDecoder {
                     key = nextKey();
 
                 default ->
-                    throw new JSONException("invalid key: expected a '\"' or '}', got <" + c + "> instead!");
+                    throw new JsonException("invalid key: expected a '\"' or '}', got <" + c + "> instead!");
             }
             reader.checkNext(':');
 
             if(map.containsKey(key)) {
-                throw new JSONException("duplicate key <" + key + ">");
+                throw new JsonException("duplicate key <" + key + ">");
             }
             map.put(key, nextValue());
 
@@ -103,14 +103,14 @@ public class JSONDecoder {
                 }
 
                 default -> 
-                    throw new JSONException("expected a ',' or '}', got <" + c + "> instead!");
+                    throw new JsonException("expected a ',' or '}', got <" + c + "> instead!");
             }
         }
-        throw new JSONException("maximum string-length of <" + JSONDecoder.MAX_STRING_LENGTH + "> reached!");
+        throw new JsonException("maximum string-length of <" + JsonDecoder.MAX_STRING_LENGTH + "> reached!");
     }
 
     protected Object nextValue()
-    throws JSONException, IOException {
+    throws JsonException, IOException {
         switch(reader.peek()) {
             case 'n' -> {
                 return nextNull();
@@ -164,15 +164,15 @@ public class JSONDecoder {
     }
 
     protected String nextString()
-    throws JSONException, IOException {
+    throws JsonException, IOException {
         reader.checkNext('"');
         char c;
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
+        for(int i = 0; i < JsonDecoder.MAX_STRING_LENGTH; ++i) {
             c = reader.next();
             switch(c) {
                 case '\n', '\r' -> 
-                    throw new JSONException("invalid char");
+                    throw new JsonException("invalid char");
                     
                 case '\\' -> {
                     c = reader.next();
@@ -186,7 +186,7 @@ public class JSONDecoder {
 
                         case '"', '\\', '/' -> sb.append(c);
                         default ->
-                            throw new JSONException("invalid escape-sequence <"+ c +">");
+                            throw new JsonException("invalid escape-sequence <"+ c +">");
                     }
                 }
 
@@ -198,11 +198,11 @@ public class JSONDecoder {
                     sb.append(c);
             }
         }
-        throw new JSONException("maximum string-length of <" + JSONDecoder.MAX_STRING_LENGTH + "> reached!");
+        throw new JsonException("maximum string-length of <" + JsonDecoder.MAX_STRING_LENGTH + "> reached!");
     }
 
     protected ArrayList<Object> nextArray()
-    throws JSONException, IOException {
+    throws JsonException, IOException {
         ArrayList<Object> arrayList = new ArrayList<>();
         reader.checkNext('[');
         char c = reader.peek();
@@ -224,16 +224,16 @@ public class JSONDecoder {
                 }
 
                 default ->
-                    throw new JSONException("expected ',' or ']', got <" + c + "> instead!");
+                    throw new JsonException("expected ',' or ']', got <" + c + "> instead!");
             }
         }
     }
 
     protected Object nextNumber()
-    throws JSONException, IOException {
+    throws JsonException, IOException {
         char c;
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < JSONDecoder.MAX_STRING_LENGTH; ++i) {
+        for(int i = 0; i < JsonDecoder.MAX_STRING_LENGTH; ++i) {
             c = reader.peek();
 
             if(",]}".indexOf(c) != -1 || c == 0) {
@@ -241,25 +241,25 @@ public class JSONDecoder {
             }
             reader.next();
 
-            if(Character.isDigit(c) || c == '-' || c == 'e' || c == 'E' || c == '.' || c == 'x' || c == 'X') {
+            if(Character.isDigit(c) || c == '-' || c == '+' || c == 'e' || c == 'E' || c == '.' || c == 'x' || c == 'X') {
                 sb.append(c);
                 continue;
             }
-            throw new JSONException("expected digit, '-' or 'e', 'E', '.' or 'x', 'X' but found <" + c + ">!");
+            throw new JsonException("expected digit, '-', '+' or 'e', 'E', '.' or 'x', 'X' but found <" + c + ">!");
         }
-        throw new JSONException("maximum string-length of <" + JSONDecoder.MAX_STRING_LENGTH + "> reached!");
+        throw new JsonException("maximum string-length of <" + JsonDecoder.MAX_STRING_LENGTH + "> reached!");
     }
 
     protected Object parseNumber(String s)
-    throws JSONException {
+    throws JsonException {
         s = s.trim();
         if(s.isEmpty()) {
-            throw new JSONException("empty value");
+            throw new JsonException("empty value");
         }
 
         char b = s.charAt(0);
         if(!Character.isDigit(b) && b != '-') {
-            throw new JSONException("number starts not with digit or -");
+            throw new JsonException("number starts not with digit or -");
         }
 
         try {
@@ -272,7 +272,7 @@ public class JSONDecoder {
             }
             return Long.valueOf(s);
         } catch(NumberFormatException e) {
-            throw new JSONException("could not determine value: <" + s + ">", e);
+            throw new JsonException("could not determine value: <" + s + ">", e);
         }
     }
 }

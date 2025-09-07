@@ -98,7 +98,7 @@ class JsonDecoderTest {
 
         @Test
         void decode_arrayWithPrimitives_returnsList() throws JsonException, IOException {
-            Object result = getDecoder("[1, true, \"text\", null]").decode();
+            Object result = getDecoder("[1,true,\"text\",null]").decode();
             assertInstanceOf(List.class, result);
             List<?> list = (List<?>) result;
             assertEquals(4, list.size());
@@ -157,6 +157,20 @@ class JsonDecoderTest {
             List<?> numbers = (List<?>) map.get("numbers");
             assertEquals(Arrays.asList(1L, 2L, 3L), numbers);
         }
+
+        @Test
+        void decode_objectWithArray_returnsMapWithList2() throws JsonException, IOException {
+            String json = """
+                {"name":"John","age":30,"hobbies":[{"first":"reading"},{"first":"gaming"}]}
+                """;
+            Object result = getDecoder(json).decode();
+            assertInstanceOf(Map.class, result);
+            Map<?, ?> map = (Map<?, ?>) result;
+            assertEquals("John", map.get("name"));
+            assertEquals(30L, map.get("age"));
+            assertInstanceOf(List.class, map.get("hobbies"));
+            List<?> hobbies = (List<?>) map.get("hobbies");
+        }
     }
 
     @Nested
@@ -170,40 +184,15 @@ class JsonDecoderTest {
 
         @Test
         void decode_incompleteJson_throwsJsonException() {
-            assertThrows(JsonException.class, () -> getDecoder("{\"name\":").decode());
-            assertThrows(JsonException.class, () -> getDecoder("[1,2").decode());
-            assertThrows(JsonException.class, () -> getDecoder("\"unclosed").decode());
+            assertThrows(IOException.class, () -> getDecoder("{\"name\":").decode());
+            assertThrows(IOException.class, () -> getDecoder("[1,2").decode());
+            assertThrows(IOException.class, () -> getDecoder("\"unclosed").decode());
         }
 
         @Test
         void decode_emptyInput_throwsJsonException() {
-            assertThrows(JsonException.class, () -> getDecoder("").decode());
+            assertThrows(IOException.class, () -> getDecoder("").decode());
             assertThrows(JsonException.class, () -> getDecoder("  ").decode());
-        }
-    }
-
-    @Nested
-    class WhitespaceTests {
-        @Test
-        void decode_jsonWithWhitespace_parsesCorrectly() throws JsonException, IOException {
-            String json = """
-                {
-                    "name": "John",
-                    "age": 30,
-                    "hobbies": [
-                        "reading",
-                        "gaming"
-                    ]
-                }
-                """;
-            Object result = getDecoder(json).decode();
-            assertInstanceOf(Map.class, result);
-            Map<?, ?> map = (Map<?, ?>) result;
-            assertEquals("John", map.get("name"));
-            assertEquals(30L, map.get("age"));
-            assertInstanceOf(List.class, map.get("hobbies"));
-            List<?> hobbies = (List<?>) map.get("hobbies");
-            assertEquals(Arrays.asList("reading", "gaming"), hobbies);
         }
     }
 

@@ -31,10 +31,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import moba.server.json.JSONEncoder;
+import moba.server.json.JsonEncoder;
 
-import moba.server.json.JSONException;
-import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
+import moba.server.json.JsonException;
+import moba.server.json.streamwriter.JsonStreamWriterStringBuilder;
 import moba.server.messages.Message;
 import moba.server.utilities.logger.MessageLogger;
 
@@ -168,7 +168,7 @@ public class Dispatcher {
                 getMessageData(message),
                 endpoint
             );
-        } catch(IOException | JSONException e) {
+        } catch(IOException | JsonException e) {
             logger.log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
         }
     }
@@ -181,7 +181,7 @@ public class Dispatcher {
 
             sendBroadCastMessage(grpId, msgId, data, grpId);
             sendBroadCastMessage(grpId, msgId, data, -1);
-        } catch(IOException | JSONException e) {
+        } catch(IOException | JsonException e) {
             logger.log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
         }
     }
@@ -195,23 +195,23 @@ public class Dispatcher {
             for(Endpoint ep : allEndpoints) {
                 sendMessage(grpId, msgId, data, ep);
             }
-        } catch(IOException | JSONException e) {
+        } catch(IOException | JsonException e) {
             logger.log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
         }
     }
 
     private String getMessageData(Message message)
-    throws IOException, JSONException {
+    throws IOException, JsonException {
         messageLogger.out(message);
         StringBuilder sb = new StringBuilder();
-        JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb);
+        JsonStreamWriterStringBuilder jsb = new JsonStreamWriterStringBuilder(sb);
+        JsonEncoder encoder = new JsonEncoder(jsb);
         encoder.encode(message.getData());
         return sb.toString();
     }
 
     protected void sendBroadCastMessage(int grpId, int msgId, String data, int groupKey)
-    throws IOException, JSONException {
+    throws IOException, JsonException {
         if(!this.groupEP.containsKey((long)groupKey)) {
             return;
         }

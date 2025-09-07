@@ -25,7 +25,7 @@ import moba.server.datatypes.enumerations.IncidentLevel;
 import moba.server.datatypes.enumerations.IncidentType;
 import moba.server.utilities.CheckedEnum;
 import moba.server.messages.Message;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -124,69 +124,4 @@ public class IncidentData {
         String str = throwable.getClass().getName();
         return str.substring(str.lastIndexOf(".") + 1);
     }
-
-/*
-
-    private void inferCaller() {
-
-        // Skip all frames until we have found the first logger frame.
-        Optional<StackWalker.StackFrame> frame = new LogRecord().CallerFinder().get();
-        frame.ifPresent(f -> {
-            setSourceClassName(f.getClassName());
-            setSourceMethodName(f.getMethodName());
-        });
-
-        // We haven't found a suitable frame, so just punt.  This is
-        // OK as we are only committed to making a "best effort" here.
-    }
-
-
-        static final class CallerFinder implements Predicate<StackWalker.StackFrame> {
-        private static final StackWalker WALKER;
-        static {
-            final PrivilegedAction<StackWalker> action =
-                () -> StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
-            WALKER = AccessController.doPrivileged(action);
-        }
-
-        /**
-         * Returns StackFrame of the caller's frame.
-         * @return StackFrame of the caller's frame.
-         * /
-        Optional<StackWalker.StackFrame> get() {
-            return WALKER.walk((s) -> s.filter(this).findFirst());
-        }
-
-        private boolean lookingForLogger = true;
-        /**
-         * Returns true if we have found the caller's frame, false if the frame
-         * must be skipped.
-         *
-         * @param t The frame info.
-         * @return true if we have found the caller's frame, false if the frame
-         * must be skipped.
-         * /
-        @Override
-        public boolean test(StackWalker.StackFrame t) {
-            final String cname = t.getClassName();
-            // We should skip all frames until we have found the logger,
-            // because these frames could be frames introduced by e.g. custom
-            // sub classes of Handler.
-            if (lookingForLogger) {
-                // the log record could be created for a platform logger
-                lookingForLogger = !isLoggerImplFrame(cname);
-                return false;
-            }
-            // Continue walking until we've found the relevant calling frame.
-            // Skips logging/logger infrastructure.
-            return !isFilteredFrame(t);
-        }
-
-        private boolean isLoggerImplFrame(String cname) {
-            return (cname.equals("java.util.logging.Logger") ||
-                cname.startsWith("sun.util.logging.PlatformLogger"));
-        }
-    }
-*/
-
 }

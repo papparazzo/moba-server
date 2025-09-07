@@ -20,20 +20,19 @@
 package moba.server.messages.messageType;
 
 import moba.server.datatypes.enumerations.ClientError;
-import moba.server.messages.MessageType;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.messages.MessageTypeInterface;
+import moba.server.exceptions.ClientErrorException;
 
-public enum SystemMessage implements MessageType {
+public enum SystemMessage implements MessageTypeInterface {
     SET_AUTOMATIC_MODE      (1),
-    TOGGLE_AUTOMATIC_MODE   (2),
-    TRIGGER_EMERGENCY_STOP  (3),
-    RELEASE_EMERGENCY_STOP  (4),
-    SET_STANDBY_MODE        (5),
-    TOGGLE_STANDBY_MODE     (6),
-    GET_HARDWARE_STATE      (7),
-    HARDWARE_STATE_CHANGED  (8),
-    HARDWARE_SHUTDOWN       (9),
-    HARDWARE_RESET          (10);
+    TRIGGER_EMERGENCY_STOP  (2),
+    RELEASE_EMERGENCY_STOP  (3),
+    SET_STANDBY_MODE        (4),
+    TOGGLE_STANDBY_MODE     (5),
+    GET_HARDWARE_STATE      (6),
+    HARDWARE_STATE_CHANGED  (7),
+    HARDWARE_SHUTDOWN       (8),
+    HARDWARE_RESET          (9);
 
     public final static int GROUP_ID = 7;
 

@@ -23,35 +23,35 @@ package moba.server.messagehandler;
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.*;
-import moba.server.utilities.CheckedEnum;
+import moba.server.messages.AbstractMessageHandler;
 import moba.server.datatypes.objects.ErrorData;
 import moba.server.datatypes.objects.IncidentData;
-import moba.server.utilities.ActiveLayout;
 import moba.server.messages.Message;
-import moba.server.messages.MessageHandlerA;
 import moba.server.messages.MessageQueue;
 import moba.server.messages.messageType.ClientMessage;
 import moba.server.messages.messageType.InternMessage;
 import moba.server.messages.messageType.SystemMessage;
-import moba.server.utilities.exceptions.ClientErrorException;
-import moba.server.utilities.lock.TrackLayoutLock;
+import moba.server.exceptions.ClientErrorException;
+import moba.server.utilities.CheckedEnum;
+import moba.server.utilities.layout.ActiveTrackLayout;
+import moba.server.utilities.layout.TrackLayoutLock;
 import moba.server.utilities.messaging.IncidentHandler;
 
 import java.sql.SQLException;
 
-final public class Systems extends MessageHandlerA {
+final public class Systems extends AbstractMessageHandler {
     private HardwareState status = HardwareState.ERROR;
     private boolean automaticMode = false;
 
     private final MessageQueue msgQueue;
-    private final ActiveLayout activeLayout;
+    private final ActiveTrackLayout activeLayout;
     private final TrackLayoutLock lock;
     private final IncidentHandler incidentHandler;
 
     public Systems(
         Dispatcher dispatcher,
         TrackLayoutLock lock,
-        ActiveLayout activeLayout,
+        ActiveTrackLayout activeLayout,
         MessageQueue msgQueue,
         IncidentHandler incidentHandler
     ) throws SQLException {
@@ -75,15 +75,17 @@ final public class Systems extends MessageHandlerA {
     }
 
     @Override
+    public void hardwareStateChanged(HardwareState state) {
+        status = state;
+        dispatcher.sendGroup(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString()));
+    }
+
+    @Override
     public void handleMsg(Message msg)
     throws ClientErrorException, SQLException {
         switch(SystemMessage.fromId(msg.getMessageId())) {
             case SET_AUTOMATIC_MODE:
                 setAutomaticMode(msg);
-                break;
-
-            case TOGGLE_AUTOMATIC_MODE:
-                setAutomaticMode(msg, true);
                 break;
 
             case TRIGGER_EMERGENCY_STOP:
@@ -107,7 +109,7 @@ final public class Systems extends MessageHandlerA {
                 break;
 
             case HARDWARE_SHUTDOWN:
-                msgQueue.add(new Message(InternMessage.SERVER_SHUTDOWN, null));
+                setHardwareShutdown(msg.getEndpoint());
                 break;
 
             case HARDWARE_RESET:
@@ -118,32 +120,23 @@ final public class Systems extends MessageHandlerA {
 
     private void setAutomaticMode(Message msg)
     throws ClientErrorException, SQLException {
-        setAutomaticMode(msg, false);
-    }
-
-    private void setAutomaticMode(Message msg, boolean toggle)
-    throws ClientErrorException, SQLException {
         if(status == HardwareState.ERROR || status == HardwareState.EMERGENCY_STOP || status == HardwareState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
 
-        if(toggle) {
-            if(automaticMode) {
-                lock.tryLock(0, activeLayout.getActiveLayout());
-            }
-            automaticMode = !automaticMode;
-        } else {
-            boolean setAutomaticMode = (boolean)msg.getData();
-            if(setAutomaticMode && status == HardwareState.AUTOMATIC) {
-                sendErrorMessage(msg.getEndpoint());
-                return;
-            }
-            if(setAutomaticMode) {
-                lock.tryLock(0, activeLayout.getActiveLayout());
-            }
-            automaticMode = setAutomaticMode;
+        boolean setAutomaticMode = (boolean)msg.getData();
+
+        if(setAutomaticMode && status == HardwareState.AUTOMATIC) {
+            sendErrorMessage(msg.getEndpoint());
+            return;
         }
+
+        if(setAutomaticMode && status == HardwareState.MANUEL) {
+            checkPreConditions();
+        }
+
+        automaticMode = setAutomaticMode;
 
         if(automaticMode) {
             msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
@@ -163,6 +156,18 @@ final public class Systems extends MessageHandlerA {
             return;
         }
 
+        msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC_HALT));
+        incidentHandler.add(new IncidentData(
+            IncidentLevel.NOTICE,
+            IncidentType.STATUS_CHANGED,
+            "Automatik anhalten",
+            "Automatikmodus wird deaktiviert...",
+            "Systems.setAutomaticMode()",
+            msg.getEndpoint()
+        ));
+
+        /*
+        FIXME Dies hier muss in das Automatic-Module!!!
         lock.resetOwn(0);
 
         msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
@@ -174,6 +179,7 @@ final public class Systems extends MessageHandlerA {
             "Systems.setAutomaticMode()",
             msg.getEndpoint()
         ));
+        */
     }
 
     private void triggerEmergencyStop(Message msg)
@@ -309,9 +315,25 @@ final public class Systems extends MessageHandlerA {
         );
     }
 
-    @Override
-    public void hardwareStateChanged(HardwareState state) {
-        status = state;
-        dispatcher.sendGroup(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString()));
+    private void checkPreConditions()
+    throws ClientErrorException, SQLException {
+        // TODO: Prüfen, ob alle Blöcke besetzt sind. Sprich: Block A belegt -> ist Block A laut DB belegt?
+        //       Laut DB befindet ein Zug in Block A, ist Block a belegt
+
+        lock.tryLock(0, activeLayout.getActiveLayout());
+    }
+
+    private void setHardwareShutdown(Endpoint endpoint) {
+        if(status == HardwareState.MANUEL) {
+            msgQueue.add(new Message(InternMessage.SERVER_SHUTDOWN, null));
+            return;
+        }
+        dispatcher.sendSingle(
+            new Message(
+                ClientMessage.ERROR,
+                new ErrorData(ClientError.OPERATION_NOT_ALLOWED, "Shutdown only in state MANUEL")
+            ),
+            endpoint
+        );
     }
 }

@@ -21,10 +21,10 @@
 package moba.server.datatypes.enumerations;
 
 public enum HardwareState {
-    ERROR,
-    STANDBY,
-    EMERGENCY_STOP,
-    MANUEL,
-    AUTOMATIC,
-    AUTOMATIC_HALT
+    ERROR,            // Keine Verbindung zur Hardware
+    STANDBY,          // Energiesparmodus
+    EMERGENCY_STOP,   // Nothalt
+    MANUEL,           // Manueller Betrieb
+    AUTOMATIC,        // Anlage im Automatikbetrieb
+    AUTOMATIC_HALT    // Analge anhalten
 }
