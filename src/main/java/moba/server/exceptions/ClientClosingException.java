@@ -1,4 +1,4 @@
-package moba.server.utilities.exceptions;
+package moba.server.exceptions;
 
 public class ClientClosingException extends RuntimeException {
 }

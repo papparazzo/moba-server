@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2020 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2025 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -17,6 +17,7 @@
  *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
+
 package moba.server.utilities.logger;
 
 import java.util.logging.Logger;

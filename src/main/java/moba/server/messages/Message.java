@@ -22,7 +22,7 @@ package moba.server.messages;
 
 import moba.server.com.Endpoint;
 
-public class Message implements Comparable {
+public class Message implements Comparable<Message> {
     protected long   trigger;
 
     protected Endpoint    endpoint = null;
@@ -30,16 +30,16 @@ public class Message implements Comparable {
     protected int         groupId;
     protected int         messageId;
 
-    public Message(MessageType msgType) {
+    public Message(MessageTypeInterface msgType) {
         this(msgType, null);
     }
 
-    public Message(MessageType msgType, Object data, Endpoint ep) {
+    public Message(MessageTypeInterface msgType, Object data, Endpoint ep) {
         this(msgType, data);
         endpoint = ep;
     }
 
-    public Message(MessageType msgType, Object data) {
+    public Message(MessageTypeInterface msgType, Object data) {
         this(msgType.getGroupId(), msgType.getMessageId(), data);
     }
 
@@ -64,9 +64,9 @@ public class Message implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
+    public int compareTo(Message m) {
         long i = trigger;
-        long j = ((Message)o).trigger;
+        long j = m.trigger;
 
         return Long.compare(i, j);
     }

@@ -22,7 +22,7 @@ package moba.server.json;
 
 import java.io.IOException;
 
-public interface JSONToStringI {
-    String toJsonString(boolean formatted, int indent)
-    throws JSONException, IOException;
+public interface JsonSerializerInterface<T> {
+    T toJson()
+    throws JsonException, IOException;
 }

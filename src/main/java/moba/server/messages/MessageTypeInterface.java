@@ -18,27 +18,11 @@
  *
  */
 
-package moba.server.json;
+package moba.server.messages;
 
-public class JSONException extends Exception {
-    private Throwable cause;
+public interface MessageTypeInterface {
 
-    public JSONException(String message) {
-        super(message);
-    }
+    int getMessageId();
 
-    public JSONException(Throwable t) {
-        super(t.getMessage());
-        cause = t;
-    }
-
-    public JSONException(String message, Throwable t) {
-        super(message);
-        cause = t;
-    }
-
-    @Override
-    public Throwable getCause() {
-        return cause;
-    }
+    int getGroupId();
 }

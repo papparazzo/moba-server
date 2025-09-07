@@ -20,7 +20,7 @@
 
 package moba.server.json.streamwriter;
 
-public class JSONStreamWriterStringBuilder implements JSONStreamWriterI {
+public class JSONStreamWriterStringBuilder implements JsonStreamWriterInterface {
     StringBuilder sb;
 
     public JSONStreamWriterStringBuilder(StringBuilder sb) {

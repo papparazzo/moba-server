@@ -23,7 +23,7 @@ package moba.server.utilities;
 import moba.server.datatypes.base.Version;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -50,21 +50,13 @@ final public class ManifestReader {
         }
 
         String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) + "/META-INF/MANIFEST.MF";
-        Manifest manifest = new Manifest(new URL(manifestPath).openStream());
+        Manifest manifest = new Manifest(URI.create(manifestPath).toURL().openStream());
         Attributes attrs = manifest.getMainAttributes();
 
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         buildDate = formatter.parse(attrs.getValue("Build-Timestamp"));
         appName = attrs.getValue("Implementation-Title");
         version = new Version(attrs.getValue("Implementation-Version"));
-
-        /*
-        'Built-By'       : System.properties['user.name'],
-        // 'Build-Revision' : versioning.info.commit,
-        'Created-By'     : "Gradle ${gradle.gradleVersion}",
-        'Build-Jdk'      : "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
-        'Build-OS'       : "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}",
-        */
     }
 
     public String getAppName() {

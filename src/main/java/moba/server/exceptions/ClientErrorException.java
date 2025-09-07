@@ -18,7 +18,7 @@
  *
  */
 
-package moba.server.utilities.exceptions;
+package moba.server.exceptions;
 
 import moba.server.datatypes.enumerations.ClientError;
 

@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2025 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -33,7 +33,9 @@ final public class MessageLogger {
 
     private final Logger logger;
 
-    public MessageLogger(Logger logger) {this.logger = logger;}
+    public MessageLogger(Logger logger) {
+        this.logger = logger;
+    }
 
     public void in(Message msg) {
         print(msg, MessageType.IN_MESSAGE);

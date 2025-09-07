@@ -20,10 +20,10 @@
 package moba.server.messages.messageType;
 
 import moba.server.datatypes.enumerations.ClientError;
-import moba.server.messages.MessageType;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.messages.MessageTypeInterface;
+import moba.server.exceptions.ClientErrorException;
 
-public enum InternMessage implements MessageType {
+public enum InternMessage implements MessageTypeInterface {
     SERVER_SHUTDOWN       (1),
     SERVER_RESET          (2),
     SET_HARDWARE_STATE    (3),

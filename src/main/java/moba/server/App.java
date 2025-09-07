@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2025 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -26,11 +26,19 @@ import moba.server.utilities.config.Config;
 
 import java.util.Date;
 import java.util.TimeZone;
-import java.util.logging.*;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import moba.server.application.ServerApplication;
 import moba.server.utilities.logger.CustomFormatter;
-import org.apache.commons.cli.*;
+
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.HelpFormatter;
 
 final public class App {
     private static final String APP_CONFIG  = "config.yaml";
@@ -102,7 +110,7 @@ final public class App {
         String header =
             appName + " " + appVersion.toString() + " (build on " + buildDate + ")" +
             System.lineSeparator() + System.lineSeparator() +
-           "Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>" + System.lineSeparator() +
+           "Copyright (C) 2025 Stefan Paproth <pappi-@gmx.de>" + System.lineSeparator() +
            System.lineSeparator() +
            "This program is free software: you can redistribute it and/or modify" + System.lineSeparator() +
            "it under the terms of the GNU Affero General Public License as" + System.lineSeparator() +

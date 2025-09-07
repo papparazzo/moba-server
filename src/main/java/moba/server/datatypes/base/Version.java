@@ -20,9 +20,9 @@
 
 package moba.server.datatypes.base;
 
-import moba.server.json.JSONToStringI;
+import moba.server.json.JsonSerializerInterface;
 
-public class Version implements Comparable, JSONToStringI {
+public class Version implements Comparable<Version>, JsonSerializerInterface<String> {
 
     protected int major;
     protected int minor;
@@ -95,9 +95,7 @@ public class Version implements Comparable, JSONToStringI {
     }
 
     @Override
-    public int compareTo(Object o) {
-        Version v = (Version)o;
-
+    public int compareTo(Version v) {
         if(major < v.major) {
             return -1;
         }
@@ -144,7 +142,7 @@ public class Version implements Comparable, JSONToStringI {
     }
 
     @Override
-    public String toJsonString(boolean formatted, int indent) {
+    public String toJson() {
         return "\"" + this + "\"";
     }
 }

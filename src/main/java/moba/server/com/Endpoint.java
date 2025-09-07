@@ -33,8 +33,8 @@ import java.util.logging.Level;
 import moba.server.datatypes.base.Version;
 import moba.server.json.JSONDecoder;
 import moba.server.json.JSONEncoder;
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
+import moba.server.json.JsonException;
+import moba.server.json.JsonSerializerInterface;
 import moba.server.json.streamreader.JSONStreamReaderBytes;
 import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
 import moba.server.json.stringreader.JSONStringReader;
@@ -45,7 +45,7 @@ import moba.server.messages.messageType.InternMessage;
 import moba.server.utilities.exceptions.ClientClosingException;
 import moba.server.utilities.logger.Loggable;
 
-public class Endpoint extends Thread implements JSONToStringI, Loggable {
+public class Endpoint extends Thread implements JsonSerializerInterface<HashMap<String, Object>>, Loggable {
 
     protected long     id;
     protected long     startTime;
@@ -89,8 +89,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
     }
 
     @Override
-    public String toJsonString(boolean formatted, int indent)
-    throws JSONException, IOException {
+    public HashMap<String, Object> toJson() {
         HashMap<String, Object> app = new HashMap<>();
         app.put("appName",   appName);
         app.put("version",   version);
@@ -105,11 +104,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
         map.put("addr",      socket.getInetAddress());
         map.put("port",      socket.getPort());
 
-        StringBuilder sb = new StringBuilder();
-        JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb, formatted);
-        encoder.encode(map, indent);
-        return sb.toString();
+        return map;
     }
 
     @Override
@@ -153,7 +148,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
     }
 
     protected Message getNextMessage()
-    throws IOException, JSONException {
+    throws IOException, JsonException {
         try {
             int groupId = dataInputStream.readInt();
             int msgId = dataInputStream.readInt();
@@ -178,7 +173,7 @@ public class Endpoint extends Thread implements JSONToStringI, Loggable {
 
     @SuppressWarnings("unchecked")
     private void init()
-    throws IOException, JSONException {
+    throws IOException, JsonException {
         Message msg = getNextMessage();
         if(
             ClientMessage.GROUP_ID != msg.getGroupId() ||

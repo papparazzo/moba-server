@@ -21,10 +21,10 @@
 package moba.server.messages.messageType;
 
 import moba.server.datatypes.enumerations.ClientError;
-import moba.server.messages.MessageType;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.messages.MessageTypeInterface;
+import moba.server.exceptions.ClientErrorException;
 
-public enum ClientMessage implements MessageType {
+public enum ClientMessage implements MessageTypeInterface {
     PING        (1),
     ECHO_REQ    (2),
     ECHO_RES    (3),
