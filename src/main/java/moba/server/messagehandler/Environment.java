@@ -26,13 +26,13 @@ import java.util.Map;
 import moba.server.com.Dispatcher;
 
 import moba.server.datatypes.objects.EnvironmentData;
+import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
-import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.EnvironmentMessage;
 import moba.server.utilities.config.Config;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 
-public class Environment extends MessageHandlerA {
+public class Environment extends AbstractMessageHandler {
     protected final Config config;
 
     protected final EnvironmentData environment = new EnvironmentData();

@@ -20,18 +20,14 @@
 
 package moba.server.datatypes.objects;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import moba.server.datatypes.enumerations.Switch;
-import moba.server.json.JSONEncoder;
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
-import moba.server.json.streamwriter.JSONStreamWriterStringBuilder;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.json.JsonSerializerInterface;
+import moba.server.exceptions.ClientErrorException;
 
-public class EnvironmentData implements JSONToStringI {
+public class EnvironmentData implements JsonSerializerInterface<HashMap<String, Switch>> {
     protected Switch thunderStorm = Switch.OFF;
     protected Switch environmentSound = Switch.OFF;
     protected Switch wind = Switch.OFF;
@@ -52,9 +48,8 @@ public class EnvironmentData implements JSONToStringI {
     }
 
     @Override
-    public String toJsonString(boolean formatted, int indent)
-    throws JSONException, IOException {
-        HashMap<String, Object> map = new HashMap<>();
+    public HashMap<String, Switch> toJson() {
+        HashMap<String, Switch> map = new HashMap<>();
         map.put("thunderStorm", thunderStorm);
         map.put("wind", wind);
         map.put("rain", rain);
@@ -62,11 +57,6 @@ public class EnvironmentData implements JSONToStringI {
         map.put("aux01", aux01);
         map.put("aux02", aux02);
         map.put("aux03", aux03);
-
-        StringBuilder sb = new StringBuilder();
-        JSONStreamWriterStringBuilder jsb = new JSONStreamWriterStringBuilder(sb);
-        JSONEncoder encoder = new JSONEncoder(jsb, formatted);
-        encoder.encode(map, indent);
-        return sb.toString();
+        return map;
     }
 }

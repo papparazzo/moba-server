@@ -26,7 +26,7 @@ import java.util.Map;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.enumerations.Day;
 import moba.server.utilities.CheckedEnum;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 
 public class GlobalTimerData {
     protected PointInTime modelTime = new PointInTime();

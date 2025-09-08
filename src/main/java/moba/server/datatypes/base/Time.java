@@ -20,12 +20,9 @@
 
 package moba.server.datatypes.base;
 
-import moba.server.json.JSONException;
-import moba.server.json.JSONToStringI;
+import moba.server.json.JsonSerializerInterface;
 
-import java.io.IOException;
-
-public class Time implements JSONToStringI {
+public class Time implements JsonSerializerInterface<String> {
     protected int timeInMinutes;
 
     public Time() {
@@ -84,8 +81,7 @@ public class Time implements JSONToStringI {
     }
 
     @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        return '"' + getTime() + '"';
+    public String toJson() {
+        return getTime();
     }
 }
