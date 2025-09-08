@@ -21,10 +21,10 @@
 package moba.server.messages.messageType;
 
 import moba.server.datatypes.enumerations.ClientError;
-import moba.server.messages.MessageType;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.messages.MessageTypeInterface;
+import moba.server.exceptions.ClientErrorException;
 
-public enum TimerMessage implements MessageType {
+public enum TimerMessage implements MessageTypeInterface {
     GLOBAL_TIMER_EVENT(1),
     GET_GLOBAL_TIMER  (2),
     SET_GLOBAL_TIMER  (3);

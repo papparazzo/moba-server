@@ -21,10 +21,10 @@
 package moba.server.messages.messageType;
 
 import moba.server.datatypes.enumerations.ClientError;
-import moba.server.messages.MessageType;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.messages.MessageTypeInterface;
+import moba.server.exceptions.ClientErrorException;
 
-public enum EnvironmentMessage implements MessageType {
+public enum EnvironmentMessage implements MessageTypeInterface {
     GET_ENVIRONMENT  (1),
     SET_ENVIRONMENT  (2),
     SET_AMBIENCE     (3),

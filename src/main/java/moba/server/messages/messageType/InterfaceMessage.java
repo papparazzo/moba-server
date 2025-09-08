@@ -20,10 +20,10 @@
 package moba.server.messages.messageType;
 
 import moba.server.datatypes.enumerations.ClientError;
-import moba.server.messages.MessageType;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.messages.MessageTypeInterface;
+import moba.server.exceptions.ClientErrorException;
 
-public enum InterfaceMessage implements MessageType {
+public enum InterfaceMessage implements MessageTypeInterface {
     CONNECTIVITY_STATE_CHANGED(1),
 	SET_ACTION_LIST           (2),
 	REPLACE_ACTION_LIST       (3),
