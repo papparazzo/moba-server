@@ -18,9 +18,13 @@
  *
  */
 
-package moba.server.routing;
+package moba.server.datatypes.objects;
 
-public class Symbol {
+import moba.server.datatypes.enumerations.SymbolType;
+import moba.server.json.JsonSerializerInterface;
+import moba.server.routing.Direction;
+
+public class Symbol implements JsonSerializerInterface<Integer> {
 
     protected int symbolFix;
     protected int symbolDyn;
@@ -139,6 +143,10 @@ public class Symbol {
         }
 
         symbolDyn &= ~dir;
+    }
+
+    public Integer toJson() {
+        return symbolFix;
     }
 
     private boolean check(int i, int t) {
