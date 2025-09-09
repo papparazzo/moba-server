@@ -38,6 +38,14 @@ final public class Position {
         this.y = y;
     }
 
+    public long getX() {
+        return x;
+    }
+
+    public long getY() {
+        return y;
+    }
+
     public Position(Position pos) {
         this(pos.x, pos.y);
     }

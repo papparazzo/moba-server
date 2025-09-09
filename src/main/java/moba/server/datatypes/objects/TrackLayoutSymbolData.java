@@ -20,10 +20,8 @@
 
 package moba.server.datatypes.objects;
 
-import moba.server.routing.Symbol;
-
 public record TrackLayoutSymbolData(
-    long id,
+    Long id,
     Symbol symbol
 ) {
 }

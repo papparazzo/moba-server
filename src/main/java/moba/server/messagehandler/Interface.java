@@ -26,17 +26,17 @@ import moba.server.datatypes.enumerations.Connectivity;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.enumerations.IncidentLevel;
 import moba.server.datatypes.enumerations.IncidentType;
+import moba.server.messages.AbstractMessageHandler;
 import moba.server.utilities.CheckedEnum;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.Message;
-import moba.server.messages.MessageHandlerA;
 import moba.server.messages.MessageQueue;
 import moba.server.messages.messageType.InterfaceMessage;
 import moba.server.messages.messageType.InternMessage;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 import moba.server.utilities.messaging.IncidentHandler;
 
-final public class Interface extends MessageHandlerA {
+final public class Interface extends AbstractMessageHandler {
 
     private final MessageQueue msgQueueIn;
     private final IncidentHandler incidentHandler;

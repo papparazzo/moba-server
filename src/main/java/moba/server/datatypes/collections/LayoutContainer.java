@@ -18,7 +18,7 @@
  *
  */
 
-package moba.server.routing.typedefs;
+package moba.server.datatypes.collections;
 
 import moba.server.datatypes.objects.Position;
 import moba.server.datatypes.objects.TrackLayoutSymbolData;

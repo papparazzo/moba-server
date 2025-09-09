@@ -20,46 +20,46 @@
 
 package moba.server.messagehandler;
 
-import java.sql.Statement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
 
+import moba.server.datatypes.collections.LayoutContainer;
 import moba.server.datatypes.enumerations.HardwareState;
-import moba.server.repositories.LayoutRepository;
-import moba.server.routing.typedefs.LayoutContainer;
-import moba.server.utilities.Database;
+import moba.server.datatypes.objects.Position;
+import moba.server.datatypes.objects.Symbol;
+import moba.server.datatypes.objects.TrackLayoutSymbolData;
+import moba.server.messages.AbstractMessageHandler;
+import moba.server.repositories.TrackLayoutRepository;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.objects.TrackLayoutInfoData;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
+
 import moba.server.com.Dispatcher;
-import moba.server.utilities.ActiveLayout;
+import moba.server.utilities.layout.ActiveTrackLayout;
 import moba.server.messages.Message;
-import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.LayoutMessage;
-import moba.server.utilities.exceptions.ClientErrorException;
-import moba.server.utilities.lock.TrackLayoutLock;
+import moba.server.exceptions.ClientErrorException;
+import moba.server.utilities.layout.TrackLayoutLock;
 import moba.server.utilities.logger.Loggable;
 
-public final class Layout extends MessageHandlerA implements Loggable {
-    private final Database        database;
-    private final TrackLayoutLock lock;
-    private final ActiveLayout    activeLayout;
-    private boolean               isRunning = false;
+public final class Layout extends AbstractMessageHandler implements Loggable {
 
-    public Layout(Dispatcher dispatcher, Database database, ActiveLayout activeLayout)
+    private final TrackLayoutRepository repository;
+
+    private final TrackLayoutLock   lock;
+    private final ActiveTrackLayout activeLayout;
+    private boolean                 isRunning = false;
+
+    public Layout(Dispatcher dispatcher, TrackLayoutRepository repository, ActiveTrackLayout activeLayout, TrackLayoutLock lock)
     throws SQLException {
-        this.database     = database;
         this.dispatcher   = dispatcher;
+        this.repository   = repository;
+
         this.activeLayout = activeLayout;
-        this.lock         = new TrackLayoutLock(database);
+        this.lock         = lock;
         this.lock.resetAll();
     }
 
@@ -82,7 +82,7 @@ public final class Layout extends MessageHandlerA implements Loggable {
 
     @Override
     public void hardwareStateChanged(HardwareState state) {
-        isRunning = (state == HardwareState.AUTOMATIC);
+        isRunning = (state == HardwareState.AUTOMATIC || state == HardwareState.AUTOMATIC_HALT);
     }
 
     @Override
@@ -103,33 +103,13 @@ public final class Layout extends MessageHandlerA implements Loggable {
 
     private void getLayouts(Message msg)
     throws SQLException {
-        String q = "SELECT * FROM `TrackLayouts`;";
-
-        ArrayList<TrackLayoutInfoData> arraylist;
-        getLogger().log(Level.INFO, q);
-
-        try(Statement stmt = database.getConnection().createStatement()) {
-            ResultSet rs = stmt.executeQuery(q);
-            arraylist = new ArrayList<>();
-            while(rs.next()) {
-                long id = rs.getLong("Id");
-                arraylist.add(new TrackLayoutInfoData(
-                    id,
-                    rs.getString("Name"),
-                    rs.getString("Description"),
-                    rs.getInt("Locked"),
-                    (id == activeLayout.getActiveLayout()),
-                    rs.getDate("ModificationDate"),
-                    rs.getDate("CreationDate")
-                ));
-            }
-        }
+        ArrayList<TrackLayoutInfoData> arraylist = repository.getLayouts(activeLayout.getActiveLayout());
         dispatcher.sendSingle(new Message(LayoutMessage.GET_LAYOUTS_RES, arraylist), msg.getEndpoint());
     }
 
     private void deleteLayout(Message msg)
     throws SQLException, ClientErrorException, IOException {
-        long id = (Long)msg.getData();
+        long id = (long)msg.getData();
         lock.isLockedByApp(msg.getEndpoint().getAppId(), id);
 
         if(isRunning && id == activeLayout.getActiveLayout()) {
@@ -138,20 +118,9 @@ public final class Layout extends MessageHandlerA implements Loggable {
                 "cannot delete active layout <" + id + "> while running"
             );
         }
-
-        Connection con = database.getConnection();
-        String q = "DELETE FROM `TrackLayouts` WHERE (`locked` IS NULL OR `locked` = ?) AND `id` = ? ";
-
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, msg.getEndpoint().getAppId());
-            pstmt.setLong(2, id);
-            getLogger().log(Level.INFO, "<{0}>", new Object[]{pstmt.toString()});
-            if(pstmt.executeUpdate() == 0) {
-                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not delete <" + id + ">");
-            }
-        }
+        repository.deleteLayout(id, msg.getEndpoint().getAppId());
         if(id == activeLayout.getActiveLayout()) {
-            activeLayout.setActiveLayout(-1);
+            activeLayout.setActiveLayout(0);
         }
         dispatcher.sendGroup(new Message(LayoutMessage.DELETE_LAYOUT, id));
     }
@@ -163,32 +132,19 @@ public final class Layout extends MessageHandlerA implements Loggable {
         boolean isActive = (boolean)map.get("active");
         long    currAppId = msg.getEndpoint().getAppId();
 
+        TrackLayoutInfoData tl = new TrackLayoutInfoData(
+            (String)map.get("name"),
+            (String)map.get("description"),
+            currAppId,
+            isActive
+        );
+
+        long id = repository.createLayout(tl, currAppId);
+
         if(isActive) {
-            lock.isLockedByApp(msg.getEndpoint().getAppId(), activeLayout.getActiveLayout());
+            activeLayout.setActiveLayout(id);
         }
-
-        TrackLayoutInfoData tl = new TrackLayoutInfoData((String)map.get("name"), (String)map.get("description"), currAppId, isActive);
-        Connection con = database.getConnection();
-
-        String q =
-            "INSERT INTO `TrackLayouts` (`Name`, `Description`, `CreationDate`, `ModificationDate`, `Locked`) VALUES (?, ?, NOW(), NOW(), ?)";
-
-        try(PreparedStatement stmt = con.prepareStatement(q, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, tl.getName());
-            stmt.setString(2, tl.getDescription());
-            stmt.setLong(3, currAppId);
-            stmt.executeUpdate();
-            getLogger().log(Level.INFO, stmt.toString());
-            try(ResultSet rs = stmt.getGeneratedKeys()) {
-                rs.next();
-                int id = rs.getInt(1);
-                if(isActive) {
-                    // TODO: Check if auto-mode
-                    activeLayout.setActiveLayout(id);
-                }
-                tl.setId(id);
-            }
-        }
+        tl.setId(id);
         dispatcher.sendGroup(new Message(LayoutMessage.CREATE_LAYOUT, tl));
     }
 
@@ -203,59 +159,48 @@ public final class Layout extends MessageHandlerA implements Loggable {
         TrackLayoutInfoData tl;
         boolean active = (boolean)map.get("active");
         long appId = msg.getEndpoint().getAppId();
-        tl = new TrackLayoutInfoData(id, (String)map.get("name"), (String)map.get("description"), appId, active, new Date(), getCreationDate(id));
+        tl = new TrackLayoutInfoData(
+            id,
+            (String)map.get("name"),
+            (String)map.get("description"),
+            appId,
+            active,
+            new Date(),
+            repository.getCreationDate(id)
+        );
 
-        Connection con = database.getConnection();
-
-        String q = "UPDATE `TrackLayouts` SET `Name` = ?, `Description` = ?, `ModificationDate` = ? WHERE (`locked` IS NULL OR `locked` = ?) AND `id` = ? ";
-
-        try (PreparedStatement stmt = con.prepareStatement(q)) {
-            stmt.setString(1, tl.getName());
-            stmt.setString(2, tl.getDescription());
-            stmt.setDate(3, new java.sql.Date(tl.getModified().getTime()));
-            stmt.setLong(4, appId);
-            stmt.setLong(5, id);
-            getLogger().log(Level.INFO, stmt.toString());
-            if(stmt.executeUpdate() == 0) {
-                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not update <" + id + ">");
-            }
-            if(active) {
-                // TODO: Check if auto-mode
-                activeLayout.setActiveLayout(id);
-            }
-            dispatcher.sendGroup(new Message(LayoutMessage.UPDATE_LAYOUT, tl));
+        repository.updateLayout(tl, id, appId);
+        if(active) {
+            activeLayout.setActiveLayout(id);
         }
+        dispatcher.sendGroup(new Message(LayoutMessage.UPDATE_LAYOUT, tl));
     }
 
     private void unlockLayout(Message msg)
     throws ClientErrorException, SQLException {
-        long id = activeLayout.getActiveLayout(msg.getData());
+        long id = activeLayout.getActiveLayout((Long)msg.getData());
         lock.unlock(msg.getEndpoint().getAppId(), id);
         dispatcher.sendGroup(new Message(LayoutMessage.UNLOCK_LAYOUT, id));
     }
 
     private void lockLayout(Message msg)
     throws ClientErrorException, SQLException {
-        long id = activeLayout.getActiveLayout(msg.getData());
+        long id = activeLayout.getActiveLayout((Long)msg.getData());
         lock.tryLock(msg.getEndpoint().getAppId(), id);
         dispatcher.sendGroup(new Message(LayoutMessage.LOCK_LAYOUT, id));
     }
 
     private void getLayout(Message msg, boolean tryLock)
     throws SQLException, ClientErrorException {
-        long id = activeLayout.getActiveLayout(msg.getData());
+        long id = activeLayout.getActiveLayout((Long)msg.getData());
 
         if(tryLock) {
             lock.tryLock(msg.getEndpoint().getAppId(), id);
         }
 
-        LayoutRepository layoutRepository = new LayoutRepository(database);
-
-        LayoutContainer layoutContainer = layoutRepository.getLayout(id);
-
         HashMap<String, Object> map = new HashMap<>();
         map.put("id", id);
-        map.put("symbols", layoutContainer);
+        map.put("symbols", repository.getLayout(id));
 
         dispatcher.sendSingle(new Message(LayoutMessage.GET_LAYOUT_RES, map), msg.getEndpoint());
     }
@@ -265,72 +210,33 @@ public final class Layout extends MessageHandlerA implements Loggable {
     throws SQLException, ClientErrorException {
 
         Map<String, Object> map = (Map<String, Object>)msg.getData();
-        long id = activeLayout.getActiveLayout(map.get("id"));
+        long id = activeLayout.getActiveLayout((Long)map.get("id"));
 
         if(!lock.isLockedByApp(msg.getEndpoint().getAppId(), id)) {
             throw new ClientErrorException(ClientError.DATASET_NOT_LOCKED, "layout <" + id + "> not locked");
         }
 
-        Connection con = database.getConnection();
-        // FIXME: Transaction
-        String stmt = "UPDATE `TrackLayouts` SET `ModificationDate` = NOW() WHERE `Id` = ? ";
-
-        try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
-            pstmt.setLong(1, id);
-            getLogger().log(Level.INFO, pstmt.toString());
-            if(pstmt.executeUpdate() == 0) {
-                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not save <" + id + ">");
-            }
-        }
+        LayoutContainer container = new LayoutContainer();
 
         ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
-
-        stmt = "DELETE FROM `TrackLayoutSymbols` WHERE `TrackLayoutId` = ?";
-        try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-            pstmt.setLong(1, id);
-            getLogger().log(Level.INFO, pstmt.toString());
-            pstmt.executeUpdate();
-        }
 
         for(Object item : arrayList) {
             Map<String, Object> symbol = (Map<String, Object>)item;
 
-            stmt =
-                "INSERT INTO `TrackLayoutSymbols` (`Id`, `TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
-                "VALUES (?, ?, ?, ?, ?)";
-
-            try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-                if(symbol.get("id") == null) {
-                    pstmt.setNull(1, java.sql.Types.INTEGER);
-                } else {
-                    pstmt.setLong(1, (long)symbol.get("id"));
-                }
-
-                pstmt.setLong(2, id);
-                pstmt.setLong(3, (long)symbol.get("xPos"));
-                pstmt.setLong(4, (long)symbol.get("yPos"));
-                pstmt.setLong(5, (long)symbol.get("symbol"));
-                getLogger().log(Level.INFO, pstmt.toString());
-                pstmt.executeUpdate();
-            }
+            container.put(
+                new Position(
+                    (long)symbol.get("xPos"),
+                    (long)symbol.get("yPos")
+                ),
+                new TrackLayoutSymbolData(
+                    (Long)symbol.get("id"),
+                    new Symbol((int)symbol.get("symbol"))
+                )
+            );
         }
+
+        repository.saveLayout(id, container);
 
         dispatcher.sendGroup(new Message(LayoutMessage.LAYOUT_CHANGED, id));
-    }
-
-    private Date getCreationDate(long id)
-    throws SQLException {
-        String q = "SELECT `CreationDate` FROM `TrackLayouts` WHERE `Id` = ?;";
-        Connection con = database.getConnection();
-
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, id);
-            getLogger().log(Level.INFO, pstmt.toString());
-            ResultSet rs = pstmt.executeQuery();
-            if(!rs.next()) {
-                throw new NoSuchElementException(String.format("no elements found for layout <%4d>", id));
-            }
-            return rs.getDate("CreationDate");
-        }
     }
 }
