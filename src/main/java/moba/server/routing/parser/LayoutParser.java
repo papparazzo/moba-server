@@ -23,7 +23,7 @@ package moba.server.routing.parser;
 import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.datatypes.collections.SwitchStateMap;
 import moba.server.datatypes.objects.Position;
-import moba.server.datatypes.objects.SwitchData;
+import moba.server.datatypes.objects.SwitchStandData;
 import moba.server.datatypes.objects.TrackLayoutSymbolData;
 import moba.server.routing.Direction;
 import moba.server.routing.Symbol;
@@ -158,7 +158,7 @@ public class LayoutParser {
         TrackLayoutSymbolData curSymbolData = layout.get(curPos);
         Symbol                curSymbol  = curSymbolData.symbol();
         long                  id         = curSymbolData.id();
-        SwitchData            switchData = switchStates.get(id);
+        SwitchStandData switchData = switchStates.get(id);
 
         // Ein Knoten existiert hier noch nicht, neu erzeugen …
         NodeInterface newNode;
