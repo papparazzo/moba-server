@@ -25,13 +25,12 @@ import moba.server.datatypes.objects.BlockContactData;
 import moba.server.datatypes.objects.ContactData;
 import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.utilities.Database;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Map;
 
 public class BlockListRepository {
@@ -47,7 +46,6 @@ public class BlockListRepository {
 
         String q =
             "SELECT `BlockSections`.`Id`, `BlockSections`.`TrainId`, " +
-            "`TrackLayoutSymbols`.`XPos`, `TrackLayoutSymbols`.`YPos`, " +
             "`TriggerContact`.`ModulAddress` AS `TriggerModulAddress`, " +
             "`TriggerContact`.`ContactNumber` AS `TriggerModulContactNumber`, " +
             "`BlockContact`.`ModulAddress` AS `BlockModulAddress`, " +
@@ -74,8 +72,14 @@ public class BlockListRepository {
                 map.put(
                     rs.getLong("Id"),
                     new BlockContactData(
-                        new ContactData(rs.getInt("TriggerModulAddress"), rs.getInt("TriggerModulContactNumber")),
-                        new ContactData(rs.getInt("BlockModulAddress"), rs.getInt("BlockModulContactNumber")),
+                        new ContactData(
+                            rs.getInt("TriggerModulAddress"),
+                            rs.getInt("TriggerModulContactNumber")
+                        ),
+                        new ContactData(
+                            rs.getInt("BlockModulAddress"),
+                            rs.getInt("BlockModulContactNumber")
+                        ),
                         trainId
                     )
                 );

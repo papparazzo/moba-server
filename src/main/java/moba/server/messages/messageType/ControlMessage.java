@@ -20,10 +20,10 @@
 package moba.server.messages.messageType;
 
 import moba.server.datatypes.enumerations.ClientError;
-import moba.server.messages.MessageType;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.messages.MessageTypeInterface;
+import moba.server.exceptions.ClientErrorException;
 
-public enum ControlMessage implements MessageType {
+public enum ControlMessage implements MessageTypeInterface {
     GET_BLOCK_LIST_REQ        (1),
     GET_BLOCK_LIST_RES        (2),
     SAVE_BLOCK_LIST           (3),
