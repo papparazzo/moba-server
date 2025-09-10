@@ -22,20 +22,20 @@ package moba.server.repositories;
 
 import moba.server.datatypes.enumerations.SwitchStand;
 import moba.server.datatypes.collections.SwitchStateMap;
-import moba.server.datatypes.objects.SwitchData;
+import moba.server.datatypes.objects.SwitchStandData;
 import moba.server.utilities.CheckedEnum;
 import moba.server.utilities.Database;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class SwitchStateListRepository {
+public class SwitchStateRepository {
     protected final Database database;
 
-    public SwitchStateListRepository(Database database) {
+    public SwitchStateRepository(Database database) {
         this.database = database;
     }
 
@@ -60,7 +60,7 @@ public class SwitchStateListRepository {
             while(rs.next()) {
                 map.put(
                     rs.getLong("Id"),
-                    new SwitchData(
+                    new SwitchStandData(
                         rs.getLong("Address"),
                         CheckedEnum.getFromString(SwitchStand.class, rs.getString("SwitchStand"))
                     )

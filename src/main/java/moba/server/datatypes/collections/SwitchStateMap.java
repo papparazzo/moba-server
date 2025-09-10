@@ -20,9 +20,9 @@
 
 package moba.server.datatypes.collections;
 
-import moba.server.datatypes.objects.SwitchData;
+import moba.server.datatypes.objects.SwitchStandData;
 
 import java.util.HashMap;
 
-public class SwitchStateMap extends HashMap<Long, SwitchData> {
+public class SwitchStateMap extends HashMap<Long, SwitchStandData> {
 }

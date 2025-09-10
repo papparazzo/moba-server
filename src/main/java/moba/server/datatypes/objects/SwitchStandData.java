@@ -22,7 +22,7 @@ package moba.server.datatypes.objects;
 
 import moba.server.datatypes.enumerations.SwitchStand;
 
-public record SwitchData(
+public record SwitchStandData(
     long address,
     SwitchStand stand
 ) {
