@@ -39,13 +39,13 @@ import java.util.concurrent.TimeUnit;
 
 import moba.server.com.Dispatcher;
 import moba.server.datatypes.objects.PointInTime;
+import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
-import moba.server.messages.MessageHandlerA;
 import moba.server.messages.messageType.InterfaceMessage;
 import moba.server.messages.messageType.TimerMessage;
 import moba.server.utilities.Database;
 import moba.server.utilities.config.Config;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 
 /*
  * https://www.laenderdaten.info/Europa/Deutschland/sonnenuntergang.php
@@ -55,7 +55,7 @@ import moba.server.utilities.exceptions.ClientErrorException;
  * ab 21:00 Uhr Sonnenuntergang
  * ab 22:00 Uht Nacht
  */
-public class Timer extends MessageHandlerA implements Runnable {
+public class Timer extends AbstractMessageHandler implements Runnable {
     protected Config          config;
     protected final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     protected GlobalTimerData timerData = null;
