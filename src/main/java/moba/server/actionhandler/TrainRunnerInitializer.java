@@ -23,13 +23,13 @@ package moba.server.actionhandler;
 import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.datatypes.collections.SwitchStateMap;
 import moba.server.repositories.BlockListRepository;
-import moba.server.repositories.LayoutRepository;
-import moba.server.repositories.SwitchStateListRepository;
+import moba.server.repositories.TrackLayoutRepository;
+import moba.server.repositories.SwitchStateRepository;
 import moba.server.routing.parser.LayoutParser;
 import moba.server.routing.router.SimpleRouter;
 import moba.server.routing.typedefs.BlockNodeMap;
 import moba.server.utilities.Database;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 
 import java.sql.SQLException;
 
@@ -41,16 +41,16 @@ final public class TrainRunnerInitializer {
         this.database = database;
     }
 
-    public Trainrunner getTrainRunner(long activeLayoutId)
+    public TrainRunner getTrainRunner(long activeLayoutId)
         throws SQLException, ClientErrorException {
 
         //TrainlistRepository trainList = new TrainlistRepository(database);
-        LayoutRepository layout = new LayoutRepository(database);
+        TrackLayoutRepository layout = new TrackLayoutRepository(database);
 
         BlockListRepository blockListRepository = new BlockListRepository(database);
         BlockContactDataMap blockContacts = blockListRepository.getBlockList(activeLayoutId);
 
-        SwitchStateListRepository switchStateListRepository = new SwitchStateListRepository(database);
+        SwitchStateRepository switchStateListRepository = new SwitchStateRepository(database);
         SwitchStateMap switchStates = switchStateListRepository.getSwitchStateList(activeLayoutId);
 
         LayoutParser parser = new LayoutParser(
@@ -65,7 +65,7 @@ final public class TrainRunnerInitializer {
         SimpleRouter router = new SimpleRouter(blocks);
 
         ActionListGenerator generator = new ActionListGenerator(blockContacts, switchStates);
-        return new Trainrunner(router, generator);
+        return new TrainRunner(router, generator);
 
     }
 }

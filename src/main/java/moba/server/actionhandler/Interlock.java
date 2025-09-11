@@ -22,7 +22,7 @@ package moba.server.actionhandler;
 
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.utilities.Database;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 import moba.server.utilities.logger.Loggable;
 
 import java.sql.Connection;

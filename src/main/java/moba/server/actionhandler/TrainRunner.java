@@ -24,7 +24,6 @@ import moba.server.datatypes.objects.*;
 import moba.server.routing.router.RoutingListItem;
 import moba.server.routing.router.SimpleRouter;
 
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -95,10 +94,7 @@ final public class TrainRunner {
 
     }
 
-*/
-/*
-
-        public boolean block(RoutingListItem itemList)
+    public boolean block(RoutingListItem itemList)
     throws SQLException {
 
         RoutingListItem current = itemList;
