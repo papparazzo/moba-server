@@ -43,7 +43,7 @@ final public class ActionListGenerator {
         ActionListCollection actionLists = new ActionListCollection();
 
         for(Long switchId : switchingList) {
-            SwitchData s = switchStates.get(switchId);
+            SwitchStandData s = switchStates.get(switchId);
 
             if(s.stand() == SwitchStand.BEND) {
                 actionLists.addActionList(new ActionList(ActionType.SWITCHING_RED, s.address()));

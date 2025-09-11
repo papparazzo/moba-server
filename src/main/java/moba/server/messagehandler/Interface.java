@@ -22,11 +22,17 @@ package moba.server.messagehandler;
 
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
+import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.datatypes.enumerations.Connectivity;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.enumerations.IncidentLevel;
 import moba.server.datatypes.enumerations.IncidentType;
+import moba.server.datatypes.objects.ActionListCollection;
 import moba.server.messages.AbstractMessageHandler;
+import moba.server.repositories.BlockListRepository;
+import moba.server.repositories.SwitchStateRepository;
+import moba.server.routing.router.SimpleRouter;
+import moba.server.routing.typedefs.BlockNodeMap;
 import moba.server.utilities.CheckedEnum;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.Message;
@@ -35,6 +41,8 @@ import moba.server.messages.messageType.InterfaceMessage;
 import moba.server.messages.messageType.InternMessage;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.utilities.messaging.IncidentHandler;
+
+import java.sql.SQLException;
 
 final public class Interface extends AbstractMessageHandler {
 
@@ -54,16 +62,29 @@ final public class Interface extends AbstractMessageHandler {
 
     @Override
     public void handleMsg(Message msg)
-    throws ClientErrorException {
-        switch(InterfaceMessage.fromId(msg.getMessageId())) {
-            case CONNECTIVITY_STATE_CHANGED:
-                setConnectivity(CheckedEnum.getFromString(Connectivity.class, (String)msg.getData()), msg.getEndpoint());
-                return;
+    throws SQLException, ClientErrorException {
+        Endpoint ep = msg.getEndpoint();
 
-            case SET_ACTION_LIST:
-            case REPLACE_ACTION_LIST:
-            case DELETE_ACTION_LIST:
-                dispatcher.sendGroup(msg);
+        switch(InterfaceMessage.fromId(msg.getMessageId())) {
+            case CONNECTIVITY_STATE_CHANGED
+                -> setConnectivity(CheckedEnum.getFromString(Connectivity.class, (String)msg.getData()), ep);
+
+            case ROUTE_SWITCHED
+                -> routeSwitched(msg);
+
+            case ROUTE_RELEASED
+                -> releaseRoute(msg);
+
+            case BLOCK_RELEASED
+                -> releaseBlock(msg);
+
+            case PUSH_TRAIN
+                -> pushTrain(msg);
+
+            case SET_ACTION_LIST,
+                 REPLACE_ACTION_LIST,
+                 DELETE_ACTION_LIST
+                -> dispatcher.sendGroup(msg);
         }
     }
 

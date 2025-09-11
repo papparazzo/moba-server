@@ -27,7 +27,11 @@ public enum InterfaceMessage implements MessageTypeInterface {
     CONNECTIVITY_STATE_CHANGED(1),
 	SET_ACTION_LIST           (2),
 	REPLACE_ACTION_LIST       (3),
-	DELETE_ACTION_LIST        (4);
+	DELETE_ACTION_LIST        (4),
+    ROUTE_SWITCHED            (5),
+	ROUTE_RELEASED            (6),
+	BLOCK_RELEASED            (7),
+    PUSH_TRAIN                (8);
 
     public final static int GROUP_ID = 6;
 
