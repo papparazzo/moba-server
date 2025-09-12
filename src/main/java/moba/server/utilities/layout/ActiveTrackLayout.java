@@ -18,24 +18,24 @@
  *
  */
 
-package moba.server.utilities;
+package moba.server.utilities.layout;
 
 import java.io.IOException;
 import java.util.HashMap;
 import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.ClientError;
+import moba.server.exceptions.ClientErrorException;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.LayoutMessage;
 import moba.server.utilities.config.Config;
-import moba.server.utilities.exceptions.ClientErrorException;
 
-public class ActiveLayout {
+public class ActiveTrackLayout {
 
     protected Long activeLayout;
     protected final Dispatcher dispatcher;
     protected final Config config;
 
-    public ActiveLayout(Dispatcher dispatcher, Config config) {
+    public ActiveTrackLayout(Dispatcher dispatcher, Config config) {
         this.config = config;
         this.dispatcher = dispatcher;
         activeLayout = (Long)config.getSection("trackLayout.activeTrackLayoutId");
@@ -49,10 +49,10 @@ public class ActiveLayout {
         return activeLayout;
     }
 
-    public long getActiveLayout(Object defaultId)
+    public long getActiveLayout(Long defaultId)
     throws ClientErrorException {
         if(defaultId != null) {
-            return (long)defaultId;
+            return defaultId;
         }
         if(activeLayout != null) {
             return activeLayout;

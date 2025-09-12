@@ -162,6 +162,7 @@ final public class MessageLoop {
 
         String data = (String)msg.getData();
 
+        // TODO Consider to refactor this.
         if(Objects.equals(data, "")) {
             incidentHandler.add(new IncidentData(
                 IncidentLevel.NOTICE,

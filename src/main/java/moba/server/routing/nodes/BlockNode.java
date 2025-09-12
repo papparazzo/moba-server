@@ -26,6 +26,13 @@ import moba.server.routing.Direction;
 
 final public class BlockNode extends AbstractNode {
 
+    // TODO: Limitations!
+    //       Güterzug
+    //       Nahverkehr
+    //       Fernverkehr
+    //       Oberleitung
+    //       Rangierzug
+
     private NodeInterface in = null;
     private NodeInterface out = null;
 

@@ -40,11 +40,13 @@ final public class SimpleRouter {
     }
 
     public RoutingListItem getRoute(TrainDestination destination) {
-        // Limitations:
-        // Güterzug
-        // Oberleitung
-        // Fahrtrichtung nur vorwärts
-        // Rangierzug
+        // TODO: Limitations!
+        //       Güterzug
+        //       Oberleitung
+        //       Nahverkehr
+        //       Fernverkehr
+        //       Fahrtrichtung nur vorwärts
+        //       Rangierzug
 
         long fromBlock = destination.trainId().blockId();
         long toBlock = destination.destinationBlockId();
@@ -60,7 +62,7 @@ final public class SimpleRouter {
             return null;
         }
 
-        // TODO Hier noch die Fahrtrichtung berücksichtigen...
+        // TODO: Hier noch die Fahrtrichtung berücksichtigen...
         RoutingListItem itemL = fetchNextNode(block, block.getIn(), fromBlock, toBlock);
         RoutingListItem itemR = fetchNextNode(block, block.getOut(), fromBlock, toBlock);
 

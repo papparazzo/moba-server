@@ -22,9 +22,7 @@ package moba.server.messagehandler;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 
 import moba.server.com.Dispatcher;
 import moba.server.datatypes.collections.BlockContactDataMap;
@@ -32,18 +30,11 @@ import moba.server.datatypes.collections.SwitchStateMap;
 import moba.server.datatypes.collections.TrainList;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.objects.*;
-import moba.server.datatypes.objects.TrainData;
 import moba.server.messages.AbstractMessageHandler;
-import moba.server.messages.messageType.InterfaceMessage;
 import moba.server.repositories.BlockListRepository;
-import moba.server.repositories.LayoutRepository;
 import moba.server.repositories.SwitchStateRepository;
 import moba.server.repositories.TrainlistRepository;
-import moba.server.routing.LayoutParser;
-import moba.server.routing.router.SimpleRouter;
-import moba.server.routing.TrainRun;
 import moba.server.routing.typedefs.*;
-import moba.server.utilities.Database;
 import moba.server.utilities.ActiveLayout;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.ControlMessage;
@@ -53,11 +44,9 @@ import moba.server.utilities.logger.Loggable;
 
 final public class Control extends AbstractMessageHandler implements Loggable {
     private final BlockListRepository blocklistRepository;
-    SwitchStateRepository switchStateRepository = new SwitchStateListRepository(database);
+    SwitchStateRepository switchStateRepository = new SwitchStateRepository(database);
 
     private final ActiveLayout activeLayout;
-    private final Interlock    interlock;
-    private final TrainRunner  trainRunner;
 
     private final TrackLayoutLock lock;
 
