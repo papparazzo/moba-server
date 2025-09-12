@@ -21,7 +21,7 @@
 package moba.server.datatypes.enumerations;
 
 import moba.server.utilities.CheckedEnum;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 
 public enum Switch {
     ON,

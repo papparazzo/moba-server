@@ -31,13 +31,9 @@ public enum ControlMessage implements MessageTypeInterface {
     GET_SWITCH_STAND_LIST_RES (5),
     // SAVE_SWITCH_STAND_LIST    (6),
     GET_TRAIN_LIST_REQ        (7),
-    GET_TRAIN_LIST_RES        (8),
+    GET_TRAIN_LIST_RES        (8);
     // SAVE_TRAIN_LIST           (9),
 
-	ROUTE_SWITCHED            (10),
-	ROUTE_RELEASED            (11),
-	BLOCK_RELEASED            (12),
-    PUSH_TRAIN                (13);
 
     public final static int GROUP_ID = 10;
 

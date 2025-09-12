@@ -25,7 +25,7 @@ import moba.server.datatypes.enumerations.DrivingDirection;
 import moba.server.datatypes.objects.Train;
 import moba.server.utilities.CheckedEnum;
 import moba.server.utilities.Database;
-import moba.server.utilities.exceptions.ClientErrorException;
+import moba.server.exceptions.ClientErrorException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

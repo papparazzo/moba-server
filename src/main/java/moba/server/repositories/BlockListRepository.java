@@ -88,11 +88,8 @@ public class BlockListRepository {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public void saveBlockList(Map<String, Object> map)
+    public void saveBlockList(long id, BlockContactDataMap container)
     throws SQLException, ClientErrorException {
-
-        long id = (long)map.get("id");
 
         Connection con = database.getConnection();
 
@@ -116,35 +113,30 @@ public class BlockListRepository {
             pstmt.executeUpdate();
         }
 
-        ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
-
-        for(Object item : arrayList) {
-            Map<String, Object> block = (Map<String, Object>)item;
+        for (Map.Entry<Long, BlockContactData> entry : container.entrySet()) {
+            Long key = entry.getKey();
+            BlockContactData value = entry.getValue();
 
             stmt =
                 "INSERT INTO `BlockSections` " +
-                "(`Id`, `BrakeTriggerContactId`, `BlockContactId`, `TrainId`, `Locked`) " +
-                "SELECT `Id`, ?, ?, ?, ? " +
-                "FROM `TrackLayoutSymbols` " +
-                "WHERE `XPos` = ? AND `YPos` = ? AND `TrackLayoutId` = ?";
+                "(`Id`, `BrakeTriggerContactId`, `BlockContactId`, `TrainId`) " +
+                "VALUES (?, " +
+                    "(SELECT `Id` FROM `FeedbackContacts` WHERE `ModulAddress` = ? AND `ContactNumber` = ?), " +
+                    "(SELECT `Id` FROM `FeedbackContacts` WHERE `ModulAddress` = ? AND `ContactNumber` = ?), ?)";
 
             try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-                pstmt.setLong(5, (long)block.get("brakeTriggerContact"));
-                // TODO: Das hier muss noch entsprechend implementiert werden!!
-                pstmt.setLong(1, (long)block.get("symbol"));
-                /*
-                Integer	xPos
-                Integer	yPos
-                ContactData	brakeTriggerContact
-                ContactData	blockContact
-                Integer	trainId
-                */
-                pstmt.setLong(2, id);
-                pstmt.setLong(3, (long)block.get("xPos"));
-                pstmt.setLong(4, (long)block.get("yPos"));
+                pstmt.setLong(1, key);
+                pstmt.setLong(2, value.brakeTriggerContact().moduleAddr());
+                pstmt.setLong(3, value.brakeTriggerContact().contactNb());
+                pstmt.setLong(4, value.blockContact().moduleAddr());
+                pstmt.setLong(5, value.blockContact().contactNb());
+                if(value.trainId() == null) {
+                    pstmt.setNull(6, java.sql.Types.INTEGER);
+                } else {
+                    pstmt.setLong(6, value.trainId());
+                }
                 pstmt.executeUpdate();
             }
         }
-
     }
 }
