@@ -31,6 +31,8 @@ import moba.server.datatypes.objects.ActionListCollection;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.repositories.BlockListRepository;
 import moba.server.repositories.SwitchStateRepository;
+import moba.server.repositories.TrackLayoutRepository;
+import moba.server.repositories.TrainlistRepository;
 import moba.server.routing.router.SimpleRouter;
 import moba.server.routing.typedefs.BlockNodeMap;
 import moba.server.utilities.CheckedEnum;
@@ -40,6 +42,7 @@ import moba.server.messages.MessageQueue;
 import moba.server.messages.messageType.InterfaceMessage;
 import moba.server.messages.messageType.InternMessage;
 import moba.server.exceptions.ClientErrorException;
+import moba.server.utilities.Database;
 import moba.server.utilities.messaging.IncidentHandler;
 
 import java.sql.SQLException;
@@ -120,11 +123,9 @@ final public class Interface extends AbstractMessageHandler {
         //long id = activeLayout.getActiveLayout(msg.getData());
         long id = 10;
 
-
-        /*
         TrainlistRepository trainList = new TrainlistRepository(database);
+        TrackLayoutRepository layout = new TrackLayoutRepository(database);
 
-        LayoutRepository layout = new LayoutRepository(database);
         BlockListRepository blocklist = new BlockListRepository(database);
         BlockContactDataMap blockContacts = blocklist.getBlockList(id);
 
@@ -135,6 +136,9 @@ final public class Interface extends AbstractMessageHandler {
             blockContacts,
             switchState.getSwitchStateList(id)
         );
+
+
+        /*
 
         parser.parse();
 
