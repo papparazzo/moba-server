@@ -96,7 +96,7 @@ public class Timer extends AbstractMessageHandler implements Runnable {
                 dispatcher.sendSingle(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData), msg.getEndpoint());
 
             case SET_GLOBAL_TIMER -> {
-                timerData.fromJsonObject((Map<String, Object>)msg.getData());
+                timerData = GlobalTimerData.fromJsonObject((Map<String, Object>)msg.getData());
                 storeData();
                 dispatcher.sendGroup(new Message(TimerMessage.SET_GLOBAL_TIMER, timerData));
             }

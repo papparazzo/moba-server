@@ -94,21 +94,25 @@ public class GlobalTimerData {
         sunsetStartTime = new Time(val);
     }
 
-    public void fromJsonObject(Map<String, Object> map)
+    public static GlobalTimerData fromJsonObject(Map<String, Object> map)
     throws ClientErrorException {
         @SuppressWarnings("unchecked")
         var pt = (Map<String, Object>)map.get("modelTime");
 
-        modelTime.setDay(CheckedEnum.getFromString(Day.class, (String)pt.get("day")));
-        modelTime.setTime(new Time(((Long)pt.get("time")).intValue()));
+        GlobalTimerData gtd = new GlobalTimerData();
 
-        setMultiplicator(((Long)map.get("multiplicator")).intValue());
+        gtd.modelTime.setDay(CheckedEnum.getFromString(Day.class, (String)pt.get("day")));
+        gtd.modelTime.setTime(new Time(((Long)pt.get("time")).intValue()));
 
-        setNightStartTime(((Long)map.get("nightStartTime")).intValue());
-        setSunriseStartTime(((Long)map.get("sunriseStartTime")).intValue());
-        setDayStartTime(((Long)map.get("dayStartTime")).intValue());
-        setSunsetStartTime(((Long)map.get("sunsetStartTime")).intValue());
-        validate();
+        gtd.setMultiplicator(((Long)map.get("multiplicator")).intValue());
+
+        gtd.setNightStartTime(((Long)map.get("nightStartTime")).intValue());
+        gtd.setSunriseStartTime(((Long)map.get("sunriseStartTime")).intValue());
+        gtd.setDayStartTime(((Long)map.get("dayStartTime")).intValue());
+        gtd.setSunsetStartTime(((Long)map.get("sunsetStartTime")).intValue());
+        gtd.validate();
+
+        return gtd;
     }
 
     protected void validate()
