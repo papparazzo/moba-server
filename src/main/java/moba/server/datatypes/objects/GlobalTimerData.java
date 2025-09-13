@@ -52,8 +52,8 @@ public class GlobalTimerData {
 
     public void setMultiplicator(int multiplicator)
     throws IllegalArgumentException {
-        if(multiplicator < 1 || multiplicator > 4) {
-            throw new IllegalArgumentException("multiplicator out of range (< 1 || > 4)");
+        if(multiplicator != 1 && multiplicator != 2 && multiplicator != 4) {
+            throw new IllegalArgumentException("multiplicator out of range (only 1, 2 and 4 are allowed)");
         }
         this.multiplicator = multiplicator;
     }
