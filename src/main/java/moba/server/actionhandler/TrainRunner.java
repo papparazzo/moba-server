@@ -70,11 +70,6 @@ final public class TrainRunner {
 
         RoutingListItem routingListItem = routing.getRoute(trainDestination);
 
-        
-
-
-
-
         //return generator.getTrainActionList(trainDestination, itemList);
 
         /*
@@ -86,12 +81,8 @@ final public class TrainRunner {
         return false;
     }
 
-
-
 /*
     private ActionListCollection getActionList(Train train, int toBlock) {
-
-
     }
 
     public boolean block(RoutingListItem itemList)
@@ -99,9 +90,6 @@ final public class TrainRunner {
 
         RoutingListItem current = itemList;
         while (current.successor() != null) {
-
-
-
             current = current.successor();
 
             if(block()) {

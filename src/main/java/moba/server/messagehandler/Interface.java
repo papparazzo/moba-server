@@ -117,87 +117,16 @@ final public class Interface extends AbstractMessageHandler {
 
     }
 
-    private void pushTrain(Message msg)
-    throws SQLException, ClientErrorException {
+    private void pushTrain(Message msg) {
 
-        //long id = activeLayout.getActiveLayout(msg.getData());
-        long id = 10;
+    }
 
-        TrainlistRepository trainList = new TrainlistRepository(database);
-        TrackLayoutRepository layout = new TrackLayoutRepository(database);
-
-        BlockListRepository blocklist = new BlockListRepository(database);
-        BlockContactDataMap blockContacts = blocklist.getBlockList(id);
-
-        SwitchStateRepository switchState = new SwitchStateRepository(database);
-
-        LayoutParser parser = new LayoutParser(
-            layout.getLayout(id),
-            blockContacts,
-            switchState.getSwitchStateList(id)
-        );
-
-
-        /*
-
-        parser.parse();
-
-        BlockNodeMap blocks = parser.getBlockMap();
-        SwitchNodeMap switches = parser.getSwitchMap();
-
-        SimpleRouter router = new SimpleRouter(blocks);
-
-        TrainRun runner = new TrainRun(blockContacts, router);
-
-        long trainId = 1;
-
-        TrainData train = trainList.getTrainList(id).get(trainId);
-
-        int toBlockId = (int)(long)msg.getData();
-
-        ActionListCollection actionLists = runner.getActionList(train, toBlockId);
-        dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, actionLists));
-
-       /*
-
-        Connection con = database.getConnection();
-
-        var data = (Map<String, Object>)msg.getData();
-        var trainId = (long)data.get("trainId");
-        var fromBlock = (long)data.get("fromBlock");
-        var toBlock = (long)data.get("toBlock");
-
-        // FIXME: Transaction
+    private void setSwitch() {
         String q =
-            "UPDATE `BlockSections` SET `BlockSections`.`TrainId` = NULL " +
-            "WHERE `BlockSections`.`Id` = ? AND `BlockSections`.`TrainId` = ?";
-
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, fromBlock);
-            pstmt.setLong(2, trainId);
-            if(pstmt.executeUpdate() != 1) {
-                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not update <" + trainId + ">");
-            }
-        }
-
-        q =
-            "UPDATE `BlockSections` SET `BlockSections`.`TrainId` = ? " +
-            "WHERE `BlockSections`.`Id` = ?";
-
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, trainId);
-            pstmt.setLong(2, toBlock);
-            if(pstmt.executeUpdate() != 1) {
-                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not update <" + trainId + ">");
-            }
-        }
-
-        // TODO Das hier per Api setzen!
-
-        q =
             "UPDATE `Trains` SET `Trains`.`DrivingDirection` = ? " +
             "WHERE `Trains`.`Id` = ?";
 
+        /*
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
             pstmt.setString(1, (String)data.get("direction"));
             pstmt.setLong(2, trainId);

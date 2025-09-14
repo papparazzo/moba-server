@@ -42,7 +42,7 @@ final public class TrainRunnerInitializer {
     }
 
     public TrainRunner getTrainRunner(long activeLayoutId)
-        throws SQLException, ClientErrorException {
+    throws SQLException, ClientErrorException {
 
         //TrainlistRepository trainList = new TrainlistRepository(database);
         TrackLayoutRepository layout = new TrackLayoutRepository(database);
@@ -66,6 +66,5 @@ final public class TrainRunnerInitializer {
 
         ActionListGenerator generator = new ActionListGenerator(blockContacts, switchStates);
         return new TrainRunner(router, generator);
-
     }
 }
