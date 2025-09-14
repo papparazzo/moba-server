@@ -36,10 +36,19 @@ import moba.server.utilities.Database;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/*
+ * https://www.laenderdaten.info/Europa/Deutschland/sonnenuntergang.php
+ *
+ * ab 04:00 Uhr Sonnenaufgang
+ * ab 05:00 Uhr Tag
+ * ab 21:00 Uhr Sonnenuntergang
+ * ab 22:00 Uht Nacht
+ */
 public class Scheduler implements Runnable {
 
     protected Dispatcher dispatcher;
@@ -54,7 +63,7 @@ public class Scheduler implements Runnable {
         this.dispatcher = dispatcher;
         this.database = database;
         this.scheduler.scheduleWithFixedDelay(this, 1, 1, TimeUnit.SECONDS);
-        this.timerData = timerData;
+        this.timerData = Objects.requireNonNullElseGet(timerData, GlobalTimerData::new);
     }
 
     public void enable(boolean enable) {
