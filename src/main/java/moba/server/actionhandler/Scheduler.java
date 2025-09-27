@@ -21,21 +21,14 @@
 package moba.server.actionhandler;
 
 import moba.server.com.Dispatcher;
-import moba.server.datatypes.base.Time;
-import moba.server.datatypes.enumerations.ActionType;
-import moba.server.datatypes.enumerations.Day;
-import moba.server.datatypes.objects.ActionList;
-import moba.server.datatypes.objects.ActionListCollection;
 import moba.server.datatypes.objects.GlobalTimerData;
-import moba.server.datatypes.objects.PointInTime;
 import moba.server.messages.Message;
-import moba.server.messages.messageType.InterfaceMessage;
 import moba.server.messages.messageType.TimerMessage;
+import moba.server.timedaction.TimedActionInterface;
 import moba.server.utilities.Database;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -49,21 +42,25 @@ import java.util.concurrent.TimeUnit;
  * ab 21:00 Uhr Sonnenuntergang
  * ab 22:00 Uht Nacht
  */
-public class Scheduler implements Runnable {
+final public class Scheduler implements Runnable {
 
-    protected Dispatcher dispatcher;
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final Dispatcher                 dispatcher;
+    private GlobalTimerData                  timerData;
 
-    protected final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    protected GlobalTimerData timerData;
-    protected Database        database;
+    private final List<TimedActionInterface> timedActions = new ArrayList<>();
 
-    protected volatile boolean isRunning = false;
+    private volatile boolean                 isRunning = false;
 
-    public Scheduler(Dispatcher dispatcher, GlobalTimerData timerData, Database database) {
+    public Scheduler(Dispatcher dispatcher, GlobalTimerData timerData) {
         this.dispatcher = dispatcher;
-        this.database = database;
+
         this.scheduler.scheduleWithFixedDelay(this, 1, 1, TimeUnit.SECONDS);
         this.timerData = Objects.requireNonNullElseGet(timerData, GlobalTimerData::new);
+    }
+
+    public void addTimedAction(TimedActionInterface timedAction) {
+        timedActions.add(timedAction);
     }
 
     public void enable(boolean enable) {
@@ -94,89 +91,11 @@ public class Scheduler implements Runnable {
                 dispatcher.sendGroup(new Message(TimerMessage.GLOBAL_TIMER_EVENT, timerData.getModelTime()));
             }
 
-            trigger(timerData.getModelTime(), timerData.getMultiplicator());
-
-        } catch(Exception ignored) {
-
-        }
-    }
-
-    private void trigger(PointInTime time, int multiplicator)
-    throws SQLException {
-
-        Time t1 = time.getTime();
-        Time t2 = time.getTime();
-
-        Day d1 = time.getDay();
-
-        ResultSet rs;
-
-        if(t2.hasDayChange(multiplicator)) {
-            rs = getResultWithDaySwitch(t1.getTime(), t2.getTime(multiplicator), d1.toString(), d1.next().toString());
-        } else {
-            rs = getResultSameDay(t1.getTime(), t2.getTime(multiplicator), d1.toString());
-        }
-
-        if (!rs.next() ) {
-            // no records, no actions!
-            return;
-        }
-
-        ActionList actionList = new ActionList();
-
-        do {
-            int localId = rs.getInt("LocalId");
-            if(rs.getBoolean("SwitchOn")) {
-                actionList.addAction(ActionType.SWITCHING_GREEN, localId);
-            } else {
-                actionList.addAction(ActionType.SWITCHING_RED, localId);
+            for(TimedActionInterface timedAction : timedActions) {
+                timedAction.trigger(timerData.getModelTime(), timerData.getMultiplicator());
             }
-        } while (rs.next());
+        } catch(Throwable ignored) {
 
-        ActionListCollection collection = new ActionListCollection();
-        collection.addActionList(actionList);
-
-        dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, collection));
-    }
-
-    private ResultSet getResultWithDaySwitch(String t1, String t2, String d1, String d2)
-    throws SQLException {
-
-        String q =
-            "SELECT LocalId, SwitchOn " +
-            "FROM FunctionCycleTimes " +
-            "LEFT JOIN FunctionAddresses " +
-            "ON FunctionCycleTimes.FunctionAddressId = FunctionAddresses.Id " +
-            "WHERE ((Weekdays = ? AND Time >= ?) OR (Weekdays = ? AND Time < ?)) " +
-            "AND ((AtRandom = 1 AND (FLOOR(RAND() * 10) % 2)) OR AtRandom = 0)";
-
-        try(PreparedStatement stmt = database.getConnection().prepareStatement(q)) {
-            stmt.setString(1, d1);
-            stmt.setString(2, t1);
-
-            stmt.setString(3, d2);
-            stmt.setString(4, t2);
-
-            return stmt.executeQuery();
-        }
-    }
-
-    private ResultSet getResultSameDay(String t1, String t2, String d1)
-    throws SQLException {
-        String q =
-            "SELECT LocalId, SwitchOn " +
-            "FROM FunctionCycleTimes " +
-            "LEFT JOIN FunctionAddresses " +
-            "ON FunctionCycleTimes.FunctionAddressId = FunctionAddresses.Id " +
-            "WHERE Weekdays = ? AND Time >= ? AND Time < ? " +
-            "AND ((AtRandom = 1 AND (FLOOR(RAND() * 10) % 2)) OR AtRandom = 0)";
-
-        try(PreparedStatement stmt = database.getConnection().prepareStatement(q)) {
-            stmt.setString(1, d1);
-            stmt.setString(2, t1);
-            stmt.setString(3, t2);
-
-            return stmt.executeQuery();
         }
     }
 }

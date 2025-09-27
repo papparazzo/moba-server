@@ -31,7 +31,6 @@ import moba.server.com.Dispatcher;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.TimerMessage;
-import moba.server.utilities.Database;
 import moba.server.utilities.config.Config;
 import moba.server.exceptions.ClientErrorException;
 
@@ -39,12 +38,13 @@ final public class Timer extends AbstractMessageHandler {
     private final Scheduler scheduler;
     private final Config    config;
 
-    public Timer(Dispatcher dispatcher, Config config, Database database) {
+    public Timer(Dispatcher dispatcher, Config config, Scheduler scheduler) {
         this.dispatcher = dispatcher;
         this.config = config;
 
         GlobalTimerData timerData = (GlobalTimerData)config.getSection("globalTimer.globalTimer");
-        this.scheduler = new Scheduler(dispatcher, timerData, database);
+        this.scheduler = scheduler;
+        this.scheduler.setTimerData(timerData);
     }
 
     @Override
