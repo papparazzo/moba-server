@@ -29,6 +29,8 @@ public enum EnvironmentMessage implements MessageTypeInterface {
     SET_ENVIRONMENT  (2),
     SET_AMBIENCE     (3),
     SET_AMBIENT_LIGHT(4);
+    //SET_
+
 
     public final static int GROUP_ID = 5;
 

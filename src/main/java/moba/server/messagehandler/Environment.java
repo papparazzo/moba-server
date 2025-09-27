@@ -21,28 +21,45 @@
 package moba.server.messagehandler;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import moba.server.com.Dispatcher;
 
-import moba.server.datatypes.objects.EnvironmentData;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.EnvironmentMessage;
 import moba.server.utilities.config.Config;
 import moba.server.exceptions.ClientErrorException;
 
+/*
+ * TODO Environment: Hier benötigen wir auch eine Rückmeldung, wann eine Aktion abgeschlossen ist.
+ *                   Zum Beispiel Bahnübergang: Zug darf erst fahren wenn Schranken unten sind
+ *                   Rückmeldung auch bei Rollladen rauf / runter, Gewittersturm, Orgelkonzert in Kirche...
+ *
+ *                   Action:
+ *                       On:       eingeschaltet (z.B. Orgelkonzert, Endlosschleife)
+ *                       Off:      ausgeschaltet
+ *                       Trigger:  einmalig durchlaufen (Orgelkonzert einmalig, Lampe an, 5 Sek. warten, Lampe aus)
+ *
+ *                   Status kann aktiv gemeldet werden wenn Aktion fertig (Finish) oder abgefragt werden (Running, Ready)
+ *
+ *                   Status:
+ *                       Off:          ausgeschaltet.
+ *                       SwitchingOn:  wird gerade eingeschaltet (Bahnübergang: Schranken senken sich)
+ *                       Aktive:       eingeschaltet, aktiv, läuft aktuell
+ *                       SwitchingOff: wird gerade ausgeschlatet (Bahnübergang: Schranken senken sich)
+ *
+ * Environment Applikation muss beim Shutdown speichern, welche Aktion gerade an war.
+ *
+ * FIXME: Müssen wir in der Tabelle FunktionAddresses speichern ob Kontakt nur "triggable" ist? -> nein!
+ *
+ *      GET_ALL_FUNCTION_ADDRESSES: Select auf Tabelle FunctionAddresses
+ */
+
 public class Environment extends AbstractMessageHandler {
     protected final Config config;
 
-    protected final EnvironmentData environment = new EnvironmentData();
-
-    @SuppressWarnings("unchecked")
-    public Environment(Dispatcher dispatcher, Config config)
-    throws ClientErrorException {
+    public Environment(Dispatcher dispatcher, Config config) {
         this.dispatcher = dispatcher;
         this.config = config;
-        this.environment.fromJsonObject((Map<String, Object>)config.getSection("environment.environment"));
     }
 
     @Override
@@ -51,29 +68,26 @@ public class Environment extends AbstractMessageHandler {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void handleMsg(Message msg)
     throws ClientErrorException, IOException {
         switch(EnvironmentMessage.fromId(msg.getMessageId())) {
-            case GET_ENVIRONMENT ->
-                dispatcher.sendSingle(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment), msg.getEndpoint());
+            //case GET_ENVIRONMENT ->
+              //  dispatcher.sendSingle(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment), msg.getEndpoint());
 
-            case SET_ENVIRONMENT -> {
-                environment.fromJsonObject((Map<String, Object>)msg.getData());
-                storeData();
-                dispatcher.sendGroup(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment));
-            }
+            //case SET_ENVIRONMENT ->
+                //dispatcher.sendGroup(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment));
+
 
             case SET_AMBIENCE, SET_AMBIENT_LIGHT ->
                 dispatcher.sendGroup(msg);
         }
     }
 
-    protected void storeData()
-    throws IOException {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("environment", environment);
-        config.setSection("environment", map);
-        config.writeFile();
-    }
+
+    /*
+
+     * AmbienceData	ToggleState	curtainUp	Rollo rauf	Rollo rauf runter
+     * 	ToggleState	mainLightOn	Schreibtischlampe an / aus
+     */
+
 }
