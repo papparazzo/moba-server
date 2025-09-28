@@ -23,9 +23,11 @@ package moba.server.messagehandler;
 import java.io.IOException;
 import moba.server.com.Dispatcher;
 
+import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.EnvironmentMessage;
+import moba.server.repositories.FunctionAddressesRepository;
 import moba.server.utilities.config.Config;
 import moba.server.exceptions.ClientErrorException;
 
@@ -51,15 +53,14 @@ import moba.server.exceptions.ClientErrorException;
  *
  * FIXME: Müssen wir in der Tabelle FunktionAddresses speichern ob Kontakt nur "triggable" ist? -> nein!
  *
- *      GET_ALL_FUNCTION_ADDRESSES: Select auf Tabelle FunctionAddresses
  */
 
-public class Environment extends AbstractMessageHandler {
-    protected final Config config;
+final public class Environment extends AbstractMessageHandler {
+    private final FunctionAddressesRepository addressesRepo;
 
-    public Environment(Dispatcher dispatcher, Config config) {
+    public Environment(Dispatcher dispatcher, FunctionAddressesRepository addressesRepo) {
         this.dispatcher = dispatcher;
-        this.config = config;
+        this.addressesRepo = addressesRepo;
     }
 
     @Override
@@ -67,10 +68,28 @@ public class Environment extends AbstractMessageHandler {
         return EnvironmentMessage.GROUP_ID;
     }
 
+    public void hardwareStateChanged(HardwareState state) {
+        /*
+         * TODO: Je nach HardwareState unterschiedliche Actions: Hier benötigen wir eine zusätzliche Tabelle:
+         *       AmbienceData       ToggleState   curtainUp     Rollo rauf Rollo rauf runter
+         * 	                        ToggleState   mainLightOn   Schreibtischlampe an / aus
+         *       EMERGENCY_STOP: Hauptlicht an.
+         *       AUTOMATIC:      Rollos runter
+         *
+         *       STANDBY,          // Energiesparmodus
+         *       EMERGENCY_STOP,   // Nothalt
+         *       MANUEL,           // Manueller Betrieb
+         *       AUTOMATIC,        // Anlage im Automatikbetrieb
+         *       AUTOMATIC_HALT    // Analge anhalten
+         */
+    }
+
     @Override
     public void handleMsg(Message msg)
     throws ClientErrorException, IOException {
         switch(EnvironmentMessage.fromId(msg.getMessageId())) {
+            //case SET_FUNCTION ->
+
             //case GET_ENVIRONMENT ->
               //  dispatcher.sendSingle(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment), msg.getEndpoint());
 
@@ -78,16 +97,12 @@ public class Environment extends AbstractMessageHandler {
                 //dispatcher.sendGroup(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment));
 
 
+/*
             case SET_AMBIENCE, SET_AMBIENT_LIGHT ->
                 dispatcher.sendGroup(msg);
+// TAgs??
+          //  "SELECT Id, DeviceId, Address, Description, Active, ActiveInAutomaticMode"
+*/
         }
     }
-
-
-    /*
-
-     * AmbienceData	ToggleState	curtainUp	Rollo rauf	Rollo rauf runter
-     * 	ToggleState	mainLightOn	Schreibtischlampe an / aus
-     */
-
 }

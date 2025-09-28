@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2025 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -18,24 +18,9 @@
  *
  */
 
-package moba.server.datatypes.enumerations;
+package moba.server.datatypes.objects;
 
-import moba.server.utilities.CheckedEnum;
-import moba.server.exceptions.ClientErrorException;
+import moba.server.datatypes.enumerations.FunctionState;
 
-public enum Switch {
-    ON,
-    AUTO,
-    UNSET,
-    TRIGGER,
-    OFF;
-
-    public static Switch getValue(String s, Switch def)
-    throws ClientErrorException {
-        Switch t = CheckedEnum.getFromString(Switch.class, s);
-        if(t == Switch.UNSET) {
-            return def;
-        }
-        return t;
-    }
+public record FunctionData(long DeviceId, long Address, FunctionState state) {
 }

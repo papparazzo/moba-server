@@ -25,12 +25,11 @@ import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
 public enum EnvironmentMessage implements MessageTypeInterface {
-    GET_ENVIRONMENT  (1),
-    SET_ENVIRONMENT  (2),
-    SET_AMBIENCE     (3),
-    SET_AMBIENT_LIGHT(4);
-    //SET_
-
+    GET_FUNCTION_LIST     (1),
+    SET_FUNCTION_LIST     (2),
+    SET_FUNCTION          (3),
+    FUNCTION_STATE_CHANGED(4),
+    SET_AMBIENT_LIGHT     (5);
 
     public final static int GROUP_ID = 5;
 
