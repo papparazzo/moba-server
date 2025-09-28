@@ -21,11 +21,11 @@
 package moba.server.timedaction;
 
 import moba.server.actionhandler.TrainRunner;
-import moba.server.datatypes.enumerations.ActionType;
 import moba.server.datatypes.objects.PointInTime;
+import moba.server.datatypes.objects.Train;
 import moba.server.datatypes.objects.TrainDestination;
+import moba.server.repositories.TrainRepository;
 import moba.server.repositories.TrainTimeTableRepository;
-import moba.server.repositories.TrainlistRepository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,12 +35,12 @@ final public class TrainRun implements TimedActionInterface {
     private final TrainTimeTableRepository trainTimeTableRepository;
     private final TrainRunner trainRunner;
 
-    private final TrainlistRepository trainlistRepository;
+    private final TrainRepository trainRepository;
 
-    public TrainRun(TrainTimeTableRepository trainTimeTableRepository, TrainRunner trainRunner, TrainlistRepository trainlistRepository) {
+    public TrainRun(TrainTimeTableRepository trainTimeTableRepository, TrainRunner trainRunner, TrainRepository trainRepository) {
         this.trainTimeTableRepository = trainTimeTableRepository;
         this.trainRunner = trainRunner;
-        this.trainlistRepository = trainlistRepository;
+        this.trainRepository = trainRepository;
     }
 
     @Override
@@ -49,41 +49,21 @@ final public class TrainRun implements TimedActionInterface {
         ResultSet rs = trainTimeTableRepository.getResult(time, multiplicator);
 
         if (!rs.next() ) {
-            // no records, no actions!
             return;
         }
 
         do {
-//trainlistRepository.getTrainList();
+            Train train = trainRepository.getTrainById(rs.getLong("TrainId"));
 
-//Train train = new Train();
-/*
-int address,
-    int speed,
-    DrivingDirection drivingDirection,
-    TrainType trainType,
-    boolean hasPantograph,
-    boolean noDirectionalControl
-*/
-
-            int localId = rs.getInt("TrainId");
-
-            //   "SELECT Id, TrainId, ToBlockId " +
-
-// Train train, long departureBlockId, long destinationBlockId
-
-            TrainDestination destination = new TrainDestination();
-
-            if(rs.getBoolean("SwitchOn")) {
-                actionList.addAction(ActionType.SWITCHING_GREEN, localId);
-            } else {
-                actionList.addAction(ActionType.SWITCHING_RED, localId);
+            TrainDestination destination = new TrainDestination(
+                train,
+                rs.getLong("FromBlockId"),
+                rs.getLong("ToBlockId")
+            );
+            trainRunner.pushTrain(destination);
+            if(rs.getLong("NonRecurring") == 1) {
+                trainTimeTableRepository.removeTrain(rs.getLong("Id"));
             }
         } while (rs.next());
-
-        trainRunner.pushTrain();
-
-
     }
-
 }

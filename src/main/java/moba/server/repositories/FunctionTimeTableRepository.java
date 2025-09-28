@@ -37,7 +37,7 @@ final public class FunctionTimeTableRepository extends AbstractTimeTableReposito
     throws SQLException {
 
         String q =
-            "SELECT Address, SwitchOn " +
+            "SELECT DeviceId, Address, Action " +
             "FROM FunctionCycleTimes " +
             "LEFT JOIN FunctionAddresses " +
             "ON FunctionCycleTimes.FunctionAddressId = FunctionAddresses.Id " +
@@ -58,7 +58,7 @@ final public class FunctionTimeTableRepository extends AbstractTimeTableReposito
     protected ResultSet getResultSameDay(String t1, String t2, String d1)
     throws SQLException {
         String q =
-            "SELECT Address, SwitchOn " +
+            "SELECT DeviceId, Address, Action " +
             "FROM FunctionCycleTimes " +
             "LEFT JOIN FunctionAddresses " +
             "ON FunctionCycleTimes.FunctionAddressId = FunctionAddresses.Id " +

@@ -20,6 +20,8 @@
 
 package moba.server.repositories;
 
+import moba.server.datatypes.base.Time;
+import moba.server.datatypes.enumerations.Day;
 import moba.server.utilities.Database;
 
 import java.sql.PreparedStatement;
@@ -37,8 +39,10 @@ final public class TrainTimeTableRepository extends AbstractTimeTableRepository 
     throws SQLException {
 
         String q =
-            "SELECT Id, TrainId, ToBlockId " +
-            "FROM TrainTimeTable " +
+            "SELECT TTT.Id, TTT.TrainId, `BS`.`Id` AS FromBlockId , ToBlockId, Recurring " +
+            "FROM TrainTimeTable TTT " +
+            "LEFT JOIN BlockSections BS " +
+            "ON BS.TrainId = TTT.TrainId " +
             "WHERE ((Weekdays = ? AND Time >= ?) OR (Weekdays = ? AND Time < ?)) ";
 
         try(PreparedStatement stmt = database.getConnection().prepareStatement(q)) {
@@ -55,8 +59,10 @@ final public class TrainTimeTableRepository extends AbstractTimeTableRepository 
     protected ResultSet getResultSameDay(String t1, String t2, String d1)
     throws SQLException {
         String q =
-            "SELECT Id, TrainId, ToBlockId " +
-            "FROM TrainTimeTable " +
+            "SELECT TTT.id, TTT.TrainId, `BS`.`Id` AS FromBlockId , ToBlockId, Recurring " +
+            "FROM TrainTimeTable TTT " +
+            "LEFT JOIN BlockSections BS " +
+            "ON BS.TrainId = TTT.TrainId " +
             "WHERE Weekdays = ? AND Time >= ? AND Time < ? ";
 
         try(PreparedStatement stmt = database.getConnection().prepareStatement(q)) {
@@ -66,5 +72,33 @@ final public class TrainTimeTableRepository extends AbstractTimeTableRepository 
 
             return stmt.executeQuery();
         }
+    }
+
+    public void removeTrain(long trainTableId)
+    throws SQLException {
+        String q = "DELETE FROM TrainTimeTable WHERE TrainId = ?";
+        try(PreparedStatement stmt = database.getConnection().prepareStatement(q)) {
+            stmt.setLong(1, trainTableId);
+            stmt.execute();
+        }
+    }
+
+    public void addTrain(long trainId, long toBlock, Day day, Time time, boolean recurring)
+    throws SQLException {
+        String q =
+            "INSERT INTO TrainTimeTable (TrainId, ToBlockId, Weekdays, Time, Recurring) " +
+            "VALUES (?, ?, ?, ?, 0)";
+        try(PreparedStatement stmt = database.getConnection().prepareStatement(q)) {
+            stmt.setLong(1, trainId);
+            stmt.setLong(2, toBlock);
+            stmt.setString(3, day.toString());
+            stmt.setString(4, time.toString());
+            stmt.execute();
+        }
+    }
+
+    public void addTrain(long trainId, long toBlock, Day day, Time time)
+    throws SQLException {
+        addTrain(trainId, toBlock, day, time, true);
     }
 }

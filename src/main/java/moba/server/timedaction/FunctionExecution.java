@@ -21,13 +21,14 @@
 package moba.server.timedaction;
 
 import moba.server.com.Dispatcher;
-import moba.server.datatypes.enumerations.ActionType;
-import moba.server.datatypes.objects.ActionList;
-import moba.server.datatypes.objects.ActionListCollection;
+import moba.server.datatypes.enumerations.FunctionState;
+import moba.server.datatypes.objects.FunctionData;
 import moba.server.datatypes.objects.PointInTime;
+import moba.server.exceptions.ClientErrorException;
 import moba.server.messages.Message;
-import moba.server.messages.messageType.InterfaceMessage;
+import moba.server.messages.messageType.EnvironmentMessage;
 import moba.server.repositories.FunctionTimeTableRepository;
+import moba.server.utilities.CheckedEnum;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -43,31 +44,21 @@ final public class FunctionExecution implements TimedActionInterface {
 
     @Override
     public void trigger(PointInTime time, int multiplicator)
-    throws SQLException {
+    throws SQLException, ClientErrorException {
 
         ResultSet rs = functionRepository.getResult(time, multiplicator);
 
         if (!rs.next() ) {
-            // no records, no actions!
             return;
         }
 
-        ActionList actionList = new ActionList();
-
         do {
-
-            // FIXME Hier raspberry aufrufen
-            int localId = rs.getInt("LocalId");
-            if(rs.getBoolean("SwitchOn")) {
-                actionList.addAction(ActionType.SWITCHING_GREEN, localId);
-            } else {
-                actionList.addAction(ActionType.SWITCHING_RED, localId);
-            }
+            FunctionData data = new FunctionData(
+                rs.getLong("DeviceId"),
+                rs.getLong("Address"),
+                CheckedEnum.getFromString(FunctionState.class, rs.getString("Action"))
+            );
+            dispatcher.sendGroup(new Message(EnvironmentMessage.SET_FUNCTION, data));
         } while (rs.next());
-
-        ActionListCollection collection = new ActionListCollection();
-        collection.addActionList(actionList);
-
-        dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, collection));
     }
 }
