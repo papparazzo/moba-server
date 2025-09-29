@@ -21,6 +21,7 @@
 package moba.server.routing.nodes;
 
 import moba.server.datatypes.enumerations.SwitchStand;
+import moba.server.datatypes.objects.Train;
 
 public abstract class AbstractNode implements NodeInterface {
 
@@ -41,5 +42,9 @@ public abstract class AbstractNode implements NodeInterface {
 
     public long getId() {
         return id;
+    }
+
+    public boolean trainAllowed(Train train) {
+        return true;
     }
 }

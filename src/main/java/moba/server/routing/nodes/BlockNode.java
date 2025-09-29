@@ -21,10 +21,16 @@
 package moba.server.routing.nodes;
 
 import moba.server.datatypes.enumerations.SwitchStand;
+import moba.server.datatypes.enumerations.TrainType;
 import moba.server.datatypes.objects.Train;
 import moba.server.routing.Direction;
 
+import java.util.HashSet;
+import java.util.Set;
+
 final public class BlockNode extends AbstractNode {
+    private final Set<TrainType> trainTypes;
+    private final boolean hasCatenary;
 
     // TODO: Limitations!
     //       Güterzug
@@ -39,7 +45,13 @@ final public class BlockNode extends AbstractNode {
     private Train train = null;
 
     public BlockNode(long id) {
+        this(id, new HashSet<>(), false);
+    }
+
+    public BlockNode(long id, Set<TrainType> trainTypes, boolean hasCatenary) {
         super(id, SwitchStand.STRAIGHT);
+        this.trainTypes = trainTypes;
+        this.hasCatenary = hasCatenary;
     }
 
     public void setTrain(Train train) {
@@ -98,68 +110,11 @@ final public class BlockNode extends AbstractNode {
         throw new NodeException("cannot turn block node!");
     }
 
-/*
-    boolean isOut(NodeInterface b) {
-        return b == out;
+    public boolean trainAllowed(Train train) {
+        if(train.hasPantograph() && !hasCatenary) {
+            return false;
+        }
+
+        return trainTypes.contains(train.trainType());
     }
-
-     boolean isBlocked() {
-        return train != null;
-    }
-
-    BlockNode pushTrain() {
-        if(!isBlocked()) {
-            throw new NodeException("block not blocked!");
-        }
-
-        BlockNode nextBlock;
-
-        if(train.drivingDirection() == DrivingDirection.FORWARD) {
-            nextBlock = getNextBlock(out);
-        } else {
-            nextBlock = getNextBlock(in);
-        }
-
-        if(nextBlock != null) {
-            nextBlock.setTrain(train);
-            train = null;
-        }
-        return nextBlock;
-    }
-
-
-    BlockNode getNextBlock(NodeInterface nextNode) {
-        if(nextNode == null) {
-            return null;
-        }
-
-        NodeInterface curNode = this;
-        NodeInterface afterNextNode;
-
-        while(true) {
-            afterNextNode = nextNode.getJunctionNode(curNode);
-            if(afterNextNode == null) {
-                return null;
-            }
-
-            var nextBlock = (BlockNode)(nextNode);
-            if(nextBlock != null) {
-                if(nextBlock.isBlocked()) {
-                    return null;
-                }
-
-                if(train != null) {
-                    return nextBlock;
-                }
-                if(nextBlock.isOut(curNode)) {
-                    train = train.withDrivingDirection(DrivingDirection.BACKWARD);
-                } else {
-                    train = train.withDrivingDirection(DrivingDirection.FORWARD);
-                }
-                return nextBlock;
-            }
-            curNode = nextNode;
-            nextNode = afterNextNode;
-        }
-    }*/
 };
