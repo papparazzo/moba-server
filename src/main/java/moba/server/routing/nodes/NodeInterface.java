@@ -21,6 +21,7 @@
 package moba.server.routing.nodes;
 
 import moba.server.datatypes.enumerations.SwitchStand;
+import moba.server.datatypes.objects.Train;
 
 public interface NodeInterface {
     NodeInterface getJunctionNode(NodeInterface node) throws NodeException;
@@ -32,4 +33,6 @@ public interface NodeInterface {
     void turn(SwitchStand stand);
 
     long getId();
+
+    boolean trainAllowed(Train train);
 }

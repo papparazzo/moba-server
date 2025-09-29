@@ -21,35 +21,33 @@
 package moba.server.routing.router;
 
 import moba.server.datatypes.enumerations.SwitchStand;
-import moba.server.datatypes.objects.TrainDestination;
+import moba.server.datatypes.objects.TrainJourney;
 import moba.server.routing.nodes.BlockNode;
 import moba.server.routing.nodes.NodeInterface;
 import moba.server.routing.typedefs.BlockNodeMap;
 import moba.server.routing.typedefs.SwitchStateData;
 
-import java.util.Vector;
-
+/**
+ * Liefert eine verkettete Liste vom Startblock bis zum Zielblock mit Weichen und Blöcken zurück
+ *     - Weichen müssen hier ggf. noch richtig gestellt und gesperrt werden
+ *     - Blöcke müssen geprüft werden, ob diese frei sind!
+ * Anmerkung: Bei Blöcken ist der SwitchStand auf null gesetzt
+ * TODO: - Unterscheidung zwischen Bahnhofs / Ziel- und Streckenblöcke -> hier kann der Zug halten, Block mitten
+ *         auf der Strecke kann kein Ziel sein
+ *       - Im Schattenbahnhof soll es eine Gruppe von Zielblöcken geben. D.h. der Zug fährt dort irgendwo auf ein
+ *         Gleis ein.
+ */
 final public class SimpleRouter {
 
     private final BlockNodeMap blocks;
-
-    private Vector<SwitchStateData> routeMap;
 
     public SimpleRouter(BlockNodeMap blocks) {
         this.blocks = blocks;
     }
 
-    public RoutingListItem getRoute(TrainDestination destination) {
-        // TODO: Limitations!
-        //       Güterzug
-        //       Oberleitung
-        //       Nahverkehr
-        //       Fernverkehr
-        //       Fahrtrichtung nur vorwärts
-        //       Rangierzug
-
-        long fromBlock = destination.trainId().blockId();
-        long toBlock = destination.destinationBlockId();
+    public RoutingListItem getRoute(TrainJourney journey) {
+        long fromBlock = journey.departureBlockId();
+        long toBlock = journey.destinationBlockId();
 
         BlockNode block = blocks.get(fromBlock);
 
@@ -62,9 +60,14 @@ final public class SimpleRouter {
             return null;
         }
 
+        RoutingListItem itemL = fetchNextNode(block, block.getIn(), journey);
+
         // TODO: Hier noch die Fahrtrichtung berücksichtigen...
-        RoutingListItem itemL = fetchNextNode(block, block.getIn(), fromBlock, toBlock);
-        RoutingListItem itemR = fetchNextNode(block, block.getOut(), fromBlock, toBlock);
+        //if(journey.train().noDirectionalControl()) {
+
+        //}
+
+        RoutingListItem itemR = fetchNextNode(block, block.getOut(), journey);
 
         if(itemL == null && itemR == null) {
             throw new IllegalArgumentException("no route found from <" + fromBlock + "> to <" + toBlock + ">");
@@ -84,21 +87,30 @@ final public class SimpleRouter {
         return itemL;
     }
 
-    private RoutingListItem fetchNextNode(NodeInterface origin, NodeInterface next, long fromBlock, long toBlock) {
+    private RoutingListItem fetchNextNode(NodeInterface origin, NodeInterface next, TrainJourney destination) {
         if(next == null) {
             return null;
         }
 
-        if(next.getId() == fromBlock) {
+        if(next.getId() == destination.departureBlockId()) {
             return null;
         }
 
-        if(next.getId() == toBlock) {
-            return new RoutingListItem(null, new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
+        if(!next.trainAllowed(destination.train())) {
+            return null;
         }
 
-        var ctrS = fetchNextNode(next, next.getJunctionNode(SwitchStand.STRAIGHT, origin), fromBlock, toBlock);
-        var ctrB = fetchNextNode(next, next.getJunctionNode(SwitchStand.BEND, origin), fromBlock, toBlock);
+        if(next.getId() == destination.destinationBlockId()) {
+            return new RoutingListItem(null, new SwitchStateData(next.getId(), null));
+        }
+
+        var ctrS = fetchNextNode(next, next.getJunctionNode(SwitchStand.STRAIGHT, origin), destination);
+
+        if(next instanceof BlockNode) {
+            return ctrS == null ? null : new RoutingListItem(ctrS, new SwitchStateData(next.getId(), null));
+        }
+
+        var ctrB = fetchNextNode(next, next.getJunctionNode(SwitchStand.BEND, origin), destination);
 
         if(ctrS == null && ctrB == null) {
             return null;

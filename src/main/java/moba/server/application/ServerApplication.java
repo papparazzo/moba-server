@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import moba.server.actionhandler.Interlock;
+import moba.server.actionhandler.Scheduler;
 import moba.server.actionhandler.TrainRunner;
 import moba.server.actionhandler.TrainRunnerInitializer;
 import moba.server.com.Acceptor;
@@ -33,18 +34,14 @@ import moba.server.com.BackgroundHandlerComposite;
 import moba.server.com.Dispatcher;
 import moba.server.com.IPC;
 import moba.server.com.KeepAlive;
-import moba.server.repositories.TrackLayoutRepository;
+import moba.server.messagehandler.*;
+import moba.server.repositories.*;
+import moba.server.timedaction.FunctionExecution;
+import moba.server.timedaction.TrainRun;
 import moba.server.utilities.Database;
 import moba.server.datatypes.base.Version;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.utilities.layout.ActiveTrackLayout;
-import moba.server.messagehandler.Client;
-import moba.server.messagehandler.Server;
-import moba.server.messagehandler.Messaging;
-import moba.server.messagehandler.Interface;
-import moba.server.messagehandler.Timer;
-import moba.server.messagehandler.Environment;
-import moba.server.messagehandler.Layout;
 import moba.server.messages.MessageLoop;
 import moba.server.messages.MessageQueue;
 import moba.server.utilities.AllowList;
@@ -119,6 +116,15 @@ final public class ServerApplication implements Loggable {
             Interlock interlock = new Interlock(database);
             TrackLayoutRepository trackLayoutRepository = new TrackLayoutRepository(database);
 
+            BlockListRepository blocklistRepository = new BlockListRepository(database);
+            SwitchStateRepository switchStateRepository = new SwitchStateRepository(database);
+            TrainlistRepository trainlistRepository = new TrainlistRepository(database);
+            TrainRepository trainRepository = new TrainRepository();
+
+            Scheduler scheduler = new Scheduler(dispatcher, null);
+            scheduler.addTimedAction(new FunctionExecution(new FunctionTimeTableRepository(database), dispatcher));
+            scheduler.addTimedAction(new TrainRun(new TrainTimeTableRepository(database), trainRunner, trainRepository));
+
             BackgroundHandlerComposite handler = new BackgroundHandlerComposite();
             handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList, incidentHandler));
             handler.add(new IPC((String)config.getSection("common.serverConfig.ipc"), msgQueueIn, logger));
@@ -127,11 +133,12 @@ final public class ServerApplication implements Loggable {
             MessageLoop  loop = new MessageLoop(dispatcher, incidentHandler);
             loop.addHandler(new Client(dispatcher, msgQueueIn));
             loop.addHandler(new Server(dispatcher, this, allowList, config));
-            loop.addHandler(new Timer(dispatcher, config, database));
-            loop.addHandler(new Environment(dispatcher, config));
+            loop.addHandler(new Timer(dispatcher, config, scheduler));
+            loop.addHandler(new Environment(dispatcher, new FunctionAddressesRepository(database)));
+            loop.addHandler(new Systems(dispatcher, trackLayoutLock, activeLayout, msgQueueIn, incidentHandler));
             loop.addHandler(new Layout(dispatcher, trackLayoutRepository, activeLayout, trackLayoutLock));
-            loop.addHandler(new Interface(dispatcher, msgQueueIn, incidentHandler));
-            loop.addHandler(new Control(dispatcher, database, activeLayout, interlock, trainRunner));
+            loop.addHandler(new Interface(dispatcher, msgQueueIn, incidentHandler, trainRunner));
+            loop.addHandler(new Control(dispatcher, blocklistRepository, switchStateRepository, trainlistRepository, activeLayout, trackLayoutLock));
             loop.addHandler(new Messaging(dispatcher, list));
 
             handler.start();
