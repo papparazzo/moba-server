@@ -25,7 +25,7 @@ import moba.server.routing.router.RoutingListItem;
 import moba.server.routing.router.SimpleRouter;
 
 import java.util.LinkedList;
-import java.util.Queue;
+import java.util.ListIterator;
 
 final public class TrainRunner {
 
@@ -33,7 +33,7 @@ final public class TrainRunner {
 
     private final ActionListGenerator generator;
 
-    private final Queue<TrainDestination> queue = new LinkedList<>();
+    private final LinkedList<TrainJourney> trainQueue = new LinkedList<>();
 
     public TrainRunner(SimpleRouter routing, ActionListGenerator generator) {
         this.generator = generator;

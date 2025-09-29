@@ -23,7 +23,7 @@ package moba.server.timedaction;
 import moba.server.actionhandler.TrainRunner;
 import moba.server.datatypes.objects.PointInTime;
 import moba.server.datatypes.objects.Train;
-import moba.server.datatypes.objects.TrainDestination;
+import moba.server.datatypes.objects.TrainJourney;
 import moba.server.repositories.TrainRepository;
 import moba.server.repositories.TrainTimeTableRepository;
 
@@ -55,7 +55,7 @@ final public class TrainRun implements TimedActionInterface {
         do {
             Train train = trainRepository.getTrainById(rs.getLong("TrainId"));
 
-            TrainDestination destination = new TrainDestination(
+            TrainJourney destination = new TrainJourney(
                 train,
                 rs.getLong("FromBlockId"),
                 rs.getLong("ToBlockId")

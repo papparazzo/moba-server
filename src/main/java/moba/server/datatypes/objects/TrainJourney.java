@@ -20,5 +20,5 @@
 
 package moba.server.datatypes.objects;
 
-public record TrainDestination(Train train, long departureBlockId, long destinationBlockId) {
+public record TrainJourney(Train train, long departureBlockId, long destinationBlockId) {
 }
