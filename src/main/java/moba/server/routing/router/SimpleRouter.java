@@ -45,7 +45,7 @@ final public class SimpleRouter {
         this.blocks = blocks;
     }
 
-    public RoutingListItem getRoute(TrainJourney journey) {
+    public RoutingList getRoute(TrainJourney journey) {
         long fromBlock = journey.departureBlockId();
         long toBlock = journey.destinationBlockId();
 
@@ -60,14 +60,14 @@ final public class SimpleRouter {
             return null;
         }
 
-        RoutingListItem itemL = fetchNextNode(block, block.getIn(), journey);
+        RoutingList itemL = fetchNextNode(block, block.getIn(), journey);
 
         // TODO: Hier noch die Fahrtrichtung berücksichtigen...
         //if(journey.train().noDirectionalControl()) {
 
         //}
 
-        RoutingListItem itemR = fetchNextNode(block, block.getOut(), journey);
+        RoutingList itemR = fetchNextNode(block, block.getOut(), journey);
 
         if(itemL == null && itemR == null) {
             throw new IllegalArgumentException("no route found from <" + fromBlock + "> to <" + toBlock + ">");
@@ -87,7 +87,7 @@ final public class SimpleRouter {
         return itemL;
     }
 
-    private RoutingListItem fetchNextNode(NodeInterface origin, NodeInterface next, TrainJourney destination) {
+    private RoutingList fetchNextNode(NodeInterface origin, NodeInterface next, TrainJourney destination) {
         if(next == null) {
             return null;
         }
@@ -101,13 +101,13 @@ final public class SimpleRouter {
         }
 
         if(next.getId() == destination.destinationBlockId()) {
-            return new RoutingListItem(null, new SwitchStateData(next.getId(), null));
+            return new RoutingList(null, new SwitchStateData(next.getId(), null));
         }
 
         var ctrS = fetchNextNode(next, next.getJunctionNode(SwitchStand.STRAIGHT, origin), destination);
 
         if(next instanceof BlockNode) {
-            return ctrS == null ? null : new RoutingListItem(ctrS, new SwitchStateData(next.getId(), null));
+            return ctrS == null ? null : new RoutingList(ctrS, new SwitchStateData(next.getId(), null));
         }
 
         var ctrB = fetchNextNode(next, next.getJunctionNode(SwitchStand.BEND, origin), destination);
@@ -117,16 +117,16 @@ final public class SimpleRouter {
         }
 
         if(ctrS == null) {
-            return new RoutingListItem(ctrB, new SwitchStateData(next.getId(), SwitchStand.BEND));
+            return new RoutingList(ctrB, new SwitchStateData(next.getId(), SwitchStand.BEND));
         }
 
         if(ctrB == null) {
-            return new RoutingListItem(ctrS, new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
+            return new RoutingList(ctrS, new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
         }
 
         if(ctrS.getCount() > ctrB.getCount()) {
-            return new RoutingListItem(ctrB, new SwitchStateData(next.getId(), SwitchStand.BEND));
+            return new RoutingList(ctrB, new SwitchStateData(next.getId(), SwitchStand.BEND));
         }
-        return new RoutingListItem(ctrS, new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
+        return new RoutingList(ctrS, new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
     }
 }

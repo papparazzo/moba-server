@@ -22,21 +22,17 @@ package moba.server.routing.router;
 
 import moba.server.routing.typedefs.SwitchStateData;
 
-public record RoutingListItem(
-    RoutingListItem successor,
-    SwitchStateData switchStateData
+public record RoutingList(
+    RoutingList successor,
+    SwitchStateData routingItem
 ) {
     public int getCount() {
         int count = 1;
-        RoutingListItem current = this;
+        RoutingList current = this;
         while (current.successor != null) {
             count++;
             current = current.successor;
         }
         return count;
-    }
-
-    public RoutingListItem withSuccessor(RoutingListItem successor) {
-        return new RoutingListItem(successor, switchStateData());
     }
 }
