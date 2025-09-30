@@ -21,18 +21,28 @@
 package moba.server.datatypes.objects;
 
 import moba.server.datatypes.enumerations.DrivingDirection;
+import moba.server.datatypes.enumerations.TrainType;
 
 public record Train(
-    long blockId,
     int address,
     int speed,
-    DrivingDirection drivingDirection
+    DrivingDirection drivingDirection,
+    TrainType trainType,
+    boolean hasPantograph,
+    boolean noDirectionalControl // keine Fahrtrichtungsängerung (z.B. Güterzug)
 ) {
     public Train withDrivingDirection(DrivingDirection drivingDirection) {
-        return new Train(blockId, address, speed, drivingDirection);
+        return new Train(address, speed, drivingDirection, trainType, hasPantograph, noDirectionalControl);
     }
 
     public Train withSpeed(int speed) {
-        return new Train(blockId, address, speed, drivingDirection);
+        return new Train(address, speed, drivingDirection, trainType, hasPantograph, noDirectionalControl);
     }
+/*
+        # 'MaxGeschwindigkeit' => '80%',                // (FIXME: MoBa-Server???)
+           # 'Position' => 12123,                          // Sollte eher vom moba-server verwaltet werden (FIXME: MoBa-Server???)
+           # 'Bremsweg' => '50%',                          // Muss aus Geschwindigkeit berechnet werden (FIXME: MoBa-Server???)
+           # 'aktuelle Richtung' => 'vorwärts',            // (FIXME: MoBa-Server???)
+           # 'LocId' => '1234567890',                     // Decoder-Adresse (FIXME: MoBa-Server???)
+*/
 }
