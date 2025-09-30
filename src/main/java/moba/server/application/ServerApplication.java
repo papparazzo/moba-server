@@ -25,17 +25,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-import moba.server.actionhandler.Interlock;
-import moba.server.actionhandler.Scheduler;
-import moba.server.actionhandler.TrainRunner;
-import moba.server.actionhandler.TrainRunnerInitializer;
+import moba.server.actionhandler.*;
 import moba.server.com.Acceptor;
 import moba.server.com.BackgroundHandlerComposite;
 import moba.server.com.Dispatcher;
 import moba.server.com.IPC;
 import moba.server.com.KeepAlive;
+import moba.server.datatypes.collections.BlockContactDataMap;
+import moba.server.datatypes.collections.SwitchStateMap;
 import moba.server.messagehandler.*;
 import moba.server.repositories.*;
+import moba.server.routing.parser.LayoutParser;
+import moba.server.routing.router.SimpleRouter;
+import moba.server.routing.typedefs.BlockNodeMap;
 import moba.server.timedaction.FunctionExecution;
 import moba.server.timedaction.TrainRun;
 import moba.server.utilities.Database;
@@ -112,14 +114,30 @@ final public class ServerApplication implements Loggable {
             ActiveTrackLayout activeLayout = new ActiveTrackLayout(dispatcher, config);
             TrackLayoutLock trackLayoutLock = new TrackLayoutLock(database);
             IncidentHandler incidentHandler = new IncidentHandler(logger, dispatcher, list);
-            TrainRunner trainRunner = (new TrainRunnerInitializer(database)).getTrainRunner(activeLayout.getActiveLayout());
+
             Interlock interlock = new Interlock(database);
             TrackLayoutRepository trackLayoutRepository = new TrackLayoutRepository(database);
 
-            BlockListRepository blocklistRepository = new BlockListRepository(database);
+            BlockListRepository blockListRepository = new BlockListRepository(database);
             SwitchStateRepository switchStateRepository = new SwitchStateRepository(database);
             TrainlistRepository trainlistRepository = new TrainlistRepository(database);
             TrainRepository trainRepository = new TrainRepository();
+
+            long activeLayoutId = activeLayout.getActiveLayout();
+            BlockContactDataMap blockContacts = blockListRepository.getBlockList(activeLayoutId);
+            SwitchStateMap switchStates = switchStateRepository.getSwitchStateList(activeLayoutId);
+
+            LayoutParser parser = new LayoutParser(
+                trackLayoutRepository.getLayout(activeLayoutId),
+                blockContacts,
+                switchStates
+            ).parse();
+
+            BlockNodeMap blocks = parser.getBlockMap();
+            SimpleRouter router = new SimpleRouter(blocks);
+
+            ActionListGenerator generator = new ActionListGenerator(blockContacts, switchStates);
+            TrainRunner trainRunner = new TrainRunner(router, interlock, generator);
 
             Scheduler scheduler = new Scheduler(dispatcher, null);
             scheduler.addTimedAction(new FunctionExecution(new FunctionTimeTableRepository(database), dispatcher));
@@ -138,7 +156,7 @@ final public class ServerApplication implements Loggable {
             loop.addHandler(new Systems(dispatcher, trackLayoutLock, activeLayout, msgQueueIn, incidentHandler));
             loop.addHandler(new Layout(dispatcher, trackLayoutRepository, activeLayout, trackLayoutLock));
             loop.addHandler(new Interface(dispatcher, msgQueueIn, incidentHandler, trainRunner));
-            loop.addHandler(new Control(dispatcher, blocklistRepository, switchStateRepository, trainlistRepository, activeLayout, trackLayoutLock));
+            loop.addHandler(new Control(dispatcher, blockListRepository, switchStateRepository, trainlistRepository, activeLayout, trackLayoutLock));
             loop.addHandler(new Messaging(dispatcher, list));
 
             handler.start();
