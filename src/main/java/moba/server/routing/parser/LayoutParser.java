@@ -66,7 +66,7 @@ public class LayoutParser {
         return blockNodeMap;
     }
 
-    public void parse() {
+    public LayoutParser parse() {
 
         // Position des ersten Blockkontaktes
         long id = blockContacts.entrySet().iterator().next().getKey();
@@ -79,6 +79,7 @@ public class LayoutParser {
 
         int dir2 = curSymbol.getNextJunction(dir1);
         fetchBlockNodes(new LocationVector(startPos, dir2));
+        return this;
     }
 
     private Position getPositionFromId(long id) {
