@@ -28,7 +28,6 @@ import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.EnvironmentMessage;
 import moba.server.repositories.FunctionAddressesRepository;
-import moba.server.utilities.config.Config;
 import moba.server.exceptions.ClientErrorException;
 
 /*

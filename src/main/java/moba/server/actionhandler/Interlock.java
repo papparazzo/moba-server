@@ -79,7 +79,7 @@ final public class Interlock implements Loggable {
     }
 
     public boolean setRoute(long trainId, Vector<Long> switches)
-        throws SQLException {
+    throws SQLException {
 
         Boolean routeStatus = routeStatusList.get(trainId);
 
