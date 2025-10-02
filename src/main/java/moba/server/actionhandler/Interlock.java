@@ -69,7 +69,7 @@ final public class Interlock implements Loggable {
             stmt.setLong(1, trainId);
             stmt.setLong(2, blockId);
 
-            if(stmt.executeUpdate() == 1) {
+            if(stmt.executeUpdate() != 1) {
                 throw new ClientErrorException(
                     ClientError.OPERATION_NOT_ALLOWED,
                     "block not set for train <" + trainId + ">"
@@ -137,7 +137,12 @@ final public class Interlock implements Loggable {
 
             getLogger().log(Level.INFO, stmt.toString());
 
-            stmt.executeUpdate();
+            if(stmt.executeUpdate() == 0) {
+                throw new ClientErrorException(
+                    ClientError.OPERATION_NOT_ALLOWED,
+                    "block not set for train <" + trainId + ">"
+                );
+            }
         }
     }
 
