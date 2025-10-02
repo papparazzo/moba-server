@@ -21,12 +21,16 @@
 package moba.server.actionhandler;
 
 import moba.server.datatypes.objects.*;
-import moba.server.routing.router.RoutingListItem;
+import moba.server.exceptions.ClientErrorException;
+import moba.server.routing.router.RoutingList;
 import moba.server.routing.router.SimpleRouter;
 
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Vector;
 
+// FIXME: ThreadSafety!!!
 final public class TrainRunner {
 
     private final SimpleRouter routing;
@@ -35,14 +39,31 @@ final public class TrainRunner {
 
     private final LinkedList<TrainJourney> trainQueue = new LinkedList<>();
 
-    public TrainRunner(SimpleRouter routing, ActionListGenerator generator) {
+    private final Interlock interlock;
+
+    // TODO: Hier muss auch der Bahnübergang mit berücksichtigt werden (Function-Address in Environment)
+    // TODO: Kreuzungsweichen!!
+
+
+    public TrainRunner(SimpleRouter routing, Interlock interlock, ActionListGenerator generator) {
         this.generator = generator;
+        this.interlock = interlock;
         this.routing = routing;
     }
 
-    public void pushTrain(TrainDestination train) {
-        queue.offer(train);
-        pushTrain();
+    /**
+     * TODO Aufruf nach Fahrplan
+     */
+    public void pushTrain(TrainJourney train) {
+        // Train already exists in the list, this train has to be handled first
+        if(insertAfterIfAlreadyExist(train)) {
+            return;
+        }
+
+        if(handleTrain(train)) {
+            return;
+        }
+        trainQueue.add(train);
     }
 
     /**
@@ -50,25 +71,87 @@ final public class TrainRunner {
      */
     public void pushTrain() {
 
-        TrainDestination trainData = queue.poll();
+        trainQueue.removeIf(this::handleTrain);
 
-        if(trainData == null) {
-            return;
-        }
-
-        if(handleTrain(trainData)) {
-            return;
-        }
-
-        // FIXME: Was machen wir hier wenn ein Zug mit derselben ID bereits drinnen ist?
-        //        Lösung: Verkette Liste! So kommt die Reihenfolge eines Zuges nicht durcheinander!
-        queue.offer(trainData);
+        // FIXME: handleTrain: 3 Rückgabewerte
+       // throw new IllegalStateException("Deadlock detected!");
     }
 
-    private boolean handleTrain(TrainDestination trainDestination) {
+    public void releaseRoute(int routeId)
+    throws SQLException, ClientErrorException {
+        interlock.releaseRoute(routeId);
+        pushTrain();
+    }
 
+    public void releaseBlock(int trainId, int blockId)
+    throws SQLException, ClientErrorException {
+        interlock.releaseBlock(trainId, blockId);
+        pushTrain();
+    }
 
-        RoutingListItem routingListItem = routing.getRoute(trainDestination);
+    public void setSwitched(int routeId) {
+        interlock.routeSet(routeId);
+        pushTrain();
+    }
+
+    /**
+     * Check if a train already exists in the linked list. If so, insert right after the last occurrence
+     */
+    private boolean insertAfterIfAlreadyExist(TrainJourney trainDestination) {
+        ListIterator<TrainJourney> iterator = trainQueue.listIterator();
+
+        // Check if the train is already in the list...
+        while (iterator.hasPrevious()) {
+            TrainJourney element = iterator.previous();
+
+            if(element.train().address() != trainDestination.train().address()) {
+                continue;
+            }
+
+            int index = iterator.previousIndex();
+
+            if(index == -1) {
+                break;
+            }
+
+            // ... train was found: Put it right behind the last occurrence
+            // TODO: Check this: is this really '+1' ?
+            trainQueue.add(index + 1, trainDestination);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean handleTrain(TrainJourney trainDestination) {
+        RoutingList current = routing.getRoute(trainDestination);
+
+        // Zug befindet sich bereits im Ziel!
+        if(current == null) {
+            return true;
+        }
+
+        Vector<Long> switchingList = new Vector<>();
+
+        while (current.successor() != null) {
+            current = current.successor();
+
+            // Es handelt sich um einen Block!
+            if(current.routingItem().switchStand() == null) {
+                try {
+                    // FIXME: Hier brauchen wir die TrainId!
+                    boolean okay = interlock.setBlock(trainDestination.train().address(), current.routingItem().id());
+
+                    if(!okay) {
+                        // TODO: Vorletzte id in TRainJourney setzen!
+                        return false;
+                    }
+                } catch (Throwable e) {
+                    // Predicat "trainQueue.removeIf(this::handleTrain);" darf keine checked Exceptions werfen!
+                    throw new RuntimeException(e);
+                }
+                continue;
+            }
+        }
 
         //return generator.getTrainActionList(trainDestination, itemList);
 
@@ -78,33 +161,42 @@ final public class TrainRunner {
         */
 
         // Zug ist am Ziel: return true, sonst false!
-        return false;
+        return true;
     }
 
-/*
-    private ActionListCollection getActionList(Train train, int toBlock) {
-    }
-
-    public boolean block(RoutingListItem itemList)
+    private boolean handleBlockList(RoutingList current)
     throws SQLException {
+        int trainId = 0;
 
-        RoutingListItem current = itemList;
+
+
+        return true;
+    }
+
+    private boolean handleSwitchingList(RoutingList current)
+    throws SQLException {
+        // FIXME: Wo bekommen wir die Zug-Id her?
+        int trainId = 0;
+        int routeId = 4;
+
+        Vector<Long> switchingList = new Vector<>();
+
         while (current.successor() != null) {
-            current = current.successor();
+            RoutingList tmp = current.successor();
 
-            if(block()) {
-                return true;
+            if(current.routingItem().switchStand() != null) {
+                break;
             }
-            else {
-                return false;
-            }
-
+            switchingList.add(current.routingItem().id());
+            current = tmp;
         }
 
-        blockContacts.get();
-        switchStates.get();
+        // schauen ob Weichen bereits geschaltet...
 
+        if(interlock.setRoute(trainId, switchingList)) {
+            return false;
+        }
+        ActionListCollection collection = generator.getSwitchActionList(routeId, switchingList);
+        return true;
     }
-*/
-
 }
