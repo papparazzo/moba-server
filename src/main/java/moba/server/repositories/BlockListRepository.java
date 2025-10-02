@@ -33,8 +33,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-public class BlockListRepository {
-    protected final Database database;
+public final class BlockListRepository {
+    private final Database database;
 
     public BlockListRepository(Database database) {
         this.database = database;
