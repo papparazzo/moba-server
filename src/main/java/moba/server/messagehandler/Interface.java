@@ -20,21 +20,15 @@
 
 package moba.server.messagehandler;
 
+import moba.server.actionhandler.TrainRunner;
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
-import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.datatypes.enumerations.Connectivity;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.enumerations.IncidentLevel;
 import moba.server.datatypes.enumerations.IncidentType;
-import moba.server.datatypes.objects.ActionListCollection;
+import moba.server.datatypes.objects.TrainJourney;
 import moba.server.messages.AbstractMessageHandler;
-import moba.server.repositories.BlockListRepository;
-import moba.server.repositories.SwitchStateRepository;
-import moba.server.repositories.TrackLayoutRepository;
-import moba.server.repositories.TrainlistRepository;
-import moba.server.routing.router.SimpleRouter;
-import moba.server.routing.typedefs.BlockNodeMap;
 import moba.server.utilities.CheckedEnum;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.Message;
@@ -42,7 +36,6 @@ import moba.server.messages.MessageQueue;
 import moba.server.messages.messageType.InterfaceMessage;
 import moba.server.messages.messageType.InternMessage;
 import moba.server.exceptions.ClientErrorException;
-import moba.server.utilities.Database;
 import moba.server.utilities.messaging.IncidentHandler;
 
 import java.sql.SQLException;
@@ -51,11 +44,13 @@ final public class Interface extends AbstractMessageHandler {
 
     private final MessageQueue msgQueueIn;
     private final IncidentHandler incidentHandler;
+    private final TrainRunner runner;
 
-    public Interface(Dispatcher dispatcher, MessageQueue msgQueueIn, IncidentHandler incidentHandler) {
+    public Interface(Dispatcher dispatcher, MessageQueue msgQueueIn, IncidentHandler incidentHandler, TrainRunner runner) {
         this.dispatcher      = dispatcher;
         this.msgQueueIn      = msgQueueIn;
         this.incidentHandler = incidentHandler;
+        this.runner          = runner;
     }
 
     @Override
@@ -106,36 +101,28 @@ final public class Interface extends AbstractMessageHandler {
     }
 
     private void routeSwitched(Message msg) {
-
+        int id = (int)msg.getData();
+        runner.setSwitched(id);
     }
 
-    private void releaseRoute(Message msg) {
-
+    private void releaseRoute(Message msg)
+    throws SQLException, ClientErrorException {
+        int id = (int)msg.getData();
+        runner.releaseRoute(id);
     }
 
-    private void releaseBlock(Message msg) {
-
+    private void releaseBlock(Message msg)
+    throws SQLException, ClientErrorException {
+        int blockId = (int)msg.getData();
+        // TODO: Wir brauchen hier noch die TrainId
+        int trainId = 0;
+        runner.releaseBlock(trainId, blockId);
     }
 
     private void pushTrain(Message msg) {
+        TrainJourney train = (TrainJourney)msg.getData();
 
-    }
-
-    private void setSwitch() {
-        String q =
-            "UPDATE `Trains` SET `Trains`.`DrivingDirection` = ? " +
-            "WHERE `Trains`.`Id` = ?";
-
-        /*
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setString(1, (String)data.get("direction"));
-            pstmt.setLong(2, trainId);
-            if(pstmt.executeUpdate() == 0) {
-                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not update <" + trainId + ">");
-            }
-        }
-       // dispatcher.sendGroup(new Message(ControlMessage.PUSH_TRAIN, msg.getData()));
-        */
+        runner.pushTrain(train);
     }
 
     private void addIncident(IncidentLevel level, String message, Endpoint ep) {
