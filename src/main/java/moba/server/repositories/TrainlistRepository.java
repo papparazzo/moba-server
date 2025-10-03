@@ -61,8 +61,8 @@ public class TrainlistRepository {
 
             while(rs.next()) {
                 map.put(
-                    rs.getLong("Id"),
                     new Train(
+                        rs.getLong("Id"),
                         rs.getInt("BlockId"),
                         rs.getInt("Address"),
                         rs.getInt("Speed"),

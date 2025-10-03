@@ -24,6 +24,7 @@ import moba.server.datatypes.enumerations.DrivingDirection;
 import moba.server.datatypes.enumerations.TrainType;
 
 public record Train(
+    int trainId,
     int address,
     int speed,
     DrivingDirection drivingDirection,
@@ -32,11 +33,11 @@ public record Train(
     boolean noDirectionalControl // keine Fahrtrichtungsängerung (z.B. Güterzug)
 ) {
     public Train withDrivingDirection(DrivingDirection drivingDirection) {
-        return new Train(address, speed, drivingDirection, trainType, hasPantograph, noDirectionalControl);
+        return new Train(trainId, address, speed, drivingDirection, trainType, hasPantograph, noDirectionalControl);
     }
 
     public Train withSpeed(int speed) {
-        return new Train(address, speed, drivingDirection, trainType, hasPantograph, noDirectionalControl);
+        return new Train(trainId, address, speed, drivingDirection, trainType, hasPantograph, noDirectionalControl);
     }
 /*
         # 'MaxGeschwindigkeit' => '80%',                // (FIXME: MoBa-Server???)
