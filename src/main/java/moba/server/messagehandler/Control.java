@@ -34,26 +34,36 @@ import moba.server.messages.AbstractMessageHandler;
 import moba.server.repositories.BlockListRepository;
 import moba.server.repositories.SwitchStateRepository;
 import moba.server.repositories.TrainlistRepository;
-import moba.server.routing.typedefs.*;
-import moba.server.utilities.ActiveLayout;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.ControlMessage;
 import moba.server.exceptions.ClientErrorException;
+import moba.server.utilities.layout.ActiveTrackLayout;
 import moba.server.utilities.layout.TrackLayoutLock;
 import moba.server.utilities.logger.Loggable;
 
 final public class Control extends AbstractMessageHandler implements Loggable {
     private final BlockListRepository blocklistRepository;
-    SwitchStateRepository switchStateRepository = new SwitchStateRepository(database);
 
-    private final ActiveLayout activeLayout;
+    private final SwitchStateRepository switchStateRepository;
+
+    private final ActiveTrackLayout activeLayout;
 
     private final TrackLayoutLock lock;
 
-    public Control(Dispatcher dispatcher, BlockListRepository blocklistRepository, ActiveLayout activeLayout)
-    throws SQLException {
+    private final TrainlistRepository trainlistRepository;
+
+    public Control(
+        Dispatcher dispatcher,
+        BlockListRepository blocklistRepository,
+        SwitchStateRepository switchStateRepository,
+        TrainlistRepository trainlistRepository,
+        ActiveTrackLayout activeLayout,
+        TrackLayoutLock lock
+    ) throws SQLException {
+        this.switchStateRepository = switchStateRepository;
         this.blocklistRepository = blocklistRepository;
         this.dispatcher = dispatcher;
+        this.trainlistRepository = trainlistRepository;
 
         this.activeLayout = activeLayout;
         this.lock         = lock;
@@ -137,15 +147,14 @@ final public class Control extends AbstractMessageHandler implements Loggable {
 
     private void getSwitchStateList(Message msg)
     throws SQLException, ClientErrorException {
-        long id = activeLayout.getActiveLayout(msg.getData());
+        long id = activeLayout.getActiveLayout((Long)msg.getData());
         SwitchStateMap switchStateList = switchStateRepository.getSwitchStateList(id);
         dispatcher.sendSingle(new Message(ControlMessage.GET_SWITCH_STAND_LIST_RES, switchStateList), msg.getEndpoint());
     }
 
     private void getTrainList(Message msg)
     throws SQLException, ClientErrorException {
-        TrainlistRepository trainlistRepository = new TrainlistRepository(database);
-        long id = activeLayout.getActiveLayout(msg.getData());
+        long id = activeLayout.getActiveLayout((Long)msg.getData());
         TrainList trainList = trainlistRepository.getTrainList(id);
         dispatcher.sendSingle(new Message(ControlMessage.GET_TRAIN_LIST_RES, trainList), msg.getEndpoint());
     }
