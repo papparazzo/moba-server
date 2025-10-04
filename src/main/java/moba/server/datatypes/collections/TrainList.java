@@ -22,7 +22,7 @@ package moba.server.datatypes.collections;
 
 import moba.server.datatypes.objects.Train;
 
-import java.util.HashMap;
+import java.util.Vector;
 
-public class TrainList extends HashMap<Long, Train> {
+public class TrainList extends Vector<Train> {
 }

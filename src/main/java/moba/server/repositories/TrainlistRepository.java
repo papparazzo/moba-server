@@ -60,7 +60,7 @@ public class TrainlistRepository {
             ResultSet rs = pstmt.executeQuery();
 
             while(rs.next()) {
-                map.put(
+                map.add(
                     new Train(
                         rs.getLong("Id"),
                         rs.getInt("BlockId"),
