@@ -33,8 +33,9 @@ public class TrainRepository {
     public Train getTrainById(long trainId) {
         // TODO get this from Repository and API
         return new Train(
-    16410, //            int address,
-            100, //            int speed,
+            4,
+            16410, //            int address,
+            100,   //            int speed,
             DrivingDirection.FORWARD,
             TrainType.FREIGHT_TRAIN,
             false,

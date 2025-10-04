@@ -44,7 +44,6 @@ final public class TrainRunner {
     // TODO: Hier muss auch der Bahnübergang mit berücksichtigt werden (Function-Address in Environment)
     // TODO: Kreuzungsweichen!!
 
-
     public TrainRunner(SimpleRouter routing, Interlock interlock, ActionListGenerator generator) {
         this.generator = generator;
         this.interlock = interlock;
