@@ -20,5 +20,14 @@
 
 package moba.server.datatypes.objects;
 
-public record TrainJourney(Train train, long departureBlockId, long destinationBlockId) {
+import moba.server.datatypes.enumerations.DrivingDirection;
+
+public record TrainJourney(
+    Train train,
+    long departureBlockId,
+    long destinationBlockId
+) {
+    public TrainJourney withDrivingDirection(long departureBlockId) {
+        return new TrainJourney(train, departureBlockId, destinationBlockId);
+    }
 }
