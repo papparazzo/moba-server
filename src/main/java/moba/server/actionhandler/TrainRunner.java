@@ -22,6 +22,7 @@ package moba.server.actionhandler;
 
 import moba.server.datatypes.objects.*;
 import moba.server.exceptions.ClientErrorException;
+import moba.server.repositories.SwitchStateRepository;
 import moba.server.routing.router.RoutingList;
 import moba.server.routing.router.SimpleRouter;
 
@@ -41,12 +42,15 @@ final public class TrainRunner {
 
     private final Interlock interlock;
 
+    private final SwitchStateRepository repo;
+
     // TODO: Hier muss auch der Bahnübergang mit berücksichtigt werden (Function-Address in Environment)
     // TODO: Kreuzungsweichen!!
 
-    public TrainRunner(SimpleRouter routing, Interlock interlock, ActionListGenerator generator) {
+    public TrainRunner(SimpleRouter routing, Interlock interlock, SwitchStateRepository repo, ActionListGenerator generator) {
         this.generator = generator;
         this.interlock = interlock;
+        this.repo = repo;
         this.routing = routing;
     }
 
