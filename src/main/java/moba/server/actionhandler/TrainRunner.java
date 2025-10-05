@@ -100,14 +100,14 @@ final public class TrainRunner {
     /**
      * Check if a train already exists in the linked list. If so, insert right after the last occurrence
      */
-    private boolean insertAfterIfAlreadyExist(TrainJourney trainDestination) {
+    private boolean insertAfterIfAlreadyExist(TrainJourney trainJourney) {
         ListIterator<TrainJourney> iterator = trainQueue.listIterator();
 
         // Check if the train is already in the list...
         while (iterator.hasPrevious()) {
             TrainJourney element = iterator.previous();
 
-            if(element.train().address() != trainDestination.train().address()) {
+            if(element.train().address() != trainJourney.train().address()) {
                 continue;
             }
 
@@ -119,7 +119,7 @@ final public class TrainRunner {
 
             // ... train was found: Put it right behind the last occurrence
             // TODO: Check this: is this really '+1' ?
-            trainQueue.add(index + 1, trainDestination);
+            trainQueue.add(index + 1, trainJourney);
             return true;
         }
         return false;
