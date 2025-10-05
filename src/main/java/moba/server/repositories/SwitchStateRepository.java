@@ -32,8 +32,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class SwitchStateRepository {
-    protected final Database database;
+public final class SwitchStateRepository {
+    private final Database database;
 
     public SwitchStateRepository(Database database) {
         this.database = database;
@@ -41,9 +41,17 @@ public class SwitchStateRepository {
 
     public SwitchStateMap getSwitchStateList(long id)
     throws SQLException, ClientErrorException {
+        String q =
+            "SELECT `SwitchDrives`.`Id`, `SwitchDrives`.`SwitchStand`, `SwitchDrives`.`Address` " +
+            "FROM SwitchDrives " +
+            "LEFT JOIN `TrackLayoutSymbols` " +
+            "ON `TrackLayoutSymbols`.`Id` = `SwitchDrives`.`Id` " +
+            "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
+        return getSwitchStateListForRoute(q, id);
+    }
 
-        Connection con = database.getConnection();
-
+    public SwitchStateMap getSwitchStateListForRoute(long routeId)
+    throws SQLException, ClientErrorException {
         String q =
             "SELECT `SwitchDrives`.`Id`, `SwitchDrives`.`SwitchStand`, `SwitchDrives`.`Address` " +
             "FROM SwitchDrives " +
@@ -51,7 +59,14 @@ public class SwitchStateRepository {
             "ON `TrackLayoutSymbols`.`Id` = `SwitchDrives`.`Id` " +
             "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
 
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
+        return getSwitchStateListForRoute(q, routeId);
+    }
+
+    private SwitchStateMap getSwitchStateListForRoute(String stmt, long id)
+    throws SQLException, ClientErrorException {
+        Connection con = database.getConnection();
+
+        try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
             pstmt.setLong(1, id);
 
             SwitchStateMap map = new SwitchStateMap();
@@ -69,4 +84,6 @@ public class SwitchStateRepository {
             return map;
         }
     }
+
+   // public void saveSwitchStateList(long id, SwitchStateMap container)
 }
