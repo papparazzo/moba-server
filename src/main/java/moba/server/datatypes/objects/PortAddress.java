@@ -20,5 +20,5 @@
 
 package moba.server.datatypes.objects;
 
-public record ContactData(int moduleAddr, int contactNb) {
+public record PortAddress(long controller, long port) {
 }

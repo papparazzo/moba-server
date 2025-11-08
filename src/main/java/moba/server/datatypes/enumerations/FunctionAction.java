@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2025 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -20,9 +20,10 @@
 
 package moba.server.datatypes.enumerations;
 
-public enum FunctionState {
-    OFF,           // ausgeschaltet.
-    SWITCHING_ON,  // wird gerade eingeschaltet (Bahnübergang: Schranken senken sich)
-    ACTIVE,        // eingeschaltet, aktiv, läuft aktuell
-    SWITCHING_OFF  // wird gerade ausgeschaltet (Bahnübergang: Schranken senken sich)
+public enum FunctionAction {
+    ON,                  // einschalten (z.B. Orgelkonzert, Endlosschleife)
+    OFF,                 // ausschalten
+    TRIGGER;             // einmalig durchlaufen (Orgelkonzert einmalig, Lampe an, 5 Sek. warten, Lampe aus)
+                         // Trigger verhält sich wie on bei Dingen, die nicht einmal durchlaufen werden können
+                         // (z.B. Bahnübergängen)
 }
