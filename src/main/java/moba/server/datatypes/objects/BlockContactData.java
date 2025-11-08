@@ -20,8 +20,8 @@
 package moba.server.datatypes.objects;
 
 public record BlockContactData(
-    ContactData brakeTriggerContact,
-    ContactData blockContact,
+    PortAddress brakeTriggerContact,
+    PortAddress blockContact,
     Integer trainId
 ) {
 }

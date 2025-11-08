@@ -24,11 +24,11 @@ import java.util.ArrayList;
 
 public class ActionTriggerList {
 
-    private final ContactData trigger;
+    private final PortAddress trigger;
 
     private final ArrayList<ActionList> actionLists = new ArrayList<>();
 
-    public ActionTriggerList(ContactData trigger) {
+    public ActionTriggerList(PortAddress trigger) {
         this.trigger = trigger;
     }
 
@@ -37,7 +37,7 @@ public class ActionTriggerList {
         return this;
     }
 
-    public ContactData getTrigger() {
+    public PortAddress getTrigger() {
         return trigger;
     }
 

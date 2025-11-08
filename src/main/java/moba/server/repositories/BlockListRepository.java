@@ -22,7 +22,7 @@ package moba.server.repositories;
 
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.objects.BlockContactData;
-import moba.server.datatypes.objects.ContactData;
+import moba.server.datatypes.objects.PortAddress;
 import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.utilities.Database;
 import moba.server.exceptions.ClientErrorException;
@@ -72,11 +72,11 @@ public final class BlockListRepository {
                 map.put(
                     rs.getLong("Id"),
                     new BlockContactData(
-                        new ContactData(
+                        new PortAddress(
                             rs.getInt("TriggerModulAddress"),
                             rs.getInt("TriggerModulContactNumber")
                         ),
-                        new ContactData(
+                        new PortAddress(
                             rs.getInt("BlockModulAddress"),
                             rs.getInt("BlockModulContactNumber")
                         ),
@@ -126,10 +126,10 @@ public final class BlockListRepository {
 
             try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
                 pstmt.setLong(1, key);
-                pstmt.setLong(2, value.brakeTriggerContact().moduleAddr());
-                pstmt.setLong(3, value.brakeTriggerContact().contactNb());
-                pstmt.setLong(4, value.blockContact().moduleAddr());
-                pstmt.setLong(5, value.blockContact().contactNb());
+                pstmt.setLong(2, value.brakeTriggerContact().controller());
+                pstmt.setLong(3, value.brakeTriggerContact().port());
+                pstmt.setLong(4, value.blockContact().controller());
+                pstmt.setLong(5, value.blockContact().port());
                 if(value.trainId() == null) {
                     pstmt.setNull(6, java.sql.Types.INTEGER);
                 } else {
