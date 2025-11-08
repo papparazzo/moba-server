@@ -20,7 +20,7 @@
 
 package moba.server.datatypes.objects;
 
-import moba.server.datatypes.enumerations.FunctionAction;
+import moba.server.datatypes.enumerations.FunctionState;
 
-public record FunctionData(GlobalPortAddress address, FunctionAction action) {
+public record FunctionStateData(GlobalPortAddress address, FunctionState state) {
 }
