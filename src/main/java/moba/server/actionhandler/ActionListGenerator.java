@@ -23,6 +23,7 @@ package moba.server.actionhandler;
 import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.datatypes.collections.SwitchStateMap;
 import moba.server.datatypes.enumerations.ActionType;
+import moba.server.datatypes.enumerations.ControllableFunction;
 import moba.server.datatypes.enumerations.SwitchStand;
 import moba.server.datatypes.objects.*;
 
@@ -80,8 +81,8 @@ final public class ActionListGenerator {
 
         actionLists.addActionList(
             new ActionList().
-                addAction(ActionType.LOCO_FUNCTION_ON, "HEADLIGHTS").
-                addAction(ActionType.LOCO_FUNCTION_ON, "OPERATION_SOUNDS").
+                addAction(ActionType.LOCO_FUNCTION_ON, ControllableFunction.HEADLIGHTS.toString()).
+                addAction(ActionType.LOCO_FUNCTION_ON, ControllableFunction.OPERATING_SOUNDS.toString()).
                 // … warten, bis Motor warmgelaufen ist :o)
                 // FIXME: Signal auf freie Fahrt schalten!
                 addAction(ActionType.DELAY, 2000).
