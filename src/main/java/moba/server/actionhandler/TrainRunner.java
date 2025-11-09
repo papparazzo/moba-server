@@ -44,9 +44,8 @@ final public class TrainRunner {
 
     private final SwitchStateRepository repo;
 
-    // TODO: Hier muss auch der Bahnübergang mit berücksichtigt werden (Function-Address in Environment)
+    // TODO: Hier muss auch der Bahnübergang mit berücksichtigt werden (Function-GlobalPortAddress in Environment)
     // TODO: Kreuzungsweichen!!
-
     public TrainRunner(SimpleRouter routing, Interlock interlock, SwitchStateRepository repo, ActionListGenerator generator) {
         this.generator = generator;
         this.interlock = interlock;
@@ -54,9 +53,7 @@ final public class TrainRunner {
         this.routing = routing;
     }
 
-    /**
-     * TODO Aufruf nach Fahrplan
-     */
+    // TODO Aufruf nach Fahrplan
     public void pushTrain(TrainJourney train) {
         // Train already exists in the list, this train has to be handled first
         if(insertAfterIfAlreadyExist(train)) {

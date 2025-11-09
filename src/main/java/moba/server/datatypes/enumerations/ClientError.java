@@ -20,9 +20,6 @@
 
 package moba.server.datatypes.enumerations;
 
-/**
- * Client-Errors
- */
 public enum ClientError {
     FAULTY_MESSAGE,
 

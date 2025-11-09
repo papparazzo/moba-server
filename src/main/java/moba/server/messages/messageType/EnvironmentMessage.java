@@ -28,8 +28,7 @@ public enum EnvironmentMessage implements MessageTypeInterface {
     GET_FUNCTION_LIST     (1),
     SET_FUNCTION_LIST     (2),
     SET_FUNCTION          (3),
-    FUNCTION_STATE_CHANGED(4),
-    SET_AMBIENT_LIGHT     (5);
+    FUNCTION_STATE_CHANGED(4);
 
     public final static int GROUP_ID = 5;
 

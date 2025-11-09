@@ -46,7 +46,7 @@ import moba.server.exceptions.ClientErrorException;
  *                       Off:          ausgeschaltet.
  *                       SwitchingOn:  wird gerade eingeschaltet (Bahnübergang: Schranken senken sich)
  *                       Aktive:       eingeschaltet, aktiv, läuft aktuell
- *                       SwitchingOff: wird gerade ausgeschlatet (Bahnübergang: Schranken senken sich)
+ *                       SwitchingOff: wird gerade ausgeschaltet (Bahnübergang: Schranken senken sich)
  *
  * Environment Applikation muss beim Shutdown speichern, welche Aktion gerade an war.
  *
@@ -67,6 +67,7 @@ final public class Environment extends AbstractMessageHandler {
         return EnvironmentMessage.GROUP_ID;
     }
 
+    @Override
     public void hardwareStateChanged(HardwareState state) {
         /*
          * TODO: Je nach HardwareState unterschiedliche Actions: Hier benötigen wir eine zusätzliche Tabelle:

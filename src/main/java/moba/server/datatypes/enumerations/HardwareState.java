@@ -26,5 +26,5 @@ public enum HardwareState {
     EMERGENCY_STOP,   // Nothalt
     MANUEL,           // Manueller Betrieb
     AUTOMATIC,        // Anlage im Automatikbetrieb
-    AUTOMATIC_HALT    // Analge anhalten
+    AUTOMATIC_HALT    // Anlage anhalten
 }
