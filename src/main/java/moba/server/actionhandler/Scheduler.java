@@ -25,7 +25,6 @@ import moba.server.datatypes.objects.GlobalTimerData;
 import moba.server.messages.Message;
 import moba.server.messages.messageType.TimerMessage;
 import moba.server.timedaction.TimedActionInterface;
-import moba.server.utilities.Database;
 
 import java.util.ArrayList;
 import java.util.List;
