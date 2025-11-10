@@ -39,6 +39,8 @@ import moba.server.exceptions.ClientErrorException;
  *                       On:       eingeschaltet (z.B. Orgelkonzert, Endlosschleife)
  *                       Off:      ausgeschaltet
  *                       Trigger:  einmalig durchlaufen (Orgelkonzert einmalig, Lampe an, 5 Sek. warten, Lampe aus)
+ *                                 Trigger verhält sich wie on bei Dingen, die nicht einmal durchlaufen werden können
+ *                                 (z.B. Bahnübergängen)
  *
  *                   Status kann aktiv gemeldet werden wenn Aktion fertig (Finish) oder abgefragt werden (Running, Ready)
  *

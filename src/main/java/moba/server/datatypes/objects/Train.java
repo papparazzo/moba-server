@@ -23,6 +23,7 @@ package moba.server.datatypes.objects;
 import moba.server.datatypes.enumerations.DrivingDirection;
 import moba.server.datatypes.enumerations.TrainType;
 
+// FIXME: Record Train ist abweichend: Hier ist die Id mit hinterlegt!!
 public record Train(
     int trainId,
     int address,

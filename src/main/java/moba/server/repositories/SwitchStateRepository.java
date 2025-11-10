@@ -32,6 +32,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+// TODO: Anstelle von `SwitchDrives`.`Address` hier eine Referenz auf FunctionAddresses!!
 public final class SwitchStateRepository {
     private final Database database;
 
@@ -42,6 +43,7 @@ public final class SwitchStateRepository {
     public SwitchStateMap getSwitchStateList(long id)
     throws SQLException, ClientErrorException {
         String q =
+             /* language=SQL */
             "SELECT `SwitchDrives`.`Id`, `SwitchDrives`.`SwitchStand`, `SwitchDrives`.`Address` " +
             "FROM SwitchDrives " +
             "LEFT JOIN `TrackLayoutSymbols` " +
@@ -53,6 +55,7 @@ public final class SwitchStateRepository {
     public SwitchStateMap getSwitchStateListForRoute(long routeId)
     throws SQLException, ClientErrorException {
         String q =
+            /* language=SQL */
             "SELECT `SwitchDrives`.`Id`, `SwitchDrives`.`SwitchStand`, `SwitchDrives`.`Address` " +
             "FROM SwitchDrives " +
             "LEFT JOIN `TrackLayoutSymbols` " +

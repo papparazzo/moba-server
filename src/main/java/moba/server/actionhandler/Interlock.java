@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
 
+// TODO: Dies ist wohl eher ein Repository als ein ActionHandler.
 final public class Interlock implements Loggable {
 
     private final Database database;
