@@ -21,8 +21,8 @@
 package moba.server.datatypes.enumerations;
 
 public enum FunctionState {
-    OFF,           // ausgeschaltet.
-    SWITCHING_ON,  // wird gerade eingeschaltet (Bahnübergang: Schranken senken sich)
-    ACTIVE,        // eingeschaltet, aktiv, läuft aktuell
-    SWITCHING_OFF  // wird gerade ausgeschaltet (Bahnübergang: Schranken senken sich)
+    ON,                  // einschalten (z.B. Orgelkonzert, Endlosschleife)
+    OFF,                 // ausschalten
+    TRIGGER;             // einmalig durchlaufen (Orgelkonzert einmalig, Lampe an, 5 Sek. warten, Lampe aus)
+                         // Trigger verhält sich wie on bei Dingen, die nicht einmal durchlaufen werden können
 }
