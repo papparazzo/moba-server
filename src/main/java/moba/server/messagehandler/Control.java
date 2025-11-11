@@ -128,11 +128,13 @@ final public class Control extends AbstractMessageHandler implements Loggable {
             container.put(
                 (long)symbol.get("id"),
                 new BlockContactData(
-                        (int)symbol.get("moduleAddr"),
-                        (int)symbol.get("contactNb")
                     new PortAddress(
+                        (int)symbol.get("controllerAddr"),
+                        (int)symbol.get("port")
                     ),
                     new PortAddress(
+                        (int)symbol.get("controllerAddr"),
+                        (int)symbol.get("port")
                     ),
                     null
                 )
