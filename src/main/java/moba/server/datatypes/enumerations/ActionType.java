@@ -10,10 +10,17 @@ public enum ActionType {
 
     LOCO_FUNCTION_ON,
     LOCO_FUNCTION_OFF,
-    SWITCHING_RED,
-    SWITCHING_GREEN,
+    LOCO_FUNCTION_TRIGGER,
+    SWITCHING_RED,              // Weiche rund / Signal rot schalten
+    SWITCHING_GREEN,            // Weiche gerade / Signal grün schalten
 
-    SEND_PUSH_TRAIN,
+ // FIXME Werden diese Dinge auch durch Kontakte ausgelöst? Ja! Knopfdruckaktionen!
+
+ //   FUNCTION_ON,
+ //   FUNCTION_OFF,
+ //   FUNCTION_TRIGGER,
+
+    // SEND_PUSH_TRAIN,
     SEND_ROUTE_SWITCHED,
     SEND_ROUTE_RELEASED,
     SEND_BLOCK_RELEASED
