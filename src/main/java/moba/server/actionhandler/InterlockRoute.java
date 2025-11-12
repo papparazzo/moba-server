@@ -21,8 +21,8 @@
 package moba.server.actionhandler;
 
 import moba.server.datatypes.enumerations.ClientError;
-import moba.server.utilities.Database;
 import moba.server.exceptions.ClientErrorException;
+import moba.server.utilities.Database;
 import moba.server.utilities.logger.Loggable;
 
 import java.sql.Connection;
@@ -32,51 +32,14 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
 
-// TODO: Dies ist wohl eher ein Repository als ein ActionHandler.
-final public class Interlock implements Loggable {
-
-    private final Database database;
+public class InterlockRoute  implements Loggable {
 
     private final HashMap<Long, Boolean> routeStatusList = new HashMap<>();
 
-    public Interlock(Database database) {
+    private final Database database;
+
+    public InterlockRoute(Database database) {
         this.database = database;
-    }
-
-    public boolean setBlock(long trainId, long blockId) throws SQLException {
-        Connection con = database.getConnection();
-
-        String q =
-            "UPDATE `BlockSections` " +
-            "SET `TrainId` = ? " +
-            "WHERE (`TrainId` IS NULL OR `TrainId` = ?) AND `id` = ?";
-
-        try(PreparedStatement stmt = con.prepareStatement(q)) {
-            stmt.setLong(1, trainId);
-            stmt.setLong(2, trainId);
-            stmt.setLong(3, blockId);
-
-            return stmt.executeUpdate() == 1;
-        }
-    }
-
-    public void releaseBlock(long trainId, long blockId)
-    throws SQLException, ClientErrorException {
-        Connection con = database.getConnection();
-
-        String q = "UPDATE `BlockSections` SET `TrainId` = NULL WHERE `TrainId` = ? AND `id` = ?";
-
-        try(PreparedStatement stmt = con.prepareStatement(q)) {
-            stmt.setLong(1, trainId);
-            stmt.setLong(2, blockId);
-
-            if(stmt.executeUpdate() != 1) {
-                throw new ClientErrorException(
-                    ClientError.OPERATION_NOT_ALLOWED,
-                    "block not set for train <" + trainId + ">"
-                );
-            }
-        }
     }
 
     public boolean setRoute(long trainId, Vector<Long> switches)
@@ -158,4 +121,3 @@ final public class Interlock implements Loggable {
         return builder.deleteCharAt(builder.length() - 1).toString();
     }
 }
-
