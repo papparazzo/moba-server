@@ -21,8 +21,8 @@
 package moba.server.timedaction;
 
 import moba.server.com.Dispatcher;
-import moba.server.datatypes.enumerations.FunctionAction;
-import moba.server.datatypes.objects.FunctionData;
+import moba.server.datatypes.enumerations.FunctionState;
+import moba.server.datatypes.objects.FunctionStateData;
 import moba.server.datatypes.objects.GlobalPortAddress;
 import moba.server.datatypes.objects.PointInTime;
 import moba.server.datatypes.objects.PortAddress;
@@ -55,7 +55,7 @@ final public class FunctionExecution implements TimedActionInterface {
         }
 
         do {
-            FunctionData data = new FunctionData(
+            FunctionStateData data = new FunctionStateData(
                 new GlobalPortAddress(
                     rs.getLong("DeviceId"),
                     new PortAddress(
@@ -63,7 +63,7 @@ final public class FunctionExecution implements TimedActionInterface {
                         rs.getLong("Port")
                     )
                 ),
-                CheckedEnum.getFromString(FunctionAction.class, rs.getString("Action"))
+                CheckedEnum.getFromString(FunctionState.class, rs.getString("Action"))
             );
             dispatcher.sendGroup(new Message(EnvironmentMessage.SET_FUNCTION, data));
         } while (rs.next());
