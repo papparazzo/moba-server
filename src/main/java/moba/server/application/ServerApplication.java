@@ -115,7 +115,8 @@ final public class ServerApplication implements Loggable {
             TrackLayoutLock trackLayoutLock = new TrackLayoutLock(database);
             IncidentHandler incidentHandler = new IncidentHandler(logger, dispatcher, list);
 
-            Interlock interlock = new Interlock(database);
+            InterlockBlock interlockBlock = new InterlockBlock(database);
+            InterlockRoute interlockRoute = new InterlockRoute(database);
             TrackLayoutRepository trackLayoutRepository = new TrackLayoutRepository(database);
 
             BlockListRepository blockListRepository = new BlockListRepository(database);
@@ -137,7 +138,7 @@ final public class ServerApplication implements Loggable {
             SimpleRouter router = new SimpleRouter(blocks);
 
             ActionListGenerator generator = new ActionListGenerator(blockContacts, switchStates);
-            TrainRunner trainRunner = new TrainRunner(router, interlock, generator);
+            TrainRunner trainRunner = new TrainRunner(router, interlockBlock, interlockRoute, switchStateRepository, generator);
 
             Scheduler scheduler = new Scheduler(dispatcher, null);
             scheduler.addTimedAction(new FunctionExecution(new FunctionTimeTableRepository(database), dispatcher));
