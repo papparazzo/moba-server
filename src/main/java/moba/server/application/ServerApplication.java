@@ -126,7 +126,7 @@ final public class ServerApplication implements Loggable {
 
             long activeLayoutId = activeLayout.getActiveLayout();
             BlockContactDataMap blockContacts = blockListRepository.getBlockList(activeLayoutId);
-            SwitchStateMap switchStates = switchStateRepository.getSwitchStateList(activeLayoutId);
+            SwitchStateMap switchStates = switchStateRepository.getSwitchStateListForTracklayout(activeLayoutId);
 
             LayoutParser parser = new LayoutParser(
                 trackLayoutRepository.getLayout(activeLayoutId),

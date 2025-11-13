@@ -40,7 +40,7 @@ public final class SwitchStateRepository {
         this.database = database;
     }
 
-    public SwitchStateMap getSwitchStateList(long id)
+    public SwitchStateMap getSwitchStateListForTracklayout(long id)
     throws SQLException, ClientErrorException {
         String q =
              /* language=SQL */
