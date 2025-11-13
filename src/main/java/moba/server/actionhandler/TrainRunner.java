@@ -20,11 +20,13 @@
 
 package moba.server.actionhandler;
 
+import moba.server.datatypes.collections.SwitchStateMap;
 import moba.server.datatypes.objects.*;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.repositories.SwitchStateRepository;
 import moba.server.routing.router.RoutingList;
 import moba.server.routing.router.SimpleRouter;
+import moba.server.routing.typedefs.SwitchStateData;
 
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -40,7 +42,9 @@ final public class TrainRunner {
 
     private final LinkedList<TrainJourney> trainQueue = new LinkedList<>();
 
-    private final Interlock interlock;
+    private final InterlockBlock interlockBlock;
+
+    private final InterlockRoute interlockRoute;
 
     private final SwitchStateRepository repo;
 
@@ -51,9 +55,10 @@ final public class TrainRunner {
      *  TODO: Für Weichen und Bahnübergang benötigen wir benötigen wir noch ein Feedback, das alle Weichen und
      *        Bahnübergänge geschaltet wurden. Bahnübergang benötigt Zeit!
      */
-    public TrainRunner(SimpleRouter routing, Interlock interlock, SwitchStateRepository repo, ActionListGenerator generator) {
+    public TrainRunner(SimpleRouter routing, InterlockBlock interlock, InterlockRoute interlockRoute, SwitchStateRepository repo, ActionListGenerator generator) {
         this.generator = generator;
-        this.interlock = interlock;
+        this.interlockBlock = interlock;
+        this.interlockRoute = interlockRoute;
         this.repo = repo;
         this.routing = routing;
     }
@@ -82,18 +87,18 @@ final public class TrainRunner {
 
     public void releaseRoute(int routeId)
     throws SQLException, ClientErrorException {
-        interlock.releaseRoute(routeId);
+        interlockRoute.releaseRoute(routeId);
         pushTrain();
     }
 
     public void releaseBlock(int trainId, int blockId)
     throws SQLException, ClientErrorException {
-        interlock.releaseBlock(trainId, blockId);
+        interlockBlock.releaseBlock(trainId, blockId);
         pushTrain();
     }
 
     public void setSwitched(int routeId) {
-        interlock.routeSet(routeId);
+        interlockRoute.routeSet(routeId);
         pushTrain();
     }
 
@@ -133,28 +138,28 @@ final public class TrainRunner {
             return true;
         }
 
-        Vector<Long> switchingList = new Vector<>();
+        try {
+            while (current.successor() != null) {
+                current = current.successor();
 
-        while (current.successor() != null) {
-            current = current.successor();
-
-            // Es handelt sich um einen Block!
-            if(current.routingItem().switchStand() == null) {
-                try {
-                    // FIXME: Hier brauchen wir die TrainId!
-                    boolean okay = interlock.setBlock(trainDestination.train().address(), current.routingItem().id());
-
-                    if(!okay) {
-                        // TODO: Vorletzte id in TRainJourney setzen!
+                // Es handelt sich um Weichenliste!
+                if(current.routingItem().switchStand() != null) {
+                    if(handleSwitchingList(current, trainDestination.train().trainId())) {
                         return false;
                     }
-                } catch (Throwable e) {
-                    // Predicat "trainQueue.removeIf(this::handleTrain);" darf keine checked Exceptions werfen!
-                    throw new RuntimeException(e);
                 }
-                continue;
+                boolean okay = interlockBlock.setBlock(trainDestination.train().trainId(), current.routingItem().id());
+
+                if(!okay) {
+                    // TODO: Vorletzte id in TrainJourney setzen!
+                    return false;
+                }
             }
+        } catch (Throwable e) {
+            // Predicat "trainQueue.removeIf(this::handleTrain);" darf keine checked Exceptions werfen!
+            throw new RuntimeException(e);
         }
+
 
         //return generator.getTrainActionList(trainDestination, itemList);
 
@@ -170,36 +175,46 @@ final public class TrainRunner {
     private boolean handleBlockList(RoutingList current)
     throws SQLException {
         int trainId = 0;
-
-
-
         return true;
     }
 
-    private boolean handleSwitchingList(RoutingList current)
-    throws SQLException {
-        // FIXME: Wo bekommen wir die Zug-Id her?
-        int trainId = 0;
+    private boolean handleSwitchingList(RoutingList current, int trainId)
+    throws SQLException, ClientErrorException {
+        // FIXME: Die routeId muss hier noch gesetzt werden!
         int routeId = 4;
 
+        SwitchStateMap list = repo.getSwitchStateListForRoute(routeId);
+
         Vector<Long> switchingList = new Vector<>();
+        Vector<Long> toSwitchList = new Vector<>();
 
         while (current.successor() != null) {
             RoutingList tmp = current.successor();
+            SwitchStateData data = current.routingItem();
 
-            if(current.routingItem().switchStand() != null) {
+            if(data.switchStand() == null) {
                 break;
             }
-            switchingList.add(current.routingItem().id());
+            long switchId = data.id();
+
+            switchingList.add(switchId);
+            if(list.get(switchId).stand() != data.switchStand()) {
+                toSwitchList.add(switchId);
+            }
             current = tmp;
         }
 
-        // schauen ob Weichen bereits geschaltet...
-
-        if(interlock.setRoute(trainId, switchingList)) {
+        // schauen, ob Weichen bereits geschaltet wurden …
+        if(interlockRoute.setRoute(trainId, switchingList)) {
             return false;
         }
-        ActionListCollection collection = generator.getSwitchActionList(routeId, switchingList);
+
+
+
+        // FIXME: Wenn alle Weichen bereits geschaltet wurden brauchen wir auch nicht zu warten!
+        ActionListCollection collection = generator.getSwitchActionList(routeId, toSwitchList);
         return true;
     }
+
+
 }
