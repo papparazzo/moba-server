@@ -45,7 +45,7 @@ public class TrainlistRepository {
         // Stell den aktuellen IST-Zustand (wo befindet sich welcher Zug) da!
         Connection con = database.getConnection();
         String q =
-            "SELECT Trains.Id, `BlockSections`.`Id` AS BlockId , Address, Speed, DrivingDirection " +
+            "SELECT Trains.Id, Address, Speed, DrivingDirection " +
             "FROM Trains " +
             "LEFT JOIN BlockSections " +
             "ON BlockSections.TrainId = Trains.Id " +
@@ -62,8 +62,7 @@ public class TrainlistRepository {
             while(rs.next()) {
                 map.add(
                     new Train(
-                        rs.getLong("Id"),
-                        rs.getInt("BlockId"),
+                        rs.getInt("Id"),
                         rs.getInt("Address"),
                         rs.getInt("Speed"),
                         CheckedEnum.getFromString(DrivingDirection.class, rs.getString("DrivingDirection"))
