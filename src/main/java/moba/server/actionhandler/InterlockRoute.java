@@ -22,6 +22,7 @@ package moba.server.actionhandler;
 
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.exceptions.ClientErrorException;
+import moba.server.routing.typedefs.SwitchStateData;
 import moba.server.utilities.Database;
 import moba.server.utilities.logger.Loggable;
 
@@ -34,6 +35,12 @@ import java.util.logging.Level;
 
 public class InterlockRoute  implements Loggable {
 
+    public enum RouteStatus {
+        BLOCKED_AND_SWITCHED,
+        BLOCKED_AND_NOT_SWITCHED,
+        NOT_BLOCKED
+    }
+
     private final HashMap<Long, Boolean> routeStatusList = new HashMap<>();
 
     private final Database database;
@@ -42,19 +49,19 @@ public class InterlockRoute  implements Loggable {
         this.database = database;
     }
 
-    public boolean setRoute(long trainId, Vector<Long> switches)
+    public RouteStatus setRoute(long trainId, Vector<SwitchStateData> switches)
     throws SQLException {
 
         Boolean routeStatus = routeStatusList.get(trainId);
 
         if(routeStatus != null && routeStatus) {
             // Fahrstraße gesetzt und Weichen geschaltet
-            return true;
+            return RouteStatus.BLOCKED_AND_SWITCHED;
         }
 
         if(routeStatus != null) {
             // Fahrstraße gesetzt und Weichen noch nicht geschaltet
-            return false;
+            return RouteStatus.BLOCKED_AND_NOT_SWITCHED;
         }
 
         Connection con = database.getConnection();
@@ -68,8 +75,8 @@ public class InterlockRoute  implements Loggable {
         try(PreparedStatement stmt = con.prepareStatement(q)) {
             stmt.setLong(1, trainId);
             int i = 1;
-            for(Long v : switches) {
-                stmt.setLong(++i, v);
+            for(SwitchStateData v : switches) {
+                stmt.setLong(++i, v.id());
             }
 
             getLogger().log(Level.INFO, stmt.toString());
@@ -77,12 +84,12 @@ public class InterlockRoute  implements Loggable {
             if(stmt.executeUpdate() != switches.size()) {
                 con.rollback();
                 // Weichen bereits anderweitig geschaltet.
-                return false;
+                return RouteStatus.NOT_BLOCKED;
             }
             con.commit();
         }
         routeStatusList.put(trainId, false);
-        return false;
+        return RouteStatus.BLOCKED_AND_NOT_SWITCHED;
     }
 
     public void routeSet(long trainId) {
