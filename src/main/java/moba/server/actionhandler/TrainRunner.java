@@ -148,6 +148,7 @@ final public class TrainRunner {
                         return false;
                     }
                 }
+                // TODO: Achtung! Signal auf freie Fahrt schalten
                 boolean okay = interlockBlock.setBlock(trainDestination.train().trainId(), current.routingItem().id());
 
                 if(!okay) {
@@ -172,21 +173,12 @@ final public class TrainRunner {
         return true;
     }
 
-    private boolean handleBlockList(RoutingList current)
-    throws SQLException {
-        int trainId = 0;
-        return true;
-    }
-
     private boolean handleSwitchingList(RoutingList current, int trainId)
     throws SQLException, ClientErrorException {
         // FIXME: Die routeId muss hier noch gesetzt werden!
         int routeId = 4;
 
-        SwitchStateMap list = repo.getSwitchStateListForRoute(routeId);
-
-        Vector<Long> switchingList = new Vector<>();
-        Vector<Long> toSwitchList = new Vector<>();
+        Vector<SwitchStateData> switchingList = new Vector<>();
 
         while (current.successor() != null) {
             RoutingList tmp = current.successor();
@@ -195,24 +187,29 @@ final public class TrainRunner {
             if(data.switchStand() == null) {
                 break;
             }
-            long switchId = data.id();
 
-            switchingList.add(switchId);
-            if(list.get(switchId).stand() != data.switchStand()) {
-                toSwitchList.add(switchId);
-            }
+            switchingList.add(data);
             current = tmp;
         }
 
         // schauen, ob Weichen bereits geschaltet wurden …
-        if(interlockRoute.setRoute(trainId, switchingList)) {
+        if(interlockRoute.setRoute(trainId, switchingList) == InterlockRoute.RouteStatus.NOT_BLOCKED) {
             return false;
         }
 
 
 
+
+        SwitchStateMap list = repo.getSwitchStateListForRoute(routeId);
+
+
         // FIXME: Wenn alle Weichen bereits geschaltet wurden brauchen wir auch nicht zu warten!
         ActionListCollection collection = generator.getSwitchActionList(routeId, toSwitchList);
+
+        if(list.isEmpty()) {
+            interlockRoute.routeSet(trainId);
+        }
+
         return true;
     }
 
