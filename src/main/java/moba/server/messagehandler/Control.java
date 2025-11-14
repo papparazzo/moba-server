@@ -148,7 +148,7 @@ final public class Control extends AbstractMessageHandler implements Loggable {
     private void getSwitchStateList(Message msg)
     throws SQLException, ClientErrorException {
         long id = activeLayout.getActiveLayout((Long)msg.getData());
-        SwitchStateMap switchStateList = switchStateRepository.getSwitchStateList(id);
+        SwitchStateMap switchStateList = switchStateRepository.getSwitchStateListForTracklayout(id);
         dispatcher.sendSingle(new Message(ControlMessage.GET_SWITCH_STAND_LIST_RES, switchStateList), msg.getEndpoint());
     }
 
