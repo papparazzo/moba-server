@@ -38,6 +38,7 @@ public class InterlockRoute  implements Loggable {
     public enum RouteStatus {
         BLOCKED_AND_SWITCHED,
         BLOCKED_AND_NOT_SWITCHED,
+        BLOCKED_AND_NOT_SWITCHED_WAITING,
         NOT_BLOCKED
     }
 
@@ -56,12 +57,13 @@ public class InterlockRoute  implements Loggable {
 
         if(routeStatus != null && routeStatus) {
             // Fahrstraße gesetzt und Weichen geschaltet
+            routeStatusList.remove(trainId);
             return RouteStatus.BLOCKED_AND_SWITCHED;
         }
 
         if(routeStatus != null) {
             // Fahrstraße gesetzt und Weichen noch nicht geschaltet
-            return RouteStatus.BLOCKED_AND_NOT_SWITCHED;
+            return RouteStatus.BLOCKED_AND_NOT_SWITCHED_WAITING;
         }
 
         Connection con = database.getConnection();
@@ -88,12 +90,23 @@ public class InterlockRoute  implements Loggable {
             }
             con.commit();
         }
+        // Fahrstraße reserviert. Warten, dass alle Weichen geschaltet sind …
         routeStatusList.put(trainId, false);
         return RouteStatus.BLOCKED_AND_NOT_SWITCHED;
     }
 
+    /**
+     * Alle Weichen wurden geschaltet. Methode wird vom Interface aufgerufen.
+     */
     public void routeSet(long trainId) {
-        routeStatusList.put(trainId, false);
+        routeStatusList.put(trainId, true);
+    }
+
+    /**
+     * Eintrag entfernen, wenn keine Weichen geschaltet werden müssen. Methode wird vom TrainRunner aufgerufen.
+     */
+    public void removeRoute(long trainId) {
+        routeStatusList.remove(trainId);
     }
 
     public void releaseRoute(long trainId)
