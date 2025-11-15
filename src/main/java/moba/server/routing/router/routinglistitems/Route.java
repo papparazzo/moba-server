@@ -24,5 +24,5 @@ import moba.server.routing.typedefs.SwitchStateData;
 
 import java.util.Vector;
 
-public record Route(Vector<SwitchStateData> routingItem) implements RoutingElementInterface {
+public record Route(Vector<SwitchStateData> switchingList) implements RoutingElementInterface {
 }

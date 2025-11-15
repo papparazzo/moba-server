@@ -87,6 +87,4 @@ public final class SwitchStateRepository {
             return map;
         }
     }
-
-   // public void saveSwitchStateList(long id, SwitchStateMap container)
 }

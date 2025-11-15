@@ -26,6 +26,7 @@ import moba.server.datatypes.enumerations.ActionType;
 import moba.server.datatypes.enumerations.ControllableFunction;
 import moba.server.datatypes.enumerations.SwitchStand;
 import moba.server.datatypes.objects.*;
+import moba.server.routing.typedefs.SwitchStateData;
 
 import java.util.Vector;
 
@@ -40,11 +41,11 @@ final public class ActionListGenerator {
         this.switchStates = switchStates;
     }
 
-    public ActionListCollection getSwitchActionList(int routeId, Vector<Long> switchingList) {
+    public ActionListCollection getSwitchActionList(int routeId, Vector<SwitchStateData> switchingList) {
         ActionListCollection actionLists = new ActionListCollection();
 
-        for(Long switchId : switchingList) {
-            SwitchStandData s = switchStates.get(switchId);
+        for(SwitchStateData switchState : switchingList) {
+            SwitchStandData s = switchStates.get(switchState.id());
 
             if(s.stand() == SwitchStand.BEND) {
                 actionLists.addActionList(new ActionList(ActionType.SWITCHING_RED, s.address()));
@@ -81,10 +82,11 @@ final public class ActionListGenerator {
 
         actionLists.addActionList(
             new ActionList().
+                // FIXME: Signal auf freie Fahrt schalten!
+                addAction(ActionType.DELAY, 2000).
                 addAction(ActionType.LOCO_FUNCTION_ON, ControllableFunction.HEADLIGHTS.toString()).
                 addAction(ActionType.LOCO_FUNCTION_ON, ControllableFunction.OPERATING_SOUNDS.toString()).
                 // … warten, bis Motor warmgelaufen ist :o)
-                // FIXME: Signal auf freie Fahrt schalten!
                 addAction(ActionType.DELAY, 2000).
                 addAction(ActionType.LOCO_SPEED, 391)
         );
@@ -111,6 +113,7 @@ final public class ActionListGenerator {
         actionLists.addTriggerList(new ActionTriggerList(c.brakeTriggerContact()));
         actionLists.addTriggerList(
             new ActionTriggerList(c.blockContact()).
+                // FIXME: Signal auf rot!
                 addActionList(new ActionList(ActionType.SEND_BLOCK_RELEASED, previousBlock))
         );
     }
@@ -127,6 +130,7 @@ final public class ActionListGenerator {
         actionLists.addTriggerList(
             new ActionTriggerList(c.blockContact()).
                 addActionList(
+                    // FIXME: Signal auf rot!
                     (new ActionList(ActionType.SEND_BLOCK_RELEASED, previousBlock)).
                         addAction(ActionType.DELAY, 1000).
                         addAction(ActionType.LOCO_HALT)
