@@ -24,8 +24,13 @@ import moba.server.datatypes.enumerations.SwitchStand;
 import moba.server.datatypes.objects.TrainJourney;
 import moba.server.routing.nodes.BlockNode;
 import moba.server.routing.nodes.NodeInterface;
+import moba.server.routing.router.routinglistitems.Block;
+import moba.server.routing.router.routinglistitems.Route;
+import moba.server.routing.router.routinglistitems.RoutingElementInterface;
 import moba.server.routing.typedefs.BlockNodeMap;
 import moba.server.routing.typedefs.SwitchStateData;
+
+import java.util.Vector;
 
 /**
  * Liefert eine verkettete Liste vom Startblock bis zum Zielblock mit Weichen und Blöcken zurück
@@ -41,11 +46,65 @@ final public class SimpleRouter {
 
     private final BlockNodeMap blocks;
 
+    private record LinkedRoutingList(
+        LinkedRoutingList successor,
+        SwitchStateData routingItem
+    ) {
+        public int getCount() {
+            int count = 1;
+            LinkedRoutingList current = this;
+            while (current.successor != null) {
+                count++;
+                current = current.successor;
+            }
+            return count;
+        }
+    }
+
     public SimpleRouter(BlockNodeMap blocks) {
         this.blocks = blocks;
     }
 
-    public RoutingList getRoute(TrainJourney journey) {
+    /**
+     * konvertiert die mit {@see getLinkedRouteList} generierte verkettete Liste in einen Vektor und liefert
+     * diesen zurück
+     */
+    public Vector<RoutingElementInterface> getRoute(TrainJourney journey) {
+        Vector<RoutingElementInterface> result = new Vector<>();
+
+        LinkedRoutingList current = getLinkedRouteList(journey);
+
+        // Zug befindet sich bereits im Ziel!
+        if(current == null) {
+            return result;
+        }
+
+        Vector<SwitchStateData> routingList = new Vector<>();
+
+        while (current.successor() != null) {
+            current = current.successor();
+
+            SwitchStateData routingItem = current.routingItem();
+
+            if(routingItem.switchStand() != null) {
+                routingList.add(routingItem);
+                continue;
+            }
+
+            if(!routingList.isEmpty()) {
+                result.add(new Route(routingList));
+                routingList = new Vector<>();
+            }
+            result.add(new Block(routingItem.id()));
+        }
+
+        return result;
+    }
+
+    /**
+     * liefert eine verkettete Liste mit Blöcken und Weichen mit dem kürzesten Weg zwischen 2 Punkten zurück
+     */
+    private LinkedRoutingList getLinkedRouteList(TrainJourney journey) {
         long fromBlock = journey.departureBlockId();
         long toBlock = journey.destinationBlockId();
 
@@ -60,14 +119,14 @@ final public class SimpleRouter {
             return null;
         }
 
-        RoutingList itemL = fetchNextNode(block, block.getIn(), journey);
+        LinkedRoutingList itemL = fetchNextNode(block, block.getIn(), journey);
 
         // TODO: Hier noch die Fahrtrichtung berücksichtigen...
         //if(journey.train().noDirectionalControl()) {
 
         //}
 
-        RoutingList itemR = fetchNextNode(block, block.getOut(), journey);
+        LinkedRoutingList itemR = fetchNextNode(block, block.getOut(), journey);
 
         if(itemL == null && itemR == null) {
             throw new IllegalArgumentException("no route found from <" + fromBlock + "> to <" + toBlock + ">");
@@ -87,7 +146,7 @@ final public class SimpleRouter {
         return itemL;
     }
 
-    private RoutingList fetchNextNode(NodeInterface origin, NodeInterface next, TrainJourney destination) {
+    private LinkedRoutingList fetchNextNode(NodeInterface origin, NodeInterface next, TrainJourney destination) {
         if(next == null) {
             return null;
         }
@@ -101,13 +160,13 @@ final public class SimpleRouter {
         }
 
         if(next.getId() == destination.destinationBlockId()) {
-            return new RoutingList(null, new SwitchStateData(next.getId(), null));
+            return new LinkedRoutingList(null, new SwitchStateData(next.getId(), null));
         }
 
         var ctrS = fetchNextNode(next, next.getJunctionNode(SwitchStand.STRAIGHT, origin), destination);
 
         if(next instanceof BlockNode) {
-            return ctrS == null ? null : new RoutingList(ctrS, new SwitchStateData(next.getId(), null));
+            return ctrS == null ? null : new LinkedRoutingList(ctrS, new SwitchStateData(next.getId(), null));
         }
 
         var ctrB = fetchNextNode(next, next.getJunctionNode(SwitchStand.BEND, origin), destination);
@@ -117,16 +176,16 @@ final public class SimpleRouter {
         }
 
         if(ctrS == null) {
-            return new RoutingList(ctrB, new SwitchStateData(next.getId(), SwitchStand.BEND));
+            return new LinkedRoutingList(ctrB, new SwitchStateData(next.getId(), SwitchStand.BEND));
         }
 
         if(ctrB == null) {
-            return new RoutingList(ctrS, new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
+            return new LinkedRoutingList(ctrS, new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
         }
 
         if(ctrS.getCount() > ctrB.getCount()) {
-            return new RoutingList(ctrB, new SwitchStateData(next.getId(), SwitchStand.BEND));
+            return new LinkedRoutingList(ctrB, new SwitchStateData(next.getId(), SwitchStand.BEND));
         }
-        return new RoutingList(ctrS, new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
+        return new LinkedRoutingList(ctrS, new SwitchStateData(next.getId(), SwitchStand.STRAIGHT));
     }
 }

@@ -18,21 +18,7 @@
  *
  */
 
-package moba.server.routing.router;
+package moba.server.routing.router.routinglistitems;
 
-import moba.server.routing.typedefs.SwitchStateData;
-
-public record RoutingList(
-    RoutingList successor,
-    SwitchStateData routingItem
-) {
-    public int getCount() {
-        int count = 1;
-        RoutingList current = this;
-        while (current.successor != null) {
-            count++;
-            current = current.successor;
-        }
-        return count;
-    }
+public record Block(long id) implements RoutingElementInterface {
 }
