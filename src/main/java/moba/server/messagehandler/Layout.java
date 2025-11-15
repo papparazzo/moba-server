@@ -40,7 +40,7 @@ import java.util.Map;
 import moba.server.com.Dispatcher;
 import moba.server.utilities.layout.ActiveTrackLayout;
 import moba.server.messages.Message;
-import moba.server.messages.messageType.LayoutMessage;
+import moba.server.messages.messagetypes.LayoutMessage;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.utilities.layout.TrackLayoutLock;
 import moba.server.utilities.logger.Loggable;

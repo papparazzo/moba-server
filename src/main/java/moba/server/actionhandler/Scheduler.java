@@ -23,7 +23,7 @@ package moba.server.actionhandler;
 import moba.server.com.Dispatcher;
 import moba.server.datatypes.objects.GlobalTimerData;
 import moba.server.messages.Message;
-import moba.server.messages.messageType.TimerMessage;
+import moba.server.messages.messagetypes.TimerMessage;
 import moba.server.timedaction.TimedActionInterface;
 
 import java.util.ArrayList;

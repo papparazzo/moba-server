@@ -26,7 +26,7 @@ import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
-import moba.server.messages.messageType.EnvironmentMessage;
+import moba.server.messages.messagetypes.EnvironmentMessage;
 import moba.server.repositories.FunctionAddressesRepository;
 import moba.server.exceptions.ClientErrorException;
 

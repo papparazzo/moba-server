@@ -18,29 +18,22 @@
  *
  */
 
-package moba.server.messages.messageType;
+package moba.server.messages.messagetypes;
 
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
-public enum ClientMessage implements MessageTypeInterface {
-    PING        (1),
-    ECHO_REQ    (2),
-    ECHO_RES    (3),
-    ERROR       (4),
-    START       (5),
-    CONNECTED   (6),
-    SHUTDOWN    (8),
-    RESET       (9),
-    SELF_TESTING(10),
-    CLOSING     (11);
+public enum TimerMessage implements MessageTypeInterface {
+    GLOBAL_TIMER_EVENT(1),
+    GET_GLOBAL_TIMER  (2),
+    SET_GLOBAL_TIMER  (3);
 
-    public final static int GROUP_ID = 2;
+    public final static int GROUP_ID = 4;
 
     private final int messageId;
 
-    ClientMessage(int msgId) {
+    TimerMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -54,9 +47,9 @@ public enum ClientMessage implements MessageTypeInterface {
         return messageId;
     }
 
-    public static ClientMessage fromId(int id)
+    public static TimerMessage fromId(int id)
     throws ClientErrorException {
-        for(ClientMessage type : values()) {
+        for(TimerMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }
@@ -67,3 +60,4 @@ public enum ClientMessage implements MessageTypeInterface {
         );
     }
 }
+

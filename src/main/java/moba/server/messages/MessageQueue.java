@@ -21,7 +21,7 @@
 package moba.server.messages;
 
 import java.util.concurrent.PriorityBlockingQueue;
-import moba.server.messages.messageType.InternMessage;
+import moba.server.messages.messagetypes.InternMessage;
 import moba.server.utilities.logger.MessageLogger;
 
 public class MessageQueue extends PriorityBlockingQueue<Message> {

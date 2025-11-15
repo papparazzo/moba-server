@@ -22,8 +22,8 @@ package moba.server.com;
 
 import moba.server.messages.Message;
 import moba.server.messages.MessageQueue;
-import moba.server.messages.messageType.InternMessage;
-import moba.server.messages.messageType.ServerMessage;
+import moba.server.messages.messagetypes.InternMessage;
+import moba.server.messages.messagetypes.ServerMessage;
 
 import java.io.BufferedReader;
 import java.io.File;

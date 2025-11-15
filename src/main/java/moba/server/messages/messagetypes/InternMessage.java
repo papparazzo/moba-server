@@ -17,27 +17,23 @@
  *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
-package moba.server.messages.messageType;
+package moba.server.messages.messagetypes;
 
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
-public enum InterfaceMessage implements MessageTypeInterface {
-    CONNECTIVITY_STATE_CHANGED(1),
-	SET_ACTION_LIST           (2),
-	REPLACE_ACTION_LIST       (3),
-	DELETE_ACTION_LIST        (4),
-    ROUTE_SWITCHED            (5),
-	ROUTE_RELEASED            (6),
-	BLOCK_RELEASED            (7),
-    PUSH_TRAIN                (8);
+public enum InternMessage implements MessageTypeInterface {
+    SERVER_SHUTDOWN       (1),
+    SERVER_RESET          (2),
+    SET_HARDWARE_STATE    (3),
+    CLIENT_SHUTDOWN       (4);
 
-    public final static int GROUP_ID = 6;
+    public final static int GROUP_ID = 1;
 
     private final int messageId;
 
-    InterfaceMessage(int msgId) {
+    InternMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -51,9 +47,9 @@ public enum InterfaceMessage implements MessageTypeInterface {
         return messageId;
     }
 
-    public static InterfaceMessage fromId(int id)
+    public static InternMessage fromId(int id)
     throws ClientErrorException {
-        for(InterfaceMessage type : values()) {
+        for(InternMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }

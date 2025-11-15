@@ -35,7 +35,7 @@ import moba.server.repositories.BlockListRepository;
 import moba.server.repositories.SwitchStateRepository;
 import moba.server.repositories.TrainlistRepository;
 import moba.server.messages.Message;
-import moba.server.messages.messageType.ControlMessage;
+import moba.server.messages.messagetypes.ControlMessage;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.utilities.layout.ActiveTrackLayout;
 import moba.server.utilities.layout.TrackLayoutLock;

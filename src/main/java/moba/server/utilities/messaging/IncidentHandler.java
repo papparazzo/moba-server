@@ -24,7 +24,7 @@ import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.IncidentLevel;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.Message;
-import moba.server.messages.messageType.MessagingMessage;
+import moba.server.messages.messagetypes.MessagingMessage;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.util.logging.Level;

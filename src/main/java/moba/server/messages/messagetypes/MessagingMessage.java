@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2020 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -17,23 +17,23 @@
  *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
-package moba.server.messages.messageType;
+
+package moba.server.messages.messagetypes;
 
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
-public enum InternMessage implements MessageTypeInterface {
-    SERVER_SHUTDOWN       (1),
-    SERVER_RESET          (2),
-    SET_HARDWARE_STATE    (3),
-    CLIENT_SHUTDOWN       (4);
+public enum MessagingMessage implements MessageTypeInterface {
+    GET_INCIDENT_LIST(1),
+    SET_INCIDENT_LIST(2),
+    NOTIFY_INCIDENT  (3);
 
-    public final static int GROUP_ID = 1;
+    public final static int GROUP_ID = 9;
 
     private final int messageId;
 
-    InternMessage(int msgId) {
+    MessagingMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -47,9 +47,9 @@ public enum InternMessage implements MessageTypeInterface {
         return messageId;
     }
 
-    public static InternMessage fromId(int id)
+    public static MessagingMessage fromId(int id)
     throws ClientErrorException {
-        for(InternMessage type : values()) {
+        for(MessagingMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }

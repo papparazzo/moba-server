@@ -38,8 +38,8 @@ import moba.server.json.streamreader.JsonStreamReaderBytes;
 import moba.server.json.stringreader.JsonStringReader;
 import moba.server.messages.Message;
 import moba.server.messages.MessageQueue;
-import moba.server.messages.messageType.ClientMessage;
-import moba.server.messages.messageType.InternMessage;
+import moba.server.messages.messagetypes.ClientMessage;
+import moba.server.messages.messagetypes.InternMessage;
 import moba.server.exceptions.ClientClosingException;
 import moba.server.utilities.logger.Loggable;
 

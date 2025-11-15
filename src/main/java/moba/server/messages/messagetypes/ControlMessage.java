@@ -17,32 +17,29 @@
  *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
-package moba.server.messages.messageType;
+package moba.server.messages.messagetypes;
 
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
-public enum LayoutMessage implements MessageTypeInterface {
-    GET_LAYOUTS_REQ         (1),
-    GET_LAYOUTS_RES         (2),
-    DELETE_LAYOUT           (3),
-    CREATE_LAYOUT           (4),
-    UPDATE_LAYOUT           (5),
-    UNLOCK_LAYOUT           (6),
-    LOCK_LAYOUT             (7),
-    GET_LAYOUT_REQ          (8),
-    GET_LAYOUT_READ_ONLY_REQ(9),
-    GET_LAYOUT_RES          (10),
-    SAVE_LAYOUT             (11),
-    LAYOUT_CHANGED          (12),
-    DEFAULT_LAYOUT_CHANGED  (13);
+public enum ControlMessage implements MessageTypeInterface {
+    GET_BLOCK_LIST_REQ        (1),
+    GET_BLOCK_LIST_RES        (2),
+    SAVE_BLOCK_LIST           (3),
+    GET_SWITCH_STAND_LIST_REQ (4),
+    GET_SWITCH_STAND_LIST_RES (5),
+    // SAVE_SWITCH_STAND_LIST    (6),
+    GET_TRAIN_LIST_REQ        (7),
+    GET_TRAIN_LIST_RES        (8);
+    // SAVE_TRAIN_LIST           (9),
 
-    public final static int GROUP_ID = 8;
+
+    public final static int GROUP_ID = 10;
 
     private final int messageId;
 
-    LayoutMessage(int msgId) {
+    ControlMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -56,9 +53,9 @@ public enum LayoutMessage implements MessageTypeInterface {
         return messageId;
     }
 
-    public static LayoutMessage fromId(int id)
+    public static ControlMessage fromId(int id)
     throws ClientErrorException {
-        for(LayoutMessage type : values()) {
+        for(ControlMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }

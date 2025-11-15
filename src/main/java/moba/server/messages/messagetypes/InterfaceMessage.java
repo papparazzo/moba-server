@@ -17,31 +17,27 @@
  *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
-
-package moba.server.messages.messageType;
+package moba.server.messages.messagetypes;
 
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
-public enum ServerMessage implements MessageTypeInterface {
-    NEW_CLIENT_STARTED   (1),
-    CLIENT_CLOSED        (2),
-    RESET_CLIENT         (3),
-    INFO_REQ             (4),
-    INFO_RES             (5),
-    CON_CLIENTS_REQ      (6),
-    CON_CLIENTS_RES      (7),
-    SELF_TESTING_CLIENT  (8),
-    ADD_ALLOWED_IP       (9),
-    GET_ALLOWED_IP_LIST  (10),
-    SET_ALLOWED_IP_LIST  (11);
+public enum InterfaceMessage implements MessageTypeInterface {
+    CONNECTIVITY_STATE_CHANGED(1),
+	SET_ACTION_LIST           (2),
+	REPLACE_ACTION_LIST       (3),
+	DELETE_ACTION_LIST        (4),
+    ROUTE_SWITCHED            (5),
+	ROUTE_RELEASED            (6),
+	BLOCK_RELEASED            (7),
+    PUSH_TRAIN                (8);
 
-    public final static int GROUP_ID = 3;
+    public final static int GROUP_ID = 6;
 
     private final int messageId;
 
-    ServerMessage(int msgId) {
+    InterfaceMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -55,9 +51,9 @@ public enum ServerMessage implements MessageTypeInterface {
         return messageId;
     }
 
-    public static ServerMessage fromId(int id)
+    public static InterfaceMessage fromId(int id)
     throws ClientErrorException {
-        for(ServerMessage type : values()) {
+        for(InterfaceMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }

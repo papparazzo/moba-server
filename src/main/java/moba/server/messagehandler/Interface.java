@@ -33,8 +33,8 @@ import moba.server.utilities.CheckedEnum;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.Message;
 import moba.server.messages.MessageQueue;
-import moba.server.messages.messageType.InterfaceMessage;
-import moba.server.messages.messageType.InternMessage;
+import moba.server.messages.messagetypes.InterfaceMessage;
+import moba.server.messages.messagetypes.InternMessage;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.utilities.messaging.IncidentHandler;
 

@@ -21,7 +21,7 @@
 package moba.server.com;
 
 import moba.server.messages.Message;
-import moba.server.messages.messageType.ClientMessage;
+import moba.server.messages.messagetypes.ClientMessage;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;

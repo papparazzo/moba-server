@@ -18,23 +18,30 @@
  *
  */
 
-package moba.server.messages.messageType;
+package moba.server.messages.messagetypes;
 
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
-public enum EnvironmentMessage implements MessageTypeInterface {
-    GET_FUNCTION_LIST     (1),
-    SET_FUNCTION_LIST     (2),
-    SET_FUNCTION          (3),
-    FUNCTION_STATE_CHANGED(4);
+public enum ServerMessage implements MessageTypeInterface {
+    NEW_CLIENT_STARTED   (1),
+    CLIENT_CLOSED        (2),
+    RESET_CLIENT         (3),
+    INFO_REQ             (4),
+    INFO_RES             (5),
+    CON_CLIENTS_REQ      (6),
+    CON_CLIENTS_RES      (7),
+    SELF_TESTING_CLIENT  (8),
+    ADD_ALLOWED_IP       (9),
+    GET_ALLOWED_IP_LIST  (10),
+    SET_ALLOWED_IP_LIST  (11);
 
-    public final static int GROUP_ID = 5;
+    public final static int GROUP_ID = 3;
 
     private final int messageId;
 
-    EnvironmentMessage(int msgId) {
+    ServerMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -48,9 +55,9 @@ public enum EnvironmentMessage implements MessageTypeInterface {
         return messageId;
     }
 
-    public static EnvironmentMessage fromId(int id)
+    public static ServerMessage fromId(int id)
     throws ClientErrorException {
-        for(EnvironmentMessage type : values()) {
+        for(ServerMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }

@@ -17,29 +17,24 @@
  *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
-package moba.server.messages.messageType;
+
+package moba.server.messages.messagetypes;
 
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
-public enum ControlMessage implements MessageTypeInterface {
-    GET_BLOCK_LIST_REQ        (1),
-    GET_BLOCK_LIST_RES        (2),
-    SAVE_BLOCK_LIST           (3),
-    GET_SWITCH_STAND_LIST_REQ (4),
-    GET_SWITCH_STAND_LIST_RES (5),
-    // SAVE_SWITCH_STAND_LIST    (6),
-    GET_TRAIN_LIST_REQ        (7),
-    GET_TRAIN_LIST_RES        (8);
-    // SAVE_TRAIN_LIST           (9),
+public enum EnvironmentMessage implements MessageTypeInterface {
+    GET_FUNCTION_LIST     (1),
+    SET_FUNCTION_LIST     (2),
+    SET_FUNCTION          (3),
+    FUNCTION_STATE_CHANGED(4);
 
-
-    public final static int GROUP_ID = 10;
+    public final static int GROUP_ID = 5;
 
     private final int messageId;
 
-    ControlMessage(int msgId) {
+    EnvironmentMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -53,9 +48,9 @@ public enum ControlMessage implements MessageTypeInterface {
         return messageId;
     }
 
-    public static ControlMessage fromId(int id)
+    public static EnvironmentMessage fromId(int id)
     throws ClientErrorException {
-        for(ControlMessage type : values()) {
+        for(EnvironmentMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }

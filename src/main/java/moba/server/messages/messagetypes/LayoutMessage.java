@@ -17,23 +17,32 @@
  *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
-
-package moba.server.messages.messageType;
+package moba.server.messages.messagetypes;
 
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
-public enum TimerMessage implements MessageTypeInterface {
-    GLOBAL_TIMER_EVENT(1),
-    GET_GLOBAL_TIMER  (2),
-    SET_GLOBAL_TIMER  (3);
+public enum LayoutMessage implements MessageTypeInterface {
+    GET_LAYOUTS_REQ         (1),
+    GET_LAYOUTS_RES         (2),
+    DELETE_LAYOUT           (3),
+    CREATE_LAYOUT           (4),
+    UPDATE_LAYOUT           (5),
+    UNLOCK_LAYOUT           (6),
+    LOCK_LAYOUT             (7),
+    GET_LAYOUT_REQ          (8),
+    GET_LAYOUT_READ_ONLY_REQ(9),
+    GET_LAYOUT_RES          (10),
+    SAVE_LAYOUT             (11),
+    LAYOUT_CHANGED          (12),
+    DEFAULT_LAYOUT_CHANGED  (13);
 
-    public final static int GROUP_ID = 4;
+    public final static int GROUP_ID = 8;
 
     private final int messageId;
 
-    TimerMessage(int msgId) {
+    LayoutMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -47,9 +56,9 @@ public enum TimerMessage implements MessageTypeInterface {
         return messageId;
     }
 
-    public static TimerMessage fromId(int id)
+    public static LayoutMessage fromId(int id)
     throws ClientErrorException {
-        for(TimerMessage type : values()) {
+        for(LayoutMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }
@@ -60,4 +69,3 @@ public enum TimerMessage implements MessageTypeInterface {
         );
     }
 }
-

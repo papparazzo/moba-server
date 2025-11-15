@@ -28,7 +28,7 @@ import moba.server.datatypes.objects.PointInTime;
 import moba.server.datatypes.objects.PortAddress;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.messages.Message;
-import moba.server.messages.messageType.EnvironmentMessage;
+import moba.server.messages.messagetypes.EnvironmentMessage;
 import moba.server.repositories.FunctionTimeTableRepository;
 import moba.server.utilities.CheckedEnum;
 

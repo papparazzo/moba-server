@@ -26,7 +26,7 @@ import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.messages.Message;
-import moba.server.messages.messageType.LayoutMessage;
+import moba.server.messages.messagetypes.LayoutMessage;
 import moba.server.utilities.config.Config;
 
 public class ActiveTrackLayout {

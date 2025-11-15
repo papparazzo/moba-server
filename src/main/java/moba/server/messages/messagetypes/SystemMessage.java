@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2020 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -17,23 +17,28 @@
  *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
-
-package moba.server.messages.messageType;
+package moba.server.messages.messagetypes;
 
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
-public enum MessagingMessage implements MessageTypeInterface {
-    GET_INCIDENT_LIST(1),
-    SET_INCIDENT_LIST(2),
-    NOTIFY_INCIDENT  (3);
+public enum SystemMessage implements MessageTypeInterface {
+    SET_AUTOMATIC_MODE      (1),
+    TRIGGER_EMERGENCY_STOP  (2),
+    RELEASE_EMERGENCY_STOP  (3),
+    SET_STANDBY_MODE        (4),
+    TOGGLE_STANDBY_MODE     (5),
+    GET_HARDWARE_STATE      (6),
+    HARDWARE_STATE_CHANGED  (7),
+    HARDWARE_SHUTDOWN       (8),
+    HARDWARE_RESET          (9);
 
-    public final static int GROUP_ID = 9;
+    public final static int GROUP_ID = 7;
 
     private final int messageId;
 
-    MessagingMessage(int msgId) {
+    SystemMessage(int msgId) {
         messageId = msgId;
     }
 
@@ -47,9 +52,9 @@ public enum MessagingMessage implements MessageTypeInterface {
         return messageId;
     }
 
-    public static MessagingMessage fromId(int id)
+    public static SystemMessage fromId(int id)
     throws ClientErrorException {
-        for(MessagingMessage type : values()) {
+        for(SystemMessage type : values()) {
             if(type.messageId == id) {
                 return type;
             }

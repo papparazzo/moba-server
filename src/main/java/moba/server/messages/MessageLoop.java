@@ -33,9 +33,9 @@ import moba.server.datatypes.enumerations.IncidentLevel;
 import moba.server.datatypes.enumerations.IncidentType;
 import moba.server.datatypes.objects.ErrorData;
 import moba.server.datatypes.objects.IncidentData;
-import moba.server.messages.messageType.ClientMessage;
-import moba.server.messages.messageType.InternMessage;
-import moba.server.messages.messageType.ServerMessage;
+import moba.server.messages.messagetypes.ClientMessage;
+import moba.server.messages.messagetypes.InternMessage;
+import moba.server.messages.messagetypes.ServerMessage;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.utilities.messaging.IncidentHandler;
 

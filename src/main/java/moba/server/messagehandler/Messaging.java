@@ -25,7 +25,7 @@ import moba.server.com.Endpoint;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
-import moba.server.messages.messageType.MessagingMessage;
+import moba.server.messages.messagetypes.MessagingMessage;
 import moba.server.exceptions.ClientErrorException;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 

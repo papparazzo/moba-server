@@ -30,7 +30,7 @@ import java.util.Map;
 import moba.server.com.Dispatcher;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
-import moba.server.messages.messageType.TimerMessage;
+import moba.server.messages.messagetypes.TimerMessage;
 import moba.server.utilities.config.Config;
 import moba.server.exceptions.ClientErrorException;
 
