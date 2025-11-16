@@ -24,8 +24,10 @@ import moba.server.datatypes.collections.SwitchStateMap;
 import moba.server.datatypes.objects.*;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.repositories.SwitchStateRepository;
-import moba.server.routing.router.RoutingList;
 import moba.server.routing.router.SimpleRouter;
+import moba.server.routing.router.routinglistitems.Block;
+import moba.server.routing.router.routinglistitems.Route;
+import moba.server.routing.router.routinglistitems.RoutingElementInterface;
 import moba.server.routing.typedefs.SwitchStateData;
 
 import java.sql.SQLException;
@@ -131,29 +133,28 @@ final public class TrainRunner {
     }
 
     private boolean handleTrain(TrainJourney trainDestination) {
-        RoutingList current = routing.getRoute(trainDestination);
-
-        // Zug befindet sich bereits im Ziel!
-        if(current == null) {
-            return true;
-        }
-
         try {
-            while (current.successor() != null) {
-                current = current.successor();
+            Vector<RoutingElementInterface> routingElements = routing.getRoute(trainDestination);
 
-                // Es handelt sich um Weichenliste!
-                if(current.routingItem().switchStand() != null) {
-                    if(handleSwitchingList(current, trainDestination.train().trainId())) {
+            Vector<Long> blocks = new Vector<>();
+          //  generator.sendBlockActionList(trainDestination.train(), blocks);
+
+
+            // Zug befindet sich bereits im Ziel!
+            if(routingElements.isEmpty()) {
+                return true;
+            }
+
+            for (RoutingElementInterface element : routingElements) {
+                if(element instanceof Route) {
+                    if(!handleSwitchingList(((Route)element).switchingList(), trainDestination.train().trainId())) {
                         return false;
                     }
-                }
-                // TODO: Achtung! Signal auf freie Fahrt schalten
-                boolean okay = interlockBlock.setBlock(trainDestination.train().trainId(), current.routingItem().id());
-
-                if(!okay) {
-                    // TODO: Vorletzte id in TrainJourney setzen!
-                    return false;
+                } else {
+                    if(!interlockBlock.setBlock(trainDestination.train().trainId(), ((Block)element).id())) {
+                        return false;
+                    }
+                    blocks.add(((Block)element).id());
                 }
             }
         } catch (Throwable e) {
@@ -161,57 +162,40 @@ final public class TrainRunner {
             throw new RuntimeException(e);
         }
 
-
-        //return generator.getTrainActionList(trainDestination, itemList);
-
-        /*
-        trainData.destinationBlockId();
-        trainData.trainId();
-        */
-
-        // Zug ist am Ziel: return true, sonst false!
+        // Zug ist am Ziel
         return true;
     }
 
-    private boolean handleSwitchingList(RoutingList current, int trainId)
+    private boolean handleSwitchingList(Vector<SwitchStateData> switchingList, int trainId)
     throws SQLException, ClientErrorException {
         // FIXME: Die routeId muss hier noch gesetzt werden!
         int routeId = 4;
 
-        Vector<SwitchStateData> switchingList = new Vector<>();
+        switch(interlockRoute.setRoute(trainId, switchingList)) {
+            case NOT_BLOCKED:
+            case BLOCKED_AND_NOT_SWITCHED_WAITING:
+                return false;
 
-        while (current.successor() != null) {
-            RoutingList tmp = current.successor();
-            SwitchStateData data = current.routingItem();
+            case BLOCKED_AND_SWITCHED:
+                return true;
 
-            if(data.switchStand() == null) {
+            case BLOCKED_AND_NOT_SWITCHED:
                 break;
-            }
 
-            switchingList.add(data);
-            current = tmp;
+            default:
+                throw new IllegalStateException("Unknown SwitchStateMap status!");
         }
-
-        // schauen, ob Weichen bereits geschaltet wurden …
-        if(interlockRoute.setRoute(trainId, switchingList) == InterlockRoute.RouteStatus.NOT_BLOCKED) {
-            return false;
-        }
-
-
-
 
         SwitchStateMap list = repo.getSwitchStateListForRoute(routeId);
 
+        switchingList.removeIf(t->list.get(t.id()).stand() == t.switchStand());
 
-        // FIXME: Wenn alle Weichen bereits geschaltet wurden brauchen wir auch nicht zu warten!
-        ActionListCollection collection = generator.getSwitchActionList(routeId, toSwitchList);
-
-        if(list.isEmpty()) {
-            interlockRoute.routeSet(trainId);
+        if(switchingList.isEmpty()) {
+            interlockRoute.removeRoute(trainId);
+            return true;
         }
 
-        return true;
+        generator.sendSwitchActionList(routeId, switchingList);
+        return false;
     }
-
-
 }
