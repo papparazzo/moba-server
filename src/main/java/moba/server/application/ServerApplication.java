@@ -137,7 +137,7 @@ final public class ServerApplication implements Loggable {
             BlockNodeMap blocks = parser.getBlockMap();
             SimpleRouter router = new SimpleRouter(blocks);
 
-            ActionListGenerator generator = new ActionListGenerator(blockContacts, switchStates);
+            ActionListGenerator generator = new ActionListGenerator(blockContacts, switchStates, dispatcher);
             TrainRunner trainRunner = new TrainRunner(router, interlockBlock, interlockRoute, switchStateRepository, generator);
 
             Scheduler scheduler = new Scheduler(dispatcher, null);
