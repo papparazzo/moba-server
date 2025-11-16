@@ -20,12 +20,15 @@
 
 package moba.server.actionhandler;
 
+import moba.server.com.Dispatcher;
 import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.datatypes.collections.SwitchStateMap;
 import moba.server.datatypes.enumerations.ActionType;
 import moba.server.datatypes.enumerations.ControllableFunction;
 import moba.server.datatypes.enumerations.SwitchStand;
 import moba.server.datatypes.objects.*;
+import moba.server.messages.Message;
+import moba.server.messages.messagetypes.InterfaceMessage;
 import moba.server.routing.typedefs.SwitchStateData;
 
 import java.util.Vector;
@@ -36,12 +39,15 @@ final public class ActionListGenerator {
 
     private final SwitchStateMap switchStates;
 
-    public ActionListGenerator(BlockContactDataMap blockContacts, SwitchStateMap switchStates) {
+    private final Dispatcher dispatcher;
+
+    public ActionListGenerator(BlockContactDataMap blockContacts, SwitchStateMap switchStates, Dispatcher dispatcher) {
         this.blockContacts = blockContacts;
         this.switchStates = switchStates;
+        this.dispatcher = dispatcher;
     }
 
-    public ActionListCollection getSwitchActionList(int routeId, Vector<SwitchStateData> switchingList) {
+    public void sendSwitchActionList(int routeId, Vector<SwitchStateData> switchingList) {
         ActionListCollection actionLists = new ActionListCollection();
 
         for(SwitchStateData switchState : switchingList) {
@@ -55,10 +61,10 @@ final public class ActionListGenerator {
         }
 
         actionLists.addActionList(new ActionList(ActionType.SEND_ROUTE_SWITCHED, routeId));
-        return actionLists;
+        this.dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, actionLists));
     }
 
-    public ActionListCollection getBlockActionList(Train train, Vector<Long> blockList) {
+    public void sendBlockActionList(Train train, Vector<Long> blockList) {
         // TODO: ACHTUNG: Wie viele Schleifer?
         ActionListCollection actionLists = new ActionListCollection(train.address());
 
@@ -90,7 +96,7 @@ final public class ActionListGenerator {
                 addAction(ActionType.DELAY, 2000).
                 addAction(ActionType.LOCO_SPEED, 391)
         );
-        return actionLists;
+        this.dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, actionLists));
     }
 
     /**
