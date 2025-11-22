@@ -22,5 +22,8 @@ package moba.server.datatypes.objects;
 
 import moba.server.datatypes.enumerations.ClientError;
 
-public record ErrorData(ClientError errorId, String additionalMsg) {
+public record ErrorData(
+    ClientError errorId,
+    String additionalMsg
+) {
 }

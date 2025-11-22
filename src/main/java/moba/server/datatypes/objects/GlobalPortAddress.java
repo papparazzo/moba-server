@@ -27,5 +27,8 @@ package moba.server.datatypes.objects;
  * PortAddress.controller => Arduino / S88
  * PortAddress.port       => Port / Ausgang
  */
-public record GlobalPortAddress(long deviceId, PortAddress address) {
+public record GlobalPortAddress(
+    long deviceId,
+    PortAddress address
+) {
 }

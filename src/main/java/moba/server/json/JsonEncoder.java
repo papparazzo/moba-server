@@ -195,7 +195,7 @@ public class JsonEncoder {
             addString(object.toString());
         } else if(object instanceof InetAddress inetAddress) {
             addInetAddr(inetAddress);
-        } else if(object instanceof JsonSerializerInterface jSONToStringI) {
+        } else if(object instanceof JsonSerializerInterface<?> jSONToStringI) {
             addJSONValue(jSONToStringI.toJson());
         } else if(object instanceof Record) {
             addRecord(object);

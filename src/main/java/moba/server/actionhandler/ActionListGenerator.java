@@ -105,7 +105,7 @@ final public class ActionListGenerator {
      *     - brake-trigger: no actions!
      */
     private void setFirstListEntry(BlockContactData c, ActionListCollection actionLists) {
-        // FIXME: Hier gibt es im Moment nichts tun! Achtung: Schleifer vom letzen Wagen berücksichtigen!
+        // FIXME: Hier gibt es im Moment nichts tun! Achtung: Schleifer vom letzten Wagen berücksichtigen!
         //actionLists.addTriggerList(new ActionTriggerList(c.brakeTriggerContact()));
         //actionLists.addTriggerList(new ActionTriggerList(c.blockContact()));
     }

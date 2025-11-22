@@ -22,5 +22,8 @@ package moba.server.datatypes.objects;
 
 import moba.server.datatypes.enumerations.FunctionState;
 
-public record FunctionStateData(GlobalPortAddress address, FunctionState state) {
+public record FunctionStateData(
+    GlobalPortAddress address,
+    FunctionState state
+) {
 }
