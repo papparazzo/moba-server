@@ -20,29 +20,31 @@
 
 package moba.server.datatypes.objects;
 
+import moba.server.datatypes.collections.ActionDataList;
+
 import java.util.ArrayList;
 
-public class ActionListCollection {
+public class ActionDataByLocalIdCollection {
 
     private Integer localId = null;
 
-    private ActionList actionList = null;
+    private ActionDataList actionList = null;
 
-    private final ArrayList<ActionTriggerList> triggerList = new ArrayList<>();
+    private final ArrayList<ActionDataByContactCollection> triggerList = new ArrayList<>();
 
-    public ActionListCollection(int localId) {
+    public ActionDataByLocalIdCollection(int localId) {
         this.localId = localId;
     }
 
-    public ActionListCollection() {
+    public ActionDataByLocalIdCollection() {
     }
 
-    public ActionListCollection addActionList(ActionList list) {
+    public ActionDataByLocalIdCollection addActionList(ActionDataList list) {
         actionList = list;
         return this;
     }
 
-    public ActionListCollection addTriggerList(ActionTriggerList list) {
+    public ActionDataByLocalIdCollection addTriggerList(ActionDataByContactCollection list) {
         triggerList.add(list);
         return this;
     }
@@ -51,12 +53,12 @@ public class ActionListCollection {
         return localId;
     }
 
-    public ActionList getActionList() {
-        // FIXME: Null oder lieber Leere ActionList??
+    public ActionDataList getActionList() {
+        // FIXME: Null oder lieber Leere ActionDataList??
         return actionList;
     }
 
-    public ArrayList<ActionTriggerList> getTriggerList() {
+    public ArrayList<ActionDataByContactCollection> getTriggerList() {
         return triggerList;
     }
 }

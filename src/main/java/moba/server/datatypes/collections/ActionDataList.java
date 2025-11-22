@@ -17,11 +17,12 @@
  *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
-package moba.server.datatypes.objects;
 
-public record BlockContactData(
-    PortAddressData brakeTriggerContact,
-    PortAddressData blockContact,
-    Integer trainId
-) {
+package moba.server.datatypes.collections;
+
+import moba.server.datatypes.objects.ActionData;
+
+import java.util.ArrayList;
+
+public class ActionDataList extends ArrayList<ActionData<?>> {
 }

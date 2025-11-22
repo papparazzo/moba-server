@@ -20,28 +20,30 @@
 
 package moba.server.datatypes.objects;
 
+import moba.server.datatypes.collections.ActionDataList;
+
 import java.util.ArrayList;
 
-public class ActionTriggerList {
+public class ActionDataByContactCollection {
 
-    private final PortAddress trigger;
+    private final PortAddressData trigger;
 
-    private final ArrayList<ActionList> actionLists = new ArrayList<>();
+    private final ArrayList<ActionDataList> actionLists = new ArrayList<>();
 
-    public ActionTriggerList(PortAddress trigger) {
+    public ActionDataByContactCollection(PortAddressData trigger) {
         this.trigger = trigger;
     }
 
-    public ActionTriggerList addActionList(ActionList list) {
+    public ActionDataByContactCollection addActionList(ActionDataList list) {
         actionLists.add(list);
         return this;
     }
 
-    public PortAddress getTrigger() {
+    public PortAddressData getTrigger() {
         return trigger;
     }
 
-    public ArrayList<ActionList> getActionLists() {
+    public ArrayList<ActionDataList> getActionLists() {
         return actionLists;
     }
 
