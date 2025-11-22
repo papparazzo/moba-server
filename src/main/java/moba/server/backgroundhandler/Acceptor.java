@@ -18,7 +18,7 @@
  *
  */
 
-package moba.server.com;
+package moba.server.backgroundhandler;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -27,6 +27,8 @@ import java.net.Socket;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 
+import moba.server.com.Dispatcher;
+import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.IncidentLevel;
 import moba.server.datatypes.enumerations.IncidentType;
 import moba.server.messages.MessageQueue;

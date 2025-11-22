@@ -18,7 +18,7 @@
  *
  */
 
-package moba.server.com;
+package moba.server.backgroundhandler;
 
 public interface BackgroundHandlerInterface {
 

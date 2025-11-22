@@ -26,11 +26,11 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import moba.server.actionhandler.*;
-import moba.server.com.Acceptor;
-import moba.server.com.BackgroundHandlerComposite;
+import moba.server.backgroundhandler.Acceptor;
+import moba.server.backgroundhandler.BackgroundHandlerComposite;
 import moba.server.com.Dispatcher;
-import moba.server.com.IPC;
-import moba.server.com.KeepAlive;
+import moba.server.backgroundhandler.IPC;
+import moba.server.backgroundhandler.KeepAlive;
 import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.datatypes.collections.SwitchStateMap;
 import moba.server.messagehandler.*;

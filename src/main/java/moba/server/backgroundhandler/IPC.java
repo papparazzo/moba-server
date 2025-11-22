@@ -18,7 +18,7 @@
  *
  */
 
-package moba.server.com;
+package moba.server.backgroundhandler;
 
 import moba.server.messages.Message;
 import moba.server.messages.MessageQueue;

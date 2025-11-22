@@ -18,8 +18,9 @@
  *
  */
 
-package moba.server.com;
+package moba.server.backgroundhandler;
 
+import moba.server.com.Dispatcher;
 import moba.server.messages.Message;
 import moba.server.messages.messagetypes.ClientMessage;
 
@@ -37,7 +38,7 @@ import java.util.logging.Logger;
  * https://en.wikipedia.org/wiki/Keepalive#TCP_keepalive and
  */
 final public class KeepAlive implements BackgroundHandlerInterface {
-    private final Dispatcher               dispatcher;
+    private final Dispatcher dispatcher;
     private final long                     intervall;
     private final Logger                   logger;
     private Future<?>                      future;
