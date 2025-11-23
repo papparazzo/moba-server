@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2020 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2025 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -20,5 +20,22 @@
 
 package moba.server.datatypes.objects;
 
-public record PortAddress(long controller, long port) {
+import moba.server.json.JsonSerializerInterface;
+
+import java.util.HashMap;
+
+public class Socket extends java.net.Socket implements JsonSerializerInterface<Object> {
+    public String toString() {
+        return this.getInetAddress().getHostAddress() + ":" + this.getPort();
+    }
+
+    @Override
+    public Object toJson() {
+        HashMap<String, Object> map = new HashMap<>();
+
+        map.put("addr", this.getInetAddress());
+        map.put("port", this.getPort());
+
+        return map;
+    }
 }

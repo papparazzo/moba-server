@@ -76,10 +76,10 @@ final public class Position {
      * setzt den Cursor (Position) in die Richtung, welche mit Direction
      * angegeben ist. Beispiel: Direction RIGHT → x einen weiter nach rechts
      */
-    public Position setNewPosition(int dir) {
+    public void setNewPosition(int dir) {
         switch(dir) {
             case Direction.UNSET:
-                return this;
+                return;
 
             case Direction.TOP_RIGHT:
                 x++;  // fall-through
@@ -93,11 +93,11 @@ final public class Position {
 
             case Direction.RIGHT:
                 x++;
-                return this;
+                return;
 
             case Direction.BOTTOM:
                 y++;
-                return this;
+                return;
 
             case Direction.BOTTOM_LEFT:
                 y++;  // fall-through
@@ -111,7 +111,6 @@ final public class Position {
                 x--;
                 break;
         }
-        return this;
     }
 }
 
