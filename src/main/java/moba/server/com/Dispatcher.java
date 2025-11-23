@@ -52,7 +52,7 @@ public class Dispatcher {
     }
 
     public boolean addEndpoint(Endpoint ep) {
-        logger.log(Level.INFO, "try to add endpoint <{0}> appName <{1}> ver<{2}>", new Object[]{ep, ep.getAppName(), ep.getVersion()});
+        logger.log(Level.INFO, "try to add endpoint <{0}>", new Object[]{ep});
 
         for(Endpoint allEndpoint: allEndpoints) {
             if(allEndpoint == ep) {

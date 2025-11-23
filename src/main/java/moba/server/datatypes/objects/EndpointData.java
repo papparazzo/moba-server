@@ -20,10 +20,17 @@
 
 package moba.server.datatypes.objects;
 
-import moba.server.datatypes.enumerations.FunctionState;
+import moba.server.datatypes.base.DateTime;
 
-public record FunctionStateData(
-    GlobalPortAddressData address,
-    FunctionState state
+import java.net.Socket;
+
+public record EndpointData(
+    AppData	appData,
+    long	appId,
+    DateTime startTime,
+    Socket socket
 ) {
+    public EndpointData withAppData(AppData appData) {
+        return new EndpointData(appData, appId(), startTime(), socket());
+    }
 }

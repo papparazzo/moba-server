@@ -24,13 +24,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import moba.server.datatypes.base.DateTime;
 import moba.server.datatypes.base.Version;
+import moba.server.datatypes.objects.AppData;
+import moba.server.datatypes.objects.EndpointData;
 import moba.server.json.JsonDecoder;
 import moba.server.json.JsonException;
 import moba.server.json.JsonSerializerInterface;
@@ -43,27 +44,21 @@ import moba.server.messages.messagetypes.InternMessage;
 import moba.server.exceptions.ClientClosingException;
 import moba.server.utilities.logger.Loggable;
 
-public class Endpoint extends Thread implements JsonSerializerInterface<HashMap<String, Object>>, Loggable {
+final public class Endpoint extends Thread implements JsonSerializerInterface<Object>, Loggable {
+    private AppData appData;
+    private EndpointData endpointData;
 
-    protected long     id;
-    protected long     startTime;
-    protected Socket   socket;
-    protected boolean  closing;
+    private boolean closing;
 
-    protected Version  version;
-    protected String   appName;
+    private final MessageQueue msgQueue;
 
-    protected ArrayList<Long>  msgGroups = new ArrayList<>();
-    protected MessageQueue msgQueue;
-
-    protected DataOutputStream dataOutputStream;
-    protected DataInputStream  dataInputStream;
+    private final DataOutputStream dataOutputStream;
+    private final DataInputStream  dataInputStream;
 
     public Endpoint(long id, Socket socket, MessageQueue msgQueue)
     throws IOException {
-        this.id        = id;
-        this.startTime = System.currentTimeMillis();
-        this.socket    = socket;
+        this.endpointData = new EndpointData(null, id, new DateTime(), socket);
+
         this.msgQueue  = msgQueue;
 
         this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
@@ -75,7 +70,7 @@ public class Endpoint extends Thread implements JsonSerializerInterface<HashMap<
     public void closeEndpoint() {
         closing = true;
         try {
-            socket.close();
+            endpointData.socket().close();
         } catch(IOException ignored) {
 
         }
@@ -83,30 +78,17 @@ public class Endpoint extends Thread implements JsonSerializerInterface<HashMap<
 
     @Override
     public String toString() {
-        return appName + "#" + id + "@" + socket.toString();
+        return appData.appName() + "[" + appData.version() + "] #" + endpointData.appId() + "@" + endpointData.socket();
     }
 
     @Override
-    public HashMap<String, Object> toJson() {
-        HashMap<String, Object> app = new HashMap<>();
-        app.put("appName",   appName);
-        app.put("version",   version);
-        app.put("msgGroups", msgGroups);
-
-        HashMap<String, Object> map = new HashMap<>();
-        SimpleDateFormat dfs = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-
-        map.put("appInfo",   app);
-        map.put("appID",     id);
-        map.put("startTime", dfs.format(startTime));
-        map.put("addr",      socket.getInetAddress());
-        map.put("port",      socket.getPort());
-
-        return map;
+    public Object toJson() {
+        return endpointData;
     }
 
     @Override
     public void run() {
+        long id = endpointData.appId();
         getLogger().log(Level.INFO, "Endpoint #{0}: thread started", new Object[]{id});
         try {
             init();
@@ -126,26 +108,18 @@ public class Endpoint extends Thread implements JsonSerializerInterface<HashMap<
     }
 
     public long getAppId() {
-        return id;
+        return endpointData.appId();
     }
 
     public ArrayList<Long> getMsgGroups() {
-        return msgGroups;
-    }
-
-    public Version getVersion() {
-        return version;
-    }
-
-    public String getAppName() {
-        return appName;
+        return appData.msgGroups();
     }
 
     public DataOutputStream getDataOutputStream() {
         return dataOutputStream;
     }
 
-    protected Message getNextMessage()
+    private Message getNextMessage()
     throws IOException, JsonException {
         try {
             int groupId = dataInputStream.readInt();
@@ -180,13 +154,18 @@ public class Endpoint extends Thread implements JsonSerializerInterface<HashMap<
             throw new IOException("first msg is not CLIENT_START");
         }
         Map<String, Object> map = (Map<String, Object>)msg.getData();
-        appName = (String)map.get("appName");
-        version = new Version((String)map.get("version"));
+
         Object o = map.get("msgGroups");
         if(!(o instanceof ArrayList)) {
             throw new IOException("invalid msg groups given");
         }
-        msgGroups = (ArrayList<Long>)o;
+
+        appData = new AppData(
+            (String)map.get("appName"),
+            new Version((String)map.get("version")),
+            (ArrayList<Long>)o
+        );
+        endpointData = endpointData.withAppData(appData);
         msgQueue.add(msg);
     }
 }

@@ -21,14 +21,13 @@
 package moba.server.datatypes.objects;
 
 import moba.server.com.Endpoint;
+import moba.server.datatypes.base.TimeStamp;
 import moba.server.datatypes.enumerations.IncidentLevel;
 import moba.server.datatypes.enumerations.IncidentType;
 import moba.server.utilities.CheckedEnum;
 import moba.server.messages.Message;
 import moba.server.exceptions.ClientErrorException;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 
 public class IncidentData {
@@ -38,7 +37,7 @@ public class IncidentData {
     private final String caption;
     private final String message;
     private final String source;
-    private final String timeStamp;
+    private final TimeStamp timeStamp;
     private final Endpoint origin;
 
     @SuppressWarnings("unchecked")
@@ -52,7 +51,7 @@ public class IncidentData {
         this.message = map.get("message");
         this.source = map.get("source");
         this.origin = msg.getEndpoint();
-        this.timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSS").format(new Date());
+        this.timeStamp = new TimeStamp();
     }
 
     public IncidentData(IncidentLevel level, IncidentType type, String caption, String message, String source, Endpoint origin) {
@@ -62,7 +61,7 @@ public class IncidentData {
         this.message = message;
         this.source = source;
         this.origin = origin;
-        this.timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSS ").format(new Date());
+        this.timeStamp = new TimeStamp();
     }
 
     public IncidentData(IncidentLevel level, IncidentType type, String caption, String message, String source) {
@@ -112,7 +111,7 @@ public class IncidentData {
         return origin;
     }
 
-    public String getTimeStamp() {
+    public TimeStamp getTimeStamp() {
         return timeStamp;
     }
 

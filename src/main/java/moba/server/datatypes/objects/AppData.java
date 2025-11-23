@@ -20,15 +20,13 @@
 
 package moba.server.datatypes.objects;
 
-/*
- * DeviceId               => Raspberry 1,
- *                           Raspberry 2,
- *                           Märklin Interface -> Jede Applikation hat eine eindeutige Id gespeichert.
- * PortAddress.controller => Arduino / S88
- * PortAddress.port       => Port / Ausgang
- */
-public record GlobalPortAddress(
-    long deviceId,
-    PortAddress address
+import moba.server.datatypes.base.Version;
+
+import java.util.ArrayList;
+
+public record AppData(
+    String  appName,
+    Version version,
+    ArrayList<Long> msgGroups
 ) {
 }

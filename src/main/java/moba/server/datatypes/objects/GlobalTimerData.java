@@ -62,36 +62,36 @@ public class GlobalTimerData {
         return multiplicator;
     }
 
-    public int getNightStartTime() {
-        return nightStartTime.getTimeInMinutes();
+    public Time getNightStartTime() {
+        return nightStartTime;
     }
 
-    public void setNightStartTime(int val) {
-        nightStartTime = new Time(val);
+    public void setNightStartTime(Time val) {
+        nightStartTime = val;
     }
 
-    public int getSunriseStartTime() {
-        return sunriseStartTime.getTimeInMinutes();
+    public Time getSunriseStartTime() {
+        return sunriseStartTime;
     }
 
-    public void setSunriseStartTime(int val) {
-        sunriseStartTime = new Time(val);
+    public void setSunriseStartTime(Time val) {
+        sunriseStartTime = val;
     }
 
-    public int getDayStartTime() {
-        return dayStartTime.getTimeInMinutes();
+    public Time getDayStartTime() {
+        return dayStartTime;
     }
 
-    public void setDayStartTime(int val) {
-        dayStartTime = new Time(val);
+    public void setDayStartTime(Time val) {
+        dayStartTime = val;
     }
 
-    public int getSunsetStartTime() {
-        return sunsetStartTime.getTimeInMinutes();
+    public Time getSunsetStartTime() {
+        return sunsetStartTime;
     }
 
-    public void setSunsetStartTime(int val) {
-        sunsetStartTime = new Time(val);
+    public void setSunsetStartTime(Time val) {
+        sunsetStartTime = val;
     }
 
     public static GlobalTimerData fromJsonObject(Map<String, Object> map)
@@ -106,10 +106,10 @@ public class GlobalTimerData {
 
         gtd.setMultiplicator(((Long)map.get("multiplicator")).intValue());
 
-        gtd.setNightStartTime(((Long)map.get("nightStartTime")).intValue());
-        gtd.setSunriseStartTime(((Long)map.get("sunriseStartTime")).intValue());
-        gtd.setDayStartTime(((Long)map.get("dayStartTime")).intValue());
-        gtd.setSunsetStartTime(((Long)map.get("sunsetStartTime")).intValue());
+        gtd.setNightStartTime(new Time((String)map.get("nightStartTime")));
+        gtd.setSunriseStartTime(new Time((String)map.get("sunriseStartTime")));
+        gtd.setDayStartTime(new Time((String)map.get("dayStartTime")));
+        gtd.setSunsetStartTime(new Time((String)map.get("sunsetStartTime")));
         gtd.validate();
 
         return gtd;

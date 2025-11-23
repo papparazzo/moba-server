@@ -20,10 +20,15 @@
 
 package moba.server.datatypes.objects;
 
-import moba.server.datatypes.enumerations.FunctionState;
-
-public record FunctionStateData(
-    GlobalPortAddressData address,
-    FunctionState state
+/*
+ * DeviceId               => Raspberry 1,
+ *                           Raspberry 2,
+ *                           Märklin Interface -> Jede Applikation hat eine eindeutige Id gespeichert.
+ * PortAddressData.controller => Arduino / S88
+ * PortAddressData.port       => Port / Ausgang
+ */
+public record GlobalPortAddressData(
+    long deviceId,
+    PortAddressData address
 ) {
 }
