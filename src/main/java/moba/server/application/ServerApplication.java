@@ -61,7 +61,7 @@ final public class ServerApplication implements Loggable {
     private final Version appVer;
     private final String  appName;
     private final Date    buildDate;
-    private final long    startTime;
+    private final Date    startTime;
 
     private final Config        config;
     private final MessageQueue  msgQueueIn;
@@ -69,7 +69,7 @@ final public class ServerApplication implements Loggable {
     public ServerApplication(String appName, Version appVer, Date date, Config config) {
         this.appVer     = appVer;
         this.appName    = appName;
-        this.startTime  = System.currentTimeMillis();
+        this.startTime  = new Date();
         this.buildDate  = date;
         this.config     = config;
         this.msgQueueIn = new MessageQueue(new MessageLogger(getLogger()));
@@ -79,7 +79,7 @@ final public class ServerApplication implements Loggable {
         return appVer;
     }
 
-    public long getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 

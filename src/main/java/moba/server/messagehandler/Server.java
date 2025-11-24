@@ -21,13 +21,14 @@
 package moba.server.messagehandler;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import moba.server.application.ServerApplication;
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
+import moba.server.datatypes.base.Date;
+import moba.server.datatypes.base.DateTime;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
@@ -108,13 +109,11 @@ final public class Server extends AbstractMessageHandler {
 
     private void handleServerInfoReq(Endpoint ep) {
         HashMap<String, Object> map = new HashMap<>();
-        SimpleDateFormat dfs        = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        SimpleDateFormat dfb        = new SimpleDateFormat("dd.MM.yyyy");
 
         map.put("appName",           app.getAppName());
         map.put("version",           app.getVersion());
-        map.put("buildDate",         dfb.format(app.getBuildDate()));
-        map.put("startTime",         dfs.format(app.getStartTime()));
+        map.put("buildDate",         new Date(app.getBuildDate()));
+        map.put("startTime",         new DateTime(app.getStartTime()));
 
         map.put("maxClients",        app.getMaxClients());
         map.put("connectedClients",  dispatcher.getEndPointsCount());
