@@ -22,14 +22,9 @@ package moba.server.json;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.InetAddress;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -171,6 +166,8 @@ public class JsonEncoder {
     throws IOException, JsonException {
         if(object == null) {
             addNull();
+        } else if(object instanceof JsonSerializerInterface<?> jSONToStringI) {
+            addJSONValue(jSONToStringI.toJson());
         } else if(object instanceof Map<?, ?> map) {
             addObject(map);
         } else if(object instanceof Boolean boolean1) {
@@ -189,14 +186,8 @@ public class JsonEncoder {
             addNumber(object);
         } else if(object.getClass().isArray()) {
             addArray((Object[])object);
-        } else if(object instanceof Date date) {
-            addDate(date);
         } else if(object instanceof Enum) {
             addString(object.toString());
-        } else if(object instanceof InetAddress inetAddress) {
-            addInetAddr(inetAddress);
-        } else if(object instanceof JsonSerializerInterface<?> jSONToStringI) {
-            addJSONValue(jSONToStringI.toJson());
         } else if(object instanceof Record) {
             addRecord(object);
         } else {
@@ -284,17 +275,5 @@ public class JsonEncoder {
     protected void addNumber(Object obj)
     throws IOException {
         writer.write(String.valueOf(obj));
-    }
-
-    protected void addDate(Date date)
-    throws IOException {
-        DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        addString(df.format(date));
-    }
-
-    protected void addInetAddr(InetAddress addr)
-    throws IOException {
-        String str = addr.getHostAddress();
-        addString(Objects.requireNonNullElse(str, "0.0.0.0"));
     }
 }
