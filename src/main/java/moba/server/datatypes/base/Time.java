@@ -28,15 +28,37 @@ public class Time implements JsonSerializerInterface<String> {
     public Time() {
     }
 
-    public Time(int time)
-    throws IllegalArgumentException {
+    public Time(int time) {
         setTimeInMinutes(time);
     }
 
-    public final void setTimeInMinutes(int timeInMinutes)
-    throws IllegalArgumentException {
+    public Time(String time) {
+        if(time == null) {
+            throw new IllegalArgumentException("time string is null");
+        }
+
+        String[] parts = time.split(":");
+        if(parts.length != 2) {
+            throw new IllegalArgumentException("Invalid time format. Expected HH:MM");
+        }
+
+        try {
+            int hours = Integer.parseInt(parts[0]);
+            int minutes = Integer.parseInt(parts[1]);
+
+            if(hours < 0 || hours >= 24 || minutes < 0 || minutes >= 60) {
+                throw new IllegalArgumentException("Invalid time values. Hours must be 0-23, minutes must be 0-59");
+            }
+
+            this.timeInMinutes = hours * 60 + minutes;
+        } catch(NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid time format. Hours and minutes must be numbers");
+        }
+    }
+
+    public final void setTimeInMinutes(int timeInMinutes) {
         if(timeInMinutes < 0 || timeInMinutes > ((60 * 24) - 1)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("time is out of range: " + timeInMinutes + " minutes");
         }
         this.timeInMinutes = timeInMinutes;
     }
