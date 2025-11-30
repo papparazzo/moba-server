@@ -35,6 +35,8 @@ import moba.server.routing.nodes.NodeInterface;
 import moba.server.routing.nodes.SwitchNode;
 import moba.server.routing.typedefs.*;
 
+import java.util.NoSuchElementException;
+
 public class LayoutParser {
     // IN
     private final LayoutMap layout;
@@ -58,7 +60,7 @@ public class LayoutParser {
         this.blockContacts = blockContacts;
         this.switchStates = switchStates;
         if(blockContacts.isEmpty()) {
-            throw new LayoutParserException("no blocks found");
+            throw new IllegalArgumentException("no blocks found");
         }
     }
 
@@ -88,7 +90,7 @@ public class LayoutParser {
                 return entry.getKey();
             }
         }
-        throw new LayoutParserException("no position found for id " + id);
+        throw new NoSuchElementException("no position found for id " + id);
     }
 
     private void fetchBlockNodes(LocationVector startPos) {
