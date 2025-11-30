@@ -21,6 +21,7 @@
 package moba.server.timedaction;
 
 import moba.server.com.Dispatcher;
+import moba.server.datatypes.collections.FunctionStateDataList;
 import moba.server.datatypes.enumerations.FunctionState;
 import moba.server.datatypes.objects.FunctionStateData;
 import moba.server.datatypes.objects.GlobalPortAddressData;
@@ -48,6 +49,7 @@ final public class FunctionExecution implements TimedActionInterface {
     public void trigger(PointInTime time, int multiplicator)
     throws SQLException, ClientErrorException {
 
+        FunctionStateDataList list = new FunctionStateDataList();
         ResultSet rs = functionRepository.getResult(time, multiplicator);
 
         while(rs.next()) {
@@ -61,7 +63,8 @@ final public class FunctionExecution implements TimedActionInterface {
                 ),
                 CheckedEnum.getFromString(FunctionState.class, rs.getString("Action"))
             );
-            dispatcher.sendGroup(new Message(EnvironmentMessage.SET_FUNCTION, data));
+            list.add(data);
         }
+        dispatcher.sendGroup(new Message(EnvironmentMessage.SET_FUNCTIONS, list));
     }
 }

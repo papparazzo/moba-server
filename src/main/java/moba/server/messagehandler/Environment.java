@@ -21,8 +21,11 @@
 package moba.server.messagehandler;
 
 import java.io.IOException;
+import java.sql.SQLException;
+
 import moba.server.com.Dispatcher;
 
+import moba.server.datatypes.collections.FunctionStateDataList;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
@@ -31,26 +34,20 @@ import moba.server.repositories.FunctionAddressesRepository;
 import moba.server.exceptions.ClientErrorException;
 
 /*
- * TODO Environment: Hier benötigen wir auch eine Rückmeldung, wann eine Aktion abgeschlossen ist.
- *                   Zum Beispiel Bahnübergang: Zug darf erst fahren wenn Schranken unten sind
- *                   Rückmeldung auch bei Rollladen rauf / runter, Gewittersturm, Orgelkonzert in Kirche...
+ * TODO Hier benötigen wir auch eine Rückmeldung, wann eine Aktion abgeschlossen ist.
+ *      Zum Beispiel Bahnübergang: Zug darf erst fahren wenn Schranken unten sind
+ *      Rückmeldung auch bei Rollladen rauf / runter, Gewittersturm, Orgelkonzert in Kirche...
  *
- *                   Action:
- *                       On:       eingeschaltet (z.B. Orgelkonzert, Endlosschleife)
- *                       Off:      ausgeschaltet
- *                       Trigger:  einmalig durchlaufen (Orgelkonzert einmalig, Lampe an, 5 Sek. warten, Lampe aus)
- *                                 Trigger verhält sich wie on bei Dingen, die nicht einmal durchlaufen werden können
- *                                 (z.B. Bahnübergängen)
+ *      Action:
+ *          On:       eingeschaltet (z.B. Orgelkonzert, Endlosschleife)
+ *          Off:      ausgeschaltet
+ *          Trigger:  einmalig durchlaufen (Orgelkonzert einmalig, Lampe an, 5 Sek. warten, Lampe aus)
+ *                    Trigger verhält sich wie on bei Dingen, die nicht einmal durchlaufen werden können
+ *                    (z.B. Bahnübergängen)
  *
- *                   Status kann aktiv gemeldet werden wenn Aktion fertig (Finish) oder abgefragt werden (Running, Ready)
+ *      Status kann aktiv gemeldet werden wenn Aktion fertig (Finish) oder abgefragt werden (Running, Ready)
  *
- *                   Status:
- *                       Off:          ausgeschaltet.
- *                       SwitchingOn:  wird gerade eingeschaltet (Bahnübergang: Schranken senken sich)
- *                       Aktive:       eingeschaltet, aktiv, läuft aktuell
- *                       SwitchingOff: wird gerade ausgeschaltet (Bahnübergang: Schranken senken sich)
- *
- * Environment Applikation muss beim Shutdown speichern, welche Aktion gerade an war.
+ *      Environment Applikation muss beim Shutdown speichern, welche Aktion gerade an war.
  *
  * FIXME: Müssen wir in der Tabelle FunktionAddresses speichern ob Kontakt nur "triggable" ist? -> nein!
  *
@@ -71,40 +68,21 @@ final public class Environment extends AbstractMessageHandler {
 
     @Override
     public void hardwareStateChanged(HardwareState state) {
-        /*
-         * TODO: Je nach HardwareState unterschiedliche Actions: Hier benötigen wir eine zusätzliche Tabelle:
-         *       AmbienceData       ToggleState   curtainUp     Rollo rauf Rollo rauf runter
-         * 	                        ToggleState   mainLightOn   Schreibtischlampe an / aus
-         *       EMERGENCY_STOP: Hauptlicht an.
-         *       AUTOMATIC:      Rollos runter
-         *
-         *       STANDBY,          // Energiesparmodus
-         *       EMERGENCY_STOP,   // Nothalt
-         *       MANUEL,           // Manueller Betrieb
-         *       AUTOMATIC,        // Anlage im Automatikbetrieb
-         *       AUTOMATIC_HALT    // Analge anhalten
-         */
+        try {
+            FunctionStateDataList list = addressesRepo.changeState(state);
+            dispatcher.sendGroup(new Message(EnvironmentMessage.SET_FUNCTIONS, list));
+        } catch(SQLException | ClientErrorException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void handleMsg(Message msg)
-    throws ClientErrorException, IOException {
+        throws ClientErrorException, IOException, SQLException {
         switch(EnvironmentMessage.fromId(msg.getMessageId())) {
-            //case SET_FUNCTION ->
-
-            //case GET_ENVIRONMENT ->
-              //  dispatcher.sendSingle(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment), msg.getEndpoint());
-
-            //case SET_ENVIRONMENT ->
-                //dispatcher.sendGroup(new Message(EnvironmentMessage.SET_ENVIRONMENT, environment));
-
-
-/*
-            case SET_AMBIENCE, SET_AMBIENT_LIGHT ->
-                dispatcher.sendGroup(msg);
-// TAgs??
-          //  "SELECT Id, DeviceId, Address, Description, Active, ActiveInAutomaticMode"
-*/
+            case SET_FUNCTIONS,
+                 // TODO: SET_FUNCTIONS muss intern noch gespeichert werden!
+                 FUNCTION_STATE_CHANGED -> dispatcher.sendGroup(msg);
         }
     }
 }

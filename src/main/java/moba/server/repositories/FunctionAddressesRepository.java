@@ -20,7 +20,18 @@
 
 package moba.server.repositories;
 
-import moba.server.utilities.Database;
+import moba.server.datatypes.collections.FunctionStateDataList;
+import moba.server.datatypes.enumerations.FunctionState;
+import moba.server.datatypes.enumerations.HardwareState;
+import moba.server.datatypes.objects.FunctionStateData;
+import moba.server.datatypes.objects.GlobalPortAddressData;
+import moba.server.datatypes.objects.PortAddressData;
+import moba.server.exceptions.ClientErrorException;
+import moba.server.utilities.CheckedEnum;
+import moba.server.utilities.database.Database;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 final public class FunctionAddressesRepository {
 
@@ -30,11 +41,41 @@ final public class FunctionAddressesRepository {
         this.database = database;
     }
 
-    public String getAddress(int addressId)
-    throws Exception {
-        String q = "SELECT Address FROM FunctionAddresses WHERE Id = ?";
-        return q;
+    public FunctionStateDataList changeState(HardwareState state)
+    throws SQLException, ClientErrorException {
+        /*
+         * Je nach HardwareState unterschiedliche Actions
+         *       EMERGENCY_STOP:    Hauptlicht an.
+         *       AUTOMATIC:         Rollos runter
+         */
+        FunctionStateDataList list = new FunctionStateDataList();
 
+        String sql =
+            "SELECT DeviceId, Controller, Port, Action " +
+            "FROM FunctionStateChange " +
+            "LEFT JOIN FunctionAddresses " +
+            "ON FunctionStateChange.FunctionAddressId = FunctionAddresses.Id " +
+            "WHERE OnState = ?";
+
+        try(java.sql.PreparedStatement stmt = database.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, state.toString());
+
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()) {
+                FunctionStateData data = new FunctionStateData(
+                    new GlobalPortAddressData(
+                        rs.getLong("DeviceId"),
+                        new PortAddressData(
+                            rs.getLong("Controller"),
+                            rs.getLong("Port")
+                        )
+                    ),
+                    CheckedEnum.getFromString(FunctionState.class, rs.getString("Action"))
+                );
+                list.add(data);
+            }
+        }
+        return list;
     }
-
 }
