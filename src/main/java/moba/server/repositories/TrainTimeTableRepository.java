@@ -22,7 +22,7 @@ package moba.server.repositories;
 
 import moba.server.datatypes.base.Time;
 import moba.server.datatypes.enumerations.Day;
-import moba.server.utilities.Database;
+import moba.server.utilities.database.Database;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

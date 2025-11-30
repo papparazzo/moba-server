@@ -21,7 +21,7 @@
 package moba.server.routing.parser;
 
 import moba.server.datatypes.collections.BlockContactDataMap;
-import moba.server.datatypes.collections.LayoutContainer;
+import moba.server.datatypes.collections.LayoutMap;
 import moba.server.datatypes.collections.SwitchStateMap;
 import moba.server.datatypes.enumerations.SymbolType;
 import moba.server.datatypes.objects.Position;
@@ -37,7 +37,7 @@ import moba.server.routing.typedefs.*;
 
 public class LayoutParser {
     // IN
-    private final LayoutContainer layout;
+    private final LayoutMap layout;
 
     private final BlockContactDataMap blockContacts;
 
@@ -50,7 +50,7 @@ public class LayoutParser {
     private final NodeJunctionsMap nodes = new NodeJunctionsMap();
 
     public LayoutParser(
-        LayoutContainer layout,
+        LayoutMap layout,
         BlockContactDataMap blockContacts,
         SwitchStateMap switchStates
     ) {

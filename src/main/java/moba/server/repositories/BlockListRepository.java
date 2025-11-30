@@ -22,9 +22,9 @@ package moba.server.repositories;
 
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.objects.BlockContactData;
-import moba.server.datatypes.objects.PortAddress;
+import moba.server.datatypes.objects.PortAddressData;
 import moba.server.datatypes.collections.BlockContactDataMap;
-import moba.server.utilities.Database;
+import moba.server.utilities.database.Database;
 import moba.server.exceptions.ClientErrorException;
 
 import java.sql.Connection;
@@ -72,11 +72,11 @@ public final class BlockListRepository {
                 map.put(
                     rs.getLong("Id"),
                     new BlockContactData(
-                        new PortAddress(
+                        new PortAddressData(
                             rs.getInt("TriggerModulAddress"),
                             rs.getInt("TriggerModulContactNumber")
                         ),
-                        new PortAddress(
+                        new PortAddressData(
                             rs.getInt("BlockModulAddress"),
                             rs.getInt("BlockModulContactNumber")
                         ),

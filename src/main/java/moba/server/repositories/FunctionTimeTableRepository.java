@@ -20,7 +20,7 @@
 
 package moba.server.repositories;
 
-import moba.server.utilities.Database;
+import moba.server.utilities.database.Database;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

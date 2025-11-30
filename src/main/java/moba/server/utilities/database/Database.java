@@ -18,7 +18,7 @@
  *
  */
 
-package moba.server.utilities;
+package moba.server.utilities.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

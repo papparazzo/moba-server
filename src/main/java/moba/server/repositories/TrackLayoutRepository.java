@@ -26,8 +26,8 @@ import moba.server.datatypes.objects.TrackLayoutInfoData;
 import moba.server.datatypes.objects.TrackLayoutSymbolData;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.datatypes.objects.Symbol;
-import moba.server.datatypes.collections.LayoutContainer;
-import moba.server.utilities.Database;
+import moba.server.datatypes.collections.LayoutMap;
+import moba.server.utilities.database.Database;
 import moba.server.utilities.logger.Loggable;
 
 import java.sql.*;
@@ -123,12 +123,12 @@ public class TrackLayoutRepository implements Loggable {
         }
     }
 
-    public LayoutContainer getLayout(long id)
+    public LayoutMap getLayout(long id)
     throws SQLException {
 
         Connection con = database.getConnection();
 
-        LayoutContainer map = new LayoutContainer();
+        LayoutMap map = new LayoutMap();
 
         String q =
             "SELECT `Id`, `XPos`, `YPos`, `Symbol` " +
@@ -154,7 +154,7 @@ public class TrackLayoutRepository implements Loggable {
         return map;
     }
 
-    public void saveLayout(long id, LayoutContainer container)
+    public void saveLayout(long id, LayoutMap container)
     throws SQLException, ClientErrorException {
 
         Connection con = database.getConnection();

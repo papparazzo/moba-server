@@ -21,6 +21,7 @@
 package moba.server.actionhandler;
 
 import moba.server.com.Dispatcher;
+import moba.server.datatypes.collections.ActionDataList;
 import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.datatypes.collections.SwitchStateMap;
 import moba.server.datatypes.enumerations.ActionType;
@@ -48,25 +49,25 @@ final public class ActionListGenerator {
     }
 
     public void sendSwitchActionList(int routeId, Vector<SwitchStateData> switchingList) {
-        ActionListCollection actionLists = new ActionListCollection();
+        ActionDataByLocalIdCollection actionLists = new ActionDataByLocalIdCollection();
 
         for(SwitchStateData switchState : switchingList) {
             SwitchStandData s = switchStates.get(switchState.id());
 
             if(s.stand() == SwitchStand.BEND) {
-                actionLists.addActionList(new ActionList(ActionType.SWITCHING_RED, s.address()));
+                actionLists.addActionList(new ActionDataList().addAction(ActionType.SWITCHING_RED, s.address()));
             } else {
-                actionLists.addActionList(new ActionList(ActionType.SWITCHING_GREEN, s.address()));
+                actionLists.addActionList(new ActionDataList().addAction(ActionType.SWITCHING_GREEN, s.address()));
             }
         }
 
-        actionLists.addActionList(new ActionList(ActionType.SEND_ROUTE_SWITCHED, routeId));
+        actionLists.addActionList(new ActionDataList().addAction(ActionType.SEND_ROUTE_SWITCHED, routeId));
         this.dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, actionLists));
     }
 
     public void sendBlockActionList(Train train, Vector<Long> blockList) {
         // TODO: ACHTUNG: Wie viele Schleifer?
-        ActionListCollection actionLists = new ActionListCollection(train.address());
+        ActionDataByLocalIdCollection actionLists = new ActionDataByLocalIdCollection(train.address());
 
         long previousBlock = 0;
 
@@ -87,7 +88,7 @@ final public class ActionListGenerator {
         }
 
         actionLists.addActionList(
-            new ActionList().
+            new ActionDataList().
                 // FIXME: Signal auf freie Fahrt schalten!
                 addAction(ActionType.DELAY, 2000).
                 addAction(ActionType.LOCO_FUNCTION_ON, ControllableFunction.HEADLIGHTS.toString()).
@@ -104,10 +105,10 @@ final public class ActionListGenerator {
      *     - block-contact: no actions!
      *     - brake-trigger: no actions!
      */
-    private void setFirstListEntry(BlockContactData c, ActionListCollection actionLists) {
+    private void setFirstListEntry(BlockContactData c, ActionDataByLocalIdCollection actionLists) {
         // FIXME: Hier gibt es im Moment nichts tun! Achtung: Schleifer vom letzten Wagen berücksichtigen!
-        //actionLists.addTriggerList(new ActionTriggerList(c.brakeTriggerContact()));
-        //actionLists.addTriggerList(new ActionTriggerList(c.blockContact()));
+        //actionLists.addTriggerList(new ActionDataByContactCollection(c.brakeTriggerContact()));
+        //actionLists.addTriggerList(new ActionDataByContactCollection(c.blockContact()));
     }
 
     /**
@@ -115,12 +116,12 @@ final public class ActionListGenerator {
      *     - block-contact: release previous block if passed!
      *     - brake-trigger: no actions!
      */
-    private void setMiddleListEntry(BlockContactData c, long previousBlock, ActionListCollection actionLists) {
-        actionLists.addTriggerList(new ActionTriggerList(c.brakeTriggerContact()));
+    private void setMiddleListEntry(BlockContactData c, long previousBlock, ActionDataByLocalIdCollection actionLists) {
+        actionLists.addTriggerList(new ActionDataByContactCollection(c.brakeTriggerContact()));
         actionLists.addTriggerList(
-            new ActionTriggerList(c.blockContact()).
+            new ActionDataByContactCollection(c.blockContact()).
                 // FIXME: Signal auf rot!
-                addActionList(new ActionList(ActionType.SEND_BLOCK_RELEASED, previousBlock))
+                addActionList(new ActionDataList().addAction(ActionType.SEND_BLOCK_RELEASED, previousBlock))
         );
     }
 
@@ -132,19 +133,19 @@ final public class ActionListGenerator {
      *           * release previous block if passed!
      *     - brake-trigger: stop lok
      */
-    private void setLastListEntry(BlockContactData c, long previousBlock, ActionListCollection actionLists) {
+    private void setLastListEntry(BlockContactData c, long previousBlock, ActionDataByLocalIdCollection actionLists) {
         actionLists.addTriggerList(
-            new ActionTriggerList(c.blockContact()).
+            new ActionDataByContactCollection(c.blockContact()).
                 addActionList(
                     // FIXME: Signal auf rot!
-                    (new ActionList(ActionType.SEND_BLOCK_RELEASED, previousBlock)).
+                    (new ActionDataList().addAction(ActionType.SEND_BLOCK_RELEASED, previousBlock)).
                         addAction(ActionType.DELAY, 1000).
                         addAction(ActionType.LOCO_HALT)
                 )
         );
         actionLists.addTriggerList(
-            new ActionTriggerList(c.brakeTriggerContact()).
-                addActionList(new ActionList(ActionType.LOCO_SPEED, 0))
+            new ActionDataByContactCollection(c.brakeTriggerContact()).
+                addActionList(new ActionDataList().addAction(ActionType.LOCO_SPEED, 0))
         );
     }
 }

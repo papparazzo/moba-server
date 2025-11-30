@@ -40,7 +40,7 @@ import moba.server.routing.router.SimpleRouter;
 import moba.server.routing.typedefs.BlockNodeMap;
 import moba.server.timedaction.FunctionExecution;
 import moba.server.timedaction.TrainRun;
-import moba.server.utilities.Database;
+import moba.server.utilities.database.Database;
 import moba.server.datatypes.base.Version;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.utilities.layout.ActiveTrackLayout;

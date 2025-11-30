@@ -23,7 +23,7 @@ package moba.server.actionhandler;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.routing.typedefs.SwitchStateData;
-import moba.server.utilities.Database;
+import moba.server.utilities.database.Database;
 import moba.server.utilities.logger.Loggable;
 
 import java.sql.Connection;

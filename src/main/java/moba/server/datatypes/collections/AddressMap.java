@@ -23,9 +23,9 @@ package moba.server.datatypes.collections;
 // TODO: einheitliches Naming: Nennen wir die Dinger *Collections*, *DataMap*, *Container*, *Map*??
 // TODO: Aufbau immer HashMap mit <PK, Data>??
 
-import moba.server.datatypes.objects.GlobalPortAddress;
+import moba.server.datatypes.objects.GlobalPortAddressData;
 
 import java.util.HashMap;
 
-public class AddressMap extends HashMap<Long, GlobalPortAddress> {
+public class AddressMap extends HashMap<Long, GlobalPortAddressData> {
 }

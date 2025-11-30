@@ -24,7 +24,7 @@ import moba.server.json.JsonSerializerInterface;
 
 import java.util.HashMap;
 
-public class Socket extends java.net.Socket implements JsonSerializerInterface<Object> {
+public class SocketData extends java.net.Socket implements JsonSerializerInterface<Object> {
     public String toString() {
         return this.getInetAddress().getHostAddress() + ":" + this.getPort();
     }

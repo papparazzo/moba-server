@@ -23,7 +23,7 @@ package moba.server.messagehandler;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import moba.server.datatypes.collections.LayoutContainer;
+import moba.server.datatypes.collections.LayoutMap;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.objects.Position;
 import moba.server.datatypes.objects.Symbol;
@@ -216,7 +216,7 @@ public final class Layout extends AbstractMessageHandler implements Loggable {
             throw new ClientErrorException(ClientError.DATASET_NOT_LOCKED, "layout <" + id + "> not locked");
         }
 
-        LayoutContainer container = new LayoutContainer();
+        LayoutMap container = new LayoutMap();
 
         ArrayList<Object> arrayList = (ArrayList<Object>)map.get("symbols");
 

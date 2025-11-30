@@ -25,6 +25,5 @@ import moba.server.datatypes.objects.TrackLayoutSymbolData;
 
 import java.util.HashMap;
 
-public class LayoutContainer extends HashMap<Position, TrackLayoutSymbolData> {
-
+public class LayoutMap extends HashMap<Position, TrackLayoutSymbolData> {
 }

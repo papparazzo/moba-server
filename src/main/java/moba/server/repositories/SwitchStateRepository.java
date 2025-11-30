@@ -24,7 +24,7 @@ import moba.server.datatypes.enumerations.SwitchStand;
 import moba.server.datatypes.collections.SwitchStateMap;
 import moba.server.datatypes.objects.SwitchStandData;
 import moba.server.utilities.CheckedEnum;
-import moba.server.utilities.Database;
+import moba.server.utilities.database.Database;
 import moba.server.exceptions.ClientErrorException;
 
 import java.sql.Connection;
