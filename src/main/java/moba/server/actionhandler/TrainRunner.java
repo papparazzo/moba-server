@@ -51,7 +51,7 @@ final public class TrainRunner {
     private final SwitchStateRepository repo;
 
     /*
-     *  TODO: Hier muss auch der Bahnübergang mit berücksichtigt werden (Function-GlobalPortAddress in Environment)
+     *  TODO: Hier muss auch der Bahnübergang mit berücksichtigt werden (Function-GlobalPortAddressData in Environment)
      *        Anmerkung: Bahnübergang ist keine Funktion sondern wie eine Weiche zu behandeln
      *  TODO: Kreuzungsweichen!!
      *  TODO: Für Weichen und Bahnübergang benötigen wir benötigen wir noch ein Feedback, das alle Weichen und
