@@ -23,6 +23,7 @@ package moba.server.messagehandler;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import moba.server.datatypes.base.DateTime;
 import moba.server.datatypes.collections.LayoutMap;
 import moba.server.datatypes.enumerations.HardwareState;
 import moba.server.datatypes.objects.Position;
@@ -33,7 +34,6 @@ import moba.server.repositories.TrackLayoutRepository;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.objects.TrackLayoutInfoData;
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -127,7 +127,7 @@ public final class Layout extends AbstractMessageHandler implements Loggable {
 
     @SuppressWarnings("unchecked")
     private void createLayout(Message msg)
-    throws SQLException, ClientErrorException, IOException {
+    throws SQLException, IOException {
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         boolean isActive = (boolean)map.get("active");
         long    currAppId = msg.getEndpoint().getAppId();
@@ -165,7 +165,7 @@ public final class Layout extends AbstractMessageHandler implements Loggable {
             (String)map.get("description"),
             appId,
             active,
-            new Date(),
+            new DateTime(),
             repository.getCreationDate(id)
         );
 

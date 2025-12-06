@@ -20,6 +20,7 @@
 
 package moba.server.repositories;
 
+import moba.server.datatypes.base.DateTime;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.datatypes.objects.Position;
 import moba.server.datatypes.objects.TrackLayoutInfoData;
@@ -32,7 +33,6 @@ import moba.server.utilities.logger.Loggable;
 
 import java.sql.*;
 import java.util.*;
-import java.util.Date;
 import java.util.logging.Level;
 
 public class TrackLayoutRepository implements Loggable {
@@ -60,8 +60,8 @@ public class TrackLayoutRepository implements Loggable {
                     rs.getString("Description"),
                     rs.getInt("Locked"),
                     (id == activeLayoutId),
-                    rs.getDate("ModificationDate"),
-                    rs.getDate("CreationDate")
+                    new DateTime(rs.getDate("ModificationDate")),
+                    new DateTime(rs.getDate("CreationDate"))
                 ));
             }
         }
@@ -201,7 +201,7 @@ public class TrackLayoutRepository implements Loggable {
         }
     }
 
-    public Date getCreationDate(long id)
+    public DateTime getCreationDate(long id)
     throws SQLException {
         String q = "SELECT `CreationDate` FROM `TrackLayouts` WHERE `Id` = ?;";
         Connection con = database.getConnection();
@@ -213,7 +213,7 @@ public class TrackLayoutRepository implements Loggable {
             if(!rs.next()) {
                 throw new NoSuchElementException(String.format("no elements found for layout <%4d>", id));
             }
-            return rs.getDate("CreationDate");
+            return new DateTime(rs.getDate("CreationDate"));
         }
     }
 }

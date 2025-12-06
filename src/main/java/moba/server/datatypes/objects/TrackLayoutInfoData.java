@@ -20,19 +20,19 @@
 
 package moba.server.datatypes.objects;
 
-import java.util.Date;
+import moba.server.datatypes.base.DateTime;
 
 public class TrackLayoutInfoData {
-    protected long    id;
-    protected String  name;
-    protected String  description;
-    protected Date    created;
-    protected Date    modified;
-    protected long    locked;
-    protected boolean active;
+    protected long     id;
+    protected String   name;
+    protected String   description;
+    protected DateTime created;
+    protected DateTime modified;
+    protected long     locked;
+    protected boolean  active;
 
     public TrackLayoutInfoData(
-        long id, String name, String description, long locked, boolean active, Date modified, Date created
+        long id, String name, String description, long locked, boolean active, DateTime modified, DateTime created
     ) {
         if(name == null || name.isEmpty()) {
             name = "";
@@ -51,7 +51,7 @@ public class TrackLayoutInfoData {
     }
 
     public TrackLayoutInfoData(String name, String description, long appId, boolean active) {
-        this(-1, name, description, appId, active, new Date(), new Date());
+        this(-1, name, description, appId, active, new DateTime(), new DateTime());
     }
 
     public void setId(long id) {
@@ -70,11 +70,11 @@ public class TrackLayoutInfoData {
         return description;
     }
 
-    public Date getModified() {
+    public DateTime getModified() {
         return modified;
     }
 
-    public Date getCreated() {
+    public DateTime getCreated() {
         return created;
     }
 
