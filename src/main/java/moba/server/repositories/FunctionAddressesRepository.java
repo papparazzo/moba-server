@@ -78,4 +78,48 @@ final public class FunctionAddressesRepository {
         }
         return list;
     }
+
+    /* TODO implement...
+
+    public FunctionStateDataList getFunctionList()
+    throws SQLException, ClientErrorException {
+        FunctionStateDataList list = new FunctionStateDataList();
+
+
+        String sql =
+            "SELECT DeviceId, Controller, Port, Action " +
+            "FROM FunctionStateChange " +
+            "LEFT JOIN FunctionAddresses " +
+            "ON FunctionStateChange.FunctionAddressId = FunctionAddresses.Id " +
+            "WHERE OnState = ?";
+
+
+        sql = "SELECT Time, Weekdays, Action, AtRandom FROM FunctionCycleTimes";
+
+        sql = "SELECT DeviceId, Controller, Port, Time, Weekdays, Action, AtRandom ";
+
+        try(java.sql.PreparedStatement stmt = database.getConnection().prepareStatement(sql)) {
+
+        }
+
+          FunctionStateData data = new FunctionStateData(
+                    new GlobalPortAddressData(
+                        rs.getLong("DeviceId"),
+                        new PortAddressData(
+                            rs.getLong("Controller"),
+                            rs.getLong("Port")
+                        )
+                    ),
+                    CheckedEnum.getFromString(FunctionState.class, rs.getString("Action"))
+                );
+
+
+
+    }
+
+    public FunctionStateDataList storeFunctionList()
+    throws SQLException, ClientErrorException {
+        FunctionStateDataList list = new FunctionStateDataList();
+    }
+*/
 }

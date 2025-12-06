@@ -18,6 +18,7 @@
  *
  */
 
+// TODO: das muss hier raus aus dem Verzeichnis!
 package moba.server.datatypes.enumerations;
 
 import moba.server.routing.Direction;
