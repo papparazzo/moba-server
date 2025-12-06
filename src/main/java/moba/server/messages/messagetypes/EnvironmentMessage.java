@@ -27,9 +27,8 @@ import moba.server.exceptions.ClientErrorException;
 public enum EnvironmentMessage implements MessageTypeInterface {
     GET_FUNCTION_LIST     (1),
     SET_FUNCTION_LIST     (2),
-    SET_FUNCTION          (3),
-    SET_FUNCTIONS         (4),
-    FUNCTION_STATE_CHANGED(5);
+    SET_FUNCTIONS         (3),
+    FUNCTION_STATE_CHANGED(4);
 
     public final static int GROUP_ID = 5;
 

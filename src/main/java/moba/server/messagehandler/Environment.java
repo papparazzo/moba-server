@@ -80,6 +80,17 @@ final public class Environment extends AbstractMessageHandler {
     public void handleMsg(Message msg)
         throws ClientErrorException, IOException, SQLException {
         switch(EnvironmentMessage.fromId(msg.getMessageId())) {
+        /* TODO implement this...
+            case SET_FUNCTION_LIST:
+                addressesRepo.storeFunctionList(msg.getData());
+                // fall through
+
+            case GET_FUNCTION_LIST:
+                dispatcher.sendSingle(
+                    new Message(EnvironmentMessage.SET_FUNCTIONS, addressesRepo.getFunctionList()), msg.getEndpoint()
+                );
+                break;
+         */
             case SET_FUNCTIONS,
                  // TODO: SET_FUNCTIONS muss intern noch gespeichert werden!
                  FUNCTION_STATE_CHANGED -> dispatcher.sendGroup(msg);
