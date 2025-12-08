@@ -102,7 +102,7 @@ public class GlobalTimerData {
         GlobalTimerData gtd = new GlobalTimerData();
 
         gtd.modelTime.setDay(CheckedEnum.getFromString(Day.class, (String)pt.get("day")));
-        gtd.modelTime.setTime(new Time(((Long)pt.get("time")).intValue()));
+        gtd.modelTime.setTime(new Time((String)pt.get("time")));
 
         gtd.setMultiplicator(((Long)map.get("multiplicator")).intValue());
 
