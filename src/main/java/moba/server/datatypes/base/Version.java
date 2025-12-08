@@ -143,6 +143,6 @@ public class Version implements Comparable<Version>, JsonSerializerInterface<Str
 
     @Override
     public String toJson() {
-        return "\"" + this + "\"";
+        return this.toString();
     }
 }
