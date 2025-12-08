@@ -25,7 +25,7 @@ import moba.server.datatypes.base.Version;
 import java.util.ArrayList;
 
 public record AppData(
-    String  appName,
+    String  name,
     Version version,
     ArrayList<Long> msgGroups
 ) {

@@ -32,6 +32,7 @@ import moba.server.datatypes.base.DateTime;
 import moba.server.datatypes.base.Version;
 import moba.server.datatypes.objects.AppData;
 import moba.server.datatypes.objects.EndpointData;
+import moba.server.datatypes.objects.SocketData;
 import moba.server.json.JsonDecoder;
 import moba.server.json.JsonException;
 import moba.server.json.JsonSerializerInterface;
@@ -47,6 +48,7 @@ import moba.server.utilities.logger.Loggable;
 final public class Endpoint extends Thread implements JsonSerializerInterface<Object>, Loggable {
     private AppData appData;
     private EndpointData endpointData;
+    private final Socket socket;
 
     private boolean closing;
 
@@ -57,9 +59,11 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
 
     public Endpoint(long id, Socket socket, MessageQueue msgQueue)
     throws IOException {
-        this.endpointData = new EndpointData(null, id, new DateTime(), socket);
+        this.endpointData = new EndpointData(null, id, new DateTime(), new SocketData(socket));
 
         this.msgQueue  = msgQueue;
+        // TODO: Das hier ist nun nicht so schön: Wir haben einmal socket und einmal socketData!
+        this.socket    = socket;
 
         this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
         this.dataInputStream  = new DataInputStream(socket.getInputStream());
@@ -70,7 +74,7 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
     public void closeEndpoint() {
         closing = true;
         try {
-            endpointData.socket().close();
+            socket.close();
         } catch(IOException ignored) {
 
         }
@@ -78,7 +82,7 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
 
     @Override
     public String toString() {
-        return appData.appName() + "[" + appData.version() + "] #" + endpointData.appId() + "@" + endpointData.socket();
+        return appData.name() + "[" + appData.version() + "] #" + endpointData.appId() + "@" + endpointData.socket();
     }
 
     @Override
@@ -161,7 +165,7 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
         }
 
         appData = new AppData(
-            (String)map.get("appName"),
+            (String)map.get("name"),
             new Version((String)map.get("version")),
             (ArrayList<Long>)o
         );

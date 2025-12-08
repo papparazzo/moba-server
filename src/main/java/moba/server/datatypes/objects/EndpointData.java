@@ -22,13 +22,11 @@ package moba.server.datatypes.objects;
 
 import moba.server.datatypes.base.DateTime;
 
-import java.net.Socket;
-
 public record EndpointData(
     AppData	appData,
     long	appId,
     DateTime startTime,
-    Socket socket
+    SocketData socket
 ) {
     public EndpointData withAppData(AppData appData) {
         return new EndpointData(appData, appId(), startTime(), socket());
