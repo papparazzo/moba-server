@@ -52,7 +52,11 @@ final public class FunctionExecution implements TimedActionInterface {
         FunctionStateDataList list = new FunctionStateDataList();
         ResultSet rs = functionRepository.getResult(time, multiplicator);
 
-        while(rs.next()) {
+        if (!rs.next()) {
+            return;
+        }
+
+        do {
             FunctionStateData data = new FunctionStateData(
                 new GlobalPortAddressData(
                     rs.getLong("DeviceId"),
@@ -64,7 +68,7 @@ final public class FunctionExecution implements TimedActionInterface {
                 CheckedEnum.getFromString(FunctionState.class, rs.getString("Action"))
             );
             list.add(data);
-        }
+        } while(rs.next());
         dispatcher.sendGroup(new Message(EnvironmentMessage.SET_FUNCTIONS, list));
     }
 }
