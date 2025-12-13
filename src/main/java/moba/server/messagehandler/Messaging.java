@@ -49,8 +49,9 @@ final public class Messaging extends AbstractMessageHandler {
     public void handleMsg(Message msg)
     throws ClientErrorException, IOException {
         switch(MessagingMessage.fromId(msg.getMessageId())) {
-            case GET_INCIDENT_LIST -> handleGetMessageList(msg.getEndpoint());
-            case NOTIFY_INCIDENT   -> handleNotifyIncident(msg);
+            case GET_INCIDENT_LIST   -> handleGetMessageList(msg.getEndpoint());
+            case NOTIFY_INCIDENT     -> handleNotifyIncident(msg);
+            case CLEAR_INCIDENT_LIST -> handleClearIncidentList();
         }
     }
 
@@ -62,5 +63,10 @@ final public class Messaging extends AbstractMessageHandler {
     throws ClientErrorException {
         list.add(new IncidentData(msg));
         dispatcher.sendGroup(new Message(MessagingMessage.NOTIFY_INCIDENT, msg.getData()));
+    }
+
+    private void handleClearIncidentList() {
+        list.clear();
+        dispatcher.sendGroup(new Message(MessagingMessage.CLEAR_INCIDENT_LIST));
     }
 }
