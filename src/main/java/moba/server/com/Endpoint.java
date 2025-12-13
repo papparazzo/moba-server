@@ -138,6 +138,10 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
             }
 
             JsonDecoder decoder = new JsonDecoder(new JsonStringReader(new JsonStreamReaderBytes(buffer)));
+            if(ClientMessage.GROUP_ID == groupId && ClientMessage.CLOSING.getMessageId() == msgId) {
+                throw new ClientClosingException();
+            }
+
             return new Message(groupId, msgId, decoder.decode(), this);
         } catch(IOException e) {
             if(closing) {

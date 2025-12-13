@@ -31,10 +31,10 @@ public enum ClientMessage implements MessageTypeInterface {
     ERROR       (4),
     START       (5),
     CONNECTED   (6),
-    SHUTDOWN    (8),
-    RESET       (9),
-    SELF_TESTING(10),
-    CLOSING     (11);
+    SHUTDOWN    (7),
+    RESET       (8),
+    SELF_TESTING(9),
+    CLOSING     (10);
 
     public final static int GROUP_ID = 2;
 
