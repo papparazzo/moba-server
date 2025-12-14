@@ -26,12 +26,16 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
 import moba.server.datatypes.base.DateTime;
 import moba.server.datatypes.base.Version;
+import moba.server.datatypes.enumerations.IncidentLevel;
+import moba.server.datatypes.enumerations.IncidentType;
 import moba.server.datatypes.objects.AppData;
 import moba.server.datatypes.objects.EndpointData;
+import moba.server.datatypes.objects.IncidentData;
 import moba.server.datatypes.objects.SocketData;
 import moba.server.json.JsonDecoder;
 import moba.server.json.JsonException;
@@ -42,7 +46,6 @@ import moba.server.messages.Message;
 import moba.server.messages.MessageQueue;
 import moba.server.messages.messagetypes.ClientMessage;
 import moba.server.messages.messagetypes.InternMessage;
-import moba.server.exceptions.ClientClosingException;
 import moba.server.utilities.logger.Loggable;
 
 final public class Endpoint extends Thread implements JsonSerializerInterface<Object>, Loggable {
@@ -50,7 +53,7 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
     private EndpointData endpointData;
     private final Socket socket;
 
-    private boolean closing;
+    private final AtomicBoolean terminating = new AtomicBoolean(false);
 
     private final MessageQueue msgQueue;
 
@@ -72,11 +75,19 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
     }
 
     public void closeEndpoint() {
-        closing = true;
+        terminating.set(true);
+        if(isAlive()) {
+            interrupt();
+            try {
+                join(250);
+            } catch(InterruptedException e) {
+                getLogger().log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
+            }
+        }
         try {
             socket.close();
-        } catch(IOException ignored) {
-
+        } catch(Throwable e) {
+            getLogger().log(Level.WARNING, "Exception occurred! <{0}> Closing socket failed!", new Object[]{e.toString()});
         }
     }
 
@@ -93,20 +104,44 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
     @Override
     public void run() {
         long id = endpointData.appId();
+        String message = "";
         getLogger().log(Level.INFO, "Endpoint #{0}: thread started", new Object[]{id});
         try {
             init();
             while(!isInterrupted()) {
                 msgQueue.add(getNextMessage());
             }
-        } catch(ClientClosingException e) {
-            getLogger().log(Level.INFO, "Endpoint #{0}: Closing client... <{1}>", new Object[]{id, e.toString()});
-        } catch(Exception e) {
-            getLogger().log(Level.INFO, "Endpoint #{0}: Exception, closing client... <{1}>", new Object[]{id, e.toString()});
-            msgQueue.add(new Message(InternMessage.CLIENT_SHUTDOWN, e.toString(), this));
-        } catch(OutOfMemoryError e) {
-            getLogger().log(Level.SEVERE, "Endpoint #{0}: OutOfMemoryError <{1}>", new Object[]{id, e.toString()});
-            msgQueue.add(new Message(InternMessage.CLIENT_SHUTDOWN, e.toString(), this));
+        } catch(Throwable e) {
+            message = e.toString();
+            getLogger().log(Level.SEVERE, "Endpoint #{0}: {1}-Exception, closing client... <{2}>", new Object[]{id, getClass().getSimpleName(), e.toString()});
+        }
+
+        if(terminating.get()) {
+            msgQueue.add(new Message(
+                InternMessage.REMOVE_CLIENT,
+                new IncidentData(
+                    IncidentLevel.NOTICE,
+                    IncidentType.CLIENT_NOTICE,
+                    "Client closed",
+                    "Client was closed",
+                    "moba-server:Endpoint.run()",
+                    this
+                ),
+                this
+            ));
+        } else {
+            msgQueue.add(new Message(
+                InternMessage.REMOVE_CLIENT,
+                new IncidentData(
+                    IncidentLevel.ERROR,
+                    IncidentType.CLIENT_ERROR,
+                    "Client shutdown",
+                    "Client was terminated. Reason: \"" + message + "\"",
+                    "moba-server:Endpoint.run()",
+                    this
+                ),
+                this
+            ));
         }
         getLogger().log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
     }
@@ -125,30 +160,24 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
 
     private Message getNextMessage()
     throws IOException, JsonException {
-        try {
-            int groupId = dataInputStream.readInt();
-            int msgId = dataInputStream.readInt();
-            int size = dataInputStream.readInt();
+        int groupId = dataInputStream.readInt();
+        int msgId = dataInputStream.readInt();
+        int size = dataInputStream.readInt();
 
-            byte[] buffer = new byte[size];
-            int len = dataInputStream.read(buffer, 0, size);
+        byte[] buffer = new byte[size];
+        int len = dataInputStream.read(buffer, 0, size);
 
-            if(len != size) {
-                throw new IOException("unexpected end of stream");
-            }
-
-            JsonDecoder decoder = new JsonDecoder(new JsonStringReader(new JsonStreamReaderBytes(buffer)));
-            if(ClientMessage.GROUP_ID == groupId && ClientMessage.CLOSING.getMessageId() == msgId) {
-                throw new ClientClosingException();
-            }
-
-            return new Message(groupId, msgId, decoder.decode(), this);
-        } catch(IOException e) {
-            if(closing) {
-                throw new ClientClosingException();
-            }
-            throw new IOException(e);
+        if(len != size) {
+            throw new IOException("unexpected end of stream");
         }
+
+        JsonDecoder decoder = new JsonDecoder(new JsonStringReader(new JsonStreamReaderBytes(buffer)));
+        if(ClientMessage.GROUP_ID == groupId && ClientMessage.CLOSING.getMessageId() == msgId) {
+            terminating.set(true);
+            throw new IOException("closing message received, terminating endpoint");
+        }
+
+        return new Message(groupId, msgId, decoder.decode(), this);
     }
 
     @SuppressWarnings("unchecked")

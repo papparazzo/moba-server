@@ -74,8 +74,6 @@ public class Dispatcher {
     }
 
     public void removeEndpoint(Endpoint ep) {
-        this.shutDownEndpoint(ep);
-
         Iterator<Endpoint> iter = allEndpoints.iterator();
 
         boolean removed = false;
@@ -118,22 +116,6 @@ public class Dispatcher {
         groupEP.get(grpId).removeIf(endpoint -> endpoint == ep);
     }
 
-    protected void shutDownEndpoint(Endpoint ep) {
-        if(ep.isAlive()) {
-            try {
-                ep.interrupt();
-                ep.join(250);
-            } catch(InterruptedException e) {
-                logger.log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
-            }
-        }
-        try {
-            ep.closeEndpoint();
-        } catch(Exception e) {
-            logger.log(Level.WARNING, "Exception occurred! <{0}> Closing socket failed!", new Object[]{e.toString()});
-        }
-    }
-
     public int getEndPointsCount() {
         return allEndpoints.size();
     }
@@ -142,6 +124,8 @@ public class Dispatcher {
         for(Endpoint endpoint: allEndpoints) {
             endpoint.closeEndpoint();
         }
+        allEndpoints.clear();
+        groupEP.clear();
     }
 
     public Set<Endpoint> getEndpoints() {

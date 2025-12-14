@@ -135,7 +135,7 @@ final public class MessageLoop {
         }
     }
 
-    private void shutdownHandler()
+    private void handleServerShutdown()
     throws Exception {
         incidentHandler.add(new IncidentData(
             IncidentLevel.NOTICE,
@@ -160,28 +160,7 @@ final public class MessageLoop {
     throws SQLException {
         long appId = msg.getEndpoint().getAppId();
 
-        String data = (String)msg.getData();
-
-        // TODO Consider to refactor this.
-        if(Objects.equals(data, "")) {
-            incidentHandler.add(new IncidentData(
-                IncidentLevel.NOTICE,
-                IncidentType.CLIENT_NOTICE,
-                "Client closed",
-                "Client was closed",
-                "moba-server:ServerApplication.handleClientClose()",
-                msg.getEndpoint()
-            ));
-        } else {
-            incidentHandler.add(new IncidentData(
-                IncidentLevel.ERROR,
-                IncidentType.CLIENT_ERROR,
-                "Client shutdown",
-                "Client was terminated. Reason: \"" + data + "\"",
-                "moba-server:ServerApplication.handleClientClose()",
-                msg.getEndpoint()
-            ));
-        }
+        incidentHandler.add((IncidentData)msg.getData());
 
         freeResources(appId);
         dispatcher.removeEndpoint(msg.getEndpoint());
