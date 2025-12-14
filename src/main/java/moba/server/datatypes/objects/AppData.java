@@ -27,6 +27,7 @@ import java.util.ArrayList;
 public record AppData(
     String  name,
     Version version,
+    String  description,
     ArrayList<Long> msgGroups
 ) {
 }

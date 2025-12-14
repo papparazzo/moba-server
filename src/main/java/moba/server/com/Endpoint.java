@@ -171,6 +171,7 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
         appData = new AppData(
             (String)map.get("name"),
             new Version((String)map.get("version")),
+            (String)map.get("description"),
             (ArrayList<Long>)o
         );
         endpointData = endpointData.withAppData(appData);
