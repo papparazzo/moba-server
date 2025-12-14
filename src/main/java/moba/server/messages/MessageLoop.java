@@ -63,22 +63,22 @@ final public class MessageLoop {
                     switch(InternMessage.fromId(msg.getMessageId())) {
                         case SERVER_RESET -> {
                             in.clear();
-                            resetHandler();
+                            handleServerReset();
                             return true;
                         }
 
                         case SERVER_SHUTDOWN -> {
-                            shutdownHandler();
+                            handleServerShutdown();
                             return false;
                         }
 
                         case SET_HARDWARE_STATE -> {
-                            hardwareStateChangedHandler((HardwareState)msg.getData());
+                            handleHardwareStateChanged((HardwareState)msg.getData());
                             continue;
                         }
 
-                        case CLIENT_SHUTDOWN -> {
-                            handleClientClose(msg);
+                        case REMOVE_CLIENT -> {
+                            handleRemoveClient(msg);
                             continue;
                         }
                     }
@@ -115,12 +115,12 @@ final public class MessageLoop {
 
     private void freeResources(long appId)
     throws SQLException {
-        for(Integer integer: handlers.keySet()) {
-            handlers.get(integer).freeResources(appId);
+        for(Integer key: handlers.keySet()) {
+            handlers.get(key).freeResources(appId);
         }
     }
 
-    private void resetHandler()
+    private void handleServerReset()
     throws Exception{
         incidentHandler.add(new IncidentData(
             IncidentLevel.NOTICE,
@@ -130,8 +130,8 @@ final public class MessageLoop {
             "moba-server:ServerApplication.run()"
         ));
         dispatcher.sendAll(new Message(ClientMessage.RESET, null));
-        for(Integer integer: handlers.keySet()) {
-            handlers.get(integer).shutdown();
+        for(Integer key: handlers.keySet()) {
+            handlers.get(key).shutdown();
         }
     }
 
@@ -145,18 +145,18 @@ final public class MessageLoop {
             "moba-server:ServerApplication.run()"
         ));
         dispatcher.sendAll(new Message(ClientMessage.SHUTDOWN, null));
-        for(Integer integer: handlers.keySet()) {
-            handlers.get(integer).shutdown();
+        for(Integer key: handlers.keySet()) {
+            handlers.get(key).shutdown();
         }
     }
 
-    private void hardwareStateChangedHandler(HardwareState state) {
-        for(Integer integer: handlers.keySet()) {
-            handlers.get(integer).hardwareStateChanged(state);
+    private void handleHardwareStateChanged(HardwareState state) {
+        for(Integer key: handlers.keySet()) {
+            handlers.get(key).hardwareStateChanged(state);
         }
     }
 
-    private void handleClientClose(Message msg)
+    private void handleRemoveClient(Message msg)
     throws SQLException {
         long appId = msg.getEndpoint().getAppId();
 

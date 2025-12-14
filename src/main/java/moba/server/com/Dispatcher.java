@@ -54,8 +54,8 @@ public class Dispatcher {
     public boolean addEndpoint(Endpoint ep) {
         logger.log(Level.INFO, "try to add endpoint <{0}>", new Object[]{ep});
 
-        for(Endpoint allEndpoint: allEndpoints) {
-            if(allEndpoint == ep) {
+        for(Endpoint endpoint: allEndpoints) {
+            if(endpoint == ep) {
                 logger.log(Level.WARNING, "Endpoint <{0}> already set", new Object[]{ep});
                 return false;
             }
@@ -139,8 +139,8 @@ public class Dispatcher {
     }
 
     public void resetDispatcher() {
-        for(Endpoint allEndpoint: allEndpoints) {
-            shutDownEndpoint(allEndpoint);
+        for(Endpoint endpoint: allEndpoints) {
+            endpoint.closeEndpoint();
         }
     }
 

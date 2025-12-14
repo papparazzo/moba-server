@@ -28,7 +28,7 @@ public enum InternMessage implements MessageTypeInterface {
     SERVER_SHUTDOWN       (1),
     SERVER_RESET          (2),
     SET_HARDWARE_STATE    (3),
-    CLIENT_SHUTDOWN       (4);
+    REMOVE_CLIENT         (4);
 
     public final static int GROUP_ID = 1;
 
