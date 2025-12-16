@@ -28,14 +28,15 @@ public enum ServerMessage implements MessageTypeInterface {
     NEW_CLIENT_STARTED   (1),
     CLIENT_CLOSED        (2),
     RESET_CLIENT         (3),
-    INFO_REQ             (4),
-    INFO_RES             (5),
-    CON_CLIENTS_REQ      (6),
-    CON_CLIENTS_RES      (7),
-    SELF_TESTING_CLIENT  (8),
-    ADD_ALLOWED_IP       (9),
-    GET_ALLOWED_IP_LIST  (10),
-    SET_ALLOWED_IP_LIST  (11);
+    RESET_CLIENT_HARDWARE(4),
+    INFO_REQ             (5),
+    INFO_RES             (6),
+    CON_CLIENTS_REQ      (7),
+    CON_CLIENTS_RES      (8),
+    SELF_TESTING_CLIENT  (9),
+    ADD_ALLOWED_IP       (10),
+    GET_ALLOWED_IP_LIST  (11),
+    SET_ALLOWED_IP_LIST  (12);
 
     public final static int GROUP_ID = 3;
 
