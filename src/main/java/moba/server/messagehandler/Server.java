@@ -60,23 +60,24 @@ final public class Server extends AbstractMessageHandler {
     public void handleMsg(Message msg)
     throws ClientErrorException, IOException {
         switch(ServerMessage.fromId(msg.getMessageId())) {
-            case INFO_REQ            -> handleServerInfoReq(msg.getEndpoint());
-            case CON_CLIENTS_REQ     -> handleClientsReq(msg.getEndpoint());
-            case RESET_CLIENT        -> sendToClient(msg, ClientMessage.RESET);
-            case SELF_TESTING_CLIENT -> sendToClient(msg, ClientMessage.SELF_TESTING);
-            case ADD_ALLOWED_IP      -> handleAddIpAddress(msg);
-            case GET_ALLOWED_IP_LIST -> handleGetAllowedIpList(msg.getEndpoint());
-            case SET_ALLOWED_IP_LIST -> handleSetAllowedIpList(msg);
+            case INFO_REQ              -> handleServerInfoReq(msg.getEndpoint());
+            case CON_CLIENTS_REQ       -> handleClientsReq(msg.getEndpoint());
+            case RESET_CLIENT          -> sendToClient(msg, ClientMessage.RESET, false);
+            case RESET_CLIENT_HARDWARE -> sendToClient(msg, ClientMessage.RESET, true);
+            case SELF_TESTING_CLIENT   -> sendToClient(msg, ClientMessage.SELF_TESTING, null);
+            case ADD_ALLOWED_IP        -> handleAddIpAddress(msg);
+            case GET_ALLOWED_IP_LIST   -> handleGetAllowedIpList(msg.getEndpoint());
+            case SET_ALLOWED_IP_LIST   -> handleSetAllowedIpList(msg);
         }
     }
 
-    private void sendToClient(Message msg, MessageTypeInterface mType)
+    private void sendToClient(Message msg, MessageTypeInterface mType, Object data)
     throws ClientErrorException {
         Endpoint ep = dispatcher.getEndpointByAppId((long)msg.getData());
         if(ep == null) {
             throw new ClientErrorException(ClientError.INVALID_APP_ID, "app-id <" + msg.getData().toString() + "> is invalid");
         }
-        dispatcher.sendSingle(new Message(mType, null), ep);
+        dispatcher.sendSingle(new Message(mType, data), ep);
     }
 
     private void handleAddIpAddress(Message msg)
