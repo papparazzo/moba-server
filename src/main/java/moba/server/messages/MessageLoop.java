@@ -68,6 +68,7 @@ final public class MessageLoop {
                         }
 
                         case SERVER_SHUTDOWN -> {
+                            in.clear();
                             handleServerShutdown();
                             return false;
                         }
