@@ -23,14 +23,18 @@ package moba.server.utilities.messaging;
 import moba.server.com.Dispatcher;
 import moba.server.datatypes.enumerations.IncidentLevel;
 import moba.server.datatypes.objects.IncidentData;
+import moba.server.exceptions.ClientErrorException;
+import moba.server.json.JsonException;
+import moba.server.json.JsonSerializerInterface;
 import moba.server.messages.Message;
 import moba.server.messages.messagetypes.MessagingMessage;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-final public class IncidentHandler {
+final public class IncidentHandler implements JsonSerializerInterface<CircularFifoQueue<IncidentData>> {
     private final Logger logger;
     private final Dispatcher dispatcher;
     CircularFifoQueue<IncidentData> list;
@@ -47,11 +51,30 @@ final public class IncidentHandler {
         dispatcher.sendGroup(new Message(MessagingMessage.NOTIFY_INCIDENT, incident));
     }
 
+    public synchronized void add(Message msg)
+    throws ClientErrorException {
+        add(new IncidentData(msg));
+    }
+
+    public synchronized void clear() {
+        list.clear();
+        dispatcher.sendGroup(new Message(MessagingMessage.CLEAR_INCIDENT_LIST));
+    }
+
+    public synchronized void reset() {
+        list.clear();
+    }
+
     private Level convertLevel(IncidentLevel level) {
         return switch(level) {
             case CRITICAL, ERROR -> Level.SEVERE;
             case WARNING -> Level.WARNING;
             case NOTICE -> Level.INFO;
         };
+    }
+
+    @Override
+    public CircularFifoQueue<IncidentData> toJson() throws JsonException, IOException {
+        return list;
     }
 }

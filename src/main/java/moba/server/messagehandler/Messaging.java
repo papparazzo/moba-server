@@ -22,22 +22,21 @@ package moba.server.messagehandler;
 
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
-import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
 import moba.server.messages.messagetypes.MessagingMessage;
 import moba.server.exceptions.ClientErrorException;
-import org.apache.commons.collections4.queue.CircularFifoQueue;
+import moba.server.utilities.messaging.IncidentHandler;
 
 import java.io.IOException;
 
 final public class Messaging extends AbstractMessageHandler {
 
-    private final CircularFifoQueue<IncidentData> list;
+    private final IncidentHandler incidentHandler;
 
-    public Messaging(Dispatcher dispatcher, CircularFifoQueue<IncidentData> list) {
+    public Messaging(Dispatcher dispatcher, IncidentHandler incidentHandler) {
         this.dispatcher = dispatcher;
-        this.list = list;
+        this.incidentHandler = incidentHandler;
     }
 
     @Override
@@ -56,17 +55,15 @@ final public class Messaging extends AbstractMessageHandler {
     }
 
     private void handleGetMessageList(Endpoint endpoint) {
-        dispatcher.sendSingle(new Message(MessagingMessage.SET_INCIDENT_LIST, list), endpoint);
+        dispatcher.sendSingle(new Message(MessagingMessage.SET_INCIDENT_LIST, incidentHandler), endpoint);
     }
 
     private void handleNotifyIncident(Message msg)
     throws ClientErrorException {
-        list.add(new IncidentData(msg));
-        dispatcher.sendGroup(new Message(MessagingMessage.NOTIFY_INCIDENT, msg.getData()));
+        incidentHandler.add(msg);
     }
 
     private void handleClearIncidentList() {
-        list.clear();
-        dispatcher.sendGroup(new Message(MessagingMessage.CLEAR_INCIDENT_LIST));
+        incidentHandler.clear();
     }
 }

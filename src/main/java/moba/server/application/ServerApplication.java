@@ -158,11 +158,12 @@ final public class ServerApplication implements Loggable {
             loop.addHandler(new Layout(dispatcher, trackLayoutRepository, activeLayout, trackLayoutLock));
             loop.addHandler(new Interface(dispatcher, msgQueueIn, incidentHandler, trainRunner));
             loop.addHandler(new Control(dispatcher, blockListRepository, switchStateRepository, trainlistRepository, activeLayout, trackLayoutLock));
-            loop.addHandler(new Messaging(dispatcher, list));
+            loop.addHandler(new Messaging(dispatcher, incidentHandler));
 
             handler.start();
             restart = loop.loop(msgQueueIn);
             dispatcher.resetDispatcher();
+            incidentHandler.reset();
             handler.halt();
         } while(restart);
     }
