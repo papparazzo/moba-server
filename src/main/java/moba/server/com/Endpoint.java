@@ -37,6 +37,7 @@ import moba.server.datatypes.objects.AppData;
 import moba.server.datatypes.objects.EndpointData;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.datatypes.objects.SocketData;
+import moba.server.exceptions.ClientClosingException;
 import moba.server.json.JsonDecoder;
 import moba.server.json.JsonException;
 import moba.server.json.JsonSerializerInterface;
@@ -104,19 +105,13 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
     @Override
     public void run() {
         long id = endpointData.appId();
-        String message = "";
         getLogger().log(Level.INFO, "Endpoint #{0}: thread started", new Object[]{id});
         try {
             init();
             while(!isInterrupted()) {
                 msgQueue.add(getNextMessage());
             }
-        } catch(Throwable e) {
-            message = e.toString();
-            getLogger().log(Level.SEVERE, "Endpoint #{0}: {1}-Exception, closing client... <{2}>", new Object[]{id, getClass().getSimpleName(), e.toString()});
-        }
-
-        if(terminating.get()) {
+        } catch(ClientClosingException e) {
             msgQueue.add(new Message(
                 InternMessage.REMOVE_CLIENT,
                 new IncidentData(
@@ -129,21 +124,26 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
                 ),
                 this
             ));
-        } else {
-            msgQueue.add(new Message(
-                InternMessage.REMOVE_CLIENT,
-                new IncidentData(
-                    IncidentLevel.ERROR,
-                    IncidentType.CLIENT_ERROR,
-                    "Client shutdown",
-                    "Client was terminated. Reason: \"" + message + "\"",
-                    "moba-server:Endpoint.run()",
+            getLogger().log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
+        } catch(Throwable e) {
+           // TODO Hier     msgQueue.add(new Message(InternMessage.SET_SYSTEM_STATE, SystemState.EMERGENCY_STOP));
+
+            if(!terminating.get()) {
+                msgQueue.add(new Message(
+                    InternMessage.REMOVE_CLIENT,
+                    new IncidentData(
+                        IncidentLevel.ERROR,
+                        IncidentType.CLIENT_ERROR,
+                        "Client shutdown",
+                        "Client was terminated. Reason: \"" + e + "\"",
+                        "moba-server:Endpoint.run()",
+                        this
+                    ),
                     this
-                ),
-                this
-            ));
+                ));
+            }
+            getLogger().log(Level.SEVERE, "Endpoint #{0}: {1}-Exception, closing client... <{2}>", new Object[]{id, getClass().getSimpleName(), e.toString()});
         }
-        getLogger().log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
     }
 
     public long getAppId() {
@@ -173,8 +173,7 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
 
         JsonDecoder decoder = new JsonDecoder(new JsonStringReader(new JsonStreamReaderBytes(buffer)));
         if(ClientMessage.GROUP_ID == groupId && ClientMessage.CLOSING.getMessageId() == msgId) {
-            terminating.set(true);
-            throw new IOException("closing message received, terminating endpoint");
+            throw new ClientClosingException("closing message received, terminating endpoint");
         }
 
         return new Message(groupId, msgId, decoder.decode(), this);
