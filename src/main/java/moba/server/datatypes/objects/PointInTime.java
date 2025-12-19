@@ -23,9 +23,9 @@ package moba.server.datatypes.objects;
 import moba.server.datatypes.base.Time;
 import moba.server.datatypes.enumerations.Day;
 
-public class PointInTime {
-    protected Day  day = Day.SUNDAY;
-    protected Time time = new Time();
+public final class PointInTime {
+    private Day  day = Day.SUNDAY;
+    private Time time = new Time();
 
     public void setDay(Day val) {
         day = val;
