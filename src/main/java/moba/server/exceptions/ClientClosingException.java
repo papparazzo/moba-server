@@ -21,4 +21,7 @@
 package moba.server.exceptions;
 
 public class ClientClosingException extends RuntimeException {
+    public ClientClosingException(String message) {
+        super(message);
+    }
 }
