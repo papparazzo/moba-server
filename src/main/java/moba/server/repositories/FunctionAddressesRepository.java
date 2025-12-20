@@ -22,7 +22,7 @@ package moba.server.repositories;
 
 import moba.server.datatypes.collections.FunctionStateDataList;
 import moba.server.datatypes.enumerations.FunctionState;
-import moba.server.datatypes.enumerations.HardwareState;
+import moba.server.datatypes.enumerations.SystemState;
 import moba.server.datatypes.objects.FunctionStateData;
 import moba.server.datatypes.objects.GlobalPortAddressData;
 import moba.server.datatypes.objects.PortAddressData;
@@ -41,11 +41,11 @@ final public class FunctionAddressesRepository {
         this.database = database;
     }
 
-    public FunctionStateDataList changeState(HardwareState state)
+    public FunctionStateDataList changeState(SystemState state)
     throws SQLException, ClientErrorException {
         /*
-         * Je nach HardwareState unterschiedliche Actions
          *       EMERGENCY_STOP:    Hauptlicht an.
+         * Je nach SystemState unterschiedliche Actions
          *       AUTOMATIC:         Rollos runter
          */
         FunctionStateDataList list = new FunctionStateDataList();

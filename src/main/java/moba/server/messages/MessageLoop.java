@@ -28,7 +28,7 @@ import java.util.Objects;
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.ClientError;
-import moba.server.datatypes.enumerations.HardwareState;
+import moba.server.datatypes.enumerations.SystemState;
 import moba.server.datatypes.enumerations.IncidentLevel;
 import moba.server.datatypes.enumerations.IncidentType;
 import moba.server.datatypes.objects.ErrorData;
@@ -151,7 +151,7 @@ final public class MessageLoop {
         }
     }
 
-    private void handleHardwareStateChanged(HardwareState state) {
+    private void handleHardwareStateChanged(SystemState state) {
         for(Integer key: handlers.keySet()) {
             handlers.get(key).hardwareStateChanged(state);
         }

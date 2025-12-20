@@ -40,7 +40,7 @@ import moba.server.utilities.messaging.IncidentHandler;
 import java.sql.SQLException;
 
 final public class Systems extends AbstractMessageHandler {
-    private HardwareState status = HardwareState.ERROR;
+    private SystemState status = SystemState.HALT;
     private boolean automaticMode = false;
 
     private final MessageQueue msgQueue;
@@ -75,7 +75,7 @@ final public class Systems extends AbstractMessageHandler {
     }
 
     @Override
-    public void hardwareStateChanged(HardwareState state) {
+    public void hardwareStateChanged(SystemState state) {
         status = state;
         dispatcher.sendGroup(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString()));
     }
@@ -120,26 +120,26 @@ final public class Systems extends AbstractMessageHandler {
 
     private void setAutomaticMode(Message msg)
     throws ClientErrorException, SQLException {
-        if(status == HardwareState.ERROR || status == HardwareState.EMERGENCY_STOP || status == HardwareState.STANDBY) {
+        if(status == SystemState.ERROR || status == SystemState.EMERGENCY_STOP || status == SystemState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
 
         boolean setAutomaticMode = (boolean)msg.getData();
 
-        if(setAutomaticMode && status == HardwareState.AUTOMATIC) {
+        if(setAutomaticMode && status == SystemState.AUTOMATIC) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
 
-        if(setAutomaticMode && status == HardwareState.MANUEL) {
+        if(setAutomaticMode && status == SystemState.MANUEL) {
             checkPreConditions();
         }
 
         automaticMode = setAutomaticMode;
 
         if(automaticMode) {
-            msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
+            msgQueue.add(new Message(InternMessage.SET_SYSTEM_STATE, SystemState.AUTOMATIC));
             incidentHandler.add(new IncidentData(
                 IncidentLevel.NOTICE,
                 IncidentType.STATUS_CHANGED,
@@ -151,12 +151,12 @@ final public class Systems extends AbstractMessageHandler {
             return;
         }
 
-        if(status != HardwareState.AUTOMATIC) {
+        if(status != SystemState.AUTOMATIC) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
 
-        msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC_HALT));
+        msgQueue.add(new Message(InternMessage.SET_SYSTEM_STATE, SystemState.AUTOMATIC_HALT));
         incidentHandler.add(new IncidentData(
             IncidentLevel.NOTICE,
             IncidentType.STATUS_CHANGED,
@@ -184,16 +184,16 @@ final public class Systems extends AbstractMessageHandler {
 
     private void triggerEmergencyStop(Message msg)
     throws ClientErrorException {
-        if(status == HardwareState.ERROR || status == HardwareState.STANDBY) {
+        if(status == SystemState.ERROR || status == SystemState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
 
-        if(status == HardwareState.EMERGENCY_STOP) {
+        if(status == SystemState.EMERGENCY_STOP) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
-        msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.EMERGENCY_STOP));
+        msgQueue.add(new Message(InternMessage.SET_SYSTEM_STATE, SystemState.EMERGENCY_STOP));
         setEmergencyStopReason(msg);
     }
 
@@ -218,7 +218,7 @@ final public class Systems extends AbstractMessageHandler {
     }
 
     private void releaseEmergencyStop(Message msg) {
-        if(status == HardwareState.ERROR || status == HardwareState.STANDBY) {
+        if(status == SystemState.ERROR || status == SystemState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
@@ -249,7 +249,7 @@ final public class Systems extends AbstractMessageHandler {
     }
 
     private void setStandByMode(Message msg, boolean toggle) {
-        if(status == HardwareState.ERROR || status == HardwareState.EMERGENCY_STOP) {
+        if(status == SystemState.ERROR || status == SystemState.EMERGENCY_STOP) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
@@ -257,11 +257,11 @@ final public class Systems extends AbstractMessageHandler {
         boolean setStandByMode;
 
         if(toggle) {
-            setStandByMode = (status != HardwareState.STANDBY);
+            setStandByMode = (status != SystemState.STANDBY);
         } else {
             setStandByMode = (boolean)msg.getData();
 
-            if(setStandByMode && status == HardwareState.STANDBY) {
+            if(setStandByMode && status == SystemState.STANDBY) {
                 sendErrorMessage(msg.getEndpoint());
                 return;
             }
@@ -280,7 +280,7 @@ final public class Systems extends AbstractMessageHandler {
             return;
         }
 
-        if(status != HardwareState.STANDBY) {
+        if(status != SystemState.STANDBY) {
             sendErrorMessage(msg.getEndpoint());
             return;
         }
@@ -324,8 +324,8 @@ final public class Systems extends AbstractMessageHandler {
     }
 
     private void setHardwareShutdown(Endpoint endpoint) {
-        if(status == HardwareState.MANUEL) {
             msgQueue.add(new Message(InternMessage.SERVER_SHUTDOWN, null));
+        if(status == SystemState.MANUEL) {
             return;
         }
         dispatcher.sendSingle(

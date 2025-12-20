@@ -21,7 +21,7 @@
 package moba.server.messages;
 
 import moba.server.com.Dispatcher;
-import moba.server.datatypes.enumerations.HardwareState;
+import moba.server.datatypes.enumerations.SystemState;
 
 import java.sql.SQLException;
 
@@ -42,6 +42,6 @@ public abstract class AbstractMessageHandler {
     throws Exception {
     }
 
-    public void hardwareStateChanged(HardwareState state) {
+    public void hardwareStateChanged(SystemState state) {
     }
 }

@@ -24,7 +24,7 @@ import moba.server.actionhandler.TrainRunner;
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.Connectivity;
-import moba.server.datatypes.enumerations.HardwareState;
+import moba.server.datatypes.enumerations.SystemState;
 import moba.server.datatypes.enumerations.IncidentLevel;
 import moba.server.datatypes.enumerations.IncidentType;
 import moba.server.datatypes.objects.TrainJourney;
@@ -89,12 +89,12 @@ final public class Interface extends AbstractMessageHandler {
     private void setConnectivity(Connectivity connectivity, Endpoint ep) {
         switch(connectivity) {
             case CONNECTED:
-                msgQueueIn.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
+                msgQueueIn.add(new Message(InternMessage.SET_SYSTEM_STATE, SystemState.MANUEL_MODE));
                 addIncident(IncidentLevel.NOTICE, "Die Verbindung zur Hardware wurde hergestellt", ep);
                 break;
 
             case ERROR:
-                msgQueueIn.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.ERROR));
+                msgQueueIn.add(new Message(InternMessage.SET_SYSTEM_STATE, SystemState.ERROR));
                 addIncident(IncidentLevel.ERROR, "Die Verbindung zur Hardware wurde unterbrochen", ep);
                 break;
         }
