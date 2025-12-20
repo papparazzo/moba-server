@@ -120,7 +120,7 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
                     IncidentType.CLIENT_NOTICE,
                     "Client closed",
                     "Client was closed",
-                    "moba-server:Endpoint.run()",
+                    "Endpoint.run()",
                     this
                 ),
                 this
@@ -134,9 +134,9 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
                     new IncidentData(
                         IncidentLevel.ERROR,
                         IncidentType.CLIENT_ERROR,
-                        "Client shutdown",
+                        "Client reset",
                         "Client was terminated. Reason: \"" + e + "\"",
-                        "moba-server:Endpoint.run()",
+                        "Endpoint.run()",
                         this
                     ),
                     this

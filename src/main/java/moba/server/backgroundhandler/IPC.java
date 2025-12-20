@@ -24,6 +24,7 @@ import moba.server.messages.Message;
 import moba.server.messages.MessageQueue;
 import moba.server.messages.messagetypes.InternMessage;
 import moba.server.messages.messagetypes.ServerMessage;
+import moba.server.messages.messagetypes.SystemMessage;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -107,12 +108,20 @@ final public class IPC extends Thread implements BackgroundHandlerInterface {
                 msgQueue.add(new Message(ServerMessage.ADD_ALLOWED_IP, parts[1]));
                 break;
 
-            case "HARDWARE_SHUTDOWN":
-                msgQueue.add(new Message(InternMessage.SERVER_SHUTDOWN, null));
+            case "SERVER_SHUTDOWN":
+                msgQueue.add(new Message(InternMessage.SERVER_SHUTDOWN));
                 break;
 
-            case "HARDWARE_RESET":
-                msgQueue.add(new Message(InternMessage.SERVER_RESET, null));
+            case "SERVER_RESET":
+                msgQueue.add(new Message(InternMessage.SERVER_RESET));
+                break;
+
+            case "SYSTEM_SHUTDOWN":
+                msgQueue.add(new Message(SystemMessage.HARDWARE_SHUTDOWN));
+                break;
+
+            case "SYSTEM_RESET":
+                msgQueue.add(new Message(SystemMessage.HARDWARE_RESET));
                 break;
 
             default:

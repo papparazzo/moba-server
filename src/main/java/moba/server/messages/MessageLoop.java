@@ -23,12 +23,11 @@ package moba.server.messages;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.ClientError;
-import moba.server.datatypes.enumerations.SystemState;
+import moba.server.datatypes.enumerations.ServerState;
 import moba.server.datatypes.enumerations.IncidentLevel;
 import moba.server.datatypes.enumerations.IncidentType;
 import moba.server.datatypes.objects.ErrorData;
@@ -99,7 +98,7 @@ final public class MessageLoop {
                     IncidentType.SERVER_NOTICE,
                     "Restart of the server (reset)",
                     "Restart of the server application due to an error",
-                    "moba-server:ServerApplication.run()")
+                    "MessageLoop.loop()")
                 );
                 in.clear();
                 return true;
@@ -122,15 +121,15 @@ final public class MessageLoop {
     }
 
     private void handleServerReset()
-    throws Exception{
+    throws Exception {
         incidentHandler.add(new IncidentData(
             IncidentLevel.NOTICE,
             IncidentType.SERVER_NOTICE,
             "Server Neustart (reset)",
             "Neustart der Serverapplikation aufgrund eines Server-Resets",
-            "moba-server:ServerApplication.run()"
+            "ServerApplication.handleServerReset()"
         ));
-        dispatcher.sendAll(new Message(ClientMessage.RESET, null));
+        dispatcher.sendAll(new Message(ClientMessage.RESET, true));
         for(Integer key: handlers.keySet()) {
             handlers.get(key).reset();
         }
@@ -141,19 +140,33 @@ final public class MessageLoop {
         incidentHandler.add(new IncidentData(
             IncidentLevel.NOTICE,
             IncidentType.SERVER_NOTICE,
-            "Server shutdown",
+            "Server reset",
             "Shutdown der Serverapplikation",
-            "moba-server:ServerApplication.run()"
+            "ServerApplication.handleServerShutdown()"
         ));
-        dispatcher.sendAll(new Message(ClientMessage.SHUTDOWN, null));
         for(Integer key: handlers.keySet()) {
             handlers.get(key).reset();
         }
     }
 
-    private void handleServerStateChanged(ServerState state) {
+    private void handleServerStateChanged(ServerState state)
+    throws Exception {
         for(Integer key: handlers.keySet()) {
             handlers.get(key).serverStateChanged(state);
+        }
+        if(state != ServerState.READY_FOR_SHUTDOWN) {
+            return;
+        }
+        dispatcher.sendAll(new Message(ClientMessage.SHUTDOWN, null));
+        incidentHandler.add(new IncidentData(
+            IncidentLevel.NOTICE,
+            IncidentType.SERVER_NOTICE,
+            "System beenden",
+            "Neustart der Serverapplikation aufgrund eines Server-Resets",
+            "ServerApplication.handleServerStateChanged()"
+        ));
+        for(Integer key: handlers.keySet()) {
+            handlers.get(key).reset();
         }
     }
 

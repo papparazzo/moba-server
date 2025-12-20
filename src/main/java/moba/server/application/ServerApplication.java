@@ -150,7 +150,7 @@ final public class ServerApplication implements Loggable {
             handler.add(new KeepAlive(dispatcher, keepAlivePingIntervall, logger));
 
             MessageLoop  loop = new MessageLoop(dispatcher, incidentHandler);
-            loop.addHandler(new Client(dispatcher, msgQueueIn));
+            loop.addHandler(new Client(dispatcher));
             loop.addHandler(new Server(dispatcher, this, allowList, config));
             loop.addHandler(new Timer(dispatcher, config, scheduler));
             loop.addHandler(new Environment(dispatcher, new FunctionAddressesRepository(database)));
@@ -163,7 +163,6 @@ final public class ServerApplication implements Loggable {
             handler.start();
             restart = loop.loop(msgQueueIn);
             dispatcher.resetDispatcher();
-            incidentHandler.reset();
             handler.halt();
         } while(restart);
     }
