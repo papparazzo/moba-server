@@ -73,8 +73,8 @@ final public class MessageLoop {
                             return false;
                         }
 
-                        case SET_HARDWARE_STATE -> {
-                            handleHardwareStateChanged((HardwareState)msg.getData());
+                        case SET_SERVER_STATE -> {
+                            handleServerStateChanged((ServerState)msg.getData());
                             continue;
                         }
 
@@ -151,9 +151,9 @@ final public class MessageLoop {
         }
     }
 
-    private void handleHardwareStateChanged(SystemState state) {
+    private void handleServerStateChanged(ServerState state) {
         for(Integer key: handlers.keySet()) {
-            handlers.get(key).hardwareStateChanged(state);
+            handlers.get(key).serverStateChanged(state);
         }
     }
 

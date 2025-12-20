@@ -75,9 +75,9 @@ final public class Systems extends AbstractMessageHandler {
     }
 
     @Override
-    public void hardwareStateChanged(SystemState state) {
-        status = state;
-        dispatcher.sendGroup(new Message(SystemMessage.HARDWARE_STATE_CHANGED, status.toString()));
+    public void serverStateChanged(ServerState state) {
+        this.state = state;
+        dispatcher.sendGroup(new Message(SystemMessage.HARDWARE_STATE_CHANGED, this.state.toSystemState().toString()));
     }
 
     @Override
@@ -118,83 +118,84 @@ final public class Systems extends AbstractMessageHandler {
         }
     }
 
-    private void setAutomaticMode(Message msg)
-    throws ClientErrorException, SQLException {
-        if(status == SystemState.ERROR || status == SystemState.EMERGENCY_STOP || status == SystemState.STANDBY) {
-            sendErrorMessage(msg.getEndpoint());
-            return;
+    private void setAutomaticMode(Message msg) {
+       if((boolean)msg.getData()) {
+           setAutomaticModeOn(msg.getEndpoint());
+       } else {
+           setAutomaticModeOff(msg.getEndpoint());
+       }
+    }
+
+    private void setAutomaticModeOn(Endpoint endpoint) {
+        if(state != ServerState.READY_FOR_AUTOMATIC_MODE) {
+           sendErrorMessage(ServerState.AUTOMATIC_MODE, endpoint);
+           return;
         }
 
-        boolean setAutomaticMode = (boolean)msg.getData();
+        msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.AUTOMATIC_MODE));
+        incidentHandler.add(new IncidentData(
+            IncidentLevel.NOTICE,
+            IncidentType.STATUS_CHANGED,
+            "Automatik an",
+            "Die Hardware befindet sich im Automatikmodus",
+            "Systems.setAutomaticMode()",
+            endpoint
+        ));
+    }
 
-        if(setAutomaticMode && status == SystemState.AUTOMATIC) {
-            sendErrorMessage(msg.getEndpoint());
-            return;
+    private void setAutomaticModeOff(Endpoint endpoint) {
+        if(state != ServerState.AUTOMATIC_MODE) {
+           sendErrorMessage(ServerState.MANUAL_MODE, endpoint);
+           return;
         }
 
-        if(setAutomaticMode && status == SystemState.MANUEL) {
-            checkPreConditions();
-        }
-
-        automaticMode = setAutomaticMode;
-
-        if(automaticMode) {
-            msgQueue.add(new Message(InternMessage.SET_SYSTEM_STATE, SystemState.AUTOMATIC));
-            incidentHandler.add(new IncidentData(
-                IncidentLevel.NOTICE,
-                IncidentType.STATUS_CHANGED,
-                "Automatik an",
-                "Die Hardware befindet sich im Automatikmodus",
-                "Systems.setAutomaticMode()",
-                msg.getEndpoint()
-            ));
-            return;
-        }
-
-        if(status != SystemState.AUTOMATIC) {
-            sendErrorMessage(msg.getEndpoint());
-            return;
-        }
-
-        msgQueue.add(new Message(InternMessage.SET_SYSTEM_STATE, SystemState.AUTOMATIC_HALT));
+        msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.AUTOMATIC_HALT));
         incidentHandler.add(new IncidentData(
             IncidentLevel.NOTICE,
             IncidentType.STATUS_CHANGED,
             "Automatik anhalten",
             "Automatikmodus wird deaktiviert...",
             "Systems.setAutomaticMode()",
-            msg.getEndpoint()
+            endpoint
         ));
-
-        /*
-        FIXME Dies hier muss in das Automatic-Module!!!
-        lock.resetOwn(0);
-
-        msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
-        incidentHandler.add(new IncidentData(
-            IncidentLevel.NOTICE,
-            IncidentType.STATUS_CHANGED,
-            "Automatik aus",
-            "Automatikmodus wurde deaktiviert",
-            "Systems.setAutomaticMode()",
-            msg.getEndpoint()
-        ));
-        */
     }
 
     private void triggerEmergencyStop(Message msg)
     throws ClientErrorException {
-        if(status == SystemState.ERROR || status == SystemState.STANDBY) {
-            sendErrorMessage(msg.getEndpoint());
-            return;
-        }
+        switch(state) {
+            case AUTOMATIC_MODE:
+                setEmergencyStopReason(msg);
+                msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.EMERGENCY_STOP_IN_AUTOMATIC_MODE));
+                break;
 
-        if(status == SystemState.EMERGENCY_STOP) {
-            sendErrorMessage(msg.getEndpoint());
-            return;
+            case AUTOMATIC_HALT:
+                setEmergencyStopReason(msg);
+                msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.EMERGENCY_STOP_IN_AUTOMATIC_HALT));
+                break;
+
+            case AUTOMATIC_HALT_FOR_SHUTDOWN:
+                setEmergencyStopReason(msg);
+                msgQueue.add(new Message(
+                    InternMessage.SET_SERVER_STATE,
+                    ServerState.EMERGENCY_STOP_IN_AUTOMATIC_HALT_FOR_SHUTDOWN
+                ));
+                break;
+
+            case MANUAL_MODE:
+            case READY_FOR_AUTOMATIC_MODE:
+                setEmergencyStopReason(msg);
+                msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.EMERGENCY_STOP_IN_MANUAL_MODE));
+                break;
+
+            case EMERGENCY_STOP_IN_MANUAL_MODE:
+            case EMERGENCY_STOP_IN_AUTOMATIC_MODE:
+            case STANDBY_IN_MANUAL_MODE:
+            case STANDBY_IN_AUTOMATIC_MODE:
+            case HALT:
+            case ERROR:
+            case READY_FOR_SHUTDOWN:
+                sendErrorMessage(ServerState.EMERGENCY_STOP_IN_MANUAL_MODE, msg.getEndpoint());
         }
-        msgQueue.add(new Message(InternMessage.SET_SYSTEM_STATE, SystemState.EMERGENCY_STOP));
-        setEmergencyStopReason(msg);
     }
 
     private void setEmergencyStopReason(Message msg)
@@ -218,27 +219,41 @@ final public class Systems extends AbstractMessageHandler {
     }
 
     private void releaseEmergencyStop(Message msg) {
-        if(status == SystemState.ERROR || status == SystemState.STANDBY) {
-            sendErrorMessage(msg.getEndpoint());
-            return;
+        switch(state) {
+            case EMERGENCY_STOP_IN_AUTOMATIC_HALT:
+                msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.AUTOMATIC_HALT));
+                break;
+
+            case EMERGENCY_STOP_IN_AUTOMATIC_HALT_FOR_SHUTDOWN:
+                msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.AUTOMATIC_HALT_FOR_SHUTDOWN));
+                break;
+
+            case EMERGENCY_STOP_IN_MANUAL_MODE:
+                msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.MANUAL_MODE));
+                break;
+
+            case EMERGENCY_STOP_IN_AUTOMATIC_MODE:
+                msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.AUTOMATIC_MODE));
+                break;
+
+            case AUTOMATIC_MODE:
+            case AUTOMATIC_HALT:
+            case AUTOMATIC_HALT_FOR_SHUTDOWN:
+            case MANUAL_MODE:
+            case READY_FOR_AUTOMATIC_MODE:
+            case STANDBY_IN_MANUAL_MODE:
+            case STANDBY_IN_AUTOMATIC_MODE:
+            case HALT:
+            case ERROR:
+            case READY_FOR_SHUTDOWN:
+                sendErrorMessage(ServerState.EMERGENCY_STOP_IN_MANUAL_MODE, msg.getEndpoint());
         }
 
-        if(status != HardwareState.EMERGENCY_STOP) {
-            sendErrorMessage(msg.getEndpoint());
-            return;
-        }
-
-        if(automaticMode) {
-            msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.AUTOMATIC));
-        } else {
-            msgQueue.add(new Message(InternMessage.SET_HARDWARE_STATE, HardwareState.MANUEL));
-        }
         incidentHandler.add(new IncidentData(
             IncidentLevel.NOTICE,
             IncidentType.STATUS_CHANGED,
             "Nothaltfreigabe",
-            "Der Nothalt wurde wieder freigegeben. " +
-            "Anlage wechselt in den " + (automaticMode ? "Automatikmodus" : "Manuellmodus"),
+            "Der Nothalt wurde wieder freigegeben.",
             "Systems.releaseEmergencyStop()",
             msg.getEndpoint()
         ));
@@ -249,9 +264,19 @@ final public class Systems extends AbstractMessageHandler {
     }
 
     private void setStandByMode(Message msg, boolean toggle) {
-        if(status == SystemState.ERROR || status == SystemState.EMERGENCY_STOP) {
-            sendErrorMessage(msg.getEndpoint());
-            return;
+        switch(state) {
+            case EMERGENCY_STOP_IN_AUTOMATIC_HALT:
+            case EMERGENCY_STOP_IN_AUTOMATIC_HALT_FOR_SHUTDOWN:
+            case EMERGENCY_STOP_IN_MANUAL_MODE:
+            case EMERGENCY_STOP_IN_AUTOMATIC_MODE:
+            case AUTOMATIC_HALT:
+            case AUTOMATIC_HALT_FOR_SHUTDOWN:
+            case HALT:
+            case ERROR:
+            case READY_FOR_AUTOMATIC_MODE:
+            case READY_FOR_SHUTDOWN:
+                sendErrorMessage(ServerState.EMERGENCY_STOP_IN_MANUAL_MODE, msg.getEndpoint());
+                return;
         }
 
         boolean setStandByMode;
@@ -302,38 +327,44 @@ final public class Systems extends AbstractMessageHandler {
         ));
     }
 
-    private void sendErrorMessage(Endpoint endpoint) {
+    private void sendErrorMessage(ServerState newState, Endpoint endpoint) {
         dispatcher.sendSingle(
             new Message(
                 ClientMessage.ERROR,
                 new ErrorData(
                     ClientError.INVALID_STATUS_CHANGE,
-                    "Current state is <" + status.toString() + ">"
+                    "Invalid status-change from <" + state.toString() + "> to <" + newState.toString() + ">"
                 )
             ),
             endpoint
         );
     }
 
-    private void checkPreConditions()
-    throws ClientErrorException, SQLException {
-        // TODO: Prüfen, ob alle Blöcke besetzt sind. Sprich: Block A belegt -> ist Block A laut DB belegt?
-        //       Laut DB befindet ein Zug in Block A, ist Block a belegt
-
-        lock.tryLock(0, activeLayout.getActiveLayout());
-    }
-
     private void setHardwareShutdown(Endpoint endpoint) {
-            msgQueue.add(new Message(InternMessage.SERVER_SHUTDOWN, null));
-        if(status == SystemState.MANUEL) {
-            return;
+        switch(state) {
+            case HALT:
+            case ERROR:
+            case EMERGENCY_STOP_IN_MANUAL_MODE:          // Nothalt (manueller Modus)
+            case EMERGENCY_STOP_IN_AUTOMATIC_MODE:       // Nothalt (automatischer Modus)
+            case EMERGENCY_STOP_IN_AUTOMATIC_HALT:
+            case EMERGENCY_STOP_IN_AUTOMATIC_HALT_FOR_SHUTDOWN:
+                sendErrorMessage(ServerState.AUTOMATIC_HALT_FOR_SHUTDOWN, endpoint);
+                break;
+
+            case MANUAL_MODE:
+            case STANDBY_IN_MANUAL_MODE:
+            case READY_FOR_AUTOMATIC_MODE:
+                msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.READY_FOR_SHUTDOWN));
+                //msgQueue.add(new Message(InternMessage.SERVER_SHUTDOWN, null));
+
+            case AUTOMATIC_MODE:
+            case STANDBY_IN_AUTOMATIC_MODE:
+            case AUTOMATIC_HALT:
+                msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.AUTOMATIC_HALT_FOR_SHUTDOWN));
+
+            case AUTOMATIC_HALT_FOR_SHUTDOWN:
+            case READY_FOR_SHUTDOWN:
+                break;
         }
-        dispatcher.sendSingle(
-            new Message(
-                ClientMessage.ERROR,
-                new ErrorData(ClientError.OPERATION_NOT_ALLOWED, "Shutdown only in state MANUEL")
-            ),
-            endpoint
-        );
     }
 }

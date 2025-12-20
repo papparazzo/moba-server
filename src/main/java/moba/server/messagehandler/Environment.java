@@ -26,7 +26,7 @@ import java.sql.SQLException;
 import moba.server.com.Dispatcher;
 
 import moba.server.datatypes.collections.FunctionStateDataList;
-import moba.server.datatypes.enumerations.SystemState;
+import moba.server.datatypes.enumerations.ServerState;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
 import moba.server.messages.messagetypes.EnvironmentMessage;
@@ -67,7 +67,7 @@ final public class Environment extends AbstractMessageHandler {
     }
 
     @Override
-    public void hardwareStateChanged(SystemState state) {
+    public void serverStateChanged(ServerState state) {
         try {
             FunctionStateDataList list = addressesRepo.changeState(state);
             dispatcher.sendGroup(new Message(EnvironmentMessage.SET_FUNCTIONS, list));

@@ -22,7 +22,7 @@ package moba.server.repositories;
 
 import moba.server.datatypes.collections.FunctionStateDataList;
 import moba.server.datatypes.enumerations.FunctionState;
-import moba.server.datatypes.enumerations.SystemState;
+import moba.server.datatypes.enumerations.ServerState;
 import moba.server.datatypes.objects.FunctionStateData;
 import moba.server.datatypes.objects.GlobalPortAddressData;
 import moba.server.datatypes.objects.PortAddressData;
@@ -41,12 +41,12 @@ final public class FunctionAddressesRepository {
         this.database = database;
     }
 
-    public FunctionStateDataList changeState(SystemState state)
+    public FunctionStateDataList changeState(ServerState state)
     throws SQLException, ClientErrorException {
         /*
-         *       EMERGENCY_STOP:    Hauptlicht an.
          * Je nach SystemState unterschiedliche Actions
-         *       AUTOMATIC:         Rollos runter
+         *       INCIDENT:    Hauptlicht an.
+         *       AUTOMATIC:   Rollos runter
          */
         FunctionStateDataList list = new FunctionStateDataList();
 
@@ -58,7 +58,7 @@ final public class FunctionAddressesRepository {
             "WHERE OnState = ?";
 
         try(java.sql.PreparedStatement stmt = database.getConnection().prepareStatement(sql)) {
-            stmt.setString(1, state.toString());
+            stmt.setString(1, state.toSystemState().toString());
 
             ResultSet rs = stmt.executeQuery();
 

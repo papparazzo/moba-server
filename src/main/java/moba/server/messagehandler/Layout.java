@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import moba.server.datatypes.base.DateTime;
 import moba.server.datatypes.collections.LayoutMap;
+import moba.server.datatypes.enumerations.ServerState;
 import moba.server.datatypes.enumerations.SystemState;
 import moba.server.datatypes.objects.Position;
 import moba.server.datatypes.objects.Symbol;
@@ -81,8 +82,8 @@ public final class Layout extends AbstractMessageHandler implements Loggable {
     }
 
     @Override
-    public void hardwareStateChanged(SystemState state) {
-        isRunning = (state == SystemState.AUTOMATIC || state == SystemState.AUTOMATIC_HALT);
+    public void serverStateChanged(ServerState state) {
+        isRunning = (state == ServerState.AUTOMATIC_MODE || state == SystemState.AUTOMATIC_HALT);
     }
 
     @Override

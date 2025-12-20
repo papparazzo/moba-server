@@ -21,7 +21,7 @@
 package moba.server.messagehandler;
 
 import moba.server.actionhandler.Scheduler;
-import moba.server.datatypes.enumerations.SystemState;
+import moba.server.datatypes.enumerations.ServerState;
 import moba.server.datatypes.objects.GlobalTimerData;
 import java.io.IOException;
 import java.util.HashMap;
@@ -85,7 +85,7 @@ final public class Timer extends AbstractMessageHandler {
     }
 
     @Override
-    public void hardwareStateChanged(SystemState state) {
-        scheduler.enable((state == SystemState.AUTOMATIC));
+    public void serverStateChanged(ServerState state) {
+        scheduler.enable((state == ServerState.AUTOMATIC_MODE));
     }
 }

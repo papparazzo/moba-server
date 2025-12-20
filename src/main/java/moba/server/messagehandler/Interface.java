@@ -23,10 +23,7 @@ package moba.server.messagehandler;
 import moba.server.actionhandler.TrainRunner;
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
-import moba.server.datatypes.enumerations.Connectivity;
-import moba.server.datatypes.enumerations.SystemState;
-import moba.server.datatypes.enumerations.IncidentLevel;
-import moba.server.datatypes.enumerations.IncidentType;
+import moba.server.datatypes.enumerations.*;
 import moba.server.datatypes.objects.TrainJourney;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.utilities.CheckedEnum;
@@ -89,12 +86,12 @@ final public class Interface extends AbstractMessageHandler {
     private void setConnectivity(Connectivity connectivity, Endpoint ep) {
         switch(connectivity) {
             case CONNECTED:
-                msgQueueIn.add(new Message(InternMessage.SET_SYSTEM_STATE, SystemState.MANUEL_MODE));
+                msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.EMERGENCY_STOP_IN_MANUAL_MODE));
                 addIncident(IncidentLevel.NOTICE, "Die Verbindung zur Hardware wurde hergestellt", ep);
                 break;
 
             case ERROR:
-                msgQueueIn.add(new Message(InternMessage.SET_SYSTEM_STATE, SystemState.ERROR));
+                msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.ERROR));
                 addIncident(IncidentLevel.ERROR, "Die Verbindung zur Hardware wurde unterbrochen", ep);
                 break;
         }

@@ -33,6 +33,7 @@ import moba.server.datatypes.base.DateTime;
 import moba.server.datatypes.base.Version;
 import moba.server.datatypes.enumerations.IncidentLevel;
 import moba.server.datatypes.enumerations.IncidentType;
+import moba.server.datatypes.enumerations.ServerState;
 import moba.server.datatypes.objects.AppData;
 import moba.server.datatypes.objects.EndpointData;
 import moba.server.datatypes.objects.IncidentData;
@@ -126,9 +127,8 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
             ));
             getLogger().log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
         } catch(Throwable e) {
-           // TODO Hier     msgQueue.add(new Message(InternMessage.SET_SYSTEM_STATE, SystemState.EMERGENCY_STOP));
-
             if(!terminating.get()) {
+                msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.ERROR));
                 msgQueue.add(new Message(
                     InternMessage.REMOVE_CLIENT,
                     new IncidentData(

@@ -21,23 +21,9 @@
 package moba.server.datatypes.enumerations;
 
 public enum SystemState {
-    HALT,                             // Alle Lokomotiven anhalten, Initialisierungszustand
-
-    //ERROR,                            // Keine Verbindung zur Hardware
-
-    MANUEL_MODE,                      // Manueller Betrieb
-    AUTOMATIC_MODE,                   // Anlage im Automatikbetrieb
-    STANDBY_IN_MANUAL_MODE,           // Energiesparmodus (manueller Modus)
-    STANDBY_IN_AUTOMATIC_MODE,        // Energiesparmodus (automatischer Modus)
-    EMERGENCY_STOP_IN_MANUAL_MODE,    // Nothalt (manueller Modus)
-    EMERGENCY_STOP_IN_AUTOMATIC_MODE, // Nothalt (automatischer Modus)
-
-    AUTOMATIC_HALT,                   // Anlage anhalten
-
-
-
-
-
-    AUTOMATIC_HALT_FOR_SHUTDOWN,
-    //READY_FOR_SHUTDOWN
+    INCIDENT,    // Nothalt, Kurzschluss, keine Verb. zur CS2
+    STANDBY,     // Energiesparmodus
+    MANUAL,      // Manueller Betrieb
+    AUTOMATIC,   // Anlage im Automatikbetrieb
+    SHUTDOWN,    // Anlage herunterfahren / anhalten
 }
