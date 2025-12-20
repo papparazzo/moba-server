@@ -132,7 +132,7 @@ final public class MessageLoop {
         ));
         dispatcher.sendAll(new Message(ClientMessage.RESET, null));
         for(Integer key: handlers.keySet()) {
-            handlers.get(key).shutdown();
+            handlers.get(key).reset();
         }
     }
 
@@ -147,7 +147,7 @@ final public class MessageLoop {
         ));
         dispatcher.sendAll(new Message(ClientMessage.SHUTDOWN, null));
         for(Integer key: handlers.keySet()) {
-            handlers.get(key).shutdown();
+            handlers.get(key).reset();
         }
     }
 

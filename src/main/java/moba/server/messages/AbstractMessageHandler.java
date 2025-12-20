@@ -38,7 +38,7 @@ public abstract class AbstractMessageHandler {
 
     public abstract int getGroupId();
 
-    public void shutdown()
+    public void reset()
     throws Exception {
     }
 

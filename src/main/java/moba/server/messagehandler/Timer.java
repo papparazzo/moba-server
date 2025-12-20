@@ -53,7 +53,7 @@ final public class Timer extends AbstractMessageHandler {
     }
 
     @Override
-    public void shutdown() {
+    public void reset() {
         scheduler.shutdown();
     }
 

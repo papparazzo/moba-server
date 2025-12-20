@@ -40,8 +40,7 @@ import moba.server.utilities.messaging.IncidentHandler;
 import java.sql.SQLException;
 
 final public class Systems extends AbstractMessageHandler {
-    private SystemState status = SystemState.HALT;
-    private boolean automaticMode = false;
+    private ServerState state = ServerState.HALT;
 
     private final MessageQueue msgQueue;
     private final ActiveTrackLayout activeLayout;
@@ -69,9 +68,10 @@ final public class Systems extends AbstractMessageHandler {
     }
 
     @Override
-    public void shutdown()
+    public void reset()
     throws SQLException {
         lock.resetAll();
+        state = ServerState.HALT;
     }
 
     @Override

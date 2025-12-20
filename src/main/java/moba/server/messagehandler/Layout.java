@@ -70,7 +70,7 @@ public final class Layout extends AbstractMessageHandler implements Loggable {
     }
 
     @Override
-    public void shutdown()
+    public void reset()
     throws SQLException {
         lock.resetAll();
     }
@@ -83,7 +83,7 @@ public final class Layout extends AbstractMessageHandler implements Loggable {
 
     @Override
     public void serverStateChanged(ServerState state) {
-        isRunning = (state == ServerState.AUTOMATIC_MODE || state == SystemState.AUTOMATIC_HALT);
+        isRunning = (state == ServerState.AUTOMATIC_MODE || state == ServerState.AUTOMATIC_HALT);
     }
 
     @Override

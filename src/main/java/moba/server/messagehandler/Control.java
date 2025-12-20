@@ -76,7 +76,7 @@ final public class Control extends AbstractMessageHandler implements Loggable {
     }
 
     @Override
-    public void shutdown()
+    public void reset()
     throws SQLException {
         lock.resetAll();
     }
