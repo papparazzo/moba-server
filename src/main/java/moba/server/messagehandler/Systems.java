@@ -76,8 +76,10 @@ final public class Systems extends AbstractMessageHandler {
 
     @Override
     public void serverStateChanged(ServerState state) {
+        if(this.state.toSystemState() != state.toSystemState()) {
+            dispatcher.sendGroup(new Message(SystemMessage.HARDWARE_STATE_CHANGED, state.toSystemState().toString()));
+        }
         this.state = state;
-        dispatcher.sendGroup(new Message(SystemMessage.HARDWARE_STATE_CHANGED, this.state.toSystemState().toString()));
     }
 
     @Override
@@ -86,6 +88,10 @@ final public class Systems extends AbstractMessageHandler {
         switch(SystemMessage.fromId(msg.getMessageId())) {
             case SET_AUTOMATIC_MODE:
                 setAutomaticMode(msg);
+                break;
+
+            case READY_FOR_AUTOMATIC_MODE:
+                setReadyForAutomaticMode(msg);
                 break;
 
             case TRIGGER_EMERGENCY_STOP:
@@ -156,6 +162,48 @@ final public class Systems extends AbstractMessageHandler {
             "Automatik anhalten",
             "Automatikmodus wird deaktiviert...",
             "Systems.setAutomaticMode()",
+            endpoint
+        ));
+    }
+
+    private void setReadyForAutomaticMode(Message msg) {
+       if((boolean)msg.getData()) {
+           setReadyForAutomaticModeOn(msg.getEndpoint());
+       } else {
+           setReadyForAutomaticModeOff(msg.getEndpoint());
+       }
+    }
+
+    private void setReadyForAutomaticModeOn(Endpoint endpoint) {
+        if(state != ServerState.MANUAL_MODE) {
+           sendErrorMessage(SystemState.AUTOMATIC, endpoint);
+           return;
+        }
+
+        msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.READY_FOR_AUTOMATIC_MODE));
+        incidentHandler.add(new IncidentData(
+            IncidentLevel.NOTICE,
+            IncidentType.STATUS_CHANGED,
+            "bereit für Automatik",
+            "Automatikmodus kann aktiviert werden...",
+            "Systems.setReadyForAutomaticModeOn()",
+            endpoint
+        ));
+    }
+
+    private void setReadyForAutomaticModeOff(Endpoint endpoint) {
+        if(state != ServerState.READY_FOR_AUTOMATIC_MODE) {
+           sendErrorMessage(SystemState.AUTOMATIC, endpoint);
+           return;
+        }
+
+        msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.MANUAL_MODE));
+        incidentHandler.add(new IncidentData(
+            IncidentLevel.NOTICE,
+            IncidentType.STATUS_CHANGED,
+            "Automatik nicht bereit",
+            "Automatikmodus kann aktuell nicht aktiviert werden...",
+            "Systems.setReadyForAutomaticModeOff()",
             endpoint
         ));
     }

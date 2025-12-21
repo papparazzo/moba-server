@@ -54,10 +54,12 @@ public enum ServerState {
 
             case
                 MANUAL_MODE,
-                AUTOMATIC_HALT_FOR_SHUTDOWN,
-                READY_FOR_AUTOMATIC_MODE
+                AUTOMATIC_HALT_FOR_SHUTDOWN
                     -> SystemState.MANUAL;
 
+            case
+                READY_FOR_AUTOMATIC_MODE
+                    -> SystemState.READY;
             case
                 AUTOMATIC_MODE,
                 AUTOMATIC_HALT

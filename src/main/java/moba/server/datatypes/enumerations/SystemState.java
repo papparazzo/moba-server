@@ -21,9 +21,10 @@
 package moba.server.datatypes.enumerations;
 
 public enum SystemState {
-    INCIDENT,    // Nothalt, Kurzschluss, keine Verb. zur CS2
-    STANDBY,     // Energiesparmodus
-    MANUAL,      // Manueller Betrieb
-    AUTOMATIC,   // Anlage im Automatikbetrieb
-    SHUTDOWN,    // Anlage herunterfahren / anhalten
+    INCIDENT,
+    STANDBY,
+    MANUAL,
+    READY,
+    AUTOMATIC,
+    SHUTDOWN,
 }
