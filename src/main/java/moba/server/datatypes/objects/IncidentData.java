@@ -29,6 +29,7 @@ import moba.server.messages.Message;
 import moba.server.exceptions.ClientErrorException;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class IncidentData {
 
@@ -88,7 +89,10 @@ public class IncidentData {
     }
 
     public String toString() {
-        return type.toString() + " " + caption + ": " + message + " @" + origin;
+        return
+            type.toString() + " " +
+            caption + ": " +
+            message + " @" + Objects.requireNonNullElse(origin, "[moba-server]");
     }
 
     public IncidentLevel getLevel() {

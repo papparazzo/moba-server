@@ -21,23 +21,15 @@
 package moba.server.datatypes.enumerations;
 
 public enum ServerState {
-    HALT,                             // Alle Lokomotiven anhalten, Initialisierungszustand
-    ERROR,                            // Keine Verbindung zur Hardware
+    HALT,
+    INCIDENT,
 
-    MANUAL_MODE,                      // Manueller Betrieb
-    AUTOMATIC_MODE,                   // Anlage im Automatikbetrieb
-
+    MANUAL_MODE,
     READY_FOR_AUTOMATIC_MODE,
+    AUTOMATIC_MODE,
+    STANDBY,
 
-    STANDBY_IN_MANUAL_MODE,                 // Energiesparmodus (manueller Modus)
-    STANDBY_IN_AUTOMATIC_MODE,              // Energiesparmodus (automatischer Modus)
-
-    EMERGENCY_STOP_IN_MANUAL_MODE,          // Nothalt (manueller Modus)
-    EMERGENCY_STOP_IN_AUTOMATIC_MODE,       // Nothalt (automatischer Modus)
-    EMERGENCY_STOP_IN_AUTOMATIC_HALT,
-    EMERGENCY_STOP_IN_AUTOMATIC_HALT_FOR_SHUTDOWN,
-
-    AUTOMATIC_HALT,                            // Anlage anhalten
+    AUTOMATIC_HALT,
     AUTOMATIC_HALT_FOR_SHUTDOWN,
     READY_FOR_SHUTDOWN;
 
@@ -45,11 +37,7 @@ public enum ServerState {
         return switch(this) {
             case
                 HALT,
-                ERROR,
-                EMERGENCY_STOP_IN_MANUAL_MODE,
-                EMERGENCY_STOP_IN_AUTOMATIC_MODE,
-                EMERGENCY_STOP_IN_AUTOMATIC_HALT,
-                EMERGENCY_STOP_IN_AUTOMATIC_HALT_FOR_SHUTDOWN
+                INCIDENT
                     -> SystemState.INCIDENT;
 
             case
@@ -66,8 +54,7 @@ public enum ServerState {
                     -> SystemState.AUTOMATIC;
 
             case
-                STANDBY_IN_MANUAL_MODE,
-                STANDBY_IN_AUTOMATIC_MODE
+                STANDBY
                     -> SystemState.STANDBY;
 
             case

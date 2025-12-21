@@ -104,6 +104,10 @@ final public class TrainRunner {
         pushTrain();
     }
 
+    public boolean trainsToHandle() {
+        return !trainQueue.isEmpty();
+    }
+
     /**
      * Check if a train already exists in the linked list. If so, insert right after the last occurrence
      */

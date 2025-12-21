@@ -128,7 +128,7 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
             getLogger().log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
         } catch(Throwable e) {
             if(!terminating.get()) {
-                msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.ERROR));
+                msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.INCIDENT));
                 msgQueue.add(new Message(
                     InternMessage.REMOVE_CLIENT,
                     new IncidentData(

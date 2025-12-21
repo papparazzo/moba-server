@@ -22,31 +22,26 @@ package moba.server.messagehandler;
 
 import moba.server.actionhandler.TrainRunner;
 import moba.server.com.Dispatcher;
-import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.*;
 import moba.server.datatypes.objects.TrainJourney;
 import moba.server.messages.AbstractMessageHandler;
-import moba.server.utilities.CheckedEnum;
-import moba.server.datatypes.objects.IncidentData;
 import moba.server.messages.Message;
 import moba.server.messages.MessageQueue;
 import moba.server.messages.messagetypes.InterfaceMessage;
 import moba.server.messages.messagetypes.InternMessage;
 import moba.server.exceptions.ClientErrorException;
-import moba.server.utilities.messaging.IncidentHandler;
 
 import java.sql.SQLException;
 
 final public class Interface extends AbstractMessageHandler {
 
     private final MessageQueue msgQueueIn;
-    private final IncidentHandler incidentHandler;
     private final TrainRunner runner;
+    private ServerState serverState = ServerState.HALT;
 
-    public Interface(Dispatcher dispatcher, MessageQueue msgQueueIn, IncidentHandler incidentHandler, TrainRunner runner) {
+    public Interface(Dispatcher dispatcher, MessageQueue msgQueueIn, TrainRunner runner) {
         this.dispatcher      = dispatcher;
         this.msgQueueIn      = msgQueueIn;
-        this.incidentHandler = incidentHandler;
         this.runner          = runner;
     }
 
@@ -56,14 +51,14 @@ final public class Interface extends AbstractMessageHandler {
     }
 
     @Override
+    public void serverStateChanged(ServerState state) {
+        serverState = state;
+    }
+
+    @Override
     public void handleMsg(Message msg)
     throws SQLException, ClientErrorException {
-        Endpoint ep = msg.getEndpoint();
-
         switch(InterfaceMessage.fromId(msg.getMessageId())) {
-            case CONNECTIVITY_STATE_CHANGED
-                -> setConnectivity(CheckedEnum.getFromString(Connectivity.class, (String)msg.getData()), ep);
-
             case ROUTE_SWITCHED
                 -> routeSwitched(msg);
 
@@ -83,29 +78,17 @@ final public class Interface extends AbstractMessageHandler {
         }
     }
 
-    private void setConnectivity(Connectivity connectivity, Endpoint ep) {
-        switch(connectivity) {
-            case CONNECTED:
-                msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.EMERGENCY_STOP_IN_MANUAL_MODE));
-                addIncident(IncidentLevel.NOTICE, "Die Verbindung zur Hardware wurde hergestellt", ep);
-                break;
-
-            case ERROR:
-                msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.ERROR));
-                addIncident(IncidentLevel.ERROR, "Die Verbindung zur Hardware wurde unterbrochen", ep);
-                break;
-        }
-    }
-
     private void routeSwitched(Message msg) {
         int id = (int)msg.getData();
         runner.setSwitched(id);
+        checkServerState();
     }
 
     private void releaseRoute(Message msg)
     throws SQLException, ClientErrorException {
         int id = (int)msg.getData();
         runner.releaseRoute(id);
+        checkServerState();
     }
 
     private void releaseBlock(Message msg)
@@ -114,22 +97,26 @@ final public class Interface extends AbstractMessageHandler {
         // TODO: Wir brauchen hier noch die TrainId
         int trainId = 0;
         runner.releaseBlock(trainId, blockId);
+        checkServerState();
     }
 
     private void pushTrain(Message msg) {
         TrainJourney train = (TrainJourney)msg.getData();
 
         runner.pushTrain(train);
+        checkServerState();
     }
 
-    private void addIncident(IncidentLevel level, String message, Endpoint ep) {
-        incidentHandler.add(new IncidentData(
-            level,
-            IncidentType.STATUS_CHANGED,
-            "Hardwareverbindung",
-            message,
-            "Interface.addIncident()",
-            ep
-        ));
+
+    private void checkServerState() {
+        if(runner.trainsToHandle()) {
+            return;
+        }
+
+        if(serverState == ServerState.AUTOMATIC_HALT) {
+            msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.READY_FOR_AUTOMATIC_MODE));
+        } else if(serverState == ServerState.AUTOMATIC_HALT_FOR_SHUTDOWN) {
+            msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.READY_FOR_SHUTDOWN));
+        }
     }
 }

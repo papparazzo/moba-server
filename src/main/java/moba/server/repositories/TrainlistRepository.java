@@ -22,6 +22,7 @@ package moba.server.repositories;
 
 import moba.server.datatypes.collections.TrainList;
 import moba.server.datatypes.enumerations.DrivingDirection;
+import moba.server.datatypes.enumerations.TrainType;
 import moba.server.datatypes.objects.Train;
 import moba.server.utilities.CheckedEnum;
 import moba.server.utilities.database.Database;
@@ -65,7 +66,11 @@ public class TrainlistRepository {
                         rs.getInt("Id"),
                         rs.getInt("Address"),
                         rs.getInt("Speed"),
-                        CheckedEnum.getFromString(DrivingDirection.class, rs.getString("DrivingDirection"))
+                        CheckedEnum.getFromString(DrivingDirection.class, rs.getString("DrivingDirection")),
+                        // TODO: Get this information from the api-endpoint!
+                        TrainType.FREIGHT_TRAIN,
+                        true,
+                        true
                     )
                 );
             }
