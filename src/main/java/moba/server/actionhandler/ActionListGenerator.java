@@ -24,10 +24,9 @@ import moba.server.com.Dispatcher;
 import moba.server.datatypes.collections.ActionDataList;
 import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.datatypes.collections.SwitchStateMap;
-import moba.server.datatypes.enumerations.ActionType;
 import moba.server.datatypes.enumerations.ControllableFunction;
-import moba.server.datatypes.enumerations.SwitchStand;
 import moba.server.datatypes.objects.*;
+import moba.server.datatypes.objects.actiondata.*;
 import moba.server.messages.Message;
 import moba.server.messages.messagetypes.InterfaceMessage;
 import moba.server.routing.typedefs.SwitchStateData;
@@ -53,15 +52,10 @@ final public class ActionListGenerator {
 
         for(SwitchStateData switchState : switchingList) {
             SwitchStandData s = switchStates.get(switchState.id());
-
-            if(s.stand() == SwitchStand.BEND) {
-                actionLists.addActionList(new ActionDataList().addAction(ActionType.SWITCHING_RED, s.address()));
-            } else {
-                actionLists.addActionList(new ActionDataList().addAction(ActionType.SWITCHING_GREEN, s.address()));
-            }
+            actionLists.addActionList(new ActionDataList().addAction(new Switching(s)));
         }
 
-        actionLists.addActionList(new ActionDataList().addAction(ActionType.SEND_ROUTE_SWITCHED, routeId));
+        actionLists.addActionList(new ActionDataList().addAction(new SendRouteSwitched(routeId)));
         this.dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, actionLists));
     }
 
@@ -90,12 +84,12 @@ final public class ActionListGenerator {
         actionLists.addActionList(
             new ActionDataList().
                 // FIXME: Signal auf freie Fahrt schalten!
-                addAction(ActionType.DELAY, 2000).
-                addAction(ActionType.LOCO_FUNCTION_ON, ControllableFunction.HEADLIGHTS.toString()).
-                addAction(ActionType.LOCO_FUNCTION_ON, ControllableFunction.OPERATING_SOUNDS.toString()).
+                addAction(new Delay(2000)).
+                addAction(new LocoFunction(ControllableFunction.HEADLIGHTS, true)).
+                addAction(new LocoFunction(ControllableFunction.OPERATING_SOUNDS, true)).
                 // … warten, bis Motor warmgelaufen ist :o)
-                addAction(ActionType.DELAY, 2000).
-                addAction(ActionType.LOCO_SPEED, 391)
+                addAction(new Delay(2000)).
+                addAction(new LocoSpeed(391))
         );
         this.dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, actionLists));
     }
@@ -121,7 +115,7 @@ final public class ActionListGenerator {
         actionLists.addTriggerList(
             new ActionDataByContactCollection(c.blockContact()).
                 // FIXME: Signal auf rot!
-                addActionList(new ActionDataList().addAction(ActionType.SEND_BLOCK_RELEASED, previousBlock))
+                addActionList(new ActionDataList().addAction(new SendBlockReleased(previousBlock)))
         );
     }
 
@@ -138,14 +132,14 @@ final public class ActionListGenerator {
             new ActionDataByContactCollection(c.blockContact()).
                 addActionList(
                     // FIXME: Signal auf rot!
-                    (new ActionDataList().addAction(ActionType.SEND_BLOCK_RELEASED, previousBlock)).
-                        addAction(ActionType.DELAY, 1000).
-                        addAction(ActionType.LOCO_HALT)
+                    (new ActionDataList().addAction(new SendBlockReleased(previousBlock))).
+                        addAction(new Delay(1000)).
+                        addAction(new LocoHalt())
                 )
         );
         actionLists.addTriggerList(
             new ActionDataByContactCollection(c.brakeTriggerContact()).
-                addActionList(new ActionDataList().addAction(ActionType.LOCO_SPEED, 0))
+                addActionList(new ActionDataList().addAction(new LocoSpeed(0)))
         );
     }
 }

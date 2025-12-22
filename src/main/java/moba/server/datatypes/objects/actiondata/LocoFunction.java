@@ -18,29 +18,28 @@
  *
  */
 
-package moba.server.datatypes.objects;
+package moba.server.datatypes.objects.actiondata;
 
 import moba.server.datatypes.enumerations.ActionType;
-import moba.server.json.JsonSerializerInterface;
+import moba.server.datatypes.enumerations.ControllableFunction;
+import moba.server.datatypes.objects.ActionData;
 
 import java.util.HashMap;
 
-public abstract class ActionData implements JsonSerializerInterface<HashMap<String, Object>> {
+public final class LocoFunction extends ActionData {
 
-    private final ActionType actionType;
+    private final ControllableFunction controllableFunction;
+    private final boolean active;
 
-    protected ActionData(ActionType actionType) {
-        this.actionType = actionType;
-    }
-
-    protected void appendData(HashMap<String, Object> action) {
+    public LocoFunction(ControllableFunction controllableFunction, boolean active) {
+        super(ActionType.LOCO_FUNCTION);
+        this.controllableFunction = controllableFunction;
+        this.active = active;
     }
 
     @Override
-    public HashMap<String, Object> toJson() {
-        HashMap<String, Object> action = new HashMap<>();
-        action.put("action", actionType);
-        appendData(action);
-        return action;
+    protected void appendData(HashMap<String, Object> action) {
+        action.put("active", active);
+        action.put("function", controllableFunction);
     }
 }

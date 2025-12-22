@@ -20,20 +20,13 @@
 
 package moba.server.datatypes.collections;
 
-import moba.server.datatypes.enumerations.ActionType;
 import moba.server.datatypes.objects.ActionData;
 
 import java.util.ArrayList;
 
-public class ActionDataList extends ArrayList<ActionData<?>> {
-
-    public ActionDataList addAction(ActionType actionType) {
-        this.add(new ActionData<>(actionType));
-        return this;
-    }
-
-    public <T> ActionDataList addAction(ActionType actionType, T data) {
-        this.add(new ActionData<>(actionType, data));
+public class ActionDataList extends ArrayList<ActionData> {
+    public ActionDataList addAction(ActionData actionData) {
+        this.add(actionData);
         return this;
     }
 }

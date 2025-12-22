@@ -18,29 +18,25 @@
  *
  */
 
-package moba.server.datatypes.objects;
+package moba.server.datatypes.objects.actiondata;
 
 import moba.server.datatypes.enumerations.ActionType;
-import moba.server.json.JsonSerializerInterface;
+import moba.server.datatypes.objects.ActionData;
+import moba.server.datatypes.objects.SwitchStandData;
 
 import java.util.HashMap;
 
-public abstract class ActionData implements JsonSerializerInterface<HashMap<String, Object>> {
+public final class Switching extends ActionData {
+    private final SwitchStandData standData;
 
-    private final ActionType actionType;
-
-    protected ActionData(ActionType actionType) {
-        this.actionType = actionType;
-    }
-
-    protected void appendData(HashMap<String, Object> action) {
+    public Switching(SwitchStandData standData) {
+        super(ActionType.SWITCHING);
+        this.standData = standData;
     }
 
     @Override
-    public HashMap<String, Object> toJson() {
-        HashMap<String, Object> action = new HashMap<>();
-        action.put("action", actionType);
-        appendData(action);
-        return action;
+    protected void appendData(HashMap<String, Object> action) {
+        action.put("address", standData.address());
+        action.put("stand", standData.stand());
     }
 }

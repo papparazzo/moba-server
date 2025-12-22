@@ -18,29 +18,23 @@
  *
  */
 
-package moba.server.datatypes.objects;
+package moba.server.datatypes.objects.actiondata;
 
 import moba.server.datatypes.enumerations.ActionType;
-import moba.server.json.JsonSerializerInterface;
+import moba.server.datatypes.objects.ActionData;
 
 import java.util.HashMap;
 
-public abstract class ActionData implements JsonSerializerInterface<HashMap<String, Object>> {
+public final class SendRouteReleased extends ActionData {
+    private final long routeId;
 
-    private final ActionType actionType;
-
-    protected ActionData(ActionType actionType) {
-        this.actionType = actionType;
-    }
-
-    protected void appendData(HashMap<String, Object> action) {
+    public SendRouteReleased(long routeId) {
+        super(ActionType.SEND_ROUTE_RELEASED);
+        this.routeId = routeId;
     }
 
     @Override
-    public HashMap<String, Object> toJson() {
-        HashMap<String, Object> action = new HashMap<>();
-        action.put("action", actionType);
-        appendData(action);
-        return action;
+    protected void appendData(HashMap<String, Object> action) {
+        action.put("routeId", routeId);
     }
 }
