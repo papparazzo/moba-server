@@ -23,6 +23,7 @@ package moba.server.datatypes.enumerations;
 public enum ServerState {
     HALT,
     INCIDENT,
+    CONNECTION_LOST,
 
     MANUAL_MODE,
     READY_FOR_AUTOMATIC_MODE,
@@ -39,6 +40,9 @@ public enum ServerState {
                 HALT,
                 INCIDENT
                     -> SystemState.INCIDENT;
+
+            case
+                CONNECTION_LOST -> SystemState.NO_CONNECTION;
 
             case
                 MANUAL_MODE,

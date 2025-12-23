@@ -22,6 +22,7 @@ package moba.server.datatypes.enumerations;
 
 public enum SystemState {
     INCIDENT,
+    NO_CONNECTION,
     STANDBY,
     MANUAL,
     READY,

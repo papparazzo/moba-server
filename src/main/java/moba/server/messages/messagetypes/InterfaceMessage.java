@@ -25,13 +25,15 @@ import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
 public enum InterfaceMessage implements MessageTypeInterface {
-	SET_ACTION_LIST           (1),
-	REPLACE_ACTION_LIST       (2),
-	DELETE_ACTION_LIST        (3),
-    ROUTE_SWITCHED            (4),
-	ROUTE_RELEASED            (5),
-	BLOCK_RELEASED            (6),
-    PUSH_TRAIN                (7);
+    CONNECTED          (1),
+    CONNECTION_LOST    (2),
+	SET_ACTION_LIST    (3),
+	REPLACE_ACTION_LIST(4),
+	DELETE_ACTION_LIST (5),
+    ROUTE_SWITCHED     (6),
+	ROUTE_RELEASED     (7),
+	BLOCK_RELEASED     (8),
+    PUSH_TRAIN         (9);
 
     public final static int GROUP_ID = 6;
 

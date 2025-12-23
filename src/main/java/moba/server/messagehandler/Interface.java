@@ -22,7 +22,9 @@ package moba.server.messagehandler;
 
 import moba.server.actionhandler.TrainRunner;
 import moba.server.com.Dispatcher;
+import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.*;
+import moba.server.datatypes.objects.IncidentData;
 import moba.server.datatypes.objects.TrainJourney;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
@@ -30,6 +32,7 @@ import moba.server.messages.MessageQueue;
 import moba.server.messages.messagetypes.InterfaceMessage;
 import moba.server.messages.messagetypes.InternMessage;
 import moba.server.exceptions.ClientErrorException;
+import moba.server.utilities.messaging.IncidentHandler;
 
 import java.sql.SQLException;
 
@@ -38,11 +41,13 @@ final public class Interface extends AbstractMessageHandler {
     private final MessageQueue msgQueueIn;
     private final TrainRunner runner;
     private ServerState serverState = ServerState.HALT;
+    private final IncidentHandler incidentHandler;
 
-    public Interface(Dispatcher dispatcher, MessageQueue msgQueueIn, TrainRunner runner) {
+    public Interface(Dispatcher dispatcher, MessageQueue msgQueueIn, IncidentHandler incidentHandler, TrainRunner runner) {
         this.dispatcher      = dispatcher;
         this.msgQueueIn      = msgQueueIn;
         this.runner          = runner;
+        this.incidentHandler = incidentHandler;
     }
 
     @Override
@@ -59,6 +64,12 @@ final public class Interface extends AbstractMessageHandler {
     public void handleMsg(Message msg)
     throws SQLException, ClientErrorException {
         switch(InterfaceMessage.fromId(msg.getMessageId())) {
+            case CONNECTED
+                -> setConnected(msg);
+
+            case CONNECTION_LOST
+                -> setConnectionLost(msg);
+
             case ROUTE_SWITCHED
                 -> routeSwitched(msg);
 
@@ -76,6 +87,35 @@ final public class Interface extends AbstractMessageHandler {
                  DELETE_ACTION_LIST
                 -> dispatcher.sendGroup(msg);
         }
+    }
+
+    private void setConnected(Message msg) {
+        boolean onInitialize = (boolean)msg.getData();
+         Endpoint ep =msg.getEndpoint();
+
+        if(serverState == ServerState.HALT && onInitialize) {
+            // TODO: Check, if ready for automatic-mode
+            msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.MANUAL_MODE));
+            addIncident(IncidentLevel.NOTICE, "Die Verbindung zur Hardware wurde hergestellt", ep);
+            return;
+        }
+        if(onInitialize) {
+            msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.INCIDENT));
+            addIncident(IncidentLevel.CRITICAL, "Die Verbindung zur Hardware wurde hergestellt (ungültiger Zustand!)", ep);
+            return;
+        }
+
+        msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.INCIDENT));
+        addIncident(IncidentLevel.NOTICE, "Die Verbindung zur Hardware wurde wieder hergestellt", ep);
+    }
+
+    private void setConnectionLost(Message msg) {
+        msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.CONNECTION_LOST));
+        addIncident(
+            IncidentLevel.ERROR,
+            "Die Verbindung zur Hardware wurde unterbrochen",
+            msg.getEndpoint()
+        );
     }
 
     private void routeSwitched(Message msg) {
@@ -118,5 +158,16 @@ final public class Interface extends AbstractMessageHandler {
         } else if(serverState == ServerState.AUTOMATIC_HALT_FOR_SHUTDOWN) {
             msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.READY_FOR_SHUTDOWN));
         }
+    }
+
+    private void addIncident(IncidentLevel level, String message, Endpoint ep) {
+        incidentHandler.add(new IncidentData(
+            level,
+            IncidentType.STATUS_CHANGED,
+            "Hardwareverbindung",
+            message,
+            "Interface.addIncident()",
+            ep
+        ));
     }
 }
