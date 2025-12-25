@@ -175,8 +175,12 @@ public class LayoutParser {
         } else if(curSymbol.isRightSwitch()) {
             newSymbol = new Symbol(SymbolType.RIGHT_SWITCH.getValue());
             newNode = new SwitchNode(id, switchData.stand());
-        } else if(curSymbol.isTrack()){
+        } else if(curSymbol.isStraight()){
             newSymbol = new Symbol(SymbolType.STRAIGHT.getValue());
+            newNode = new BlockNode(id);
+            blockNodeMap.put(id, (BlockNode)newNode);
+        } else if(curSymbol.isBend()){
+            newSymbol = new Symbol(SymbolType.BEND.getValue());
             newNode = new BlockNode(id);
             blockNodeMap.put(id, (BlockNode)newNode);
         } else {

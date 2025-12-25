@@ -130,7 +130,9 @@ public class Symbol implements JsonSerializerInterface<Integer> {
             }
             x = rotateRight(x);
         }
-        throw new IllegalArgumentException("given symbol does not match");
+        throw new IllegalArgumentException(
+            "own <" + symbolFix + "> does not match to given symbol <" + symbol.symbolFix + ">"
+        );
     }
 
     public boolean isJunctionSet(int dir) {
