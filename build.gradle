@@ -56,23 +56,10 @@ tasks.named('test', Test) {
 }
 
 ext.getVersion = { ->
-    def build = project['version.build'].toInteger()
-    def newBuild = build + 1
-
-    // Update gradle.properties file
-    def gradleProps = new File(project.rootDir, 'gradle.properties')
-    def props = new Properties()
-    props.load(new FileInputStream(gradleProps))
-    props.setProperty('version.build', newBuild.toString())
-    props.store(new FileOutputStream(gradleProps), null)
-
-    project['version.build'] = newBuild.toString()
-
     return project['version.major'] + '.' +
            project['version.minor'] + '.' +
            project['version.patch'] + '-' +
-           String.format("%04d", build)
-
+           project['version.build']
 }
 
 version = ext.getVersion()
