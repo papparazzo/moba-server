@@ -31,14 +31,8 @@ public enum ActionType {
     LOCO_FUNCTION_TRIGGER,
     SWITCHING,
 
+    FUNCTION,
 
- // FIXME Werden diese Dinge auch durch Kontakte ausgelöst? Ja! Knopfdruckaktionen!
-
- //   FUNCTION_ON,
- //   FUNCTION_OFF,
- //   FUNCTION_TRIGGER,
-
-    // SEND_PUSH_TRAIN,
     SEND_ROUTE_SWITCHED,
     SEND_ROUTE_RELEASED,
     SEND_BLOCK_RELEASED

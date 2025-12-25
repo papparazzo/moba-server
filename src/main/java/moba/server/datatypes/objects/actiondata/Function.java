@@ -21,25 +21,22 @@
 package moba.server.datatypes.objects.actiondata;
 
 import moba.server.datatypes.enumerations.ActionType;
-import moba.server.datatypes.enumerations.ControllableFunction;
 import moba.server.datatypes.objects.ActionData;
+import moba.server.datatypes.objects.FunctionStateData;
 
 import java.util.HashMap;
 
-public final class LocoFunctionTrigger extends ActionData {
+public final class Function extends ActionData {
 
-    private final ControllableFunction function;
-    private final int duration;
+    private final FunctionStateData function;
 
-    public LocoFunctionTrigger(ControllableFunction controllableFunction, int duration) {
-        super(ActionType.LOCO_FUNCTION_TRIGGER);
-        this.function = controllableFunction;
-        this.duration = duration;
+    public Function(FunctionStateData function, boolean active) {
+        super(ActionType.FUNCTION);
+        this.function = function;
     }
 
     @Override
     protected void appendData(HashMap<String, Object> action) {
-        action.put("duration", duration);
         action.put("function", function);
     }
 }

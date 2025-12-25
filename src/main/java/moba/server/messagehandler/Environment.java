@@ -70,6 +70,9 @@ final public class Environment extends AbstractMessageHandler {
     public void serverStateChanged(ServerState state) {
         try {
             FunctionStateDataList list = addressesRepo.changeState(state);
+            if(list.isEmpty()) {
+                return;
+            }
             dispatcher.sendGroup(new Message(EnvironmentMessage.SET_FUNCTIONS, list));
         } catch(SQLException | ClientErrorException e) {
             throw new RuntimeException(e);

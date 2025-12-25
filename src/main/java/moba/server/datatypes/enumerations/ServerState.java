@@ -37,11 +37,11 @@ public enum ServerState {
     public SystemState toSystemState() {
         return switch(this) {
             case
-                HALT,
                 INCIDENT
                     -> SystemState.INCIDENT;
 
             case
+                HALT,
                 CONNECTION_LOST -> SystemState.NO_CONNECTION;
 
             case

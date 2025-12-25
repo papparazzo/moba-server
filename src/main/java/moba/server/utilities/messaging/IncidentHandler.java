@@ -61,10 +61,6 @@ final public class IncidentHandler implements JsonSerializerInterface<CircularFi
         dispatcher.sendGroup(new Message(MessagingMessage.CLEAR_INCIDENT_LIST));
     }
 
-    public synchronized void reset() {
-        list.clear();
-    }
-
     private Level convertLevel(IncidentLevel level) {
         return switch(level) {
             case CRITICAL, ERROR -> Level.SEVERE;
