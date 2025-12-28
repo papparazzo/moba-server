@@ -33,11 +33,7 @@ import moba.server.datatypes.base.DateTime;
 import moba.server.datatypes.base.Version;
 import moba.server.datatypes.enumerations.IncidentLevel;
 import moba.server.datatypes.enumerations.IncidentType;
-import moba.server.datatypes.enumerations.ServerState;
-import moba.server.datatypes.objects.AppData;
-import moba.server.datatypes.objects.EndpointData;
-import moba.server.datatypes.objects.IncidentData;
-import moba.server.datatypes.objects.SocketData;
+import moba.server.datatypes.objects.*;
 import moba.server.exceptions.ClientClosingException;
 import moba.server.json.JsonDecoder;
 import moba.server.json.JsonException;
@@ -128,21 +124,24 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
             getLogger().log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
         } catch(Throwable e) {
             if(!terminating.get()) {
-                msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.INCIDENT));
                 msgQueue.add(new Message(
                     InternMessage.REMOVE_CLIENT,
                     new IncidentData(
-                        IncidentLevel.ERROR,
+                        IncidentLevel.CRITICAL,
                         IncidentType.CLIENT_ERROR,
                         "Client reset",
-                        "Client was terminated. Reason: \"" + e + "\"",
+                        "Client #" + getAppId() + "was terminated. Reason: \"" + e + "\"",
                         "Endpoint.run()",
                         this
                     ),
                     this
                 ));
             }
-            getLogger().log(Level.SEVERE, "Endpoint #{0}: {1}-Exception, closing client... <{2}>", new Object[]{id, getClass().getSimpleName(), e.toString()});
+            getLogger().log(
+                Level.SEVERE,
+                "Endpoint #{0}: {1}-Exception, closing client... <{2}>",
+                new Object[]{id, getClass().getSimpleName(), e.toString()}
+            );
         }
     }
 
