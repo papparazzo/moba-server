@@ -24,6 +24,7 @@ import moba.server.actionhandler.TrainRunner;
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.*;
+import moba.server.datatypes.objects.EmergencyTriggerData;
 import moba.server.datatypes.objects.IncidentData;
 import moba.server.datatypes.objects.TrainJourney;
 import moba.server.messages.AbstractMessageHandler;
@@ -100,12 +101,11 @@ final public class Interface extends AbstractMessageHandler {
             return;
         }
         if(onInitialize) {
-            msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.INCIDENT));
+            msgQueueIn.add(new Message(InternMessage.EMERGENCY_STOP, new EmergencyTriggerData(EmergencyTriggerReason.CONNECTION_LOST, "")));
             addIncident(IncidentLevel.CRITICAL, "Die Verbindung zur Hardware wurde hergestellt (ungültiger Zustand!)", ep);
             return;
         }
-
-        msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.INCIDENT));
+        msgQueueIn.add(new Message(InternMessage.EMERGENCY_STOP, new EmergencyTriggerData(EmergencyTriggerReason.CONNECTION_LOST, "")));
         addIncident(IncidentLevel.NOTICE, "Die Verbindung zur Hardware wurde wieder hergestellt", ep);
     }
 
