@@ -30,6 +30,10 @@ public class Message implements Comparable<Message> {
     protected int         groupId;
     protected int         messageId;
 
+    public Message(MessageTypeInterface msgType, Endpoint ep) {
+        this(msgType, null, ep);
+    }
+
     public Message(MessageTypeInterface msgType) {
         this(msgType, null);
     }
