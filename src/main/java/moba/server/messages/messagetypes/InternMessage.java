@@ -25,10 +25,14 @@ import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
 public enum InternMessage implements MessageTypeInterface {
-    SERVER_SHUTDOWN (1),
-    SERVER_RESET    (2),
-    SET_SERVER_STATE(3),
-    REMOVE_CLIENT   (4);
+    SERVER_SHUTDOWN      (1),
+    SERVER_RESET         (2),
+    SYSTEM_SHUTDOWN      (3),
+    SET_SERVER_STATE     (4),
+    REMOVE_CLIENT        (5),
+    EMERGENCY_STOP       (6),
+    RELEASE_INCIDENT_MODE(7),
+    RELEASE_STANDBY_MODE (8);
 
     public final static int GROUP_ID = 1;
 
