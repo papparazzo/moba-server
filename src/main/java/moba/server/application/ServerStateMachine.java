@@ -25,14 +25,14 @@ import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.*;
 import moba.server.datatypes.objects.EmergencyTriggerData;
 import moba.server.datatypes.objects.ErrorData;
-import moba.server.datatypes.objects.IncidentData;
+import moba.server.datatypes.objects.NotificationData;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
 import moba.server.messages.messagetypes.ClientMessage;
 import moba.server.messages.messagetypes.ServerMessage;
 import moba.server.messages.messagetypes.SystemMessage;
 import moba.server.utilities.logger.Loggable;
-import moba.server.utilities.messaging.IncidentHandler;
+import moba.server.utilities.messaging.NotificationHandler;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -44,12 +44,12 @@ public class ServerStateMachine implements Loggable {
 
     private final List<AbstractMessageHandler> handlers = new ArrayList<>();
 
-    private final Dispatcher dispatcher;
-    private final IncidentHandler incidentHandler;
+    private final Dispatcher          dispatcher;
+    private final NotificationHandler notificationHandler;
 
-    public ServerStateMachine(Dispatcher dispatcher, IncidentHandler incidentHandler) {
-        this.dispatcher      = dispatcher;
-        this.incidentHandler = incidentHandler;
+    public ServerStateMachine(Dispatcher dispatcher, NotificationHandler notificationHandler) {
+        this.dispatcher          = dispatcher;
+        this.notificationHandler = notificationHandler;
     }
 
     public void addHandler(AbstractMessageHandler msgHandler) {
@@ -88,9 +88,9 @@ public class ServerStateMachine implements Loggable {
             case SOFTWARE_MANUAL                 -> "Manuell durch die Software (Notausbutton).";
         };
 
-        incidentHandler.add(new IncidentData(
-            IncidentLevel.CRITICAL,
-            IncidentType.STATUS_CHANGED,
+        notificationHandler.add(new NotificationData(
+            NotificationLevel.CRITICAL,
+            NotificationType.STATUS_CHANGED,
             "Nothalt ausgelöst",
             "Auslösegrund: " + reason + message,
             "Systems.setEmergencyStopReason()",
@@ -114,7 +114,7 @@ public class ServerStateMachine implements Loggable {
                 return;
         }
         setNewServerState(lastState);
-        addStatusChangedIncident("Nothalt Freigabe", "Der Nothalt wurde wieder freigegeben.", ep);
+        addStatusChangedNotification("Nothalt Freigabe", "Der Nothalt wurde wieder freigegeben.", ep);
     }
 
     public void activateAutomaticMode(Endpoint ep)
@@ -124,7 +124,7 @@ public class ServerStateMachine implements Loggable {
            return;
         }
         setNewServerState(ServerState.AUTOMATIC_MODE);
-        addStatusChangedIncident("Automatik an", "Die Hardware befindet sich im Automatikmodus", ep);
+        addStatusChangedNotification("Automatik an", "Die Hardware befindet sich im Automatikmodus", ep);
     }
 
     public void deactivateAutomaticMode(Endpoint endpoint)
@@ -134,7 +134,7 @@ public class ServerStateMachine implements Loggable {
            return;
         }
         setNewServerState(ServerState.AUTOMATIC_HALT);
-        addStatusChangedIncident("Automatik anhalten", "Automatikmodus wird deaktiviert...", endpoint);
+        addStatusChangedNotification("Automatik anhalten", "Automatikmodus wird deaktiviert...", endpoint);
     }
 
     public void automaticModeFinished(Endpoint endpoint)
@@ -164,7 +164,7 @@ public class ServerStateMachine implements Loggable {
                 return;
         }
         setNewServerState(ServerState.STANDBY);
-        addStatusChangedIncident("Standby an", "Anlage wird in den Standby-Modus geschickt", endpoint);
+        addStatusChangedNotification("Standby an", "Anlage wird in den Standby-Modus geschickt", endpoint);
     }
 
     public void deactivateStandby(Endpoint endpoint)
@@ -182,7 +182,7 @@ public class ServerStateMachine implements Loggable {
         };
 
         setNewServerState(lastState);
-        addStatusChangedIncident(
+        addStatusChangedNotification(
             "Standby aus",
             "Die Anlage wird aus dem Standby-Modus geholt und wechselt in " + message + ".",
             endpoint
@@ -196,7 +196,7 @@ public class ServerStateMachine implements Loggable {
            return;
         }
         setNewServerState(ServerState.READY_FOR_AUTOMATIC_MODE);
-        addStatusChangedIncident(
+        addStatusChangedNotification(
             "manueller Modus (bereit für Automatik)",
             "Automatikmodus kann aktiviert werden...",
             endpoint
@@ -210,7 +210,7 @@ public class ServerStateMachine implements Loggable {
            return;
         }
         setNewServerState(ServerState.MANUAL_MODE);
-        addStatusChangedIncident(
+        addStatusChangedNotification(
             "manueller Modus",
             "Anlage befindet sich im manuellen Modus",
             endpoint
@@ -223,7 +223,7 @@ public class ServerStateMachine implements Loggable {
         if(currState == ServerState.HALT && onInitialize) {
             // TODO: Check, if ready for automatic-mode
             setNewServerState(ServerState.MANUAL_MODE);
-            addStatusChangedIncident(
+            addStatusChangedNotification(
                 "manueller Modus",
                 "Die Verbindung zur Hardware wurde hergestellt",
                 endpoint
@@ -260,12 +260,12 @@ public class ServerStateMachine implements Loggable {
 
         setNewServerState(ServerState.CONNECTION_LOST);
 
-        incidentHandler.add(new IncidentData(
-            IncidentLevel.NOTICE,
-            IncidentType.STATUS_CHANGED,
+        notificationHandler.add(new NotificationData(
+            NotificationLevel.NOTICE,
+            NotificationType.STATUS_CHANGED,
             "Hardwareverbindung",
             "Die Verbindung zur Hardware wurde unterbrochen",
-            "Interface.addIncident()",
+            "ServerStateMachine.setConnectionLost()",
             endpoint
         ));
     }
@@ -301,9 +301,9 @@ public class ServerStateMachine implements Loggable {
 
     public void handleServerReset()
     throws Exception {
-        incidentHandler.add(new IncidentData(
-            IncidentLevel.NOTICE,
-            IncidentType.SERVER_NOTICE,
+        notificationHandler.add(new NotificationData(
+            NotificationLevel.NOTICE,
+            NotificationType.SERVER_NOTICE,
             "Server Neustart (reset)",
             "Neustart der Serverapplikation aufgrund eines Server-Resets",
             "ServerApplication.handleServerReset()"
@@ -319,9 +319,9 @@ public class ServerStateMachine implements Loggable {
 
     public void handleServerShutdown()
     throws SQLException {
-        incidentHandler.add(new IncidentData(
-            IncidentLevel.NOTICE,
-            IncidentType.SERVER_NOTICE,
+        notificationHandler.add(new NotificationData(
+            NotificationLevel.NOTICE,
+            NotificationType.SERVER_NOTICE,
             "Server reset / shutdown (System beenden)",
             "Shutdown der Serverapplikation",
             "ServerApplication.handleServerShutdown()"
@@ -340,19 +340,19 @@ public class ServerStateMachine implements Loggable {
     throws Exception {
         long appId = msg.getEndpoint().getAppId();
 
-        IncidentData incidentData = (IncidentData)msg.getData();
+        NotificationData notificationData = (NotificationData)msg.getData();
 
-        if(incidentData.getLevel() == IncidentLevel.CRITICAL) {
+        if(notificationData.getLevel() == NotificationLevel.CRITICAL) {
             activateIncident(
                 new EmergencyTriggerData(
                     EmergencyTriggerReason.SOFTWARE_ERROR,
-                    incidentData.getMessage()
+                    notificationData.getMessage()
                 ),
                 msg.getEndpoint()
             );
         }
 
-        incidentHandler.add(incidentData);
+        notificationHandler.add(notificationData);
 
         for(AbstractMessageHandler handler: handlers) {
             handler.freeResources(appId);
@@ -404,13 +404,13 @@ public class ServerStateMachine implements Loggable {
         );
     }
 
-    private void addStatusChangedIncident(String caption, String message, Endpoint ep) {
-        incidentHandler.add(new IncidentData(
-            IncidentLevel.NOTICE,
-            IncidentType.STATUS_CHANGED,
+    private void addStatusChangedNotification(String caption, String message, Endpoint ep) {
+        notificationHandler.add(new NotificationData(
+            NotificationLevel.NOTICE,
+            NotificationType.STATUS_CHANGED,
             caption,
             message,
-            "ServerStateMachine.addStatusChangedIncident()",
+            "ServerStateMachine.addStatusChangedNotification()",
             ep
         ));
     }

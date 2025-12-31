@@ -28,25 +28,25 @@ import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.*;
 import moba.server.datatypes.objects.ErrorData;
-import moba.server.datatypes.objects.IncidentData;
+import moba.server.datatypes.objects.NotificationData;
 import moba.server.messages.messagetypes.ClientMessage;
 import moba.server.messages.messagetypes.InternMessage;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.utilities.logger.Loggable;
-import moba.server.utilities.messaging.IncidentHandler;
+import moba.server.utilities.messaging.NotificationHandler;
 
 final public class MessageLoop implements Loggable {
 
     private final ServerStateMachine stateMachine;
 
     private final Map<Integer, AbstractMessageHandler> handlers   = new HashMap<>();
-    private final Dispatcher                    dispatcher;
-    private final IncidentHandler               incidentHandler;
+    private final Dispatcher                           dispatcher;
+    private final NotificationHandler                  notificationHandler;
 
-    public MessageLoop(Dispatcher dispatcher, IncidentHandler incidentHandler, ServerStateMachine stateMachine) {
-        this.dispatcher      = dispatcher;
-        this.incidentHandler = incidentHandler;
-        this.stateMachine    = stateMachine;
+    public MessageLoop(Dispatcher dispatcher, NotificationHandler notificationHandler, ServerStateMachine stateMachine) {
+        this.dispatcher          = dispatcher;
+        this.notificationHandler = notificationHandler;
+        this.stateMachine        = stateMachine;
     }
 
     public void addHandler(AbstractMessageHandler msgHandler) {
@@ -86,12 +86,12 @@ final public class MessageLoop implements Loggable {
                 ClientError id = e.getErrorId();
                 Endpoint ep = msg.getEndpoint();
                 dispatcher.sendSingle(new Message(ClientMessage.ERROR, new ErrorData(id, e.getMessage())), ep);
-                incidentHandler.add(new IncidentData(IncidentType.CLIENT_ERROR, e, ep));
+                notificationHandler.add(new NotificationData(NotificationType.CLIENT_ERROR, e, ep));
             } catch(Throwable e) {
-                incidentHandler.add(new IncidentData(IncidentType.EXCEPTION, e, msg.getEndpoint()));
-                incidentHandler.add(new IncidentData(
-                    IncidentLevel.CRITICAL,
-                    IncidentType.SERVER_NOTICE,
+                notificationHandler.add(new NotificationData(NotificationType.EXCEPTION, e, msg.getEndpoint()));
+                notificationHandler.add(new NotificationData(
+                    NotificationLevel.CRITICAL,
+                    NotificationType.SERVER_NOTICE,
                     "Restart of the server (reset)",
                     "Restart of the server application due to an error",
                     "MessageLoop.loop()")

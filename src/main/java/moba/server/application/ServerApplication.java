@@ -33,6 +33,7 @@ import moba.server.backgroundhandler.IPC;
 import moba.server.backgroundhandler.KeepAlive;
 import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.datatypes.collections.SwitchStateMap;
+import moba.server.datatypes.objects.NotificationData;
 import moba.server.messagehandler.*;
 import moba.server.repositories.*;
 import moba.server.routing.parser.LayoutParser;
@@ -42,14 +43,13 @@ import moba.server.timedaction.FunctionExecution;
 import moba.server.timedaction.TrainRun;
 import moba.server.utilities.database.Database;
 import moba.server.datatypes.base.Version;
-import moba.server.datatypes.objects.IncidentData;
 import moba.server.utilities.layout.ActiveTrackLayout;
 import moba.server.messages.MessageLoop;
 import moba.server.messages.MessageQueue;
 import moba.server.utilities.AllowList;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.layout.TrackLayoutLock;
-import moba.server.utilities.messaging.IncidentHandler;
+import moba.server.utilities.messaging.NotificationHandler;
 import moba.server.utilities.logger.Loggable;
 import moba.server.utilities.logger.MessageLogger;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -103,19 +103,19 @@ final public class ServerApplication implements Loggable {
         maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
         int port = (int)(long)config.getSection("common.serverConfig.port");
         var allowed = (ArrayList<String>)config.getSection("common.serverConfig.allowedIPs");
-        int maxEntries = (int)(long)config.getSection("common.serverConfig.maxIncidentEntries");
+        int maxEntries = (int)(long)config.getSection("common.serverConfig.maxNotificationEntries");
         int keepAlivePingIntervall = (int)(long)config.getSection("common.serverConfig.keepAlivePingIntervall");
         AllowList allowList = new AllowList(maxClients, allowed);
-        CircularFifoQueue<IncidentData> list = new CircularFifoQueue<>(maxEntries);
 
+        CircularFifoQueue<NotificationData> list = new CircularFifoQueue<>(maxEntries);
         do {
             Dispatcher dispatcher = new Dispatcher(new MessageLogger(logger), logger);
             Database database = new Database((HashMap<String, Object>)config.getSection("common.database"), logger);
             ActiveTrackLayout activeLayout = new ActiveTrackLayout(dispatcher, config);
             TrackLayoutLock trackLayoutLock = new TrackLayoutLock(database);
-            IncidentHandler incidentHandler = new IncidentHandler(logger, dispatcher, list);
+            NotificationHandler notificationHandler = new NotificationHandler(logger, dispatcher, list);
 
-            ServerStateMachine serverStateMachine = new ServerStateMachine(dispatcher, incidentHandler);
+            ServerStateMachine serverStateMachine = new ServerStateMachine(dispatcher, notificationHandler);
 
             InterlockBlock interlockBlock = new InterlockBlock(database);
             InterlockRoute interlockRoute = new InterlockRoute(database);
@@ -147,11 +147,11 @@ final public class ServerApplication implements Loggable {
             scheduler.addTimedAction(new TrainRun(new TrainTimeTableRepository(database), trainRunner, trainRepository));
 
             BackgroundHandlerComposite handler = new BackgroundHandlerComposite();
-            handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList, incidentHandler));
+            handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList, notificationHandler));
             handler.add(new IPC((String)config.getSection("common.serverConfig.ipc"), msgQueueIn, logger));
             handler.add(new KeepAlive(dispatcher, keepAlivePingIntervall, logger));
 
-            MessageLoop  loop = new MessageLoop(dispatcher, incidentHandler, serverStateMachine);
+            MessageLoop  loop = new MessageLoop(dispatcher, notificationHandler, serverStateMachine);
             loop.addHandler(new Client(dispatcher));
             loop.addHandler(new Server(dispatcher, this, allowList, config));
             loop.addHandler(new Timer(dispatcher, config, scheduler));
@@ -160,7 +160,7 @@ final public class ServerApplication implements Loggable {
             loop.addHandler(new Layout(dispatcher, trackLayoutRepository, activeLayout, trackLayoutLock));
             loop.addHandler(new Interface(dispatcher, serverStateMachine, trainRunner));
             loop.addHandler(new Control(dispatcher, blockListRepository, switchStateRepository, trainlistRepository, activeLayout, trackLayoutLock));
-            loop.addHandler(new Messaging(dispatcher, incidentHandler));
+            loop.addHandler(new Messaging(dispatcher, notificationHandler));
 
             handler.start();
             restart = loop.loop(msgQueueIn);

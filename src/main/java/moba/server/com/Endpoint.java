@@ -31,8 +31,8 @@ import java.util.logging.Level;
 
 import moba.server.datatypes.base.DateTime;
 import moba.server.datatypes.base.Version;
-import moba.server.datatypes.enumerations.IncidentLevel;
-import moba.server.datatypes.enumerations.IncidentType;
+import moba.server.datatypes.enumerations.NotificationLevel;
+import moba.server.datatypes.enumerations.NotificationType;
 import moba.server.datatypes.objects.*;
 import moba.server.exceptions.ClientClosingException;
 import moba.server.json.JsonDecoder;
@@ -111,9 +111,9 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
         } catch(ClientClosingException e) {
             msgQueue.add(new Message(
                 InternMessage.REMOVE_CLIENT,
-                new IncidentData(
-                    IncidentLevel.NOTICE,
-                    IncidentType.CLIENT_NOTICE,
+                new NotificationData(
+                    NotificationLevel.NOTICE,
+                    NotificationType.CLIENT_NOTICE,
                     "Client closed",
                     "Client \"" + this + "\" was closed",
                     "Endpoint.run()",
@@ -126,9 +126,9 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
             if(!terminating.get()) {
                 msgQueue.add(new Message(
                     InternMessage.REMOVE_CLIENT,
-                    new IncidentData(
-                        IncidentLevel.CRITICAL,
-                        IncidentType.CLIENT_ERROR,
+                    new NotificationData(
+                        NotificationLevel.CRITICAL,
+                        NotificationType.CLIENT_ERROR,
                         "Client reset",
                         "Client \"" + this + "\" was terminated. Reason: \"" + e + "\"",
                         "Endpoint.run()",

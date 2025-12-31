@@ -21,8 +21,8 @@
 package moba.server.utilities.messaging;
 
 import moba.server.com.Dispatcher;
-import moba.server.datatypes.enumerations.IncidentLevel;
-import moba.server.datatypes.objects.IncidentData;
+import moba.server.datatypes.enumerations.NotificationLevel;
+import moba.server.datatypes.objects.NotificationData;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.json.JsonException;
 import moba.server.json.JsonSerializerInterface;
@@ -34,34 +34,34 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-final public class IncidentHandler implements JsonSerializerInterface<CircularFifoQueue<IncidentData>> {
+final public class NotificationHandler implements JsonSerializerInterface<CircularFifoQueue<NotificationData>> {
     private final Logger logger;
     private final Dispatcher dispatcher;
-    CircularFifoQueue<IncidentData> list;
+    CircularFifoQueue<NotificationData> list;
 
-    public IncidentHandler(Logger logger, Dispatcher dispatcher, CircularFifoQueue<IncidentData> list) {
+    public NotificationHandler(Logger logger, Dispatcher dispatcher, CircularFifoQueue<NotificationData> list) {
         this.logger = logger;
         this.dispatcher = dispatcher;
         this.list = list;
     }
 
-    public synchronized void add(IncidentData incident) {
-        logger.log(convertLevel(incident.getLevel()), incident.toString());
-        list.add(incident);
-        dispatcher.sendGroup(new Message(MessagingMessage.NOTIFY_INCIDENT, incident));
+    public synchronized void add(NotificationData notificationData) {
+        logger.log(convertLevel(notificationData.getLevel()), notificationData.toString());
+        list.add(notificationData);
+        dispatcher.sendGroup(new Message(MessagingMessage.SEND_NOTIFICATION, notificationData));
     }
 
     public synchronized void add(Message msg)
     throws ClientErrorException {
-        add(new IncidentData(msg));
+        add(new NotificationData(msg));
     }
 
     public synchronized void clear() {
         list.clear();
-        dispatcher.sendGroup(new Message(MessagingMessage.CLEAR_INCIDENT_LIST));
+        dispatcher.sendGroup(new Message(MessagingMessage.CLEAR_NOTIFICATION_LIST));
     }
 
-    private Level convertLevel(IncidentLevel level) {
+    private Level convertLevel(NotificationLevel level) {
         return switch(level) {
             case CRITICAL, ERROR -> Level.SEVERE;
             case WARNING -> Level.WARNING;
@@ -70,7 +70,7 @@ final public class IncidentHandler implements JsonSerializerInterface<CircularFi
     }
 
     @Override
-    public CircularFifoQueue<IncidentData> toJson() throws JsonException, IOException {
+    public CircularFifoQueue<NotificationData> toJson() throws JsonException, IOException {
         return list;
     }
 }

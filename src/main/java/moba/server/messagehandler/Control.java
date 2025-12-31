@@ -142,7 +142,7 @@ final public class Control extends AbstractMessageHandler implements Loggable {
         }
         blocklistRepository.saveBlockList(id, container);
 
-        //dispatcher.dispatch(new IncidentData(LayoutMessage.LAYOUT_CHANGED, map));
+        //dispatcher.dispatch(new NotificationData(LayoutMessage.LAYOUT_CHANGED, map));
     }
 
     private void getSwitchStateList(Message msg)

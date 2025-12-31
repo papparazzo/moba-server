@@ -22,8 +22,8 @@ package moba.server.datatypes.objects;
 
 import moba.server.com.Endpoint;
 import moba.server.datatypes.base.TimeStamp;
-import moba.server.datatypes.enumerations.IncidentLevel;
-import moba.server.datatypes.enumerations.IncidentType;
+import moba.server.datatypes.enumerations.NotificationLevel;
+import moba.server.datatypes.enumerations.NotificationType;
 import moba.server.utilities.CheckedEnum;
 import moba.server.messages.Message;
 import moba.server.exceptions.ClientErrorException;
@@ -31,10 +31,10 @@ import moba.server.exceptions.ClientErrorException;
 import java.util.Map;
 import java.util.Objects;
 
-public class IncidentData {
+public class NotificationData {
 
-    private final IncidentLevel  level;
-    private final IncidentType type;
+    private final NotificationLevel level;
+    private final NotificationType type;
     private final String caption;
     private final String message;
     private final String source;
@@ -42,12 +42,12 @@ public class IncidentData {
     private final Endpoint origin;
 
     @SuppressWarnings("unchecked")
-    public IncidentData(Message msg)
+    public NotificationData(Message msg)
     throws ClientErrorException {
         Map<String, String> map = (Map<String, String>)msg.getData();
 
-        this.level = CheckedEnum.getFromString(IncidentLevel.class, map.get("level"));
-        this.type = CheckedEnum.getFromString(IncidentType.class, map.get("type"));
+        this.level = CheckedEnum.getFromString(NotificationLevel.class, map.get("level"));
+        this.type = CheckedEnum.getFromString(NotificationType.class, map.get("type"));
         this.caption = map.get("caption");
         this.message = map.get("message");
         this.source = map.get("source");
@@ -55,7 +55,7 @@ public class IncidentData {
         this.timeStamp = new TimeStamp();
     }
 
-    public IncidentData(IncidentLevel level, IncidentType type, String caption, String message, String source, Endpoint origin) {
+    public NotificationData(NotificationLevel level, NotificationType type, String caption, String message, String source, Endpoint origin) {
         this.level = level;
         this.type = type;
         this.caption = caption;
@@ -65,13 +65,13 @@ public class IncidentData {
         this.timeStamp = new TimeStamp();
     }
 
-    public IncidentData(IncidentLevel level, IncidentType type, String caption, String message, String source) {
+    public NotificationData(NotificationLevel level, NotificationType type, String caption, String message, String source) {
         this(level, type, caption, message, source, null);
     }
 
-    public IncidentData(IncidentType type, Throwable throwable, Endpoint origin) {
+    public NotificationData(NotificationType type, Throwable throwable, Endpoint origin) {
         this(
-            IncidentLevel.CRITICAL,
+            NotificationLevel.CRITICAL,
             type,
             getClassName(throwable),
             throwable.getMessage(),
@@ -80,11 +80,11 @@ public class IncidentData {
         );
     }
 
-    public IncidentData(Throwable throwable) {
-        this(IncidentType.EXCEPTION, throwable);
+    public NotificationData(Throwable throwable) {
+        this(NotificationType.EXCEPTION, throwable);
     }
 
-    public IncidentData(IncidentType type, Throwable throwable) {
+    public NotificationData(NotificationType type, Throwable throwable) {
         this(type, throwable, null);
     }
 
@@ -95,11 +95,11 @@ public class IncidentData {
             message + " @" + Objects.requireNonNullElse(origin, "[moba-server]");
     }
 
-    public IncidentLevel getLevel() {
+    public NotificationLevel getLevel() {
         return level;
     }
 
-    public IncidentType getType() {
+    public NotificationType getType() {
         return type;
     }
 

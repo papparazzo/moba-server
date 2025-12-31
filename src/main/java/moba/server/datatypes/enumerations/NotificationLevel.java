@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2022 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -20,10 +20,9 @@
 
 package moba.server.datatypes.enumerations;
 
-public enum IncidentType {
-    EXCEPTION,
-    STATUS_CHANGED,       // Statusänderung
-    CLIENT_NOTICE,
-    CLIENT_ERROR,
-    SERVER_NOTICE         // Server-spezifische Nachrichten (z.B. Fehlermeldungen)
+public enum NotificationLevel {
+    CRITICAL,  // schwerwiegende Ausnahme, moba-server wird neu gestartet
+    ERROR,     // Fehlerhafte Nachrichten vom Client: Ungültige Nachrichten-Id, falscher Nachrichtenaufbau
+    WARNING,   // Nothalt ausgelöst, Probleme im Automatikbetrieb
+    NOTICE     // Freigabe Nothalt
 }

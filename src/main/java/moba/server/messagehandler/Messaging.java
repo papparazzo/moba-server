@@ -26,17 +26,17 @@ import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
 import moba.server.messages.messagetypes.MessagingMessage;
 import moba.server.exceptions.ClientErrorException;
-import moba.server.utilities.messaging.IncidentHandler;
+import moba.server.utilities.messaging.NotificationHandler;
 
 import java.io.IOException;
 
 final public class Messaging extends AbstractMessageHandler {
 
-    private final IncidentHandler incidentHandler;
+    private final NotificationHandler notificationHandler;
 
-    public Messaging(Dispatcher dispatcher, IncidentHandler incidentHandler) {
-        this.dispatcher = dispatcher;
-        this.incidentHandler = incidentHandler;
+    public Messaging(Dispatcher dispatcher, NotificationHandler notificationHandler) {
+        this.dispatcher          = dispatcher;
+        this.notificationHandler = notificationHandler;
     }
 
     @Override
@@ -48,22 +48,22 @@ final public class Messaging extends AbstractMessageHandler {
     public void handleMsg(Message msg)
     throws ClientErrorException, IOException {
         switch(MessagingMessage.fromId(msg.getMessageId())) {
-            case GET_INCIDENT_LIST   -> handleGetMessageList(msg.getEndpoint());
-            case NOTIFY_INCIDENT     -> handleNotifyIncident(msg);
-            case CLEAR_INCIDENT_LIST -> handleClearIncidentList();
+            case GET_NOTIFICATION_LIST   -> handleGetNotificationList(msg.getEndpoint());
+            case SEND_NOTIFICATION       -> handleSendNotification(msg);
+            case CLEAR_NOTIFICATION_LIST -> handleClearNotificationList();
         }
     }
 
-    private void handleGetMessageList(Endpoint endpoint) {
-        dispatcher.sendSingle(new Message(MessagingMessage.SET_INCIDENT_LIST, incidentHandler), endpoint);
+    private void handleGetNotificationList(Endpoint endpoint) {
+        dispatcher.sendSingle(new Message(MessagingMessage.SET_NOTIFICATION_LIST, notificationHandler), endpoint);
     }
 
-    private void handleNotifyIncident(Message msg)
+    private void handleSendNotification(Message msg)
     throws ClientErrorException {
-        incidentHandler.add(msg);
+        notificationHandler.add(msg);
     }
 
-    private void handleClearIncidentList() {
-        incidentHandler.clear();
+    private void handleClearNotificationList() {
+        notificationHandler.clear();
     }
 }

@@ -29,23 +29,23 @@ import java.util.logging.Level;
 
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
-import moba.server.datatypes.enumerations.IncidentLevel;
-import moba.server.datatypes.enumerations.IncidentType;
+import moba.server.datatypes.enumerations.NotificationLevel;
+import moba.server.datatypes.enumerations.NotificationType;
+import moba.server.datatypes.objects.NotificationData;
 import moba.server.messages.MessageQueue;
 import moba.server.utilities.AllowList;
-import moba.server.datatypes.objects.IncidentData;
-import moba.server.utilities.messaging.IncidentHandler;
+import moba.server.utilities.messaging.NotificationHandler;
 import moba.server.utilities.logger.Loggable;
 
 final public class Acceptor extends Thread implements Loggable, BackgroundHandlerInterface {
 
-    private ServerSocket          serverSocket = null;
-    private final MessageQueue    msgQueue;
-    private final Dispatcher      dispatcher;
-    private final int             serverPort;
-    private final int             maxClients;
-    private final AllowList       allowList;
-    private final IncidentHandler incidentHandler;
+    private ServerSocket              serverSocket = null;
+    private final MessageQueue        msgQueue;
+    private final Dispatcher          dispatcher;
+    private final int                 serverPort;
+    private final int                 maxClients;
+    private final AllowList           allowList;
+    private final NotificationHandler notificationHandler;
 
     public Acceptor(
         MessageQueue msgQueue,
@@ -53,14 +53,14 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
         int serverPort,
         int maxClients,
         AllowList allowList,
-        IncidentHandler incidentHandler
+        NotificationHandler notificationHandler
     ) {
-        this.msgQueue        = msgQueue;
-        this.dispatcher      = dispatcher;
-        this.serverPort      = serverPort;
-        this.maxClients      = maxClients;
-        this.allowList       = allowList;
-        this.incidentHandler = incidentHandler;
+        this.msgQueue      = msgQueue;
+        this.dispatcher    = dispatcher;
+        this.serverPort    = serverPort;
+        this.maxClients    = maxClients;
+        this.allowList     = allowList;
+        this.notificationHandler = notificationHandler;
     }
 
     public void start() {
@@ -107,10 +107,10 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
                 }
                 if(dispatcher.getEndPointsCount() == maxClients) {
                     socket.close();
-                    incidentHandler.add(
-                        new IncidentData(
-                            IncidentLevel.WARNING,
-                            IncidentType.SERVER_NOTICE,
+                    notificationHandler.add(
+                        new NotificationData(
+                            NotificationLevel.WARNING,
+                            NotificationType.SERVER_NOTICE,
                             "Max amount of clients",
                             MessageFormat.format("Max amount of clients <{0}> connected!", maxClients),
                             "Acceptor.run()"
@@ -121,7 +121,7 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
                 (new Endpoint(id, socket, msgQueue)).start();
             } catch (Exception e) {
                 getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
-                incidentHandler.add(new IncidentData(e));
+                notificationHandler.add(new NotificationData(e));
             }
         }
         getLogger().info("acceptor-thread terminated");
