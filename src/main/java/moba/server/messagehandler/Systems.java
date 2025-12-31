@@ -20,30 +20,31 @@
 
 package moba.server.messagehandler;
 
+import moba.server.application.ServerStateMachine;
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
 import moba.server.datatypes.enumerations.*;
+import moba.server.datatypes.objects.EmergencyTriggerData;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
 import moba.server.messages.MessageQueue;
 import moba.server.messages.messagetypes.InternMessage;
 import moba.server.messages.messagetypes.SystemMessage;
-import moba.server.exceptions.ClientErrorException;
 import moba.server.utilities.layout.TrackLayoutLock;
 
 import java.sql.SQLException;
 
 final public class Systems extends AbstractMessageHandler {
-    private ServerState currState = ServerState.HALT;
-
     private final MessageQueue msgQueue;
     private final TrackLayoutLock lock;
+    private final ServerStateMachine stateMachine;
 
-    public Systems(Dispatcher dispatcher, TrackLayoutLock lock, MessageQueue msgQueue)
+    public Systems(Dispatcher dispatcher, TrackLayoutLock lock, MessageQueue msgQueue, ServerStateMachine stateMachine)
     throws SQLException {
         this.dispatcher      = dispatcher;
         this.msgQueue        = msgQueue;
         this.lock            = lock;
+        this.stateMachine    = stateMachine;
         this.lock.resetAll();
     }
 
@@ -56,18 +57,11 @@ final public class Systems extends AbstractMessageHandler {
     public void reset()
     throws SQLException {
         lock.resetAll();
-        currState = ServerState.HALT;
-    }
-
-    @Override
-    public void serverStateChanged(ServerState state) {
-        dispatcher.sendGroup(new Message(SystemMessage.HARDWARE_STATE_CHANGED, state.toSystemState().toString()));
-        currState = state;
     }
 
     @Override
     public void handleMsg(Message msg)
-    throws ClientErrorException, SQLException {
+    throws Exception {
         switch(SystemMessage.fromId(msg.getMessageId())) {
             case SET_AUTOMATIC_MODE:
                 setAutomaticMode(msg);
@@ -95,66 +89,67 @@ final public class Systems extends AbstractMessageHandler {
 
             case GET_HARDWARE_STATE:
                 dispatcher.sendSingle(
-                    new Message(SystemMessage.HARDWARE_STATE_CHANGED, currState.toSystemState().toString()),
+                    new Message(
+                        SystemMessage.HARDWARE_STATE_CHANGED,
+                        stateMachine.getState().toSystemState().toString()
+                    ),
                     msg.getEndpoint()
                 );
                 break;
 
             case HARDWARE_SHUTDOWN:
-                msgQueue.add(new Message(InternMessage.SYSTEM_SHUTDOWN, msg.getEndpoint()));
+                stateMachine.setSystemShutdown(msg.getEndpoint());
                 break;
 
             case HARDWARE_RESET:
-                msgQueue.add(new Message(InternMessage.SERVER_RESET, msg.getEndpoint()));
+                msgQueue.add(new Message(InternMessage.SERVER_RESET));
                 break;
         }
     }
 
-    private void setAutomaticMode(Message msg) {
+    private void setAutomaticMode(Message msg)
+    throws SQLException {
         if((boolean)msg.getData()) {
-            msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.AUTOMATIC_MODE, msg.getEndpoint()));
+            stateMachine.activateAutomaticMode(msg.getEndpoint());
         } else {
-            msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.AUTOMATIC_HALT, msg.getEndpoint()));
+            stateMachine.deactivateAutomaticMode(msg.getEndpoint());
         }
     }
 
-    private void setReadyForAutomaticMode(Message msg) {
+    private void setReadyForAutomaticMode(Message msg)
+    throws SQLException {
        if((boolean)msg.getData()) {
-           msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.READY_FOR_AUTOMATIC_MODE, msg.getEndpoint()));
+           stateMachine.setReadyForAutomaticMode(msg.getEndpoint());
        } else {
-           msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.MANUAL_MODE, msg.getEndpoint()));
+           stateMachine.setManualMode(msg.getEndpoint());
        }
     }
 
-    private void triggerEmergencyStop(Message msg) {
-        msgQueue.add(new Message(InternMessage.EMERGENCY_STOP, msg.getData()));
+    private void triggerEmergencyStop(Message msg)
+    throws Exception {
+        stateMachine.activateIncident(EmergencyTriggerData.fromMessage(msg), msg.getEndpoint());
     }
 
-    private void releaseEmergencyStop(Endpoint endpoint) {
-        msgQueue.add(new Message(InternMessage.RELEASE_INCIDENT_MODE, endpoint));
+    private void releaseEmergencyStop(Endpoint endpoint)
+    throws SQLException{
+        stateMachine.releaseIncident(endpoint);
     }
 
-    private void toggleStandByMode(Message msg) {
-        if(currState == ServerState.STANDBY) {
-            setStandByModeOff(msg.getEndpoint());
+    private void toggleStandByMode(Message msg)
+    throws SQLException {
+        if(stateMachine.getState() == ServerState.STANDBY) {
+            stateMachine.deactivateStandby(msg.getEndpoint());
         } else {
-            setStandByModeOn(msg.getEndpoint());
+            stateMachine.activateStandby(msg.getEndpoint());
         }
     }
 
-    private void setStandByMode(Message msg) {
+    private void setStandByMode(Message msg)
+    throws SQLException {
         if((boolean)msg.getData()) {
-            setStandByModeOn(msg.getEndpoint());
+            stateMachine.activateStandby(msg.getEndpoint());
         } else {
-            setStandByModeOff(msg.getEndpoint());
+            stateMachine.deactivateStandby(msg.getEndpoint());
         }
-    }
-
-    private void setStandByModeOn(Endpoint endpoint) {
-        msgQueue.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.STANDBY, endpoint));
-    }
-
-    private void setStandByModeOff(Endpoint endpoint) {
-        msgQueue.add(new Message(InternMessage.RELEASE_STANDBY_MODE, endpoint));
     }
 }

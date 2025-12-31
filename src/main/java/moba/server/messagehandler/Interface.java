@@ -21,34 +21,27 @@
 package moba.server.messagehandler;
 
 import moba.server.actionhandler.TrainRunner;
+import moba.server.application.ServerStateMachine;
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
-import moba.server.datatypes.enumerations.*;
-import moba.server.datatypes.objects.EmergencyTriggerData;
-import moba.server.datatypes.objects.IncidentData;
+import moba.server.datatypes.enumerations.ServerState;
 import moba.server.datatypes.objects.TrainJourney;
+import moba.server.exceptions.ClientErrorException;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
-import moba.server.messages.MessageQueue;
 import moba.server.messages.messagetypes.InterfaceMessage;
-import moba.server.messages.messagetypes.InternMessage;
-import moba.server.exceptions.ClientErrorException;
-import moba.server.utilities.messaging.IncidentHandler;
 
 import java.sql.SQLException;
 
 final public class Interface extends AbstractMessageHandler {
 
-    private final MessageQueue msgQueueIn;
+    private final ServerStateMachine stateMachine;
     private final TrainRunner runner;
-    private ServerState serverState = ServerState.HALT;
-    private final IncidentHandler incidentHandler;
 
-    public Interface(Dispatcher dispatcher, MessageQueue msgQueueIn, IncidentHandler incidentHandler, TrainRunner runner) {
+    public Interface(Dispatcher dispatcher, ServerStateMachine stateMachine, TrainRunner runner) {
         this.dispatcher      = dispatcher;
-        this.msgQueueIn      = msgQueueIn;
+        this.stateMachine    = stateMachine;
         this.runner          = runner;
-        this.incidentHandler = incidentHandler;
     }
 
     @Override
@@ -57,13 +50,14 @@ final public class Interface extends AbstractMessageHandler {
     }
 
     @Override
-    public void serverStateChanged(ServerState state) {
-        serverState = state;
+    public void serverStateChanged(ServerState state)
+    throws SQLException {
+        checkServerState(null);
     }
 
     @Override
     public void handleMsg(Message msg)
-    throws SQLException, ClientErrorException {
+    throws Exception {
         switch(InterfaceMessage.fromId(msg.getMessageId())) {
             case CONNECTED
                 -> setConnected(msg);
@@ -90,84 +84,54 @@ final public class Interface extends AbstractMessageHandler {
         }
     }
 
-    private void setConnected(Message msg) {
+    private void setConnected(Message msg)
+    throws SQLException {
         boolean onInitialize = (boolean)msg.getData();
-         Endpoint ep =msg.getEndpoint();
-
-        if(serverState == ServerState.HALT && onInitialize) {
-            // TODO: Check, if ready for automatic-mode
-            msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.MANUAL_MODE));
-            addIncident(IncidentLevel.NOTICE, "Die Verbindung zur Hardware wurde hergestellt", ep);
-            return;
-        }
-        if(onInitialize) {
-            msgQueueIn.add(new Message(InternMessage.EMERGENCY_STOP, new EmergencyTriggerData(EmergencyTriggerReason.CONNECTION_LOST, "")));
-            addIncident(IncidentLevel.CRITICAL, "Die Verbindung zur Hardware wurde hergestellt (ungültiger Zustand!)", ep);
-            return;
-        }
-        msgQueueIn.add(new Message(InternMessage.EMERGENCY_STOP, new EmergencyTriggerData(EmergencyTriggerReason.CONNECTION_LOST, "")));
-        addIncident(IncidentLevel.NOTICE, "Die Verbindung zur Hardware wurde wieder hergestellt", ep);
+        stateMachine.setConnected(msg.getEndpoint(), onInitialize);
     }
 
-    private void setConnectionLost(Message msg) {
-        msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.CONNECTION_LOST));
-        addIncident(
-            IncidentLevel.ERROR,
-            "Die Verbindung zur Hardware wurde unterbrochen",
-            msg.getEndpoint()
-        );
+    private void setConnectionLost(Message msg)
+    throws  SQLException {
+        stateMachine.setConnectionLost(msg.getEndpoint());
     }
 
-    private void routeSwitched(Message msg) {
+    private void routeSwitched(Message msg)
+    throws  SQLException {
         int id = (int)msg.getData();
         runner.setSwitched(id);
-        checkServerState();
+        checkServerState(msg.getEndpoint());
     }
 
     private void releaseRoute(Message msg)
-    throws SQLException, ClientErrorException {
+    throws  SQLException, ClientErrorException {
         int id = (int)msg.getData();
         runner.releaseRoute(id);
-        checkServerState();
+        checkServerState(msg.getEndpoint());
     }
 
     private void releaseBlock(Message msg)
-    throws SQLException, ClientErrorException {
+    throws Exception {
         int blockId = (int)msg.getData();
         // TODO: Wir brauchen hier noch die TrainId
         int trainId = 0;
         runner.releaseBlock(trainId, blockId);
-        checkServerState();
+        checkServerState(msg.getEndpoint());
     }
 
-    private void pushTrain(Message msg) {
+    private void pushTrain(Message msg)
+    throws SQLException {
         TrainJourney train = (TrainJourney)msg.getData();
 
         runner.pushTrain(train);
-        checkServerState();
+        checkServerState(msg.getEndpoint());
     }
 
 
-    private void checkServerState() {
+    private void checkServerState(Endpoint endpoint)
+    throws SQLException {
         if(runner.trainsToHandle()) {
             return;
         }
-
-        if(serverState == ServerState.AUTOMATIC_HALT) {
-            msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.READY_FOR_AUTOMATIC_MODE));
-        } else if(serverState == ServerState.AUTOMATIC_HALT_FOR_SHUTDOWN) {
-            msgQueueIn.add(new Message(InternMessage.SET_SERVER_STATE, ServerState.READY_FOR_SHUTDOWN));
-        }
-    }
-
-    private void addIncident(IncidentLevel level, String message, Endpoint ep) {
-        incidentHandler.add(new IncidentData(
-            level,
-            IncidentType.STATUS_CHANGED,
-            "Hardwareverbindung",
-            message,
-            "Interface.addIncident()",
-            ep
-        ));
+        stateMachine.automaticModeFinished(endpoint);
     }
 }

@@ -115,6 +115,8 @@ final public class ServerApplication implements Loggable {
             TrackLayoutLock trackLayoutLock = new TrackLayoutLock(database);
             IncidentHandler incidentHandler = new IncidentHandler(logger, dispatcher, list);
 
+            ServerStateMachine serverStateMachine = new ServerStateMachine(dispatcher, incidentHandler);
+
             InterlockBlock interlockBlock = new InterlockBlock(database);
             InterlockRoute interlockRoute = new InterlockRoute(database);
             TrackLayoutRepository trackLayoutRepository = new TrackLayoutRepository(database);
@@ -149,14 +151,14 @@ final public class ServerApplication implements Loggable {
             handler.add(new IPC((String)config.getSection("common.serverConfig.ipc"), msgQueueIn, logger));
             handler.add(new KeepAlive(dispatcher, keepAlivePingIntervall, logger));
 
-            MessageLoop  loop = new MessageLoop(dispatcher, incidentHandler);
+            MessageLoop  loop = new MessageLoop(dispatcher, incidentHandler, serverStateMachine);
             loop.addHandler(new Client(dispatcher));
             loop.addHandler(new Server(dispatcher, this, allowList, config));
             loop.addHandler(new Timer(dispatcher, config, scheduler));
             loop.addHandler(new Environment(dispatcher, new FunctionAddressesRepository(database)));
-            loop.addHandler(new Systems(dispatcher, trackLayoutLock, msgQueueIn));
+            loop.addHandler(new Systems(dispatcher, trackLayoutLock, msgQueueIn, serverStateMachine));
             loop.addHandler(new Layout(dispatcher, trackLayoutRepository, activeLayout, trackLayoutLock));
-            loop.addHandler(new Interface(dispatcher, msgQueueIn, incidentHandler, trainRunner));
+            loop.addHandler(new Interface(dispatcher, serverStateMachine, trainRunner));
             loop.addHandler(new Control(dispatcher, blockListRepository, switchStateRepository, trainlistRepository, activeLayout, trackLayoutLock));
             loop.addHandler(new Messaging(dispatcher, incidentHandler));
 

@@ -42,11 +42,11 @@ public enum ServerState {
 
             case
                 HALT,
-                CONNECTION_LOST -> SystemState.NO_CONNECTION;
+                CONNECTION_LOST
+                    -> SystemState.NO_CONNECTION;
 
             case
-                MANUAL_MODE,
-                AUTOMATIC_HALT_FOR_SHUTDOWN
+                MANUAL_MODE
                     -> SystemState.MANUAL;
 
             case
@@ -62,6 +62,7 @@ public enum ServerState {
                     -> SystemState.STANDBY;
 
             case
+                AUTOMATIC_HALT_FOR_SHUTDOWN,
                 READY_FOR_SHUTDOWN
                     -> SystemState.SHUTDOWN;
         };
