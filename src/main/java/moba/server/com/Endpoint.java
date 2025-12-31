@@ -91,7 +91,7 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
 
     @Override
     public String toString() {
-        return appData.name() + "[" + appData.version() + "] #" + endpointData.appId() + "@" + endpointData.socket();
+        return appData.name() + "[" + appData.description() + "] #" + endpointData.appId() + "@" + endpointData.socket();
     }
 
     @Override
@@ -115,7 +115,7 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
                     IncidentLevel.NOTICE,
                     IncidentType.CLIENT_NOTICE,
                     "Client closed",
-                    "Client was closed",
+                    "Client \"" + this + "\" was closed",
                     "Endpoint.run()",
                     this
                 ),
@@ -130,7 +130,7 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
                         IncidentLevel.CRITICAL,
                         IncidentType.CLIENT_ERROR,
                         "Client reset",
-                        "Client #" + getAppId() + "was terminated. Reason: \"" + e + "\"",
+                        "Client \"" + this + "\" was terminated. Reason: \"" + e + "\"",
                         "Endpoint.run()",
                         this
                     ),

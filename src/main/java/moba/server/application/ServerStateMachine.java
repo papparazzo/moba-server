@@ -234,7 +234,7 @@ public class ServerStateMachine implements Loggable {
             activateIncident(
                 new EmergencyTriggerData(
                     EmergencyTriggerReason.SOFTWARE_ERROR,
-                    "Die Verbindung zur Hardware wurde hergestellt (ungültiger Zustand!)"
+                    "Verbindung mit initialize == true"
                 ),
                 endpoint
             );
@@ -244,7 +244,7 @@ public class ServerStateMachine implements Loggable {
         activateIncident(
             new EmergencyTriggerData(
                 EmergencyTriggerReason.RECONNECTED,
-                "Die Verbindung zur Hardware wurde wieder hergestellt (ungültiger Zustand!)"
+                "temporäre Unterbrechung"
             ),
             endpoint
         );

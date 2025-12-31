@@ -39,9 +39,10 @@ public abstract class AbstractMessageHandler {
     public abstract int getGroupId();
 
     public void reset()
-    throws Exception {
+    throws SQLException {
     }
 
-    public void serverStateChanged(ServerState state) {
+    public void serverStateChanged(ServerState state)
+    throws SQLException {
     }
 }
