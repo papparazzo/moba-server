@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### [4.0.0] - 2026-01-01
+#### Added
+- ServerStateMachine to manage server state transitions and incidents
+- New message types to InternMessage enum
+- EmergencyTriggerData record to handle emergency trigger information
+
+#### Changed
+- Refactor Incident handling to Notification system, replacing `IncidentData` with `NotificationData`
+- Refactor server state handling
+- Improve error handling for client termination in Endpoint.java
+
 ### [3.1.0] - 2025-12-26
 #### Changed
 - gradle-wrapper updated

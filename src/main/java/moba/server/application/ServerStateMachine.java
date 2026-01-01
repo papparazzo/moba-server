@@ -387,7 +387,7 @@ public class ServerStateMachine implements Loggable {
     private boolean checkPreConditions() {
         // TODO: Prüfen, ob alle Blöcke besetzt sind. Sprich: Block A belegt -> ist Block A laut DB belegt?
         //       Laut DB befindet ein Zug in Block A, ist Block a belegt
-        return true;
+        return false;
     }
 
     private void sendErrorMessage(ServerState newState, Endpoint endpoint) {
