@@ -69,6 +69,13 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
         this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
         this.dataInputStream  = new DataInputStream(socket.getInputStream());
 
+        appData = new AppData(
+            "[---]",
+            new Version(),
+            "[initializing...]",
+            new ArrayList<>()
+        );
+
         setName("endpoint #" + id);
     }
 
