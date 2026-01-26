@@ -108,5 +108,4 @@ final public class MessageLoop implements Loggable {
             throw new ClientErrorException(ClientError.UNKNOWN_GROUP_ID, "no handler for group <" + groupId + ">!");
         }
     }
-
 }
