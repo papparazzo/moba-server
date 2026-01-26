@@ -85,7 +85,10 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
         try {
             socket.close();
         } catch(Throwable e) {
-            getLogger().log(Level.WARNING, "Exception occurred! <{0}> Closing socket failed!", new Object[]{e.toString()});
+            getLogger().log(
+                Level.WARNING,
+                "Exception occurred! <{0}> Closing socket failed!", new Object[]{e.toString()}
+            );
         }
     }
 
