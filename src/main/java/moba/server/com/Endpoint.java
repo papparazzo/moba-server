@@ -69,13 +69,6 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
         this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
         this.dataInputStream  = new DataInputStream(socket.getInputStream());
 
-        appData = new AppData(
-            "[---]",
-            new Version(),
-            "[initializing...]",
-            new ArrayList<>()
-        );
-
         setName("endpoint #" + id);
     }
 
@@ -98,7 +91,11 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
 
     @Override
     public String toString() {
-        return appData.name() + "[" + appData.description() + "] #" + endpointData.appId() + "@" + endpointData.socket();
+        if(appData == null) {
+            return "[Uninitialized Endpoint] #" + endpointData.appId() + "@" + endpointData.socket();
+        }
+        return
+            appData.name() + "[" + appData.description() + "] #" + endpointData.appId() + "@" + endpointData.socket();
     }
 
     @Override
