@@ -331,7 +331,6 @@ public class ServerStateMachine implements Loggable {
             "Shutdown der Serverapplikation",
             "ServerApplication.handleServerShutdown()"
         ));
-
         currState = ServerState.HALT;
         lastState = ServerState.HALT;
 
