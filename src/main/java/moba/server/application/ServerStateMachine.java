@@ -67,7 +67,7 @@ public class ServerStateMachine implements Loggable {
             case STANDBY:
             case HALT:
             case READY_FOR_SHUTDOWN:
-                sendErrorMessage(ServerState.INCIDENT, endpoint);
+                sendErrorMessageForInvalidStatusChange(ServerState.INCIDENT, endpoint);
                 return;
         }
         setNewServerState(ServerState.INCIDENT);
@@ -110,7 +110,7 @@ public class ServerStateMachine implements Loggable {
             case STANDBY:
             case HALT:
             case READY_FOR_SHUTDOWN:
-                sendErrorMessage(lastState, ep);
+                sendErrorMessageForInvalidStatusChange(lastState, ep);
                 return;
         }
         setNewServerState(lastState);
@@ -120,7 +120,7 @@ public class ServerStateMachine implements Loggable {
     public void activateAutomaticMode(Endpoint ep)
     throws SQLException {
         if(currState != ServerState.READY_FOR_AUTOMATIC_MODE && !checkPreConditions()) {
-           sendErrorMessage(ServerState.AUTOMATIC_MODE, ep);
+           sendErrorMessageForInvalidStatusChange(ServerState.AUTOMATIC_MODE, ep);
            return;
         }
         setNewServerState(ServerState.AUTOMATIC_MODE);
@@ -130,7 +130,7 @@ public class ServerStateMachine implements Loggable {
     public void deactivateAutomaticMode(Endpoint endpoint)
     throws SQLException {
         if(currState != ServerState.AUTOMATIC_MODE) {
-           sendErrorMessage(ServerState.AUTOMATIC_HALT, endpoint);
+           sendErrorMessageForInvalidStatusChange(ServerState.AUTOMATIC_HALT, endpoint);
            return;
         }
         setNewServerState(ServerState.AUTOMATIC_HALT);
@@ -148,7 +148,7 @@ public class ServerStateMachine implements Loggable {
             handleServerShutdown();
         }
 
-       sendErrorMessage(ServerState.AUTOMATIC_MODE, endpoint);
+       sendErrorMessageForInvalidStatusChange(ServerState.AUTOMATIC_MODE, endpoint);
     }
 
     public void activateStandby(Endpoint endpoint)
@@ -160,7 +160,7 @@ public class ServerStateMachine implements Loggable {
             case HALT:
             case READY_FOR_SHUTDOWN:
             case STANDBY:
-                sendErrorMessage(ServerState.STANDBY, endpoint);
+                sendErrorMessageForInvalidStatusChange(ServerState.STANDBY, endpoint);
                 return;
         }
         setNewServerState(ServerState.STANDBY);
@@ -170,7 +170,7 @@ public class ServerStateMachine implements Loggable {
     public void deactivateStandby(Endpoint endpoint)
     throws SQLException {
         if(currState != ServerState.STANDBY) {
-            sendErrorMessage(lastState, endpoint);
+            sendErrorMessageForInvalidStatusChange(lastState, endpoint);
             return;
         }
 
@@ -192,7 +192,7 @@ public class ServerStateMachine implements Loggable {
     public void setReadyForAutomaticMode(Endpoint endpoint)
     throws SQLException {
         if(currState != ServerState.MANUAL_MODE && currState != ServerState.AUTOMATIC_HALT) {
-           sendErrorMessage(ServerState.READY_FOR_AUTOMATIC_MODE, endpoint);
+           sendErrorMessageForInvalidStatusChange(ServerState.READY_FOR_AUTOMATIC_MODE, endpoint);
            return;
         }
         setNewServerState(ServerState.READY_FOR_AUTOMATIC_MODE);
@@ -206,7 +206,7 @@ public class ServerStateMachine implements Loggable {
     public void setManualMode(Endpoint endpoint)
     throws SQLException {
         if(currState == ServerState.MANUAL_MODE) {
-           sendErrorMessage(ServerState.MANUAL_MODE, endpoint);
+           sendErrorMessageForInvalidStatusChange(ServerState.MANUAL_MODE, endpoint);
            return;
         }
         setNewServerState(ServerState.MANUAL_MODE);
@@ -254,7 +254,7 @@ public class ServerStateMachine implements Loggable {
     public void setConnectionLost(Endpoint endpoint)
     throws SQLException {
         if(currState == ServerState.CONNECTION_LOST) {
-           sendErrorMessage(ServerState.CONNECTION_LOST, endpoint);
+           sendErrorMessageForInvalidStatusChange(ServerState.CONNECTION_LOST, endpoint);
            return;
         }
 
@@ -275,7 +275,7 @@ public class ServerStateMachine implements Loggable {
         switch(currState) {
             case HALT:
             case INCIDENT:
-                sendErrorMessage(ServerState.READY_FOR_SHUTDOWN, endpoint);
+                sendErrorMessageForInvalidStatusChange(ServerState.READY_FOR_SHUTDOWN, endpoint);
                 break;
 
             case MANUAL_MODE:
@@ -390,7 +390,7 @@ public class ServerStateMachine implements Loggable {
         return false;
     }
 
-    private void sendErrorMessage(ServerState newState, Endpoint endpoint) {
+    private void sendErrorMessageForInvalidStatusChange(ServerState newState, Endpoint endpoint) {
         dispatcher.sendSingle(
             new Message(
                 ClientMessage.ERROR,
