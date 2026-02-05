@@ -62,6 +62,14 @@ public class ServerStateMachine implements Loggable {
 
     public void activateIncident(EmergencyTriggerData triggerData, Endpoint endpoint)
     throws SQLException {
+        if(currState == ServerState.CONNECTION_LOST) {
+            return;
+        }
+        setIncidentState(triggerData, endpoint);
+    }
+
+    private void setIncidentState(EmergencyTriggerData triggerData, Endpoint endpoint)
+    throws SQLException {
         switch(currState) {
             case INCIDENT:
             case STANDBY:
@@ -231,7 +239,7 @@ public class ServerStateMachine implements Loggable {
             return;
         }
         if(onInitialize) {
-            activateIncident(
+            setIncidentState(
                 new EmergencyTriggerData(
                     EmergencyTriggerReason.SOFTWARE_ERROR,
                     "Verbindung mit initialize == true"
@@ -241,11 +249,8 @@ public class ServerStateMachine implements Loggable {
             lastState = ServerState.MANUAL_MODE;
             return;
         }
-        activateIncident(
-            new EmergencyTriggerData(
-                EmergencyTriggerReason.RECONNECTED,
-                "temporäre Unterbrechung"
-            ),
+        setIncidentState(
+            new EmergencyTriggerData(EmergencyTriggerReason.RECONNECTED, "temporäre Unterbrechung"),
             endpoint
         );
         lastState = ServerState.MANUAL_MODE;
