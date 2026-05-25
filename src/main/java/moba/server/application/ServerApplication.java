@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import moba.server.actionhandler.*;
+import moba.server.apiconnector.OAuth2HttpClient;
+import moba.server.apiconnector.TrainApi;
 import moba.server.backgroundhandler.Acceptor;
 import moba.server.backgroundhandler.BackgroundHandlerComposite;
 import moba.server.com.Dispatcher;
@@ -105,9 +107,15 @@ final public class ServerApplication implements Loggable {
         var allowed = (ArrayList<String>)config.getSection("common.serverConfig.allowedIPs");
         int maxEntries = (int)(long)config.getSection("common.serverConfig.maxNotificationEntries");
         int keepAlivePingIntervall = (int)(long)config.getSection("common.serverConfig.keepAlivePingIntervall");
-        AllowList allowList = new AllowList(maxClients, allowed);
 
+        String trainApiUrl = (String)config.getSection("api.sso.url");
+        String trainApiClientId = (String)config.getSection("api.sso.clientId");
+        String trainApiClientSecret = (String)config.getSection("api.sso.clientSecret");
+
+        AllowList allowList = new AllowList(maxClients, allowed);
         CircularFifoQueue<NotificationData> list = new CircularFifoQueue<>(maxEntries);
+        OAuth2HttpClient apiConnector = new OAuth2HttpClient(trainApiUrl, trainApiClientId, trainApiClientSecret);
+
         do {
             Dispatcher dispatcher = new Dispatcher(new MessageLogger(logger), logger);
             Database database = new Database((HashMap<String, Object>)config.getSection("common.database"), logger);
@@ -123,7 +131,8 @@ final public class ServerApplication implements Loggable {
 
             BlockListRepository blockListRepository = new BlockListRepository(database);
             SwitchStateRepository switchStateRepository = new SwitchStateRepository(database);
-            TrainlistRepository trainlistRepository = new TrainlistRepository(database);
+            TrainApi trainApi = new TrainApi(apiConnector, (String)config.getSection("api.train.url"));
+            TrainListRepository trainlistRepository = new TrainListRepository(database, trainApi);
             TrainRepository trainRepository = new TrainRepository();
 
             long activeLayoutId = activeLayout.getActiveLayout();
