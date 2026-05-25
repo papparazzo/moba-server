@@ -33,7 +33,7 @@ import moba.server.datatypes.objects.*;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.repositories.BlockListRepository;
 import moba.server.repositories.SwitchStateRepository;
-import moba.server.repositories.TrainlistRepository;
+import moba.server.repositories.TrainListRepository;
 import moba.server.messages.Message;
 import moba.server.messages.messagetypes.ControlMessage;
 import moba.server.exceptions.ClientErrorException;
@@ -50,13 +50,13 @@ final public class Control extends AbstractMessageHandler implements Loggable {
 
     private final TrackLayoutLock lock;
 
-    private final TrainlistRepository trainlistRepository;
+    private final TrainListRepository trainlistRepository;
 
     public Control(
         Dispatcher dispatcher,
         BlockListRepository blocklistRepository,
         SwitchStateRepository switchStateRepository,
-        TrainlistRepository trainlistRepository,
+        TrainListRepository trainlistRepository,
         ActiveTrackLayout activeLayout,
         TrackLayoutLock lock
     ) throws SQLException {

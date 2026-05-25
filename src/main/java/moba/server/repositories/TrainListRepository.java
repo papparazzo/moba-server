@@ -20,6 +20,7 @@
 
 package moba.server.repositories;
 
+import moba.server.apiconnector.TrainApi;
 import moba.server.datatypes.collections.TrainList;
 import moba.server.datatypes.enumerations.DrivingDirection;
 import moba.server.datatypes.enumerations.TrainType;
@@ -33,11 +34,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class TrainlistRepository {
-    protected final Database database;
+public final class TrainListRepository {
+    private final Database database;
+    private final TrainApi trainApi;
 
-    public TrainlistRepository(Database database) {
+    public TrainListRepository(Database database, TrainApi trainApi) {
         this.database = database;
+        this.trainApi = trainApi;
     }
 
     public TrainList getTrainList(long id)
