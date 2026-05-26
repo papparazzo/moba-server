@@ -46,7 +46,7 @@ public final class TrainListRepository {
     public TrainList getTrainList(long id)
     throws SQLException, ClientErrorException {
 
-        // Stell den aktuellen IST-Zustand (wo befindet sich welcher Zug) da!
+        // Stell den aktuellen IST-Zustand (wo befindet sich welcher Zug) dar!
         Connection con = database.getConnection();
         String q =
             "SELECT Trains.Id, Address, Speed, DrivingDirection " +

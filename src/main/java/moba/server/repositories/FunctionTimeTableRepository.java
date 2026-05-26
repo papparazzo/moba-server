@@ -35,7 +35,6 @@ final public class FunctionTimeTableRepository extends AbstractTimeTableReposito
 
     protected ResultSet getResultWithDaySwitch(String t1, String t2, String d1, String d2)
     throws SQLException {
-
         String q =
             "SELECT DeviceId, Controller, Port, Action " +
             "FROM FunctionCycleTimes " +
