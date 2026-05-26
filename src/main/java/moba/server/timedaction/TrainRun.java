@@ -61,7 +61,7 @@ final public class TrainRun implements TimedActionInterface {
                 rs.getLong("ToBlockId")
             );
             trainRunner.pushTrain(destination);
-            if(rs.getLong("NonRecurring") == 1) {
+            if(rs.getLong("Recurring") == 0) {
                 trainTimeTableRepository.removeTrain(rs.getLong("Id"));
             }
         } while (rs.next());
