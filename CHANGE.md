@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### [4.1.0]
+#### Added
+- OAuth2-based HTTP client for authenticated API communication
+- Train API connector for retrieving train data from the external API
+
+#### Changed
+- Integrated OAuth2HttpClient and TrainApi into ServerApplication
+- Added TrainApi dependency to train list handling
+- Updated Gradle wrapper to 9.4.0
+- Refactored incident state handling for better readability
+- Improved naming for invalid status change error handling
+- Improved Endpoint logging readability
+
+#### Fixed
+- Endpoint now handles uninitialized app data safely in toString()
+- Corrected recurring train timetable handling
+- Corrected TrainListRepository query to include TrainId
+
 ### [4.0.1] - 2026-01-25
 #### Fixed
 - java.lang.NullPointerException in Endpoint-class fixed
