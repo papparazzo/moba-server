@@ -132,8 +132,7 @@ final public class ServerApplication implements Loggable {
             BlockListRepository blockListRepository = new BlockListRepository(database);
             SwitchStateRepository switchStateRepository = new SwitchStateRepository(database);
             TrainApi trainApi = new TrainApi(apiConnector, (String)config.getSection("api.train.url"));
-            TrainListRepository trainlistRepository = new TrainListRepository(database, trainApi);
-            TrainRepository trainRepository = new TrainRepository();
+            TrainRepository trainRepository = new TrainRepository(database, trainApi);
 
             long activeLayoutId = activeLayout.getActiveLayout();
             BlockContactDataMap blockContacts = blockListRepository.getBlockList(activeLayoutId);
@@ -168,7 +167,7 @@ final public class ServerApplication implements Loggable {
             loop.addHandler(new Systems(dispatcher, trackLayoutLock, msgQueueIn, serverStateMachine));
             loop.addHandler(new Layout(dispatcher, trackLayoutRepository, activeLayout, trackLayoutLock));
             loop.addHandler(new Interface(dispatcher, serverStateMachine, trainRunner));
-            loop.addHandler(new Control(dispatcher, blockListRepository, switchStateRepository, trainlistRepository, activeLayout, trackLayoutLock));
+            loop.addHandler(new Control(dispatcher, blockListRepository, switchStateRepository, trainRepository, activeLayout, trackLayoutLock));
             loop.addHandler(new Messaging(dispatcher, notificationHandler));
 
             handler.start();

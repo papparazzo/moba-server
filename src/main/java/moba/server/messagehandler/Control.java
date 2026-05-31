@@ -33,10 +33,10 @@ import moba.server.datatypes.objects.*;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.repositories.BlockListRepository;
 import moba.server.repositories.SwitchStateRepository;
-import moba.server.repositories.TrainListRepository;
 import moba.server.messages.Message;
 import moba.server.messages.messagetypes.ControlMessage;
 import moba.server.exceptions.ClientErrorException;
+import moba.server.repositories.TrainRepository;
 import moba.server.utilities.layout.ActiveTrackLayout;
 import moba.server.utilities.layout.TrackLayoutLock;
 import moba.server.utilities.logger.Loggable;
@@ -50,20 +50,20 @@ final public class Control extends AbstractMessageHandler implements Loggable {
 
     private final TrackLayoutLock lock;
 
-    private final TrainListRepository trainlistRepository;
+    private final TrainRepository trainRepository;
 
     public Control(
         Dispatcher dispatcher,
         BlockListRepository blocklistRepository,
         SwitchStateRepository switchStateRepository,
-        TrainListRepository trainlistRepository,
+        TrainRepository trainRepository,
         ActiveTrackLayout activeLayout,
         TrackLayoutLock lock
     ) throws SQLException {
         this.switchStateRepository = switchStateRepository;
         this.blocklistRepository = blocklistRepository;
         this.dispatcher = dispatcher;
-        this.trainlistRepository = trainlistRepository;
+        this.trainRepository = trainRepository;
 
         this.activeLayout = activeLayout;
         this.lock         = lock;
@@ -155,7 +155,7 @@ final public class Control extends AbstractMessageHandler implements Loggable {
     private void getTrainList(Message msg)
     throws SQLException, ClientErrorException {
         long id = activeLayout.getActiveLayout((Long)msg.getData());
-        TrainList trainList = trainlistRepository.getTrainList(id);
+        TrainList trainList = trainRepository.getTrainList(id);
         dispatcher.sendSingle(new Message(ControlMessage.GET_TRAIN_LIST_RES, trainList), msg.getEndpoint());
     }
 }

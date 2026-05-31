@@ -20,15 +20,79 @@
 
 package moba.server.repositories;
 
+import moba.server.apiconnector.TrainApi;
+import moba.server.datatypes.collections.TrainList;
 import moba.server.datatypes.enumerations.DrivingDirection;
 import moba.server.datatypes.enumerations.TrainType;
 import moba.server.datatypes.objects.Train;
+import moba.server.exceptions.ClientErrorException;
+import moba.server.utilities.CheckedEnum;
+import moba.server.utilities.database.Database;
 
-public class TrainRepository {
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-    public TrainRepository() {
+public final class TrainRepository {
 
+    private final Database database;
+    private final TrainApi trainApi;
+
+    public TrainRepository(Database database, TrainApi trainApi) {
+        this.database = database;
+        this.trainApi = trainApi;
     }
+
+    public TrainList getTrainList(long id)
+    throws SQLException, ClientErrorException {
+
+        // Stell den aktuellen IST-Zustand (wo befindet sich welcher Zug) dar!
+        Connection con = database.getConnection();
+        String q =
+            "SELECT " +
+                "Trains.Id, " +             // Interne Id
+                "Trains.TrainId, " +        // fünfstellige "Zugnummer" für die Verknüpfung mit der API (Inventory)
+                "Address, " +               // Lokadresse des Zugs
+                "Speed, " +                 // FIXME: Brauchen wir das? Kommt aus der CS2!
+                "DrivingDirection " +       // FIXME: Brauchen wir das? Kommt aus der CS2!
+            "FROM Trains " +
+            "LEFT JOIN BlockSections " +
+            "ON BlockSections.TrainId = Trains.Id " +
+            "LEFT JOIN `TrackLayoutSymbols` " +
+            "ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` " +
+            "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
+
+        try (PreparedStatement pstmt = con.prepareStatement(q)) {
+            pstmt.setLong(1, id);
+
+            TrainList map = new TrainList();
+            ResultSet rs = pstmt.executeQuery();
+
+            while(rs.next()) {
+                int trainId = rs.getInt("Id");
+
+                var x = trainApi.getTrain(trainId);
+
+                map.add(
+                    new Train(
+                        rs.getInt("Id"),
+                        rs.getInt("Address"),
+                        rs.getInt("Speed"),
+                        CheckedEnum.getFromString(DrivingDirection.class, rs.getString("DrivingDirection")),
+                        // TODO: Get this information from the api-endpoint!
+                        TrainType.FREIGHT_TRAIN,
+                        true,
+                        true
+                    )
+                );
+            }
+            return map;
+        } catch(Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public Train getTrainById(long trainId) {
         // TODO get this from Repository and API
