@@ -31,7 +31,7 @@ public record Train(
     DrivingDirection drivingDirection,
     TrainType trainType,
     boolean hasPantograph,
-    boolean noDirectionalControl // keine Fahrtrichtungsängerung (z.B. Güterzug)
+    boolean noDirectionalControl // keine Fahrtrichtungsänderung (z.B. Güterzug)
 ) {
     public Train withDrivingDirection(DrivingDirection drivingDirection) {
         return new Train(trainId, address, speed, drivingDirection, trainType, hasPantograph, noDirectionalControl);
