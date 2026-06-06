@@ -30,7 +30,7 @@ import moba.server.routing.router.routinglistitems.RoutingElementInterface;
 import moba.server.routing.typedefs.BlockNodeMap;
 import moba.server.routing.typedefs.SwitchStateData;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * Liefert eine verkettete Liste vom Startblock bis zum Zielblock mit Weichen und Blöcken zurück
@@ -69,8 +69,8 @@ final public class SimpleRouter {
      * konvertiert die mit {@see getLinkedRouteList} generierte verkettete Liste in einen Vektor und liefert
      * diesen zurück
      */
-    public Vector<RoutingElementInterface> getRoute(TrainJourney journey) {
-        Vector<RoutingElementInterface> result = new Vector<>();
+    public ArrayList<RoutingElementInterface> getRoute(TrainJourney journey) {
+        ArrayList<RoutingElementInterface> result = new ArrayList<>();
 
         LinkedRoutingList current = getLinkedRouteList(journey);
 
@@ -79,7 +79,7 @@ final public class SimpleRouter {
             return result;
         }
 
-        Vector<SwitchStateData> routingList = new Vector<>();
+        ArrayList<SwitchStateData> routingList = new ArrayList<>();
 
         while (current.successor() != null) {
             current = current.successor();
@@ -93,7 +93,7 @@ final public class SimpleRouter {
 
             if(!routingList.isEmpty()) {
                 result.add(new Route(routingList));
-                routingList = new Vector<>();
+                routingList = new ArrayList<>();
             }
             result.add(new Block(routingItem.id()));
         }

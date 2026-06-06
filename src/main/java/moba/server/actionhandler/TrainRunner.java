@@ -31,9 +31,9 @@ import moba.server.routing.router.routinglistitems.RoutingElementInterface;
 import moba.server.routing.typedefs.SwitchStateData;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
-import java.util.Vector;
 
 // FIXME: ThreadSafety!!!
 final public class TrainRunner {
@@ -138,9 +138,9 @@ final public class TrainRunner {
 
     private boolean handleTrain(TrainJourney trainDestination) {
         try {
-            Vector<RoutingElementInterface> routingElements = routing.getRoute(trainDestination);
+            ArrayList<RoutingElementInterface> routingElements = routing.getRoute(trainDestination);
 
-            Vector<Long> blocks = new Vector<>();
+            ArrayList<Long> blocks = new ArrayList<>();
           //  generator.sendBlockActionList(trainDestination.train(), blocks);
 
 
@@ -170,7 +170,7 @@ final public class TrainRunner {
         return true;
     }
 
-    private boolean handleSwitchingList(Vector<SwitchStateData> switchingList, int trainId)
+    private boolean handleSwitchingList(ArrayList<SwitchStateData> switchingList, int trainId)
     throws SQLException, ClientErrorException {
         // FIXME: Die routeId muss hier noch gesetzt werden!
         int routeId = 4;

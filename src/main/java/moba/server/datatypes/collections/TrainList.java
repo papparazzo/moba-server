@@ -22,7 +22,7 @@ package moba.server.datatypes.collections;
 
 import moba.server.datatypes.objects.Train;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
-public class TrainList extends Vector<Train> {
+public class TrainList extends ArrayList<Train> {
 }

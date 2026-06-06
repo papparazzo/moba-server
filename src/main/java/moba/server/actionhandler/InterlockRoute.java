@@ -29,8 +29,8 @@ import moba.server.utilities.logger.Loggable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Vector;
 import java.util.logging.Level;
 
 public class InterlockRoute  implements Loggable {
@@ -50,7 +50,7 @@ public class InterlockRoute  implements Loggable {
         this.database = database;
     }
 
-    public RouteStatus setRoute(long trainId, Vector<SwitchStateData> switches)
+    public RouteStatus setRoute(long trainId, ArrayList<SwitchStateData> switches)
     throws SQLException {
 
         Boolean routeStatus = routeStatusList.get(trainId);

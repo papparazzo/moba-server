@@ -31,7 +31,7 @@ import moba.server.messages.Message;
 import moba.server.messages.messagetypes.InterfaceMessage;
 import moba.server.routing.typedefs.SwitchStateData;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 final public class ActionListGenerator {
 
@@ -47,7 +47,7 @@ final public class ActionListGenerator {
         this.dispatcher = dispatcher;
     }
 
-    public void sendSwitchActionList(int routeId, Vector<SwitchStateData> switchingList) {
+    public void sendSwitchActionList(int routeId, ArrayList<SwitchStateData> switchingList) {
         ActionDataByLocalIdCollection actionLists = new ActionDataByLocalIdCollection();
 
         for(SwitchStateData switchState : switchingList) {
@@ -59,14 +59,14 @@ final public class ActionListGenerator {
         this.dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, actionLists));
     }
 
-    public void sendBlockActionList(Train train, Vector<Long> blockList) {
+    public void sendBlockActionList(Train train, ArrayList<Long> blockList) {
         // TODO: ACHTUNG: Wie viele Schleifer?
         ActionDataByLocalIdCollection actionLists = new ActionDataByLocalIdCollection(train.address());
 
         long previousBlock = 0;
 
-        long last = blockList.lastElement();
-        long first = blockList.firstElement();
+        long last = blockList.getLast();
+        long first = blockList.getFirst();
 
         for(Long blockNodeId : blockList) {
             BlockContactData blockContactData = blockContacts.get(blockNodeId);

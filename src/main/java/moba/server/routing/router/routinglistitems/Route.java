@@ -22,7 +22,7 @@ package moba.server.routing.router.routinglistitems;
 
 import moba.server.routing.typedefs.SwitchStateData;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
-public record Route(Vector<SwitchStateData> switchingList) implements RoutingElementInterface {
+public record Route(ArrayList<SwitchStateData> switchingList) implements RoutingElementInterface {
 }
