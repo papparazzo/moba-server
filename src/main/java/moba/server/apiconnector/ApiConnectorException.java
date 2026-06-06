@@ -21,7 +21,11 @@
 package moba.server.apiconnector;
 
 final public class ApiConnectorException extends Exception {
-    public ApiConnectorException(String unauthorizedAfterRefreshingAccessToken) {
-        super(unauthorizedAfterRefreshingAccessToken);
+    public ApiConnectorException(String message) {
+        super(message);
+    }
+
+    public ApiConnectorException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 import moba.server.actionhandler.*;
 import moba.server.apiconnector.OAuth2HttpClient;
-import moba.server.apiconnector.TrainApi;
+import moba.server.apiconnector.TrainApiConnector;
 import moba.server.backgroundhandler.Acceptor;
 import moba.server.backgroundhandler.BackgroundHandlerComposite;
 import moba.server.com.Dispatcher;
@@ -131,7 +131,7 @@ final public class ServerApplication implements Loggable {
 
             BlockListRepository blockListRepository = new BlockListRepository(database);
             SwitchStateRepository switchStateRepository = new SwitchStateRepository(database);
-            TrainApi trainApi = new TrainApi(apiConnector, (String)config.getSection("api.train.url"));
+            TrainApiConnector trainApi = new TrainApiConnector(apiConnector, (String)config.getSection("api.train.url"));
             TrainRepository trainRepository = new TrainRepository(database, trainApi);
 
             long activeLayoutId = activeLayout.getActiveLayout();

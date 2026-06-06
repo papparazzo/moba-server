@@ -20,28 +20,22 @@
 
 package moba.server.apiconnector;
 
-import moba.server.json.JsonException;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-public final class TrainApi {
+public final class TrainApiConnector {
     private final OAuth2HttpClient client;
     private final String endPoint;
 
-    public TrainApi(OAuth2HttpClient client, String baseUrl) {
+    public TrainApiConnector(OAuth2HttpClient client, String baseUrl) {
         this.client = client;
         this.endPoint = baseUrl;
     }
 
     public Object getTrains()
-    throws URISyntaxException, IOException, InterruptedException, JsonException, ApiConnectorException {
-        return client.get(new URI(endPoint + "trains"));
+    throws ApiConnectorException {
+        return client.get(endPoint + "trains");
     }
 
     public Object getTrain(int id)
-    throws URISyntaxException, IOException, InterruptedException, JsonException, ApiConnectorException {
-        return client.get(new URI(endPoint + "train/" + id));
+    throws ApiConnectorException {
+        return client.get(endPoint + "train/" + id);
     }
 }

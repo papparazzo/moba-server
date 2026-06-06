@@ -20,7 +20,8 @@
 
 package moba.server.repositories;
 
-import moba.server.apiconnector.TrainApi;
+import moba.server.apiconnector.ApiConnectorException;
+import moba.server.apiconnector.TrainApiConnector;
 import moba.server.datatypes.collections.TrainList;
 import moba.server.datatypes.enumerations.DrivingDirection;
 import moba.server.datatypes.enumerations.TrainType;
@@ -37,9 +38,9 @@ import java.sql.SQLException;
 public final class TrainRepository {
 
     private final Database database;
-    private final TrainApi trainApi;
+    private final TrainApiConnector trainApi;
 
-    public TrainRepository(Database database, TrainApi trainApi) {
+    public TrainRepository(Database database, TrainApiConnector trainApi) {
         this.database = database;
         this.trainApi = trainApi;
     }

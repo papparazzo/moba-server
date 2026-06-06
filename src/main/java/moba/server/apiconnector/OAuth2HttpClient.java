@@ -51,15 +51,22 @@ public final class OAuth2HttpClient {
         this.accessToken = getAccessToken(clientId, clientSecret);
     }
 
-    public Object get(URI uri)
-    throws IOException, InterruptedException, JsonException, URISyntaxException, ApiConnectorException {
+    public Object get(String uri)
+    throws ApiConnectorException {
         HttpRequest.Builder builder = HttpRequest.newBuilder().GET();
         return this.sendRequest(builder, uri);
     }
 
-    private Object sendRequest(HttpRequest.Builder builder, URI uri)
-    throws IOException, InterruptedException, JsonException, URISyntaxException, ApiConnectorException {
-        return sendRequest(builder, uri, false);
+    private Object sendRequest(HttpRequest.Builder builder, String uri)
+    throws ApiConnectorException {
+        try {
+           return sendRequest(builder, new URI(uri), false);
+        } catch (URISyntaxException | IOException | JsonException e) {
+            throw new ApiConnectorException("could not send request <" + uri + ">", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ApiConnectorException("interrupted while loading <" + uri + ">", e);
+        }
     }
 
     private Object sendRequest(HttpRequest.Builder builder, URI uri, boolean retry)
