@@ -45,8 +45,8 @@ public final class TrainRepository {
         this.trainApi = trainApi;
     }
 
-    public TrainList getTrainList(long id)
-    throws SQLException, ClientErrorException {
+    public TrainList getTrainList(long trackLayoutId)
+    throws SQLException, ClientErrorException, ApiConnectorException {
 
         // Stell den aktuellen IST-Zustand (wo befindet sich welcher Zug) dar!
         Connection con = database.getConnection();
@@ -55,7 +55,7 @@ public final class TrainRepository {
                 "Trains.Id, " +             // Interne Id
                 "Trains.TrainId, " +        // fünfstellige "Zugnummer" für die Verknüpfung mit der API (Inventory)
                 "Address, " +               // Lokadresse des Zugs
-                "Speed, " +                 // FIXME: Brauchen wir das? Kommt aus der CS2!
+                "Speed, " +                 // FIXME: Brauchen wir das? Kommt aus der API!
                 "DrivingDirection " +       // FIXME: Brauchen wir das? Kommt aus der CS2!
             "FROM Trains " +
             "LEFT JOIN BlockSections " +
@@ -65,7 +65,7 @@ public final class TrainRepository {
             "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
 
         try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, id);
+            pstmt.setLong(1, trackLayoutId);
 
             TrainList map = new TrainList();
             ResultSet rs = pstmt.executeQuery();

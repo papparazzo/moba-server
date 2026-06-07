@@ -87,7 +87,7 @@ final public class ActionListGenerator {
                 addAction(new Delay(2000)).
                 addAction(new LocoFunction(ControllableFunction.HEADLIGHTS, true)).
                 addAction(new LocoFunction(ControllableFunction.OPERATING_SOUNDS, true)).
-                // … warten, bis Motor warmgelaufen ist :o)
+                // ... warten, bis Motor warmgelaufen ist :o)
                 addAction(new Delay(2000)).
                 addAction(new LocoSpeed(391))
         );
@@ -107,7 +107,7 @@ final public class ActionListGenerator {
 
     /**
      * nth block:
-     *     - block-contact: release previous block if passed!
+     *     - block-contact: release the previous block if passed!
      *     - brake-trigger: no actions!
      */
     private void setMiddleListEntry(BlockContactData c, long previousBlock, ActionDataByLocalIdCollection actionLists) {
@@ -124,7 +124,7 @@ final public class ActionListGenerator {
      *     - block-contact:
      *           * delay 1-second
      *           * halt lok
-     *           * release previous block if passed!
+     *           * release the previous block if passed!
      *     - brake-trigger: stop lok
      */
     private void setLastListEntry(BlockContactData c, long previousBlock, ActionDataByLocalIdCollection actionLists) {

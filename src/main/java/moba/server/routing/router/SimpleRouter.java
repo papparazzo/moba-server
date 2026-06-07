@@ -66,7 +66,7 @@ final public class SimpleRouter {
     }
 
     /**
-     * konvertiert die mit {@see getLinkedRouteList} generierte verkettete Liste in einen Vektor und liefert
+     * Konvertiert die mit {@see getLinkedRouteList} generierte verkettete Liste in einen Vektor und liefert
      * diesen zurück
      */
     public ArrayList<RoutingElementInterface> getRoute(TrainJourney journey) {
