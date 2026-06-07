@@ -21,9 +21,11 @@
 package moba.server.timedaction;
 
 import moba.server.actionhandler.TrainRunner;
+import moba.server.apiconnector.ApiConnectorException;
 import moba.server.datatypes.objects.PointInTime;
 import moba.server.datatypes.objects.Train;
 import moba.server.datatypes.objects.TrainJourney;
+import moba.server.exceptions.ClientErrorException;
 import moba.server.repositories.TrainRepository;
 import moba.server.repositories.TrainTimeTableRepository;
 
@@ -45,7 +47,7 @@ final public class TrainRun implements TimedActionInterface {
 
     @Override
     public void trigger(PointInTime time, int multiplicator)
-    throws SQLException {
+    throws SQLException, ApiConnectorException, ClientErrorException {
         ResultSet rs = trainTimeTableRepository.getResult(time, multiplicator);
 
         if (!rs.next() ) {

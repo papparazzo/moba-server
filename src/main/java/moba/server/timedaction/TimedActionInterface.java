@@ -20,6 +20,7 @@
 
 package moba.server.timedaction;
 
+import moba.server.apiconnector.ApiConnectorException;
 import moba.server.datatypes.objects.PointInTime;
 import moba.server.exceptions.ClientErrorException;
 
@@ -27,5 +28,5 @@ import java.sql.SQLException;
 
 public interface TimedActionInterface {
     void trigger(PointInTime time, int multiplicator)
-    throws SQLException, ClientErrorException;
+    throws SQLException, ClientErrorException, ApiConnectorException;
 }

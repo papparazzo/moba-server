@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import moba.server.apiconnector.ApiConnectorException;
 import moba.server.com.Dispatcher;
 import moba.server.datatypes.collections.BlockContactDataMap;
 import moba.server.datatypes.collections.SwitchStateMap;
@@ -89,7 +90,7 @@ final public class Control extends AbstractMessageHandler implements Loggable {
 
     @Override
     public void handleMsg(Message msg)
-    throws ClientErrorException, SQLException {
+    throws ClientErrorException, SQLException, ApiConnectorException {
         switch(ControlMessage.fromId(msg.getMessageId())) {
             case GET_BLOCK_LIST_REQ        -> getBlockList(msg);
             case SAVE_BLOCK_LIST           -> saveBlockList(msg);
@@ -153,7 +154,7 @@ final public class Control extends AbstractMessageHandler implements Loggable {
     }
 
     private void getTrainList(Message msg)
-    throws SQLException, ClientErrorException {
+    throws SQLException, ClientErrorException, ApiConnectorException {
         long id = activeLayout.getActiveLayout((Long)msg.getData());
         TrainList trainList = trainRepository.getTrainList(id);
         dispatcher.sendSingle(new Message(ControlMessage.GET_TRAIN_LIST_RES, trainList), msg.getEndpoint());
