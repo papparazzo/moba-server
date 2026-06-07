@@ -30,6 +30,7 @@ dependencies {
     implementation 'org.apache.commons:commons-collections4:4.5.0-M3'  // IP Allowlist
     implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
     implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
+    implementation 'com.zaxxer:HikariCP:5.1.0'
     implementation 'org.yaml:snakeyaml:2.0'
 }
 

@@ -20,21 +20,17 @@
 
 package moba.server.utilities.database;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
 public final class Database {
 
-    private Connection connection;
-
-    private final String usr;
-    private final String pwd;
-    private final String url;
-
-    private final Logger logger;
+    private final HikariDataSource dataSource;
 
     public enum ConnectorType {
         MARIADB_CONNECTOR,
@@ -44,14 +40,13 @@ public final class Database {
 
     public Database(HashMap<String, Object> map, Logger logger)
     throws SQLException {
-        this.logger = logger;
-
         if(map == null) {
             throw new SQLException("invalid connection-data");
         }
 
-        usr = (String)map.get("usr");
-        pwd = (String)map.get("pwd");
+        String usr = (String)map.get("usr");
+        String pwd = (String)map.get("pwd");
+        String url;
 
         switch(ConnectorType.valueOf((String)map.get("connectorType"))) {
             case MARIADB_CONNECTOR -> url = "jdbc:mariadb://" + map.get("host") + "/" + map.get("db");
@@ -59,17 +54,22 @@ public final class Database {
             case SQLITE_CONNECTOR  -> url = "jdbc:sqlite:" + map.get("db") + ".db";
             default                -> throw new SQLException("unsupported connector-type");
         }
-        connection = DriverManager.getConnection(url, usr, pwd);
-        this.logger.info("connected to database <" + map.get("db") + "> as user <" + usr + ">");
+
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(url);
+        config.setUsername(usr);
+        config.setPassword(pwd);
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        config.setMaximumPoolSize(10);
+        dataSource = new HikariDataSource(config);
+
+        logger.info("connected to database <" + map.get("db") + "> as user <" + usr + ">");
     }
 
     public Connection getConnection()
     throws SQLException {
-        if(!connection.isValid(0)) {
-            logger.warning("connection to database lost, reconnecting...");
-            connection.close();
-            connection = DriverManager.getConnection(url, usr, pwd);
-        }
-        return connection;
+        return dataSource.getConnection();
     }
 }
