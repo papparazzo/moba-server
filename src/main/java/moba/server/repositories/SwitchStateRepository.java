@@ -67,14 +67,16 @@ public final class SwitchStateRepository {
 
     private SwitchStateMap getSwitchStateListForRoute(String stmt, long id)
     throws SQLException, ClientErrorException {
-        Connection con = database.getConnection();
 
-        try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
-            pstmt.setLong(1, id);
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement pStmt = con.prepareStatement(stmt)
+        ) {
+            pStmt.setLong(1, id);
 
             SwitchStateMap map = new SwitchStateMap();
 
-            ResultSet rs = pstmt.executeQuery();
+            ResultSet rs = pStmt.executeQuery();
             while(rs.next()) {
                 map.put(
                     rs.getLong("Id"),

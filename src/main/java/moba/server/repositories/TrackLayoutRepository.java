@@ -49,7 +49,10 @@ public class TrackLayoutRepository implements Loggable {
 
         ArrayList<TrackLayoutInfoData> arraylist;
 
-        try(Statement stmt = database.getConnection().createStatement()) {
+        try(
+            Connection con = database.getConnection();
+            Statement stmt = con.createStatement()
+        ) {
             ResultSet rs = stmt.executeQuery(q);
             arraylist = new ArrayList<>();
             while(rs.next()) {
@@ -70,10 +73,12 @@ public class TrackLayoutRepository implements Loggable {
 
     public void deleteLayout(long id, long appId)
     throws SQLException, ClientErrorException {
-        Connection con = database.getConnection();
         String q = "DELETE FROM `TrackLayouts` WHERE (`locked` IS NULL OR `locked` = ?) AND `id` = ? ";
 
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement pstmt = con.prepareStatement(q)
+        ) {
             pstmt.setLong(1, appId);
             pstmt.setLong(2, id);
             if(pstmt.executeUpdate() == 0) {
@@ -84,13 +89,14 @@ public class TrackLayoutRepository implements Loggable {
 
     public long createLayout(TrackLayoutInfoData tl, long appId)
     throws SQLException {
-
-        Connection con = database.getConnection();
-
         String q =
-            "INSERT INTO `TrackLayouts` (`Name`, `Description`, `CreationDate`, `ModificationDate`, `Locked`) VALUES (?, ?, NOW(), NOW(), ?)";
+            "INSERT INTO `TrackLayouts` (`Name`, `Description`, `CreationDate`, `ModificationDate`, `Locked`) " +
+            "VALUES (?, ?, NOW(), NOW(), ?)";
 
-        try(PreparedStatement stmt = con.prepareStatement(q, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(q, PreparedStatement.RETURN_GENERATED_KEYS)
+        ) {
             stmt.setString(1, tl.getName());
             stmt.setString(2, tl.getDescription());
             stmt.setLong(3, appId);
@@ -105,12 +111,14 @@ public class TrackLayoutRepository implements Loggable {
 
     public void updateLayout(TrackLayoutInfoData tl, long id, long appId)
     throws SQLException, ClientErrorException {
+        String q =
+            "UPDATE `TrackLayouts` SET `Name` = ?, `Description` = ?, `ModificationDate` = ? " +
+            "WHERE (`locked` IS NULL OR `locked` = ?) AND `id` = ? ";
 
-        Connection con = database.getConnection();
-
-        String q = "UPDATE `TrackLayouts` SET `Name` = ?, `Description` = ?, `ModificationDate` = ? WHERE (`locked` IS NULL OR `locked` = ?) AND `id` = ? ";
-
-        try (PreparedStatement stmt = con.prepareStatement(q)) {
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(q)
+        ) {
             stmt.setString(1, tl.getName());
             stmt.setString(2, tl.getDescription());
             stmt.setDate(3, new java.sql.Date(tl.getModified().getTime()));
@@ -126,15 +134,14 @@ public class TrackLayoutRepository implements Loggable {
     public LayoutMap getLayout(long id)
     throws SQLException {
 
-        Connection con = database.getConnection();
-
         LayoutMap map = new LayoutMap();
 
-        String q =
-            "SELECT `Id`, `XPos`, `YPos`, `Symbol` " +
-            "FROM `TrackLayoutSymbols` WHERE `TrackLayoutId` = ?";
+        String q = "SELECT `Id`, `XPos`, `YPos`, `Symbol` FROM `TrackLayoutSymbols` WHERE `TrackLayoutId` = ?";
 
-        try (PreparedStatement stmt = con.prepareStatement(q)) {
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(q)
+        ) {
             stmt.setLong(1, id);
 
             ResultSet rs = stmt.executeQuery();

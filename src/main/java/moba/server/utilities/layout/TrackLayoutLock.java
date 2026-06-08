@@ -41,10 +41,11 @@ public final class TrackLayoutLock implements Loggable {
 
     public void resetAll()
     throws SQLException {
-        Connection con = database.getConnection();
-
         // noinspection SqlWithoutWhere
-        try(PreparedStatement stmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL")) {
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL")
+        ) {
             stmt.executeUpdate();
             getLogger().log(Level.INFO, stmt.toString());
         }
@@ -52,9 +53,11 @@ public final class TrackLayoutLock implements Loggable {
 
     public void resetOwn(long appId)
     throws SQLException {
-        Connection con = database.getConnection();
-
-        try(PreparedStatement stmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL WHERE `Locked` = ?")) {
+        String q = "UPDATE `TrackLayouts` SET `Locked` = NULL WHERE `Locked` = ?";
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(q)
+        ) {
             stmt.setLong(1, appId);
             stmt.executeUpdate();
             getLogger().log(Level.INFO, stmt.toString());
@@ -67,10 +70,12 @@ public final class TrackLayoutLock implements Loggable {
             return;
         }
 
-        Connection con = database.getConnection();
         String q = "UPDATE `TrackLayouts` SET `locked` = ? WHERE `locked` IS NULL AND `id` = ? ";
 
-        try(PreparedStatement stmt = con.prepareStatement(q)) {
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(q)
+        ) {
             stmt.setLong(1, appId);
             stmt.setLong(2, id);
 
@@ -88,10 +93,12 @@ public final class TrackLayoutLock implements Loggable {
             return;
         }
 
-        Connection con = database.getConnection();
         String q = "UPDATE `TrackLayouts` SET `locked` = NULL WHERE `locked` = ? AND `id` = ? ";
 
-        try(PreparedStatement stmt = con.prepareStatement(q)) {
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(q)
+        ) {
             stmt.setLong(1, appId);
             stmt.setLong(2, id);
 
@@ -121,16 +128,18 @@ public final class TrackLayoutLock implements Loggable {
     private Long getIdOfLockingApp(long id)
     throws ClientErrorException, SQLException {
 
-        Connection con = database.getConnection();
-
-        String q = "SELECT `locked` FROM `TrackLayouts` WHERE `Id` = ?";
-
-        try(PreparedStatement stmt = con.prepareStatement(q)) {
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement("SELECT `locked` FROM `TrackLayouts` WHERE `Id` = ?")
+        ) {
             stmt.setLong(1, id);
             getLogger().log(Level.INFO, stmt.toString());
             ResultSet rs = stmt.executeQuery();
             if(!rs.next()) {
-                throw new ClientErrorException(ClientError.DATASET_MISSING, "No layout found with id <" + id + "> for determining lock-state");
+                throw new ClientErrorException(
+                    ClientError.DATASET_MISSING,
+                    "No layout found with id <" + id + "> for determining lock-state"
+                );
             }
             var val = rs.getLong("locked");
             return rs.wasNull() ? null : val;

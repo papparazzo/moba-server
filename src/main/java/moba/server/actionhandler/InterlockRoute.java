@@ -66,31 +66,32 @@ public class InterlockRoute  implements Loggable {
             return RouteStatus.BLOCKED_AND_NOT_SWITCHED_WAITING;
         }
 
-        Connection con = database.getConnection();
-        con.setAutoCommit(false);
+        try(Connection con = database.getConnection()) {
+            con.setAutoCommit(false);
+            String q =
+                "UPDATE `SwitchDrives` " +
+                "SET `TrainId` = ? " +
+                "WHERE `TrainId` IS NULL AND `id` IN (" + getPlaceHolderString(switches.size()) + ")";
 
-        String q =
-            "UPDATE `SwitchDrives` " +
-            "SET `TrainId` = ? " +
-            "WHERE `TrainId` IS NULL AND `id` IN (" + getPlaceHolderString(switches.size()) + ")";
+            try(PreparedStatement stmt = con.prepareStatement(q)) {
+                stmt.setLong(1, trainId);
+                int i = 1;
+                for(SwitchStateData v : switches) {
+                    stmt.setLong(++i, v.id());
+                }
 
-        try(PreparedStatement stmt = con.prepareStatement(q)) {
-            stmt.setLong(1, trainId);
-            int i = 1;
-            for(SwitchStateData v : switches) {
-                stmt.setLong(++i, v.id());
+                getLogger().log(Level.INFO, stmt.toString());
+
+                if(stmt.executeUpdate() != switches.size()) {
+                    con.rollback();
+                    // Weichen bereits anderweitig geschaltet.
+                    return RouteStatus.NOT_BLOCKED;
+                }
+                con.commit();
             }
-
-            getLogger().log(Level.INFO, stmt.toString());
-
-            if(stmt.executeUpdate() != switches.size()) {
-                con.rollback();
-                // Weichen bereits anderweitig geschaltet.
-                return RouteStatus.NOT_BLOCKED;
-            }
-            con.commit();
         }
-        // Fahrstraße reserviert. Warten, dass alle Weichen geschaltet sind …
+
+        // Fahrstraße reserviert. Warten, dass alle Weichen geschaltet sind ...
         routeStatusList.put(trainId, false);
         return RouteStatus.BLOCKED_AND_NOT_SWITCHED;
     }
@@ -112,11 +113,12 @@ public class InterlockRoute  implements Loggable {
     public void releaseRoute(long trainId)
     throws SQLException, ClientErrorException {
 
-        Connection con = database.getConnection();
-
         String q = "UPDATE `SwitchDrives` SET `TrainId` = NULL WHERE `TrainId` = ? ";
 
-        try(PreparedStatement stmt = con.prepareStatement(q)) {
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(q)
+        ) {
             stmt.setLong(1, trainId);
 
             getLogger().log(Level.INFO, stmt.toString());

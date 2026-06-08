@@ -49,7 +49,6 @@ public final class TrainRepository {
     throws SQLException, ClientErrorException, ApiConnectorException {
 
         // Stell den aktuellen IST-Zustand (wo befindet sich welcher Zug) dar!
-        Connection con = database.getConnection();
         String q =
             "SELECT " +
                 "Trains.Id, " +             // Interne Id
@@ -64,11 +63,14 @@ public final class TrainRepository {
             "ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` " +
             "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
 
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, trackLayoutId);
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(q)
+        ) {
+            stmt.setLong(1, trackLayoutId);
 
             TrainList map = new TrainList();
-            ResultSet rs = pstmt.executeQuery();
+            ResultSet rs = stmt.executeQuery();
 
             while(rs.next()) {
                 int trainId = rs.getInt("Id");

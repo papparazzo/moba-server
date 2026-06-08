@@ -39,14 +39,13 @@ final public class InterlockBlock implements Loggable {
     }
 
     public boolean setBlock(long trainId, long blockId) throws SQLException {
-        Connection con = database.getConnection();
 
-        String q =
-            "UPDATE `BlockSections` " +
-            "SET `TrainId` = ? " +
-            "WHERE (`TrainId` IS NULL OR `TrainId` = ?) AND `id` = ?";
+        String q = "UPDATE `BlockSections` SET `TrainId` = ? WHERE (`TrainId` IS NULL OR `TrainId` = ?) AND `id` = ?";
 
-        try(PreparedStatement stmt = con.prepareStatement(q)) {
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(q)
+        ) {
             stmt.setLong(1, trainId);
             stmt.setLong(2, trainId);
             stmt.setLong(3, blockId);
@@ -57,11 +56,12 @@ final public class InterlockBlock implements Loggable {
 
     public void releaseBlock(long trainId, long blockId)
     throws SQLException, ClientErrorException {
-        Connection con = database.getConnection();
-
         String q = "UPDATE `BlockSections` SET `TrainId` = NULL WHERE `TrainId` = ? AND `id` = ?";
 
-        try(PreparedStatement stmt = con.prepareStatement(q)) {
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(q)
+        ) {
             stmt.setLong(1, trainId);
             stmt.setLong(2, blockId);
 

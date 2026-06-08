@@ -30,6 +30,8 @@ import moba.server.exceptions.ClientErrorException;
 import moba.server.utilities.CheckedEnum;
 import moba.server.utilities.database.Database;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -57,7 +59,10 @@ final public class FunctionAddressesRepository {
             "ON FunctionStateChange.FunctionAddressId = FunctionAddresses.Id " +
             "WHERE OnState = ?";
 
-        try(java.sql.PreparedStatement stmt = database.getConnection().prepareStatement(sql)) {
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(sql)
+        ) {
             stmt.setString(1, state.toSystemState().toString());
 
             ResultSet rs = stmt.executeQuery();

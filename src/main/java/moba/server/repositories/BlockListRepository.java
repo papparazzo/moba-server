@@ -42,8 +42,6 @@ public final class BlockListRepository {
 
     public BlockContactDataMap getBlockList(long id)
     throws SQLException {
-        Connection con = database.getConnection();
-
         String q =
             "SELECT `BlockSections`.`Id`, `BlockSections`.`TrainId`, " +
             "`TriggerContact`.`ModulAddress` AS `TriggerModulAddress`, " +
@@ -59,12 +57,15 @@ public final class BlockListRepository {
             "ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` " +
             "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
 
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, id);
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(q)
+        ) {
+            stmt.setLong(1, id);
 
             BlockContactDataMap map = new BlockContactDataMap();
 
-            ResultSet rs = pstmt.executeQuery();
+            ResultSet rs = stmt.executeQuery();
 
             while(rs.next()) {
                 Integer trainId = rs.getInt("TrainId");
@@ -91,51 +92,51 @@ public final class BlockListRepository {
     public void saveBlockList(long id, BlockContactDataMap container)
     throws SQLException, ClientErrorException {
 
-        Connection con = database.getConnection();
-
-        String stmt = "UPDATE `TrackLayouts` SET `ModificationDate` = NOW() WHERE `Id` = ? ";
-
-        try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
-            pstmt.setLong(1, id);
-            if(pstmt.executeUpdate() == 0) {
-                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not save <" + id + ">");
-            }
-        }
-
-        stmt =
-            "DELETE `BlockSections`.* " +
-            "FROM `BlockSections` " +
-            "LEFT JOIN `TrackLayoutSymbols` ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` "    +
-            "WHERE `TrackLayoutId` = ?";
-
-        try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-            pstmt.setLong(1, id);
-            pstmt.executeUpdate();
-        }
-
-        for (Map.Entry<Long, BlockContactData> entry : container.entrySet()) {
-            Long key = entry.getKey();
-            BlockContactData value = entry.getValue();
-
-            stmt =
-                "INSERT INTO `BlockSections` " +
-                "(`Id`, `BrakeTriggerContactId`, `BlockContactId`, `TrainId`) " +
-                "VALUES (?, " +
-                    "(SELECT `Id` FROM `FeedbackContacts` WHERE `ModulAddress` = ? AND `ContactNumber` = ?), " +
-                    "(SELECT `Id` FROM `FeedbackContacts` WHERE `ModulAddress` = ? AND `ContactNumber` = ?), ?)";
+        try(Connection con = database.getConnection()) {
+            String stmt = "UPDATE `TrackLayouts` SET `ModificationDate` = NOW() WHERE `Id` = ? ";
 
             try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-                pstmt.setLong(1, key);
-                pstmt.setLong(2, value.brakeTriggerContact().controller());
-                pstmt.setLong(3, value.brakeTriggerContact().port());
-                pstmt.setLong(4, value.blockContact().controller());
-                pstmt.setLong(5, value.blockContact().port());
-                if(value.trainId() == null) {
-                    pstmt.setNull(6, java.sql.Types.INTEGER);
-                } else {
-                    pstmt.setLong(6, value.trainId());
+                pstmt.setLong(1, id);
+                if(pstmt.executeUpdate() == 0) {
+                    throw new ClientErrorException(ClientError.DATASET_MISSING, "could not save <" + id + ">");
                 }
+            }
+
+            stmt =
+                "DELETE `BlockSections`.* " +
+                "FROM `BlockSections` " +
+                "LEFT JOIN `TrackLayoutSymbols` ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` "    +
+                "WHERE `TrackLayoutId` = ?";
+
+            try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
+                pstmt.setLong(1, id);
                 pstmt.executeUpdate();
+            }
+
+            for (Map.Entry<Long, BlockContactData> entry : container.entrySet()) {
+                Long key = entry.getKey();
+                BlockContactData value = entry.getValue();
+
+                stmt =
+                    "INSERT INTO `BlockSections` " +
+                    "(`Id`, `BrakeTriggerContactId`, `BlockContactId`, `TrainId`) " +
+                    "VALUES (?, " +
+                        "(SELECT `Id` FROM `FeedbackContacts` WHERE `ModulAddress` = ? AND `ContactNumber` = ?), " +
+                        "(SELECT `Id` FROM `FeedbackContacts` WHERE `ModulAddress` = ? AND `ContactNumber` = ?), ?)";
+
+                try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
+                    pstmt.setLong(1, key);
+                    pstmt.setLong(2, value.brakeTriggerContact().controller());
+                    pstmt.setLong(3, value.brakeTriggerContact().port());
+                    pstmt.setLong(4, value.blockContact().controller());
+                    pstmt.setLong(5, value.blockContact().port());
+                    if(value.trainId() == null) {
+                        pstmt.setNull(6, java.sql.Types.INTEGER);
+                    } else {
+                        pstmt.setLong(6, value.trainId());
+                    }
+                    pstmt.executeUpdate();
+                }
             }
         }
     }
