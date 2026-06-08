@@ -97,14 +97,14 @@ public class InterlockRoute  implements Loggable {
     }
 
     /**
-     * Alle Weichen wurden geschaltet. Methode wird vom Interface aufgerufen.
+     * Alle Weichen wurden geschaltet. Diese Methode wird vom Interface aufgerufen.
      */
     public void routeSet(long trainId) {
         routeStatusList.put(trainId, true);
     }
 
     /**
-     * Eintrag entfernen, wenn keine Weichen geschaltet werden müssen. Methode wird vom TrainRunner aufgerufen.
+     * Eintrag entfernen, wenn keine Weichen geschaltet werden müssen. Diese Methode wird vom TrainRunner aufgerufen.
      */
     public void removeRoute(long trainId) {
         routeStatusList.remove(trainId);

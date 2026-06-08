@@ -60,10 +60,10 @@ public final class OAuth2HttpClient {
     private Object sendRequest(HttpRequest.Builder builder, String uri)
     throws ApiConnectorException {
         try {
-           return sendRequest(builder, new URI(uri), false);
-        } catch (URISyntaxException | IOException | JsonException e) {
+            return sendRequest(builder, new URI(uri), false);
+        } catch(URISyntaxException | IOException | JsonException e) {
             throw new ApiConnectorException("could not send request <" + uri + ">", e);
-        } catch (InterruptedException e) {
+        } catch(InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ApiConnectorException("interrupted while loading <" + uri + ">", e);
         }

@@ -119,7 +119,7 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
                     continue;
                 }
                 (new Endpoint(id, socket, msgQueue)).start();
-            } catch (Exception e) {
+            } catch(Exception e) {
                 getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
                 notificationHandler.add(new NotificationData(e));
             }

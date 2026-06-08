@@ -52,7 +52,7 @@ final public class FunctionExecution implements TimedActionInterface {
         FunctionStateDataList list = new FunctionStateDataList();
         ResultSet rs = functionRepository.getResult(time, multiplicator);
 
-        if (!rs.next()) {
+        if(!rs.next()) {
             return;
         }
 

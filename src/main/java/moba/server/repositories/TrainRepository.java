@@ -96,7 +96,6 @@ public final class TrainRepository {
         }
     }
 
-
     public Train getTrainById(long trainId) {
         // TODO get this from Repository and API
         return new Train(

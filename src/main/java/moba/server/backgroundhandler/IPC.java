@@ -84,13 +84,13 @@ final public class IPC extends Thread implements BackgroundHandlerInterface {
         logger.info("ipc-thread started");
 
         while(!isInterrupted()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(fifoFile))) {
+            try(BufferedReader reader = new BufferedReader(new FileReader(fifoFile))) {
                 String line;
-                while ((line = reader.readLine()) != null) {
+                while((line = reader.readLine()) != null) {
                     handleAction(line);
                 }
-            } catch (Exception e) {
-               logger.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+            } catch(Exception e) {
+                logger.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
             }
         }
         logger.info("ipc-thread terminated");
@@ -126,11 +126,10 @@ final public class IPC extends Thread implements BackgroundHandlerInterface {
 
             default:
                 logger.log(Level.WARNING, "unknown command <{0}> given", new Object[]{parts[0]});
-         }
+        }
     }
 
-    private ArrayList<String> getAsArrayList(String part)
-    {
+    private ArrayList<String> getAsArrayList(String part) {
         return new ArrayList<>(Arrays.asList(part.split(";")));
     }
 }

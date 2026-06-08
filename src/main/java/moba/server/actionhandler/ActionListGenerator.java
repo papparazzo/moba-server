@@ -87,8 +87,7 @@ final public class ActionListGenerator {
                 addAction(new Delay(2000)).
                 addAction(new LocoFunction(ControllableFunction.HEADLIGHTS, true)).
                 addAction(new LocoFunction(ControllableFunction.OPERATING_SOUNDS, true)).
-                // ... warten, bis Motor warmgelaufen ist :o)
-                addAction(new Delay(2000)).
+                addAction(new Delay(2000)).                  // ... warten, bis Motor warmgelaufen ist :o)
                 addAction(new LocoSpeed(391))
         );
         this.dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, actionLists));

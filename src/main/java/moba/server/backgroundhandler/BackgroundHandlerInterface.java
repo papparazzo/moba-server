@@ -22,7 +22,7 @@ package moba.server.backgroundhandler;
 
 public interface BackgroundHandlerInterface {
 
-     void halt();
+    void halt();
 
-     void start();
+    void start();
 }

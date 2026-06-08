@@ -106,7 +106,7 @@ public class ServerStateMachine implements Loggable {
         ));
 
     }
-    
+
     public void releaseIncident(Endpoint ep)
     throws SQLException {
         switch(currState) {
@@ -128,8 +128,8 @@ public class ServerStateMachine implements Loggable {
     public void activateAutomaticMode(Endpoint ep)
     throws SQLException {
         if(currState != ServerState.READY_FOR_AUTOMATIC_MODE && !checkPreConditions()) {
-           sendErrorMessageForInvalidStatusChange(ServerState.AUTOMATIC_MODE, ep);
-           return;
+            sendErrorMessageForInvalidStatusChange(ServerState.AUTOMATIC_MODE, ep);
+            return;
         }
         setNewServerState(ServerState.AUTOMATIC_MODE);
         addStatusChangedNotification("Automatik an", "Die Hardware befindet sich im Automatikmodus", ep);
@@ -138,8 +138,8 @@ public class ServerStateMachine implements Loggable {
     public void deactivateAutomaticMode(Endpoint endpoint)
     throws SQLException {
         if(currState != ServerState.AUTOMATIC_MODE) {
-           sendErrorMessageForInvalidStatusChange(ServerState.AUTOMATIC_HALT, endpoint);
-           return;
+            sendErrorMessageForInvalidStatusChange(ServerState.AUTOMATIC_HALT, endpoint);
+            return;
         }
         setNewServerState(ServerState.AUTOMATIC_HALT);
         addStatusChangedNotification("Automatik anhalten", "Automatikmodus wird deaktiviert...", endpoint);
@@ -156,7 +156,7 @@ public class ServerStateMachine implements Loggable {
             handleServerShutdown();
         }
 
-       sendErrorMessageForInvalidStatusChange(ServerState.AUTOMATIC_MODE, endpoint);
+        sendErrorMessageForInvalidStatusChange(ServerState.AUTOMATIC_MODE, endpoint);
     }
 
     public void activateStandby(Endpoint endpoint)
@@ -200,8 +200,8 @@ public class ServerStateMachine implements Loggable {
     public void setReadyForAutomaticMode(Endpoint endpoint)
     throws SQLException {
         if(currState != ServerState.MANUAL_MODE && currState != ServerState.AUTOMATIC_HALT) {
-           sendErrorMessageForInvalidStatusChange(ServerState.READY_FOR_AUTOMATIC_MODE, endpoint);
-           return;
+            sendErrorMessageForInvalidStatusChange(ServerState.READY_FOR_AUTOMATIC_MODE, endpoint);
+            return;
         }
         setNewServerState(ServerState.READY_FOR_AUTOMATIC_MODE);
         addStatusChangedNotification(
@@ -214,8 +214,8 @@ public class ServerStateMachine implements Loggable {
     public void setManualMode(Endpoint endpoint)
     throws SQLException {
         if(currState == ServerState.MANUAL_MODE) {
-           sendErrorMessageForInvalidStatusChange(ServerState.MANUAL_MODE, endpoint);
-           return;
+            sendErrorMessageForInvalidStatusChange(ServerState.MANUAL_MODE, endpoint);
+            return;
         }
         setNewServerState(ServerState.MANUAL_MODE);
         addStatusChangedNotification(
@@ -224,7 +224,7 @@ public class ServerStateMachine implements Loggable {
             endpoint
         );
     }
-    
+
     public void setConnected(Endpoint endpoint, boolean onInitialize)
     throws SQLException {
 
@@ -259,8 +259,8 @@ public class ServerStateMachine implements Loggable {
     public void setConnectionLost(Endpoint endpoint)
     throws SQLException {
         if(currState == ServerState.CONNECTION_LOST) {
-           sendErrorMessageForInvalidStatusChange(ServerState.CONNECTION_LOST, endpoint);
-           return;
+            sendErrorMessageForInvalidStatusChange(ServerState.CONNECTION_LOST, endpoint);
+            return;
         }
 
         setNewServerState(ServerState.CONNECTION_LOST);
@@ -274,7 +274,7 @@ public class ServerStateMachine implements Loggable {
             endpoint
         ));
     }
-    
+
     public void setSystemShutdown(Endpoint endpoint)
     throws Exception {
         switch(currState) {
@@ -373,7 +373,7 @@ public class ServerStateMachine implements Loggable {
         }
 
         dispatcher.sendGroup(new Message(SystemMessage.HARDWARE_STATE_CHANGED, state.toSystemState().toString()));
-        
+
         getLogger().info("Server state changed from <" + currState + "> to <" + state + ">");
 
         lastState = currState;
@@ -401,7 +401,7 @@ public class ServerStateMachine implements Loggable {
                 new ErrorData(
                     ClientError.INVALID_STATUS_CHANGE,
                     "Invalid status-change from <" + currState.toString() +
-                        "> to <" + newState.toString() + ">"
+                    "> to <" + newState.toString() + ">"
                 )
             ),
             endpoint
