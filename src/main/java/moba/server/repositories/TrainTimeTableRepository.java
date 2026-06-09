@@ -22,68 +22,99 @@ package moba.server.repositories;
 
 import moba.server.datatypes.base.Time;
 import moba.server.datatypes.enumerations.Day;
+import moba.server.datatypes.objects.PointInTime;
+import moba.server.repositories.datatypes.TrainTimeTableEntry;
 import moba.server.utilities.database.Database;
-import moba.server.utilities.logger.Loggable;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-final public class TrainTimeTableRepository extends AbstractTimeTableRepository implements Loggable {
+final public class TrainTimeTableRepository {
     private final Database database;
 
-    public TrainTimeTableRepository(Database database) {
+    private final Logger logger;
+
+    public TrainTimeTableRepository(Database database, Logger logger) {
         this.database = database;
+        this.logger = logger;
     }
 
-    protected ResultSet getResultWithDaySwitch(String t1, String t2, String d1, String d2)
+    public List<TrainTimeTableEntry> getTrainTableEntries(PointInTime time, int multiplicator)
     throws SQLException {
+        Time t1 = time.getTime();
+        Time t2 = time.getTime();
 
-        String q =
-            "SELECT TTT.Id, TTT.TrainId, `BS`.`Id` AS FromBlockId , ToBlockId, Recurring " +
-            "FROM TrainTimeTable TTT " +
-            "LEFT JOIN BlockSections BS " +
-            "ON BS.TrainId = TTT.TrainId " +
-            "WHERE ((Weekdays = ? AND Time >= ?) OR (Weekdays = ? AND Time < ?)) ";
+        Day d1 = time.getDay();
 
-        try(PreparedStatement stmt = database.getConnection().prepareStatement(q)) {
-            stmt.setString(1, d1);
-            stmt.setString(2, t1);
+        boolean daySwitch = t2.hasDayChange(multiplicator);
 
-            stmt.setString(3, d2);
-            stmt.setString(4, t2);
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(getQuery(daySwitch))
+        ) {
+            stmt.setString(1, d1.toString());
+            stmt.setString(2, t1.getTime());
+            stmt.setString(3, t2.getTime(multiplicator));
 
-            return stmt.executeQuery();
+            if(daySwitch) {
+                stmt.setString(4, d1.next().toString());
+            }
+
+            try(ResultSet rs = stmt.executeQuery()) {
+                List<TrainTimeTableEntry> entries = new ArrayList<>();
+
+                while(rs.next()) {
+                    entries.add(new TrainTimeTableEntry(
+                        rs.getLong("Id"),
+                        rs.getLong("TrainId"),
+                        rs.getLong("FromBlockId"),
+                        rs.getLong("ToBlockId")
+                    ));
+
+                    if(rs.getBoolean("Recurring")) {
+                        removeTrain(rs.getLong("Id"));
+                    }
+                }
+                return entries;
+            }
         }
     }
 
-    protected ResultSet getResultSameDay(String t1, String t2, String d1)
-    throws SQLException {
-        String q =
-            "SELECT TTT.id, TTT.TrainId, `BS`.`Id` AS FromBlockId , ToBlockId, Recurring " +
-            "FROM TrainTimeTable TTT " +
-            "LEFT JOIN BlockSections BS " +
-            "ON BS.TrainId = TTT.TrainId " +
-            "WHERE Weekdays = ? AND Time >= ? AND Time < ? ";
-
-        try(PreparedStatement stmt = database.getConnection().prepareStatement(q)) {
-            stmt.setString(1, d1);
-            stmt.setString(2, t1);
-            stmt.setString(3, t2);
-
-            return stmt.executeQuery();
+    private static String getQuery(boolean daySwitch) {
+        if(daySwitch) {
+            return /* language=SQL */
+                "SELECT TTT.Id, TTT.TrainId, `BS`.`Id` AS FromBlockId , ToBlockId, Recurring " +
+                "FROM TrainTimeTable TTT " +
+                "LEFT JOIN BlockSections BS " +
+                "ON BS.TrainId = TTT.TrainId " +
+                "WHERE ((Weekdays = ? AND Time >= ?) OR (Time < ? AND Weekdays = ?)) ";
+        } else {
+            return /* language=SQL */
+                "SELECT TTT.id, TTT.TrainId, `BS`.`Id` AS FromBlockId , ToBlockId, Recurring " +
+                "FROM TrainTimeTable TTT " +
+                "LEFT JOIN BlockSections BS " +
+                "ON BS.TrainId = TTT.TrainId " +
+                "WHERE Weekdays = ? AND Time >= ? AND Time < ? ";
         }
     }
 
-    public void removeTrain(long trainTableId)
+    private void removeTrain(long trainTableId)
     throws SQLException {
         String q = "DELETE FROM TrainTimeTable WHERE TrainId = ? AND Recurring = 1";
-        try(PreparedStatement stmt = database.getConnection().prepareStatement(q)) {
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(q)
+        ) {
             stmt.setLong(1, trainTableId);
             stmt.execute();
         }
-        getLogger().log(Level.WARNING, "train <{0}> already deleted from train-table!", new Object[]{trainTableId});
+        logger.log(Level.WARNING, "train <{0}> already deleted from train-table!", new Object[]{trainTableId});
     }
 
     public void addTrain(long trainId, long toBlock, Day day, Time time, boolean recurring)
@@ -91,7 +122,11 @@ final public class TrainTimeTableRepository extends AbstractTimeTableRepository 
         String q =
             "INSERT INTO TrainTimeTable (TrainId, ToBlockId, Weekdays, Time, Recurring) " +
             "VALUES (?, ?, ?, ?, ?)";
-        try(PreparedStatement stmt = database.getConnection().prepareStatement(q)) {
+
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(q)
+        ) {
             stmt.setLong(1, trainId);
             stmt.setLong(2, toBlock);
             stmt.setString(3, day.toString());

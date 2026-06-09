@@ -20,56 +20,91 @@
 
 package moba.server.repositories;
 
+import moba.server.datatypes.base.Time;
+import moba.server.datatypes.collections.FunctionStateDataList;
+import moba.server.datatypes.enumerations.Day;
+import moba.server.datatypes.enumerations.FunctionState;
+import moba.server.datatypes.objects.FunctionStateData;
+import moba.server.datatypes.objects.GlobalPortAddressData;
+import moba.server.datatypes.objects.PointInTime;
+import moba.server.datatypes.objects.PortAddressData;
+import moba.server.exceptions.ClientErrorException;
+import moba.server.utilities.CheckedEnum;
 import moba.server.utilities.database.Database;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-final public class FunctionTimeTableRepository extends AbstractTimeTableRepository {
+final public class FunctionTimeTableRepository {
     private final Database database;
 
     public FunctionTimeTableRepository(Database database) {
         this.database = database;
     }
 
-    protected ResultSet getResultWithDaySwitch(String t1, String t2, String d1, String d2)
-    throws SQLException {
-        String q =
-            "SELECT DeviceId, Controller, Port, Action " +
-            "FROM FunctionCycleTimes " +
-            "LEFT JOIN FunctionAddresses " +
-            "ON FunctionCycleTimes.FunctionAddressId = FunctionAddresses.Id " +
-            "WHERE ((Weekdays = ? AND Time >= ?) OR (Weekdays = ? AND Time < ?)) " +
-            "AND ((AtRandom = 1 AND (FLOOR(RAND() * 10) % 2)) OR AtRandom = 0)";
+    public FunctionStateDataList getResult(PointInTime time, int multiplicator)
+    throws SQLException, ClientErrorException {
+        Time t1 = time.getTime();
+        Time t2 = time.getTime();
 
-        try(PreparedStatement stmt = database.getConnection().prepareStatement(q)) {
-            stmt.setString(1, d1);
-            stmt.setString(2, t1);
+        Day d1 = time.getDay();
 
-            stmt.setString(3, d2);
-            stmt.setString(4, t2);
+        boolean daySwitch = t2.hasDayChange(multiplicator);
 
-            return stmt.executeQuery();
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(getQuery(daySwitch))
+        ) {
+            stmt.setString(1, d1.toString());
+            stmt.setString(2, t1.getTime());
+            stmt.setString(3, t2.getTime(multiplicator));
+
+            if(daySwitch) {
+                stmt.setString(4, d1.next().toString());
+            }
+
+            try(ResultSet rs = stmt.executeQuery()) {
+                FunctionStateDataList list = new FunctionStateDataList();
+                if(!rs.next()) {
+                    return list;
+                }
+                do {
+                    FunctionStateData data = new FunctionStateData(
+                        new GlobalPortAddressData(
+                            rs.getLong("DeviceId"),
+                            new PortAddressData(
+                                rs.getLong("Controller"),
+                                rs.getLong("Port")
+                            )
+                        ),
+                        CheckedEnum.getFromString(FunctionState.class, rs.getString("Action"))
+                    );
+                    list.add(data);
+                } while(rs.next());
+                return list;
+            }
         }
     }
 
-    protected ResultSet getResultSameDay(String t1, String t2, String d1)
-    throws SQLException {
-        String q =
-            "SELECT DeviceId, Controller, Port, Action " +
-            "FROM FunctionCycleTimes " +
-            "LEFT JOIN FunctionAddresses " +
-            "ON FunctionCycleTimes.FunctionAddressId = FunctionAddresses.Id " +
-            "WHERE Weekdays = ? AND Time >= ? AND Time < ? " +
-            "AND ((AtRandom = 1 AND (FLOOR(RAND() * 10) % 2)) OR AtRandom = 0)";
-
-        try(PreparedStatement stmt = database.getConnection().prepareStatement(q)) {
-            stmt.setString(1, d1);
-            stmt.setString(2, t1);
-            stmt.setString(3, t2);
-
-            return stmt.executeQuery();
+    private static String getQuery(boolean daySwitch) {
+        if(daySwitch) {
+            return /* language=SQL */
+                "SELECT DeviceId, Controller, Port, Action " +
+                "FROM FunctionCycleTimes " +
+                "LEFT JOIN FunctionAddresses " +
+                "ON FunctionCycleTimes.FunctionAddressId = FunctionAddresses.Id " +
+                "WHERE ((Weekdays = ? AND Time >= ?) OR (Weekdays = ? AND Time < ?)) " +
+                "AND ((AtRandom = 1 AND (FLOOR(RAND() * 10) % 2)) OR AtRandom = 0)";
+        } else {
+            return /* language=SQL */
+                "SELECT DeviceId, Controller, Port, Action " +
+                "FROM FunctionCycleTimes " +
+                "LEFT JOIN FunctionAddresses " +
+                "ON FunctionCycleTimes.FunctionAddressId = FunctionAddresses.Id " +
+                "WHERE Weekdays = ? AND Time >= ? AND Time < ? " +
+                "AND ((AtRandom = 1 AND (FLOOR(RAND() * 10) % 2)) OR AtRandom = 0)";
         }
     }
 }

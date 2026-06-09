@@ -21,16 +21,15 @@
 package moba.server.timedaction;
 
 import moba.server.actionhandler.TrainRunner;
-import moba.server.apiconnector.ApiConnectorException;
 import moba.server.datatypes.objects.PointInTime;
 import moba.server.datatypes.objects.Train;
 import moba.server.datatypes.objects.TrainJourney;
-import moba.server.exceptions.ClientErrorException;
 import moba.server.repositories.TrainRepository;
 import moba.server.repositories.TrainTimeTableRepository;
+import moba.server.repositories.datatypes.TrainTimeTableEntry;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 final public class TrainRun implements TimedActionInterface {
 
@@ -47,25 +46,17 @@ final public class TrainRun implements TimedActionInterface {
 
     @Override
     public void trigger(PointInTime time, int multiplicator)
-    throws SQLException, ApiConnectorException, ClientErrorException {
-        ResultSet rs = trainTimeTableRepository.getResult(time, multiplicator);
+    throws SQLException {
+        List<TrainTimeTableEntry> entries = trainTimeTableRepository.getTrainTableEntries(time, multiplicator);
 
-        if (!rs.next() ) {
-            return;
-        }
-
-        do {
-            Train train = trainRepository.getTrainById(rs.getLong("TrainId"));
-
+        for(TrainTimeTableEntry entry : entries) {
+            Train train = trainRepository.getTrainById(entry.trainId());
             TrainJourney destination = new TrainJourney(
                 train,
-                rs.getLong("FromBlockId"),
-                rs.getLong("ToBlockId")
+                entry.fromBlockId(),
+                entry.toBlockId()
             );
             trainRunner.pushTrain(destination);
-            if(rs.getLong("Recurring") == 0) {
-                trainTimeTableRepository.removeTrain(rs.getLong("Id"));
-            }
-        } while (rs.next());
+        }
     }
 }

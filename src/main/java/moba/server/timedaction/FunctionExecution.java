@@ -22,23 +22,17 @@ package moba.server.timedaction;
 
 import moba.server.com.Dispatcher;
 import moba.server.datatypes.collections.FunctionStateDataList;
-import moba.server.datatypes.enumerations.FunctionState;
-import moba.server.datatypes.objects.FunctionStateData;
-import moba.server.datatypes.objects.GlobalPortAddressData;
 import moba.server.datatypes.objects.PointInTime;
-import moba.server.datatypes.objects.PortAddressData;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.messages.Message;
 import moba.server.messages.messagetypes.EnvironmentMessage;
 import moba.server.repositories.FunctionTimeTableRepository;
-import moba.server.utilities.CheckedEnum;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 final public class FunctionExecution implements TimedActionInterface {
     private final FunctionTimeTableRepository functionRepository;
-    private final Dispatcher                 dispatcher;
+    private final Dispatcher                  dispatcher;
 
     public FunctionExecution(FunctionTimeTableRepository functionRepository, Dispatcher dispatcher) {
         this.functionRepository = functionRepository;
@@ -48,27 +42,11 @@ final public class FunctionExecution implements TimedActionInterface {
     @Override
     public void trigger(PointInTime time, int multiplicator)
     throws SQLException, ClientErrorException {
+        FunctionStateDataList list = functionRepository.getResult(time, multiplicator);
 
-        FunctionStateDataList list = new FunctionStateDataList();
-        ResultSet rs = functionRepository.getResult(time, multiplicator);
-
-        if(!rs.next()) {
+        if(list.isEmpty()) {
             return;
         }
-
-        do {
-            FunctionStateData data = new FunctionStateData(
-                new GlobalPortAddressData(
-                    rs.getLong("DeviceId"),
-                    new PortAddressData(
-                        rs.getLong("Controller"),
-                        rs.getLong("Port")
-                    )
-                ),
-                CheckedEnum.getFromString(FunctionState.class, rs.getString("Action"))
-            );
-            list.add(data);
-        } while(rs.next());
         dispatcher.sendGroup(new Message(EnvironmentMessage.SET_FUNCTIONS, list));
     }
 }
