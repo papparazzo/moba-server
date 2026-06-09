@@ -23,14 +23,13 @@ package moba.server.actionhandler;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.utilities.database.Database;
 import moba.server.exceptions.ClientErrorException;
-import moba.server.utilities.logger.Loggable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 // TODO: Dies ist wohl eher ein Repository als ein ActionHandler.
-final public class InterlockBlock implements Loggable {
+final public class InterlockBlock {
 
     private final Database database;
 

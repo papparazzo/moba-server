@@ -136,7 +136,7 @@ final public class ServerApplication implements Loggable {
 
             long activeLayoutId = activeLayout.getActiveLayout();
             BlockContactDataMap blockContacts = blockListRepository.getBlockList(activeLayoutId);
-            SwitchStateMap switchStates = switchStateRepository.getSwitchStateListForTracklayout(activeLayoutId);
+            SwitchStateMap switchStates = switchStateRepository.getSwitchStateListForTrackLayout(activeLayoutId);
 
             LayoutParser parser = new LayoutParser(
                 trackLayoutRepository.getLayout(activeLayoutId),
@@ -159,7 +159,7 @@ final public class ServerApplication implements Loggable {
             handler.add(new IPC((String)config.getSection("common.serverConfig.ipc"), msgQueueIn, logger));
             handler.add(new KeepAlive(dispatcher, keepAlivePingIntervall, logger));
 
-            MessageLoop  loop = new MessageLoop(dispatcher, notificationHandler, serverStateMachine);
+            MessageLoop loop = new MessageLoop(dispatcher, notificationHandler, serverStateMachine);
             loop.addHandler(new Client(dispatcher));
             loop.addHandler(new Server(dispatcher, this, allowList, config));
             loop.addHandler(new Timer(dispatcher, config, scheduler));

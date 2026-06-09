@@ -40,10 +40,10 @@ public final class SwitchStateRepository {
         this.database = database;
     }
 
-    public SwitchStateMap getSwitchStateListForTracklayout(long id)
+    public SwitchStateMap getSwitchStateListForTrackLayout(long id)
     throws SQLException, ClientErrorException {
         String q =
-             /* language=SQL */
+            /* language=SQL */
             "SELECT `SwitchDrives`.`Id`, `SwitchDrives`.`SwitchStand`, `SwitchDrives`.`Address` " +
             "FROM SwitchDrives " +
             "LEFT JOIN `TrackLayoutSymbols` " +

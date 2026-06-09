@@ -57,15 +57,9 @@ final public class MessageLogger {
         StringBuilder sb = new StringBuilder();
 
         switch(type) {
-            case IN_MESSAGE -> 
-                sb.append("-->| ");
-
-            case OUT_MESSAGE ->
-                sb.append("<--| ");
-
-            case INTERN_MESSAGE ->
-                sb.append("   | ");
-
+            case IN_MESSAGE -> sb.append("-->| ");
+            case OUT_MESSAGE -> sb.append("<--| ");
+            case INTERN_MESSAGE -> sb.append("   | ");
         }
 
         sb.append(msg);

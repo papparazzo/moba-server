@@ -62,12 +62,14 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
     throws IOException {
         this.endpointData = new EndpointData(null, id, new DateTime(), new SocketData(socket));
 
+        // @formatter:off
         this.msgQueue  = msgQueue;
         // TODO: Das hier ist nun nicht so schön: Wir haben einmal socket und einmal socketData!
         this.socket    = socket;
 
         this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
         this.dataInputStream  = new DataInputStream(socket.getInputStream());
+        // @formatter:on
 
         setName("endpoint #" + id);
     }

@@ -28,10 +28,11 @@ import java.text.*;
 import java.util.Date;
 
 public class CustomFormatter extends Formatter {
-
+    // @formatter:off
     private final String  appName;
     private final Version appVersion;
     private final Date    buildDate;
+    // @formatter:on
 
     public CustomFormatter(String appName, Version appVersion, Date buildDate) {
         this.appName = appName;

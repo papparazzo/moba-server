@@ -48,12 +48,14 @@ public final class Database {
         String pwd = (String)map.get("pwd");
         String url;
 
+        // @formatter:off
         switch(ConnectorType.valueOf((String)map.get("connectorType"))) {
             case MARIADB_CONNECTOR -> url = "jdbc:mariadb://" + map.get("host") + "/" + map.get("db");
             case MYSQL_CONNECTOR   -> url = "jdbc:mysql://" + map.get("host") + "/" + map.get("db");
             case SQLITE_CONNECTOR  -> url = "jdbc:sqlite:" + map.get("db") + ".db";
             default                -> throw new SQLException("unsupported connector-type");
         }
+        // @formatter:on
 
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(url);
