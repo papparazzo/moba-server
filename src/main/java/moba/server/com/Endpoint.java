@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import moba.server.datatypes.base.DateTime;
 import moba.server.datatypes.base.Version;
@@ -44,26 +45,30 @@ import moba.server.messages.Message;
 import moba.server.messages.MessageQueue;
 import moba.server.messages.messagetypes.ClientMessage;
 import moba.server.messages.messagetypes.InternMessage;
-import moba.server.utilities.logger.Loggable;
 
-final public class Endpoint extends Thread implements JsonSerializerInterface<Object>, Loggable {
-    private AppData appData;
-    private EndpointData endpointData;
-    private final Socket socket;
+final public class Endpoint extends Thread implements JsonSerializerInterface<Object> {
+    // @formatter:off
+    private AppData                appData;
+    private EndpointData           endpointData;
+    private final Socket           socket;
 
-    private final AtomicBoolean terminating = new AtomicBoolean(false);
+    private final AtomicBoolean    terminating = new AtomicBoolean(false);
 
-    private final MessageQueue msgQueue;
+    private final MessageQueue     msgQueue;
+    private final Logger           logger;
 
     private final DataOutputStream dataOutputStream;
     private final DataInputStream  dataInputStream;
+    // @formatter:on
 
-    public Endpoint(long id, Socket socket, MessageQueue msgQueue)
+    public Endpoint(long id, Socket socket, MessageQueue msgQueue, Logger logger)
     throws IOException {
         this.endpointData = new EndpointData(null, id, new DateTime(), new SocketData(socket));
 
         // @formatter:off
         this.msgQueue  = msgQueue;
+        this.logger    = logger;
+
         // TODO: Das hier ist nun nicht so schön: Wir haben einmal socket und einmal socketData!
         this.socket    = socket;
 
@@ -81,13 +86,13 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
             try {
                 join(250);
             } catch(InterruptedException e) {
-                getLogger().log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
+                logger.log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
             }
         }
         try {
             socket.close();
         } catch(Throwable e) {
-            getLogger().log(
+            logger.log(
                 Level.WARNING,
                 "Exception occurred! <{0}> Closing socket failed!", new Object[]{e.toString()}
             );
@@ -111,7 +116,7 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
     @Override
     public void run() {
         long id = endpointData.appId();
-        getLogger().log(Level.INFO, "Endpoint #{0}: thread started", new Object[]{id});
+        logger.log(Level.INFO, "Endpoint #{0}: thread started", new Object[]{id});
         try {
             init();
             while(!isInterrupted()) {
@@ -130,7 +135,7 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
                 ),
                 this
             ));
-            getLogger().log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
+            logger.log(Level.INFO, "Endpoint #{0}: thread terminated", new Object[]{id});
         } catch(Throwable e) {
             if(!terminating.get()) {
                 msgQueue.add(new Message(
@@ -146,7 +151,7 @@ final public class Endpoint extends Thread implements JsonSerializerInterface<Ob
                     this
                 ));
             }
-            getLogger().log(
+            logger.log(
                 Level.SEVERE,
                 "Endpoint #{0}: {1}-Exception, closing client... <{2}>",
                 new Object[]{id, getClass().getSimpleName(), e.toString()}

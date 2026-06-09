@@ -24,7 +24,6 @@ import moba.server.datatypes.enumerations.ClientError;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.routing.typedefs.SwitchStateData;
 import moba.server.utilities.database.Database;
-import moba.server.utilities.logger.Loggable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,8 +31,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class InterlockRoute  implements Loggable {
+public class InterlockRoute {
 
     public enum RouteStatus {
         BLOCKED_AND_SWITCHED,
@@ -46,8 +46,11 @@ public class InterlockRoute  implements Loggable {
 
     private final Database database;
 
-    public InterlockRoute(Database database) {
+    private final Logger logger;
+
+    public InterlockRoute(Database database, Logger logger) {
         this.database = database;
+        this.logger = logger;
     }
 
     public RouteStatus setRoute(long trainId, ArrayList<SwitchStateData> switches)
@@ -80,7 +83,7 @@ public class InterlockRoute  implements Loggable {
                     stmt.setLong(++i, v.id());
                 }
 
-                getLogger().log(Level.INFO, stmt.toString());
+                logger.log(Level.INFO, stmt.toString());
 
                 if(stmt.executeUpdate() != switches.size()) {
                     con.rollback();
@@ -121,7 +124,7 @@ public class InterlockRoute  implements Loggable {
         ) {
             stmt.setLong(1, trainId);
 
-            getLogger().log(Level.INFO, stmt.toString());
+            logger.log(Level.INFO, stmt.toString());
 
             if(stmt.executeUpdate() == 0) {
                 throw new ClientErrorException(

@@ -31,14 +31,14 @@ import moba.server.messages.Message;
 import moba.server.messages.messagetypes.ClientMessage;
 import moba.server.messages.messagetypes.ServerMessage;
 import moba.server.messages.messagetypes.SystemMessage;
-import moba.server.utilities.logger.Loggable;
 import moba.server.utilities.messaging.NotificationHandler;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
-public class ServerStateMachine implements Loggable {
+public class ServerStateMachine {
     private ServerState lastState = ServerState.HALT;
     private ServerState currState = ServerState.HALT;
 
@@ -46,10 +46,12 @@ public class ServerStateMachine implements Loggable {
 
     private final Dispatcher          dispatcher;
     private final NotificationHandler notificationHandler;
+    private final Logger              logger;
 
-    public ServerStateMachine(Dispatcher dispatcher, NotificationHandler notificationHandler) {
+    public ServerStateMachine(Dispatcher dispatcher, NotificationHandler notificationHandler, Logger logger) {
         this.dispatcher          = dispatcher;
         this.notificationHandler = notificationHandler;
+        this.logger              = logger;
     }
 
     public void addHandler(AbstractMessageHandler msgHandler) {
@@ -374,7 +376,7 @@ public class ServerStateMachine implements Loggable {
 
         dispatcher.sendGroup(new Message(SystemMessage.HARDWARE_STATE_CHANGED, state.toSystemState().toString()));
 
-        getLogger().info("Server state changed from <" + currState + "> to <" + state + ">");
+        logger.info("Server state changed from <" + currState + "> to <" + state + ">");
 
         lastState = currState;
         currState = state;

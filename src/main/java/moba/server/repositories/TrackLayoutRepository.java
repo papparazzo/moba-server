@@ -29,18 +29,21 @@ import moba.server.exceptions.ClientErrorException;
 import moba.server.datatypes.objects.Symbol;
 import moba.server.datatypes.collections.LayoutMap;
 import moba.server.utilities.database.Database;
-import moba.server.utilities.logger.Loggable;
 
 import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class TrackLayoutRepository implements Loggable {
+public final class TrackLayoutRepository {
 
-    protected final Database database;
+    private final Database database;
 
-    public TrackLayoutRepository(Database database) {
+    private final Logger logger;
+
+    public TrackLayoutRepository(Database database, Logger logger) {
         this.database = database;
+        this.logger = logger;
     }
 
     public ArrayList<TrackLayoutInfoData> getLayouts(long activeLayoutId)
@@ -101,7 +104,7 @@ public class TrackLayoutRepository implements Loggable {
             stmt.setString(2, tl.getDescription());
             stmt.setLong(3, appId);
             stmt.executeUpdate();
-            getLogger().log(Level.INFO, stmt.toString());
+            logger.log(Level.INFO, stmt.toString());
             try(ResultSet rs = stmt.getGeneratedKeys()) {
                 rs.next();
                 return rs.getLong(1);
@@ -124,7 +127,7 @@ public class TrackLayoutRepository implements Loggable {
             stmt.setDate(3, new java.sql.Date(tl.getModified().getTime()));
             stmt.setLong(4, appId);
             stmt.setLong(5, id);
-            getLogger().log(Level.INFO, stmt.toString());
+            logger.log(Level.INFO, stmt.toString());
             if(stmt.executeUpdate() == 0) {
                 throw new ClientErrorException(ClientError.DATASET_MISSING, "could not update <" + id + ">");
             }

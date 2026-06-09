@@ -52,11 +52,10 @@ import moba.server.utilities.AllowList;
 import moba.server.utilities.config.Config;
 import moba.server.utilities.layout.TrackLayoutLock;
 import moba.server.utilities.messaging.NotificationHandler;
-import moba.server.utilities.logger.Loggable;
 import moba.server.utilities.logger.MessageLogger;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
-final public class ServerApplication implements Loggable {
+final public class ServerApplication {
 
     private int           maxClients = -1;
 
@@ -68,13 +67,16 @@ final public class ServerApplication implements Loggable {
     private final Config        config;
     private final MessageQueue  msgQueueIn;
 
+    private final Logger logger;
+
     public ServerApplication(String appName, Version appVer, Date date, Config config) {
         this.appVer     = appVer;
         this.appName    = appName;
         this.startTime  = new Date();
         this.buildDate  = date;
         this.config     = config;
-        this.msgQueueIn = new MessageQueue(new MessageLogger(getLogger()));
+        this.logger     = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+        this.msgQueueIn = new MessageQueue(new MessageLogger(this.logger));
     }
 
     public Version getVersion() {
@@ -100,7 +102,6 @@ final public class ServerApplication implements Loggable {
     @SuppressWarnings("unchecked")
     public void run()
     throws Exception {
-        Logger logger = getLogger();
         boolean restart;
         maxClients = (int)(long)config.getSection("common.serverConfig.maxClients");
         int port = (int)(long)config.getSection("common.serverConfig.port");
@@ -120,14 +121,14 @@ final public class ServerApplication implements Loggable {
             Dispatcher dispatcher = new Dispatcher(new MessageLogger(logger), logger);
             Database database = new Database((HashMap<String, Object>)config.getSection("common.database"), logger);
             ActiveTrackLayout activeLayout = new ActiveTrackLayout(dispatcher, config);
-            TrackLayoutLock trackLayoutLock = new TrackLayoutLock(database);
+            TrackLayoutLock trackLayoutLock = new TrackLayoutLock(database, logger);
             NotificationHandler notificationHandler = new NotificationHandler(logger, dispatcher, list);
 
-            ServerStateMachine serverStateMachine = new ServerStateMachine(dispatcher, notificationHandler);
+            ServerStateMachine serverStateMachine = new ServerStateMachine(dispatcher, notificationHandler, logger);
 
             InterlockBlock interlockBlock = new InterlockBlock(database);
-            InterlockRoute interlockRoute = new InterlockRoute(database);
-            TrackLayoutRepository trackLayoutRepository = new TrackLayoutRepository(database);
+            InterlockRoute interlockRoute = new InterlockRoute(database, logger);
+            TrackLayoutRepository trackLayoutRepository = new TrackLayoutRepository(database, logger);
 
             BlockListRepository blockListRepository = new BlockListRepository(database);
             SwitchStateRepository switchStateRepository = new SwitchStateRepository(database);
@@ -152,7 +153,7 @@ final public class ServerApplication implements Loggable {
 
             Scheduler scheduler = new Scheduler(dispatcher, null);
             scheduler.addTimedAction(new FunctionExecution(new FunctionTimeTableRepository(database), dispatcher));
-            scheduler.addTimedAction(new TrainRun(new TrainTimeTableRepository(database), trainRunner, trainRepository));
+            scheduler.addTimedAction(new TrainRun(new TrainTimeTableRepository(database, logger), trainRunner, trainRepository));
 
             BackgroundHandlerComposite handler = new BackgroundHandlerComposite();
             handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList, notificationHandler));
