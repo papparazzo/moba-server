@@ -25,18 +25,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import moba.server.utilities.database.Database;
 import moba.server.datatypes.enumerations.ClientError;
 import moba.server.exceptions.ClientErrorException;
-import moba.server.utilities.logger.Loggable;
 
-public final class TrackLayoutLock implements Loggable {
+public final class TrackLayoutLock {
 
     private final Database database;
+    private final Logger logger;
 
-    public TrackLayoutLock(Database database) {
+    public TrackLayoutLock(Database database, Logger logger) {
         this.database = database;
+        this.logger = logger;
     }
 
     public void resetAll()
@@ -47,7 +49,7 @@ public final class TrackLayoutLock implements Loggable {
             PreparedStatement stmt = con.prepareStatement("UPDATE `TrackLayouts` SET `Locked` = NULL")
         ) {
             stmt.executeUpdate();
-            getLogger().log(Level.INFO, stmt.toString());
+            logger.log(Level.INFO, stmt.toString());
         }
     }
 
@@ -60,7 +62,7 @@ public final class TrackLayoutLock implements Loggable {
         ) {
             stmt.setLong(1, appId);
             stmt.executeUpdate();
-            getLogger().log(Level.INFO, stmt.toString());
+            logger.log(Level.INFO, stmt.toString());
         }
     }
 
@@ -79,7 +81,7 @@ public final class TrackLayoutLock implements Loggable {
             stmt.setLong(1, appId);
             stmt.setLong(2, id);
 
-            getLogger().log(Level.INFO, stmt.toString());
+            logger.log(Level.INFO, stmt.toString());
 
             if(stmt.executeUpdate() == 0) {
                 throw new ClientErrorException(ClientError.DATASET_LOCKED, "object is already locked");
@@ -102,7 +104,7 @@ public final class TrackLayoutLock implements Loggable {
             stmt.setLong(1, appId);
             stmt.setLong(2, id);
 
-            getLogger().log(Level.INFO, stmt.toString());
+            logger.log(Level.INFO, stmt.toString());
 
             if(stmt.executeUpdate() == 0) {
                 throw new ClientErrorException(ClientError.DATASET_MISSING, "no layout found with id <" + id + ">");
@@ -114,7 +116,7 @@ public final class TrackLayoutLock implements Loggable {
     throws ClientErrorException, SQLException {
         var lockedBy = getIdOfLockingApp(id);
 
-        getLogger().log(Level.INFO, "object is locked by <{1}>", new Object[]{lockedBy});
+        logger.log(Level.INFO, "object is locked by <{1}>", new Object[]{lockedBy});
 
         if(lockedBy == null) {
             return false;
@@ -133,7 +135,7 @@ public final class TrackLayoutLock implements Loggable {
             PreparedStatement stmt = con.prepareStatement("SELECT `locked` FROM `TrackLayouts` WHERE `Id` = ?")
         ) {
             stmt.setLong(1, id);
-            getLogger().log(Level.INFO, stmt.toString());
+            logger.log(Level.INFO, stmt.toString());
             ResultSet rs = stmt.executeQuery();
             if(!rs.next()) {
                 throw new ClientErrorException(

@@ -153,10 +153,10 @@ final public class ServerApplication {
 
             Scheduler scheduler = new Scheduler(dispatcher, null);
             scheduler.addTimedAction(new FunctionExecution(new FunctionTimeTableRepository(database), dispatcher));
-            scheduler.addTimedAction(new TrainRun(new TrainTimeTableRepository(database, logger), trainRunner, trainRepository));
+            scheduler.addTimedAction(new TrainRun(new TrainTimeTableRepository(database), trainRunner, trainRepository));
 
             BackgroundHandlerComposite handler = new BackgroundHandlerComposite();
-            handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList, notificationHandler));
+            handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList, notificationHandler, logger));
             handler.add(new IPC((String)config.getSection("common.serverConfig.ipc"), msgQueueIn, logger));
             handler.add(new KeepAlive(dispatcher, keepAlivePingIntervall, logger));
 

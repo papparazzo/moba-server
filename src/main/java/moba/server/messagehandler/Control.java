@@ -40,9 +40,8 @@ import moba.server.exceptions.ClientErrorException;
 import moba.server.repositories.TrainRepository;
 import moba.server.utilities.layout.ActiveTrackLayout;
 import moba.server.utilities.layout.TrackLayoutLock;
-import moba.server.utilities.logger.Loggable;
 
-final public class Control extends AbstractMessageHandler implements Loggable {
+final public class Control extends AbstractMessageHandler {
     private final BlockListRepository blocklistRepository;
 
     private final SwitchStateRepository switchStateRepository;

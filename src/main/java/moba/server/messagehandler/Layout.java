@@ -44,9 +44,8 @@ import moba.server.messages.Message;
 import moba.server.messages.messagetypes.LayoutMessage;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.utilities.layout.TrackLayoutLock;
-import moba.server.utilities.logger.Loggable;
 
-public final class Layout extends AbstractMessageHandler implements Loggable {
+public final class Layout extends AbstractMessageHandler {
 
     private final TrackLayoutRepository repository;
 

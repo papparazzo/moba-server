@@ -26,6 +26,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.MessageFormat;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
@@ -35,10 +36,9 @@ import moba.server.datatypes.objects.NotificationData;
 import moba.server.messages.MessageQueue;
 import moba.server.utilities.AllowList;
 import moba.server.utilities.messaging.NotificationHandler;
-import moba.server.utilities.logger.Loggable;
 
-final public class Acceptor extends Thread implements Loggable, BackgroundHandlerInterface {
 
+final public class Acceptor extends Thread implements BackgroundHandlerInterface {
     private ServerSocket              serverSocket = null;
     private final MessageQueue        msgQueue;
     private final Dispatcher          dispatcher;
@@ -46,6 +46,7 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
     private final int                 maxClients;
     private final AllowList           allowList;
     private final NotificationHandler notificationHandler;
+    private final Logger              logger;
 
     public Acceptor(
         MessageQueue msgQueue,
@@ -53,7 +54,8 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
         int serverPort,
         int maxClients,
         AllowList allowList,
-        NotificationHandler notificationHandler
+        NotificationHandler notificationHandler,
+        Logger logger
     ) {
         this.msgQueue      = msgQueue;
         this.dispatcher    = dispatcher;
@@ -61,6 +63,7 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
         this.maxClients    = maxClients;
         this.allowList     = allowList;
         this.notificationHandler = notificationHandler;
+        this.logger              = logger;
     }
 
     public void start() {
@@ -71,7 +74,7 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
             throw new RuntimeException(e);
         }
 
-        getLogger().log(Level.INFO, "Successful bind on port <{0}>", new Object[]{serverPort});
+        logger.log(Level.INFO, "Successful bind on port <{0}>", new Object[]{serverPort});
         super.start();
     }
 
@@ -83,23 +86,23 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
             interrupt();
             join(250);
         } catch(IOException e) {
-            getLogger().log(Level.WARNING, "could not close server socket! <{0}>", new Object[]{e.toString()});
+            logger.log(Level.WARNING, "could not close server socket! <{0}>", new Object[]{e.toString()});
         } catch(InterruptedException e) {
-            getLogger().log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
+            logger.log(Level.WARNING, "InterruptedException occurred! <{0}>", new Object[]{e.toString()});
         }
-        getLogger().info("acceptor-thread stopped.");
+        logger.info("acceptor-thread stopped.");
     }
 
     @Override
     public void run() {
         long id = 0;
 
-        getLogger().info("acceptor-thread started");
+        logger.info("acceptor-thread started");
 
         while(!isInterrupted()) {
             try {
                 Socket socket = serverSocket.accept();
-                getLogger().log(Level.INFO, "new client <{0}> socket <{1}>", new Object[]{++id, socket.toString()});
+                logger.log(Level.INFO, "new client <{0}> socket <{1}>", new Object[]{++id, socket.toString()});
 
                 if(!allowedOrigin(socket)) {
                     socket.close();
@@ -118,13 +121,13 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
                     );
                     continue;
                 }
-                (new Endpoint(id, socket, msgQueue)).start();
+                (new Endpoint(id, socket, msgQueue, logger)).start();
             } catch(Exception e) {
-                getLogger().log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
+                logger.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
                 notificationHandler.add(new NotificationData(e));
             }
         }
-        getLogger().info("acceptor-thread terminated");
+        logger.info("acceptor-thread terminated");
     }
 
     private boolean allowedOrigin(Socket socket) {
@@ -133,7 +136,7 @@ final public class Acceptor extends Thread implements Loggable, BackgroundHandle
         if(allowList.isAllowed(addr)) {
             return true;
         }
-        getLogger().log(Level.WARNING, "access of ip <{0}> is forbidden!", new Object[]{addr});
+        logger.log(Level.WARNING, "access of ip <{0}> is forbidden!", new Object[]{addr});
         return false;
     }
 }
