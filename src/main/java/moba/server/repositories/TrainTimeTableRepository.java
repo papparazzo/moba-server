@@ -32,17 +32,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 final public class TrainTimeTableRepository {
     private final Database database;
 
-    private final Logger logger;
 
-    public TrainTimeTableRepository(Database database, Logger logger) {
+    public TrainTimeTableRepository(Database database) {
         this.database = database;
-        this.logger = logger;
     }
 
     public List<TrainTimeTableEntry> getTrainTableEntries(PointInTime time, int multiplicator)
