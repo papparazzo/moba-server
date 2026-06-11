@@ -30,7 +30,7 @@ public enum Day {
     SATURDAY;
 
     public Day next() {
-        if (ordinal() == values().length - 1) {
+        if(ordinal() == values().length - 1) {
             return values()[0];
         }
         return values()[ordinal() + 1];

@@ -60,14 +60,16 @@ final public class Control extends AbstractMessageHandler {
         ActiveTrackLayout activeLayout,
         TrackLayoutLock lock
     ) throws SQLException {
+        // @formatter:off
         this.switchStateRepository = switchStateRepository;
-        this.blocklistRepository = blocklistRepository;
-        this.dispatcher = dispatcher;
-        this.trainRepository = trainRepository;
+        this.blocklistRepository   = blocklistRepository;
+        this.dispatcher            = dispatcher;
+        this.trainRepository       = trainRepository;
 
         this.activeLayout = activeLayout;
         this.lock         = lock;
         this.lock.resetAll();
+        // @formatter:on
     }
 
     @Override
@@ -91,11 +93,12 @@ final public class Control extends AbstractMessageHandler {
     public void handleMsg(Message msg)
     throws ClientErrorException, SQLException, ApiConnectorException {
         switch(ControlMessage.fromId(msg.getMessageId())) {
+            // @formatter:off
             case GET_BLOCK_LIST_REQ        -> getBlockList(msg);
             case SAVE_BLOCK_LIST           -> saveBlockList(msg);
             case GET_SWITCH_STAND_LIST_REQ -> getSwitchStateList(msg);
             case GET_TRAIN_LIST_REQ        -> getTrainList(msg);
-
+            // @formatter:on
         }
     }
 

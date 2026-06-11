@@ -37,8 +37,8 @@ import moba.server.messages.MessageQueue;
 import moba.server.utilities.AllowList;
 import moba.server.utilities.messaging.NotificationHandler;
 
-
 final public class Acceptor extends Thread implements BackgroundHandlerInterface {
+    // @formatter:off
     private ServerSocket              serverSocket = null;
     private final MessageQueue        msgQueue;
     private final Dispatcher          dispatcher;
@@ -47,6 +47,7 @@ final public class Acceptor extends Thread implements BackgroundHandlerInterface
     private final AllowList           allowList;
     private final NotificationHandler notificationHandler;
     private final Logger              logger;
+    // @formatter:on
 
     public Acceptor(
         MessageQueue msgQueue,
@@ -57,13 +58,15 @@ final public class Acceptor extends Thread implements BackgroundHandlerInterface
         NotificationHandler notificationHandler,
         Logger logger
     ) {
-        this.msgQueue      = msgQueue;
-        this.dispatcher    = dispatcher;
-        this.serverPort    = serverPort;
-        this.maxClients    = maxClients;
-        this.allowList     = allowList;
+        // @formatter:off
+        this.msgQueue            = msgQueue;
+        this.dispatcher          = dispatcher;
+        this.serverPort          = serverPort;
+        this.maxClients          = maxClients;
+        this.allowList           = allowList;
         this.notificationHandler = notificationHandler;
         this.logger              = logger;
+        // @formatter:on
     }
 
     public void start() {

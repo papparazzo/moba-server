@@ -93,7 +93,7 @@ public class Dispatcher {
 
         removeEndpointFromGroup((long)-1, ep);
 
-        ep.getMsgGroups().forEach((msgGroup) -> removeEndpointFromGroup(msgGroup, ep));
+        ep.getMsgGroups().forEach((msgGroup)->removeEndpointFromGroup(msgGroup, ep));
         logger.log(Level.INFO, "endpoint <{0}> successfully removed!", new Object[]{ep});
     }
 
@@ -113,7 +113,7 @@ public class Dispatcher {
             return;
         }
 
-        groupEP.get(grpId).removeIf(endpoint -> endpoint == ep);
+        groupEP.get(grpId).removeIf(endpoint->endpoint == ep);
     }
 
     public int getEndPointsCount() {
@@ -121,7 +121,7 @@ public class Dispatcher {
     }
 
     public void resetDispatcher() {
-        for(Endpoint endpoint: allEndpoints) {
+        for(Endpoint endpoint : allEndpoints) {
             endpoint.closeEndpoint();
         }
         allEndpoints.clear();
@@ -132,9 +132,9 @@ public class Dispatcher {
         return allEndpoints;
     }
 
-    public Endpoint getEndpointByAppId(long appID) {
+    public Endpoint getEndpointByAppId(long appId) {
         for(Endpoint ep : allEndpoints) {
-            if(ep.getAppId() == appID) {
+            if(ep.getAppId() == appId) {
                 return ep;
             }
         }

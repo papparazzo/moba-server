@@ -32,21 +32,24 @@ import moba.server.datatypes.objects.NotificationData;
 import moba.server.messages.messagetypes.ClientMessage;
 import moba.server.messages.messagetypes.InternMessage;
 import moba.server.exceptions.ClientErrorException;
-import moba.server.utilities.logger.Loggable;
 import moba.server.utilities.messaging.NotificationHandler;
 
-final public class MessageLoop implements Loggable {
+final public class MessageLoop {
 
     private final ServerStateMachine stateMachine;
 
+    // @formatter:off
     private final Map<Integer, AbstractMessageHandler> handlers   = new HashMap<>();
     private final Dispatcher                           dispatcher;
     private final NotificationHandler                  notificationHandler;
+    // @formatter:on
 
     public MessageLoop(Dispatcher dispatcher, NotificationHandler notificationHandler, ServerStateMachine stateMachine) {
+        // @formatter:off
         this.dispatcher          = dispatcher;
         this.notificationHandler = notificationHandler;
         this.stateMachine        = stateMachine;
+        // @formatter:on
     }
 
     public void addHandler(AbstractMessageHandler msgHandler) {

@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import moba.server.datatypes.base.DateTime;
 import moba.server.datatypes.collections.LayoutMap;
 import moba.server.datatypes.enumerations.ServerState;
-import moba.server.datatypes.enumerations.SystemState;
 import moba.server.datatypes.objects.Position;
 import moba.server.datatypes.objects.Symbol;
 import moba.server.datatypes.objects.TrackLayoutSymbolData;
@@ -47,20 +46,28 @@ import moba.server.utilities.layout.TrackLayoutLock;
 
 public final class Layout extends AbstractMessageHandler {
 
+    // @formatter:off
     private final TrackLayoutRepository repository;
 
-    private final TrackLayoutLock   lock;
-    private final ActiveTrackLayout activeLayout;
-    private boolean                 isRunning = false;
+    private final TrackLayoutLock       lock;
+    private final ActiveTrackLayout     activeLayout;
+    private boolean                     isRunning = false;
+    // @formatter:on
 
-    public Layout(Dispatcher dispatcher, TrackLayoutRepository repository, ActiveTrackLayout activeLayout, TrackLayoutLock lock)
-    throws SQLException {
+    public Layout(
+        Dispatcher dispatcher,
+        TrackLayoutRepository repository,
+        ActiveTrackLayout activeLayout,
+        TrackLayoutLock lock
+    ) throws SQLException {
+        // @formatter:off
         this.dispatcher   = dispatcher;
         this.repository   = repository;
 
         this.activeLayout = activeLayout;
         this.lock         = lock;
         this.lock.resetAll();
+        // @formatter:on
     }
 
     @Override
@@ -89,6 +96,7 @@ public final class Layout extends AbstractMessageHandler {
     public void handleMsg(Message msg)
     throws ClientErrorException, SQLException, IOException {
         switch(LayoutMessage.fromId(msg.getMessageId())) {
+            // @formatter:off
             case GET_LAYOUTS_REQ          -> getLayouts(msg);
             case GET_LAYOUT_REQ           -> getLayout(msg, true);
             case GET_LAYOUT_READ_ONLY_REQ -> getLayout(msg, false);
@@ -98,6 +106,7 @@ public final class Layout extends AbstractMessageHandler {
             case UNLOCK_LAYOUT            -> unlockLayout(msg);
             case LOCK_LAYOUT              -> lockLayout(msg);
             case SAVE_LAYOUT              -> saveLayout(msg);
+            // @formatter:on
         }
     }
 
@@ -130,7 +139,7 @@ public final class Layout extends AbstractMessageHandler {
     throws SQLException, IOException {
         Map<String, Object> map = (Map<String, Object>)msg.getData();
         boolean isActive = (boolean)map.get("active");
-        long    currAppId = msg.getEndpoint().getAppId();
+        long currAppId = msg.getEndpoint().getAppId();
 
         TrackLayoutInfoData tl = new TrackLayoutInfoData(
             (String)map.get("name"),
