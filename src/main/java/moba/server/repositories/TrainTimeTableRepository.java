@@ -23,6 +23,7 @@ package moba.server.repositories;
 import moba.server.datatypes.base.Time;
 import moba.server.datatypes.enumerations.Day;
 import moba.server.datatypes.objects.PointInTime;
+import moba.server.repositories.datatypes.ScheduleType;
 import moba.server.repositories.datatypes.TrainTimeTableEntry;
 import moba.server.utilities.database.Database;
 
@@ -73,8 +74,12 @@ final public class TrainTimeTableRepository {
                         rs.getLong("ToBlockId")
                     ));
 
-                    if(rs.getBoolean("Recurring")) {
-                        removeTrain(rs.getLong("Id"));
+                    if(ScheduleType.RECURRING != ScheduleType.valueOf(rs.getString("ScheduleType"))) {
+                        String q = "DELETE FROM TrainTimeTable WHERE Id = ?";
+                        try(PreparedStatement stmt1 = con.prepareStatement(q)) {
+                            stmt1.setLong(1, rs.getLong("Id"));
+                            stmt1.execute();
+                        }
                     }
                 }
                 return entries;
@@ -85,14 +90,14 @@ final public class TrainTimeTableRepository {
     private static String getQuery(boolean daySwitch) {
         if(daySwitch) {
             return /* language=SQL */
-                "SELECT TTT.Id, TTT.TrainId, `BS`.`Id` AS FromBlockId , ToBlockId, Recurring " +
+                "SELECT TTT.Id, TTT.TrainId, `BS`.`Id` AS FromBlockId , ToBlockId, ScheduleType " +
                 "FROM TrainTimeTable TTT " +
                 "LEFT JOIN BlockSections BS " +
                 "ON BS.TrainId = TTT.TrainId " +
                 "WHERE ((Weekdays = ? AND Time >= ?) OR (Time < ? AND Weekdays = ?)) ";
         } else {
             return /* language=SQL */
-                "SELECT TTT.id, TTT.TrainId, `BS`.`Id` AS FromBlockId , ToBlockId, Recurring " +
+                "SELECT TTT.id, TTT.TrainId, `BS`.`Id` AS FromBlockId , ToBlockId, ScheduleType " +
                 "FROM TrainTimeTable TTT " +
                 "LEFT JOIN BlockSections BS " +
                 "ON BS.TrainId = TTT.TrainId " +
@@ -100,23 +105,27 @@ final public class TrainTimeTableRepository {
         }
     }
 
-    private void removeTrain(long trainTableId)
+    public void addTrain(long trainId, long toBlock)
     throws SQLException {
-        String q = "DELETE FROM TrainTimeTable WHERE TrainId = ? AND Recurring = 1";
+        String q =
+            "INSERT INTO TrainTimeTable (TrainId, ToBlockId, ScheduleType) " +
+            "VALUES (?, ?, ?)";
+
         try(
             Connection con = database.getConnection();
             PreparedStatement stmt = con.prepareStatement(q)
         ) {
-            stmt.setLong(1, trainTableId);
+            stmt.setLong(1, trainId);
+            stmt.setLong(2, toBlock);
+            stmt.setString(3, ScheduleType.IMMEDIATE.toString());
             stmt.execute();
         }
-        logger.log(Level.WARNING, "train <{0}> already deleted from train-table!", new Object[]{trainTableId});
     }
 
     public void addTrain(long trainId, long toBlock, Day day, Time time, boolean recurring)
     throws SQLException {
         String q =
-            "INSERT INTO TrainTimeTable (TrainId, ToBlockId, Weekdays, Time, Recurring) " +
+            "INSERT INTO TrainTimeTable (TrainId, ToBlockId, Weekdays, Time, ScheduleType) " +
             "VALUES (?, ?, ?, ?, ?)";
 
         try(
@@ -127,7 +136,7 @@ final public class TrainTimeTableRepository {
             stmt.setLong(2, toBlock);
             stmt.setString(3, day.toString());
             stmt.setString(4, time.toString());
-            stmt.setBoolean(5, recurring);
+            stmt.setString(5, recurring ? ScheduleType.RECURRING.toString() : ScheduleType.IMMEDIATE.toString());
             stmt.execute();
         }
     }

@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-server
  *
- *  Copyright (C) 2025 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2026 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -18,12 +18,10 @@
  *
  */
 
-package moba.server.utilities.logger;
+package moba.server.repositories.datatypes;
 
-import java.util.logging.Logger;
-
-public interface Loggable {
-    default Logger getLogger() {
-        return Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    }
+public enum ScheduleType {
+    RECURRING,
+    ONCE,
+    IMMEDIATE
 }
