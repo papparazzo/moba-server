@@ -28,7 +28,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-public final class Database {
+public final class Database implements AutoCloseable {
 
     private final HikariDataSource dataSource;
 
@@ -73,5 +73,10 @@ public final class Database {
     public Connection getConnection()
     throws SQLException {
         return dataSource.getConnection();
+    }
+
+    @Override
+    public void close() {
+        dataSource.close();
     }
 }
