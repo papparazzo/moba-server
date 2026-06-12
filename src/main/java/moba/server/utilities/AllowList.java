@@ -36,14 +36,14 @@ final public class AllowList {
         if(allowed == null) {
             return;
         }
-        for(String addr: allowed) {
+        for(String addr : allowed) {
             add(addr);
         }
     }
 
     public ArrayList<String> getList() {
         ArrayList<String> list = new ArrayList<>(allowList.size());
-        for(InetAddress addr: allowList) {
+        for(InetAddress addr : allowList) {
             list.add(addr.getHostAddress());
         }
         return list;
@@ -52,7 +52,7 @@ final public class AllowList {
     public synchronized void setList(ArrayList<String> list)
     throws UnknownHostException {
         allowList.clear();
-        for(String addr: list) {
+        for(String addr : list) {
             add(addr);
         }
     }
@@ -70,7 +70,7 @@ final public class AllowList {
     }
 
     public synchronized boolean isAllowed(InetAddress ip) {
-        if (ip.isAnyLocalAddress() || ip.isLoopbackAddress()) {
+        if(ip.isAnyLocalAddress() || ip.isLoopbackAddress()) {
             return true;
         }
         return allowList.contains(ip);

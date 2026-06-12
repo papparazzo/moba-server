@@ -34,8 +34,10 @@ import org.yaml.snakeyaml.inspector.TagInspector;
 import org.yaml.snakeyaml.nodes.Tag;
 
 public class Config {
+    // @formatter:off
     protected String              fileName;
     protected Map<String, Object> content;
+    // @formatter:on
 
     public Config(String fileName)
     throws IOException {
@@ -44,9 +46,9 @@ public class Config {
 
         // https://www.veracode.com/blog/research/resolving-cve-2022-1471-snakeyaml-20-release-0
         LoaderOptions options = new LoaderOptions();
-        TagInspector allowedTags = (Tag tag) -> true;
+        TagInspector allowedTags = (Tag tag)->true;
         options.setTagInspector(allowedTags);
-        
+
         Yaml yaml = new Yaml(options);
         content = yaml.load(is);
         if(content == null || content.isEmpty()) {

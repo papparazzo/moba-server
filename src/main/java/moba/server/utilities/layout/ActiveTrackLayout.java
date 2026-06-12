@@ -43,6 +43,7 @@ public class ActiveTrackLayout {
     }
 
     public long getActiveLayout() {
+        //noinspection ReplaceNullCheck
         if(activeLayout == null) {
             //FIXME switch to nullable...
             return -1;

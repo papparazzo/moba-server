@@ -39,14 +39,18 @@ import java.util.logging.Logger;
 
 final public class IPC extends Thread implements BackgroundHandlerInterface {
 
+    // @formatter:off
     private final MessageQueue msgQueue;
     private final String       fifoFile;
     private final Logger       logger;
+    // @formatter:on
 
     public IPC(String fifoFile, MessageQueue msgQueue, Logger logger) {
+        // @formatter:off
         this.msgQueue = msgQueue;
         this.fifoFile = fifoFile;
         this.logger   = logger;
+        // @formatter:on
     }
 
     public void halt() {

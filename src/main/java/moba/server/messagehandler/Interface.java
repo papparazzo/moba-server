@@ -39,9 +39,11 @@ final public class Interface extends AbstractMessageHandler {
     private final TrainRunner runner;
 
     public Interface(Dispatcher dispatcher, ServerStateMachine stateMachine, TrainRunner runner) {
+        // @formatter:off
         this.dispatcher      = dispatcher;
         this.stateMachine    = stateMachine;
         this.runner          = runner;
+        // @formatter:on
     }
 
     @Override
@@ -59,6 +61,7 @@ final public class Interface extends AbstractMessageHandler {
     public void handleMsg(Message msg)
     throws Exception {
         switch(InterfaceMessage.fromId(msg.getMessageId())) {
+            // @formatter:off
             case CONNECTED
                 -> setConnected(msg);
 
@@ -81,6 +84,7 @@ final public class Interface extends AbstractMessageHandler {
                  REPLACE_ACTION_LIST,
                  DELETE_ACTION_LIST
                 -> dispatcher.sendGroup(msg);
+            // @formatter:on
         }
     }
 
@@ -91,19 +95,19 @@ final public class Interface extends AbstractMessageHandler {
     }
 
     private void setConnectionLost(Message msg)
-    throws  SQLException {
+    throws SQLException {
         stateMachine.setConnectionLost(msg.getEndpoint());
     }
 
     private void routeSwitched(Message msg)
-    throws  SQLException {
+    throws SQLException {
         int id = (int)msg.getData();
         runner.setSwitched(id);
         checkServerState(msg.getEndpoint());
     }
 
     private void releaseRoute(Message msg)
-    throws  SQLException, ClientErrorException {
+    throws SQLException, ClientErrorException {
         int id = (int)msg.getData();
         runner.releaseRoute(id);
         checkServerState(msg.getEndpoint());

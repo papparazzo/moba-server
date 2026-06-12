@@ -41,8 +41,10 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.HelpFormatter;
 
 final public class App {
+    // @formatter:off
     private static final String APP_CONFIG  = "config.yaml";
     private static final String APP_NAME    = "moba-server";
+    // @formatter:on
 
     public static void main(String[] args) {
         try {
@@ -101,34 +103,34 @@ final public class App {
     private static Options getOptions() {
         return
             new Options().
-            addOption("h", "help", false, "print this message").
-            addOption("c", "config", true, "configuration-file").
-            addOption("v", "version", false, "print version");
+                addOption("h", "help", false, "print this message").
+                addOption("c", "config", true, "configuration-file").
+                addOption("v", "version", false, "print version");
     }
 
     private static void printInfo(String appName, Version appVersion, Date buildDate) {
         String header =
             appName + " " + appVersion.toString() + " (build on " + buildDate + ")" +
             System.lineSeparator() + System.lineSeparator() +
-           "Copyright (C) 2025 Stefan Paproth <pappi-@gmx.de>" + System.lineSeparator() +
-           System.lineSeparator() +
-           "This program is free software: you can redistribute it and/or modify" + System.lineSeparator() +
-           "it under the terms of the GNU Affero General Public License as" + System.lineSeparator() +
-           "published by the Free Software Foundation, either version 3 of the" + System.lineSeparator() +
-           "License, or (at your option) any later version." + System.lineSeparator() +
-           System.lineSeparator() +
-           "This program is distributed in the hope that it will be useful," + System.lineSeparator() +
-           "but WITHOUT ANY WARRANTY; without even the implied warranty of" + System.lineSeparator() +
-           "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the" + System.lineSeparator() +
-           "GNU Affero General Public License for more details." + System.lineSeparator() +
-           System.lineSeparator() +
-           "You should have received a copy of the GNU Affero General Public License" + System.lineSeparator() +
-           "along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.";
+            "Copyright (C) 2025 Stefan Paproth <pappi-@gmx.de>" + System.lineSeparator() +
+            System.lineSeparator() +
+            "This program is free software: you can redistribute it and/or modify" + System.lineSeparator() +
+            "it under the terms of the GNU Affero General Public License as" + System.lineSeparator() +
+            "published by the Free Software Foundation, either version 3 of the" + System.lineSeparator() +
+            "License, or (at your option) any later version." + System.lineSeparator() +
+            System.lineSeparator() +
+            "This program is distributed in the hope that it will be useful," + System.lineSeparator() +
+            "but WITHOUT ANY WARRANTY; without even the implied warranty of" + System.lineSeparator() +
+            "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the" + System.lineSeparator() +
+            "GNU Affero General Public License for more details." + System.lineSeparator() +
+            System.lineSeparator() +
+            "You should have received a copy of the GNU Affero General Public License" + System.lineSeparator() +
+            "along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.";
         System.err.println(header);
     }
 
     private static void printHelp(String appName) {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp( appName + " [OPTION]", System.lineSeparator(), getOptions(), "");
+        formatter.printHelp(appName + " [OPTION]", System.lineSeparator(), getOptions(), "");
     }
 }

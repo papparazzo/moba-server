@@ -25,6 +25,7 @@ import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
 public enum InterfaceMessage implements MessageTypeInterface {
+    // @formatter:off
     CONNECTED          (1),
     CONNECTION_LOST    (2),
 	SET_ACTION_LIST    (3),
@@ -34,6 +35,7 @@ public enum InterfaceMessage implements MessageTypeInterface {
 	ROUTE_RELEASED     (7),
 	BLOCK_RELEASED     (8),
     PUSH_TRAIN         (9);
+    // @formatter:on
 
     public final static int GROUP_ID = 6;
 

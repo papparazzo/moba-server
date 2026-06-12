@@ -105,7 +105,7 @@ public final class BlockListRepository {
             stmt =
                 "DELETE `BlockSections`.* " +
                 "FROM `BlockSections` " +
-                "LEFT JOIN `TrackLayoutSymbols` ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` "    +
+                "LEFT JOIN `TrackLayoutSymbols` ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` " +
                 "WHERE `TrackLayoutId` = ?";
 
             try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
@@ -113,7 +113,7 @@ public final class BlockListRepository {
                 pstmt.executeUpdate();
             }
 
-            for (Map.Entry<Long, BlockContactData> entry : container.entrySet()) {
+            for(Map.Entry<Long, BlockContactData> entry : container.entrySet()) {
                 Long key = entry.getKey();
                 BlockContactData value = entry.getValue();
 

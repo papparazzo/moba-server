@@ -25,6 +25,7 @@ import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
 public enum ClientMessage implements MessageTypeInterface {
+    // @formatter:off
     PING        (1),
     ECHO_REQ    (2),
     ECHO_RES    (3),
@@ -35,6 +36,7 @@ public enum ClientMessage implements MessageTypeInterface {
     RESET       (8),
     SELF_TESTING(9),
     CLOSING     (10);
+    // @formatter:on
 
     public final static int GROUP_ID = 2;
 

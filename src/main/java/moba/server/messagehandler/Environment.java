@@ -81,7 +81,7 @@ final public class Environment extends AbstractMessageHandler {
 
     @Override
     public void handleMsg(Message msg)
-        throws ClientErrorException, IOException, SQLException {
+    throws ClientErrorException, IOException, SQLException {
         switch(EnvironmentMessage.fromId(msg.getMessageId())) {
             /* TODO implement this...
             case SET_FUNCTION_LIST:

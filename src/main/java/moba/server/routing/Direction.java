@@ -21,6 +21,7 @@
 package moba.server.routing;
 
 public final class Direction {
+    // @formatter:off
     public static final int UNSET        =   0;
     public static final int TOP          =   1;
     public static final int TOP_RIGHT    =   2;
@@ -31,6 +32,7 @@ public final class Direction {
     public static final int BOTTOM_LEFT  =  32;
     public static final int LEFT         =  64;
     public static final int TOP_LEFT     = 128;
+    // @formatter:on
 
     public static int getComplementaryDirection(int direction) {
         return switch(direction) {

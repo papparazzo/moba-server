@@ -25,6 +25,7 @@ import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
 public enum ControlMessage implements MessageTypeInterface {
+    // @formatter:off
     GET_BLOCK_LIST_REQ        (1),
     GET_BLOCK_LIST_RES        (2),
     SAVE_BLOCK_LIST           (3),
@@ -34,6 +35,7 @@ public enum ControlMessage implements MessageTypeInterface {
     GET_TRAIN_LIST_REQ        (7),
     GET_TRAIN_LIST_RES        (8);
     // SAVE_TRAIN_LIST           (9),
+    // @formatter:on
 
 
     public final static int GROUP_ID = 10;

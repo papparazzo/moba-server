@@ -31,8 +31,10 @@ import moba.server.repositories.FunctionTimeTableRepository;
 import java.sql.SQLException;
 
 final public class FunctionExecution implements TimedActionInterface {
+    // @formatter:off
     private final FunctionTimeTableRepository functionRepository;
     private final Dispatcher                  dispatcher;
+    // @formatter:on
 
     public FunctionExecution(FunctionTimeTableRepository functionRepository, Dispatcher dispatcher) {
         this.functionRepository = functionRepository;
