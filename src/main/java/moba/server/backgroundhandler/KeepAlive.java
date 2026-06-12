@@ -38,16 +38,20 @@ import java.util.logging.Logger;
  * https://en.wikipedia.org/wiki/Keepalive#TCP_keepalive and
  */
 final public class KeepAlive implements BackgroundHandlerInterface {
+    // @formatter:off
     private final Dispatcher dispatcher;
     private final long                     intervall;
     private final Logger                   logger;
     private Future<?>                      future;
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    // @formatter:on
 
     public KeepAlive(Dispatcher dispatcher, long intervall, Logger logger) {
+        // @formatter:off
         this.dispatcher = dispatcher;
         this.intervall   = intervall;
         this.logger      = logger;
+        // @formatter:on
     }
 
     public void halt() {

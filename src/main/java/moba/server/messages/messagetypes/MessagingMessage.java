@@ -25,10 +25,12 @@ import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
 public enum MessagingMessage implements MessageTypeInterface {
+    // @formatter:off
     GET_NOTIFICATION_LIST  (1),
     SET_NOTIFICATION_LIST  (2),
     CLEAR_NOTIFICATION_LIST(3),
     SEND_NOTIFICATION      (4);
+    // @formatter:on
 
     public final static int GROUP_ID = 9;
 

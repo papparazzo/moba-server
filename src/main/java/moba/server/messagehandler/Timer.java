@@ -20,14 +20,14 @@
 
 package moba.server.messagehandler;
 
-import moba.server.actionhandler.Scheduler;
-import moba.server.datatypes.enumerations.ServerState;
-import moba.server.datatypes.objects.GlobalTimerData;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import moba.server.actionhandler.Scheduler;
 import moba.server.com.Dispatcher;
+import moba.server.datatypes.enumerations.ServerState;
+import moba.server.datatypes.objects.GlobalTimerData;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
 import moba.server.messages.messagetypes.TimerMessage;
@@ -35,8 +35,10 @@ import moba.server.utilities.config.Config;
 import moba.server.exceptions.ClientErrorException;
 
 final public class Timer extends AbstractMessageHandler {
+    // @formatter:off
     private final Scheduler scheduler;
     private final Config    config;
+    // @formatter:on
 
     public Timer(Dispatcher dispatcher, Config config, Scheduler scheduler) {
         this.dispatcher = dispatcher;
@@ -62,10 +64,9 @@ final public class Timer extends AbstractMessageHandler {
     public void handleMsg(Message msg)
     throws ClientErrorException, IOException {
         switch(TimerMessage.fromId(msg.getMessageId())) {
-            case GET_GLOBAL_TIMER ->
-                dispatcher.sendSingle(
-                    new Message(TimerMessage.SET_GLOBAL_TIMER, scheduler.getTimerData()), msg.getEndpoint()
-                );
+            case GET_GLOBAL_TIMER -> dispatcher.sendSingle(
+                new Message(TimerMessage.SET_GLOBAL_TIMER, scheduler.getTimerData()), msg.getEndpoint()
+            );
 
             case SET_GLOBAL_TIMER -> {
                 GlobalTimerData timerData = GlobalTimerData.fromJsonObject((Map<String, Object>)msg.getData());

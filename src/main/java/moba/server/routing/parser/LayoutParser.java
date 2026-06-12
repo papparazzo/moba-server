@@ -73,7 +73,7 @@ public class LayoutParser {
         // Position des ersten Blockkontaktes
         long id = blockContacts.entrySet().iterator().next().getKey();
 
-        Position startPos  = getPositionFromId(id);
+        Position startPos = getPositionFromId(id);
         Symbol curSymbol = layout.get(startPos).symbol();
 
         int dir1 = curSymbol.getNextJunction();
@@ -101,8 +101,10 @@ public class LayoutParser {
             return;
         }
 
+        // @formatter:off
         NodeJunction start = getNodeJunction(startPos.getPosition());
         NodeJunction end   = getNodeJunction(endPos.getPosition());
+        // @formatter:on
 
         start.setCounterpartNode(startPos.getDirection(), end.node());
         end.setCounterpartNode(Direction.getComplementaryDirection(endPos.getDirection()), start.node());
@@ -133,7 +135,7 @@ public class LayoutParser {
             // Prüfen, ob das Symbol eine Weiche oder ein Block ist
             if(blockContacts.containsKey(curSymbolData.id()) || switchStates.containsKey(curSymbolData.id())) {
                 if(curSymbol.hasOpenJunctionsLeft()) {
-                   return pos;
+                    return pos;
                 }
                 return null;
             }
@@ -158,28 +160,30 @@ public class LayoutParser {
         if(nodes.containsKey(curPos)) {
             return nodes.get(curPos);
         }
-
+        // @formatter:off
         TrackLayoutSymbolData curSymbolData = layout.get(curPos);
-        Symbol                curSymbol  = curSymbolData.symbol();
-        long                  id         = curSymbolData.id();
+        Symbol                curSymbol     = curSymbolData.symbol();
+        long                  id            = curSymbolData.id();
+        // @formatter:on
+
         SwitchStandData switchData = switchStates.get(id);
 
-        // Ein Knoten existiert hier noch nicht, neu erzeugen …
+        // Ein Knoten existiert hier noch nicht, neu erzeugen ...
         NodeInterface newNode;
         Symbol newSymbol;
 
-        // … aktueller Knoten ist eine Weiche
+        // ... aktueller Knoten ist eine Weiche
         if(curSymbol.isLeftSwitch()) {
             newSymbol = new Symbol(SymbolType.LEFT_SWITCH.getValue());
             newNode = new SwitchNode(id, switchData.stand());
         } else if(curSymbol.isRightSwitch()) {
             newSymbol = new Symbol(SymbolType.RIGHT_SWITCH.getValue());
             newNode = new SwitchNode(id, switchData.stand());
-        } else if(curSymbol.isStraight()){
+        } else if(curSymbol.isStraight()) {
             newSymbol = new Symbol(SymbolType.STRAIGHT.getValue());
             newNode = new BlockNode(id);
             blockNodeMap.put(id, (BlockNode)newNode);
-        } else if(curSymbol.isBend()){
+        } else if(curSymbol.isBend()) {
             newSymbol = new Symbol(SymbolType.BEND.getValue());
             newNode = new BlockNode(id);
             blockNodeMap.put(id, (BlockNode)newNode);

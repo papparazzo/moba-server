@@ -35,8 +35,10 @@ final public class Messaging extends AbstractMessageHandler {
     private final NotificationHandler notificationHandler;
 
     public Messaging(Dispatcher dispatcher, NotificationHandler notificationHandler) {
+        // @formatter:off
         this.dispatcher          = dispatcher;
         this.notificationHandler = notificationHandler;
+        // @formatter:on
     }
 
     @Override
@@ -48,9 +50,11 @@ final public class Messaging extends AbstractMessageHandler {
     public void handleMsg(Message msg)
     throws ClientErrorException, IOException {
         switch(MessagingMessage.fromId(msg.getMessageId())) {
+            // @formatter:off
             case GET_NOTIFICATION_LIST   -> handleGetNotificationList(msg.getEndpoint());
             case SEND_NOTIFICATION       -> handleSendNotification(msg);
             case CLEAR_NOTIFICATION_LIST -> handleClearNotificationList();
+            // @formatter:on
         }
     }
 

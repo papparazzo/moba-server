@@ -25,9 +25,11 @@ import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
 public enum TimerMessage implements MessageTypeInterface {
+    // @formatter:off
     GLOBAL_TIMER_EVENT(1),
     GET_GLOBAL_TIMER  (2),
     SET_GLOBAL_TIMER  (3);
+    // @formatter:on
 
     public final static int GROUP_ID = 4;
 

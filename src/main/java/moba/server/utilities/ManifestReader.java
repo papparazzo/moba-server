@@ -43,9 +43,11 @@ final public class ManifestReader {
         String className = clazz.getSimpleName() + ".class";
         String classPath = Objects.requireNonNull(clazz.getResource(className)).toString();
         if(!classPath.startsWith("jar")) {
+            // @formatter:off
             appName = "moba-server";
             buildDate = new Date();
             version   = new Version();
+            // @formatter:on
             return;
         }
 

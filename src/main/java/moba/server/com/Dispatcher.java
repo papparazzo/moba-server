@@ -67,7 +67,7 @@ public class Dispatcher {
             addEndpointToGroup((long)-1, ep);
         }
 
-        msgGroups.forEach((msgGroup) -> addEndpointToGroup(msgGroup, ep));
+        msgGroups.forEach((msgGroup)->addEndpointToGroup(msgGroup, ep));
 
         allEndpoints.add(ep);
         return true;

@@ -24,6 +24,7 @@ import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
 public enum SystemMessage implements MessageTypeInterface {
+    // @formatter:off
     SET_AUTOMATIC_MODE      (1),
     READY_FOR_AUTOMATIC_MODE(2),
     TRIGGER_EMERGENCY_STOP  (3),
@@ -34,6 +35,7 @@ public enum SystemMessage implements MessageTypeInterface {
     HARDWARE_STATE_CHANGED  (8),
     HARDWARE_SHUTDOWN       (9),
     HARDWARE_RESET          (10);
+    // @formatter:on
 
     public final static int GROUP_ID = 7;
 

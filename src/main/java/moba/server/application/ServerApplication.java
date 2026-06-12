@@ -57,6 +57,7 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 final public class ServerApplication {
 
+    // @formatter:off
     private int           maxClients = -1;
 
     private final Version appVer;
@@ -68,8 +69,10 @@ final public class ServerApplication {
     private final MessageQueue  msgQueueIn;
 
     private final Logger logger;
+    // @formatter:on
 
     public ServerApplication(String appName, Version appVer, Date date, Config config) {
+        // @formatter:off
         this.appVer     = appVer;
         this.appName    = appName;
         this.startTime  = new Date();
@@ -77,6 +80,7 @@ final public class ServerApplication {
         this.config     = config;
         this.logger     = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
         this.msgQueueIn = new MessageQueue(new MessageLogger(this.logger));
+        // @formatter:on
     }
 
     public Version getVersion() {

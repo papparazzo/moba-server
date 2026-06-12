@@ -84,7 +84,7 @@ final public class TrainRunner {
         trainQueue.removeIf(this::handleTrain);
 
         // FIXME: handleTrain: 3 Rückgabewerte
-       // throw new IllegalStateException("Deadlock detected!");
+        // throw new IllegalStateException("Deadlock detected!");
     }
 
     public void releaseRoute(int routeId)
@@ -115,7 +115,7 @@ final public class TrainRunner {
         ListIterator<TrainJourney> iterator = trainQueue.listIterator();
 
         // Check if the train is already in the list...
-        while (iterator.hasPrevious()) {
+        while(iterator.hasPrevious()) {
             TrainJourney element = iterator.previous();
 
             if(element.train().address() != trainJourney.train().address()) {
@@ -141,15 +141,14 @@ final public class TrainRunner {
             ArrayList<RoutingElementInterface> routingElements = routing.getRoute(trainDestination);
 
             ArrayList<Long> blocks = new ArrayList<>();
-          //  generator.sendBlockActionList(trainDestination.train(), blocks);
-
+            //  generator.sendBlockActionList(trainDestination.train(), blocks);
 
             // Zug befindet sich bereits im Ziel!
             if(routingElements.isEmpty()) {
                 return true;
             }
 
-            for (RoutingElementInterface element : routingElements) {
+            for(RoutingElementInterface element : routingElements) {
                 if(element instanceof Route) {
                     if(!handleSwitchingList(((Route)element).switchingList(), trainDestination.train().trainId())) {
                         return false;
@@ -161,7 +160,7 @@ final public class TrainRunner {
                     blocks.add(((Block)element).id());
                 }
             }
-        } catch (Throwable e) {
+        } catch(Throwable e) {
             // Predicat "trainQueue.removeIf(this::handleTrain);" darf keine checked Exceptions werfen!
             throw new RuntimeException(e);
         }

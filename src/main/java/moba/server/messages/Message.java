@@ -23,12 +23,14 @@ package moba.server.messages;
 import moba.server.com.Endpoint;
 
 public class Message implements Comparable<Message> {
+    // @formatter:off
     protected long   trigger;
 
     protected Endpoint    endpoint = null;
     protected Object      data     = null;
     protected int         groupId;
     protected int         messageId;
+    // @formatter:on
 
     public Message(MessageTypeInterface msgType) {
         this(msgType, null);
@@ -54,7 +56,7 @@ public class Message implements Comparable<Message> {
     }
 
     public Message(int grpId, int msgId) {
-        if (grpId < 1 || msgId < 1) {
+        if(grpId < 1 || msgId < 1) {
             throw new ExceptionInInitializerError("invalid data given");
         }
 

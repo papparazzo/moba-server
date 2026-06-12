@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  * ab 22:00 Uht Nacht
  */
 final public class Scheduler implements Runnable {
-
+    // @formatter:off
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final Dispatcher                 dispatcher;
     private GlobalTimerData                  timerData;
@@ -50,6 +50,7 @@ final public class Scheduler implements Runnable {
     private final List<TimedActionInterface> timedActions = new ArrayList<>();
 
     private volatile boolean                 isRunning = false;
+    // @formatter:on
 
     public Scheduler(Dispatcher dispatcher, GlobalTimerData timerData) {
         this.dispatcher = dispatcher;

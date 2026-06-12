@@ -73,15 +73,15 @@ public final class OAuth2HttpClient {
     throws IOException, InterruptedException, JsonException, URISyntaxException, ApiConnectorException {
         HttpRequest request =
             builder.
-            setHeader("Authorization", "Bearer " + accessToken).
-            version(HttpClient.Version.HTTP_2).
-            uri(uri).
-            build();
+                setHeader("Authorization", "Bearer " + accessToken).
+                version(HttpClient.Version.HTTP_2).
+                uri(uri).
+                build();
 
         HttpResponse<String> response =
             HttpClient.newBuilder().
-            followRedirects(HttpClient.Redirect.NORMAL).
-            build().send(request, HttpResponse.BodyHandlers.ofString());
+                followRedirects(HttpClient.Redirect.NORMAL).
+                build().send(request, HttpResponse.BodyHandlers.ofString());
 
         var status = response.statusCode();
 
@@ -100,7 +100,7 @@ public final class OAuth2HttpClient {
 
         var body = response.body();
 
-        if (body == null || body.isEmpty()) {
+        if(body == null || body.isEmpty()) {
             return null;
         }
 
@@ -121,12 +121,12 @@ public final class OAuth2HttpClient {
 
         HttpRequest request =
             HttpRequest.newBuilder().
-            uri(new URI( endPoint + "access_token")).
-            header("Accept", "application/json").
-            header("Content-Type", "application/x-www-form-urlencoded").
-            version(HttpClient.Version.HTTP_2).
-            POST(HttpRequest.BodyPublishers.ofString(getFormDataAsString(formData))).
-            build();
+                uri(new URI(endPoint + "access_token")).
+                header("Accept", "application/json").
+                header("Content-Type", "application/x-www-form-urlencoded").
+                version(HttpClient.Version.HTTP_2).
+                POST(HttpRequest.BodyPublishers.ofString(getFormDataAsString(formData))).
+                build();
 
         HttpResponse<String> response =
             HttpClient.newBuilder().build().send(request, HttpResponse.BodyHandlers.ofString());
@@ -142,8 +142,8 @@ public final class OAuth2HttpClient {
 
     private static String getFormDataAsString(Map<String, String> formData) {
         StringBuilder formBodyBuilder = new StringBuilder();
-        for (Map.Entry<String, String> singleEntry : formData.entrySet()) {
-            if (!formBodyBuilder.isEmpty()) {
+        for(Map.Entry<String, String> singleEntry : formData.entrySet()) {
+            if(!formBodyBuilder.isEmpty()) {
                 formBodyBuilder.append("&");
             }
             formBodyBuilder.append(URLEncoder.encode(singleEntry.getKey(), StandardCharsets.UTF_8));

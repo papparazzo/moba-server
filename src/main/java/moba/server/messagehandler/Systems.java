@@ -41,11 +41,13 @@ final public class Systems extends AbstractMessageHandler {
 
     public Systems(Dispatcher dispatcher, TrackLayoutLock lock, MessageQueue msgQueue, ServerStateMachine stateMachine)
     throws SQLException {
+        // @formatter:off
         this.dispatcher      = dispatcher;
         this.msgQueue        = msgQueue;
         this.lock            = lock;
         this.stateMachine    = stateMachine;
         this.lock.resetAll();
+        // @formatter:on
     }
 
     @Override
@@ -118,11 +120,11 @@ final public class Systems extends AbstractMessageHandler {
 
     private void setReadyForAutomaticMode(Message msg)
     throws SQLException {
-       if((boolean)msg.getData()) {
-           stateMachine.setReadyForAutomaticMode(msg.getEndpoint());
-       } else {
-           stateMachine.setManualMode(msg.getEndpoint());
-       }
+        if((boolean)msg.getData()) {
+            stateMachine.setReadyForAutomaticMode(msg.getEndpoint());
+        } else {
+            stateMachine.setManualMode(msg.getEndpoint());
+        }
     }
 
     private void triggerEmergencyStop(Message msg)
@@ -131,7 +133,7 @@ final public class Systems extends AbstractMessageHandler {
     }
 
     private void releaseEmergencyStop(Endpoint endpoint)
-    throws SQLException{
+    throws SQLException {
         stateMachine.releaseIncident(endpoint);
     }
 

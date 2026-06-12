@@ -25,6 +25,7 @@ import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
 public enum ServerMessage implements MessageTypeInterface {
+    // @formatter:off
     NEW_CLIENT_STARTED   (1),
     CLIENT_CLOSED        (2),
     RESET_CLIENT         (3),
@@ -37,6 +38,7 @@ public enum ServerMessage implements MessageTypeInterface {
     ADD_ALLOWED_IP       (10),
     GET_ALLOWED_IP_LIST  (11),
     SET_ALLOWED_IP_LIST  (12);
+    // @formatter:on
 
     public final static int GROUP_ID = 3;
 

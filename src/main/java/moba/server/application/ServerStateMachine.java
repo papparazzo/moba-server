@@ -44,14 +44,18 @@ public class ServerStateMachine {
 
     private final List<AbstractMessageHandler> handlers = new ArrayList<>();
 
+    // @formatter:off
     private final Dispatcher          dispatcher;
     private final NotificationHandler notificationHandler;
     private final Logger              logger;
+    // @formatter:on
 
     public ServerStateMachine(Dispatcher dispatcher, NotificationHandler notificationHandler, Logger logger) {
+        // @formatter:off
         this.dispatcher          = dispatcher;
         this.notificationHandler = notificationHandler;
         this.logger              = logger;
+        // @formatter:on
     }
 
     public void addHandler(AbstractMessageHandler msgHandler) {
@@ -89,6 +93,7 @@ public class ServerStateMachine {
         }
 
         String reason = switch(triggerData.reason()) {
+            // @formatter:off
             case CENTRAL_STATION                 -> "Nothalt durch CentralStation ausgelöst.";
             case EXTERN                          -> "Externes Ereignis (z.B. Notausschalter).";
             case SELF_ACTING_BY_EXTERN_SWITCHING -> "Manuelle Weichenstellung im Automatikmodus.";
@@ -96,6 +101,7 @@ public class ServerStateMachine {
             case CONNECTION_LOST                 -> "Verbindung zur Hardware verloren.";
             case SOFTWARE_ERROR                  -> "Automatisch durch Softwarefehler.";
             case SOFTWARE_MANUAL                 -> "Manuell durch die Software (Notausbutton).";
+            // @formatter:on
         };
 
         notificationHandler.add(new NotificationData(
@@ -319,7 +325,7 @@ public class ServerStateMachine {
         lastState = ServerState.HALT;
 
         dispatcher.sendAll(new Message(ClientMessage.RESET, true));
-        for(AbstractMessageHandler handler: handlers) {
+        for(AbstractMessageHandler handler : handlers) {
             handler.reset();
         }
     }
@@ -337,7 +343,7 @@ public class ServerStateMachine {
         lastState = ServerState.HALT;
 
         dispatcher.sendAll(new Message(ClientMessage.SHUTDOWN));
-        for(AbstractMessageHandler handler: handlers) {
+        for(AbstractMessageHandler handler : handlers) {
             handler.reset();
         }
     }
@@ -360,7 +366,7 @@ public class ServerStateMachine {
 
         notificationHandler.add(notificationData);
 
-        for(AbstractMessageHandler handler: handlers) {
+        for(AbstractMessageHandler handler : handlers) {
             handler.freeResources(appId);
         }
 
@@ -381,7 +387,7 @@ public class ServerStateMachine {
         lastState = currState;
         currState = state;
 
-        for(AbstractMessageHandler handler: handlers) {
+        for(AbstractMessageHandler handler : handlers) {
             handler.serverStateChanged(state);
         }
 

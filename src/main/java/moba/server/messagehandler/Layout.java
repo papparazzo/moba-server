@@ -20,28 +20,27 @@
 
 package moba.server.messagehandler;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import moba.server.datatypes.base.DateTime;
-import moba.server.datatypes.collections.LayoutMap;
-import moba.server.datatypes.enumerations.ServerState;
-import moba.server.datatypes.objects.Position;
-import moba.server.datatypes.objects.Symbol;
-import moba.server.datatypes.objects.TrackLayoutSymbolData;
-import moba.server.messages.AbstractMessageHandler;
-import moba.server.repositories.TrackLayoutRepository;
-import moba.server.datatypes.enumerations.ClientError;
-import moba.server.datatypes.objects.TrackLayoutInfoData;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import moba.server.com.Dispatcher;
-import moba.server.utilities.layout.ActiveTrackLayout;
+import moba.server.datatypes.base.DateTime;
+import moba.server.datatypes.collections.LayoutMap;
+import moba.server.datatypes.enumerations.ClientError;
+import moba.server.datatypes.enumerations.ServerState;
+import moba.server.datatypes.objects.Position;
+import moba.server.datatypes.objects.Symbol;
+import moba.server.datatypes.objects.TrackLayoutInfoData;
+import moba.server.datatypes.objects.TrackLayoutSymbolData;
+import moba.server.exceptions.ClientErrorException;
+import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
 import moba.server.messages.messagetypes.LayoutMessage;
-import moba.server.exceptions.ClientErrorException;
+import moba.server.repositories.TrackLayoutRepository;
+import moba.server.utilities.layout.ActiveTrackLayout;
 import moba.server.utilities.layout.TrackLayoutLock;
 
 public final class Layout extends AbstractMessageHandler {

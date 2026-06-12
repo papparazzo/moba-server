@@ -25,6 +25,7 @@ import moba.server.messages.MessageTypeInterface;
 import moba.server.exceptions.ClientErrorException;
 
 public enum LayoutMessage implements MessageTypeInterface {
+    // @formatter:off
     GET_LAYOUTS_REQ         (1),
     GET_LAYOUTS_RES         (2),
     DELETE_LAYOUT           (3),
@@ -38,6 +39,7 @@ public enum LayoutMessage implements MessageTypeInterface {
     SAVE_LAYOUT             (11),
     LAYOUT_CHANGED          (12),
     DEFAULT_LAYOUT_CHANGED  (13);
+    // @formatter:on
 
     public final static int GROUP_ID = 8;
 

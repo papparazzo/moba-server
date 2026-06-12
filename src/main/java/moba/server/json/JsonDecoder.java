@@ -29,7 +29,7 @@ import moba.server.json.stringreader.JsonStringReader;
 
 public class JsonDecoder {
     protected JsonStringReader reader;
-    protected static final int  MAX_STRING_LENGTH = 1024;
+    protected static final int MAX_STRING_LENGTH = 1024;
 
     public JsonDecoder(JsonStringReader reader) {
         this.reader = reader;
@@ -48,10 +48,7 @@ public class JsonDecoder {
         for(int i = 0; i < JsonDecoder.MAX_STRING_LENGTH; ++i) {
             c = reader.next();
 
-            if(
-                Character.isWhitespace(c) || 
-                !(Character.isLetterOrDigit(c) || c == '_' || c == '"')
-            ) {
+            if(Character.isWhitespace(c) || !(Character.isLetterOrDigit(c) || c == '_' || c == '"')) {
                 throw new JsonException("key contains invalid char!");
             }
 
@@ -81,11 +78,9 @@ public class JsonDecoder {
                     return map;
                 }
 
-                case '"' -> 
-                    key = nextKey();
+                case '"' -> key = nextKey();
 
-                default ->
-                    throw new JsonException("invalid key: expected a '\"' or '}', got <" + c + "> instead!");
+                default -> throw new JsonException("invalid key: expected a '\"' or '}', got <" + c + "> instead!");
             }
             reader.checkNext(':');
 
@@ -102,8 +97,7 @@ public class JsonDecoder {
                     return map;
                 }
 
-                default -> 
-                    throw new JsonException("expected a ',' or '}', got <" + c + "> instead!");
+                default -> throw new JsonException("expected a ',' or '}', got <" + c + "> instead!");
             }
         }
         throw new JsonException("maximum string-length of <" + JsonDecoder.MAX_STRING_LENGTH + "> reached!");
@@ -136,8 +130,7 @@ public class JsonDecoder {
                 return nextArray();
             }
 
-            case 0 -> 
-                throw new IOException("input stream corrupted!");
+            case 0 -> throw new IOException("input stream corrupted!");
 
             default -> {
                 return nextNumber();
@@ -171,12 +164,11 @@ public class JsonDecoder {
         for(int i = 0; i < JsonDecoder.MAX_STRING_LENGTH; ++i) {
             c = reader.next();
             switch(c) {
-                case '\n', '\r' -> 
-                    throw new JsonException("invalid char");
-                    
+                case '\n', '\r' -> throw new JsonException("invalid char");
+
                 case '\\' -> {
                     c = reader.next();
-                    switch (c) {
+                    switch(c) {
                         case 'b' -> sb.append('\b');
                         case 't' -> sb.append('\t');
                         case 'n' -> sb.append('\n');
@@ -185,8 +177,7 @@ public class JsonDecoder {
                         case 'u' -> sb.append((char)Integer.parseInt(reader.next(4), 16));
 
                         case '"', '\\', '/' -> sb.append(c);
-                        default ->
-                            throw new JsonException("invalid escape-sequence <"+ c +">");
+                        default -> throw new JsonException("invalid escape-sequence <" + c + ">");
                     }
                 }
 
@@ -194,8 +185,7 @@ public class JsonDecoder {
                     return sb.toString();
                 }
 
-                default -> 
-                    sb.append(c);
+                default -> sb.append(c);
             }
         }
         throw new JsonException("maximum string-length of <" + JsonDecoder.MAX_STRING_LENGTH + "> reached!");
@@ -223,8 +213,7 @@ public class JsonDecoder {
                     return arrayList;
                 }
 
-                default ->
-                    throw new JsonException("expected ',' or ']', got <" + c + "> instead!");
+                default -> throw new JsonException("expected ',' or ']', got <" + c + "> instead!");
             }
         }
     }

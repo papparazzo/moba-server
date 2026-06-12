@@ -53,7 +53,7 @@ final public class SimpleRouter {
         public int getCount() {
             int count = 1;
             LinkedRoutingList current = this;
-            while (current.successor != null) {
+            while(current.successor != null) {
                 count++;
                 current = current.successor;
             }
@@ -81,7 +81,7 @@ final public class SimpleRouter {
 
         ArrayList<SwitchStateData> routingList = new ArrayList<>();
 
-        while (current.successor() != null) {
+        while(current.successor() != null) {
             current = current.successor();
 
             SwitchStateData routingItem = current.routingItem();

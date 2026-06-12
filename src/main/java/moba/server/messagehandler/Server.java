@@ -60,6 +60,7 @@ final public class Server extends AbstractMessageHandler {
     public void handleMsg(Message msg)
     throws ClientErrorException, IOException {
         switch(ServerMessage.fromId(msg.getMessageId())) {
+            // @formatter:off
             case INFO_REQ              -> handleServerInfoReq(msg.getEndpoint());
             case CON_CLIENTS_REQ       -> handleClientsReq(msg.getEndpoint());
             case RESET_CLIENT          -> sendToClient(msg, ClientMessage.RESET, false);
@@ -68,6 +69,7 @@ final public class Server extends AbstractMessageHandler {
             case ADD_ALLOWED_IP        -> handleAddIpAddress(msg);
             case GET_ALLOWED_IP_LIST   -> handleGetAllowedIpList(msg.getEndpoint());
             case SET_ALLOWED_IP_LIST   -> handleSetAllowedIpList(msg);
+            // @formatter:on
         }
     }
 
@@ -111,6 +113,7 @@ final public class Server extends AbstractMessageHandler {
     private void handleServerInfoReq(Endpoint ep) {
         HashMap<String, Object> map = new HashMap<>();
 
+        // @formatter:off
         map.put("appName",           app.getAppName());
         map.put("version",           app.getVersion());
         map.put("buildDate",         new Date(app.getBuildDate()));
@@ -125,6 +128,7 @@ final public class Server extends AbstractMessageHandler {
 
         map.put("fwType",            java.lang.System.getProperty("java.vm.vendor", ""));
         map.put("fwVersion",         java.lang.System.getProperty("java.version", ""));
+        // @formatter:on
 
         dispatcher.sendSingle(new Message(ServerMessage.INFO_RES, map), ep);
     }
