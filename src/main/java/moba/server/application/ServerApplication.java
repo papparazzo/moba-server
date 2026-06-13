@@ -122,63 +122,69 @@ final public class ServerApplication {
         OAuth2HttpClient apiConnector = new OAuth2HttpClient(trainApiUrl, trainApiClientId, trainApiClientSecret);
 
         do {
-            Dispatcher dispatcher = new Dispatcher(new MessageLogger(logger), logger);
-            Database database = new Database((HashMap<String, Object>)config.getSection("common.database"), logger);
-            ActiveTrackLayout activeLayout = new ActiveTrackLayout(dispatcher, config);
-            TrackLayoutLock trackLayoutLock = new TrackLayoutLock(database, logger);
-            NotificationHandler notificationHandler = new NotificationHandler(logger, dispatcher, list);
+            try(
+                Database database = new Database((HashMap<String, Object>)config.getSection("common.database"), logger);
+                Dispatcher dispatcher = new Dispatcher(new MessageLogger(logger), logger)
+            ) {
 
-            ServerStateMachine serverStateMachine = new ServerStateMachine(dispatcher, notificationHandler, logger);
+                ActiveTrackLayout activeLayout = new ActiveTrackLayout(dispatcher, config);
+                TrackLayoutLock trackLayoutLock = new TrackLayoutLock(database, logger);
+                NotificationHandler notificationHandler = new NotificationHandler(logger, dispatcher, list);
 
-            InterlockBlock interlockBlock = new InterlockBlock(database);
-            InterlockRoute interlockRoute = new InterlockRoute(database, logger);
-            TrackLayoutRepository trackLayoutRepository = new TrackLayoutRepository(database, logger);
+                ServerStateMachine serverStateMachine = new ServerStateMachine(dispatcher, notificationHandler, logger);
 
-            BlockListRepository blockListRepository = new BlockListRepository(database);
-            SwitchStateRepository switchStateRepository = new SwitchStateRepository(database);
-            TrainApiConnector trainApi = new TrainApiConnector(apiConnector, (String)config.getSection("api.train.url"));
-            TrainRepository trainRepository = new TrainRepository(database, trainApi);
+                InterlockBlock interlockBlock = new InterlockBlock(database);
+                InterlockRoute interlockRoute = new InterlockRoute(database, logger);
+                TrackLayoutRepository trackLayoutRepository = new TrackLayoutRepository(database, logger);
 
-            long activeLayoutId = activeLayout.getActiveLayout();
-            BlockContactDataMap blockContacts = blockListRepository.getBlockList(activeLayoutId);
-            SwitchStateMap switchStates = switchStateRepository.getSwitchStateListForTrackLayout(activeLayoutId);
+                BlockListRepository blockListRepository = new BlockListRepository(database);
+                SwitchStateRepository switchStateRepository = new SwitchStateRepository(database);
+                TrainApiConnector trainApi = new TrainApiConnector(apiConnector, (String)config.getSection("api.train.url"));
+                TrainRepository trainRepository = new TrainRepository(database, trainApi);
 
-            LayoutParser parser = new LayoutParser(
-                trackLayoutRepository.getLayout(activeLayoutId),
-                blockContacts,
-                switchStates
-            ).parse();
+                long activeLayoutId = activeLayout.getActiveLayout();
+                BlockContactDataMap blockContacts = blockListRepository.getBlockList(activeLayoutId);
+                SwitchStateMap switchStates = switchStateRepository.getSwitchStateListForTrackLayout(activeLayoutId);
 
-            BlockNodeMap blocks = parser.getBlockMap();
-            SimpleRouter router = new SimpleRouter(blocks);
+                LayoutParser parser = new LayoutParser(
+                    trackLayoutRepository.getLayout(activeLayoutId),
+                    blockContacts,
+                    switchStates
+                ).parse();
 
-            ActionListGenerator generator = new ActionListGenerator(blockContacts, switchStates, dispatcher);
-            TrainRunner trainRunner = new TrainRunner(router, interlockBlock, interlockRoute, switchStateRepository, generator);
+                BlockNodeMap blocks = parser.getBlockMap();
+                SimpleRouter router = new SimpleRouter(blocks);
 
-            Scheduler scheduler = new Scheduler(dispatcher, null);
-            scheduler.addTimedAction(new FunctionExecution(new FunctionTimeTableRepository(database), dispatcher));
-            scheduler.addTimedAction(new TrainRun(new TrainTimeTableRepository(database), trainRunner, trainRepository));
+                ActionListGenerator generator = new ActionListGenerator(blockContacts, switchStates, dispatcher);
+                TrainRunner trainRunner = new TrainRunner(router, interlockBlock, interlockRoute, switchStateRepository, generator);
 
-            BackgroundHandlerComposite handler = new BackgroundHandlerComposite();
-            handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList, notificationHandler, logger));
-            handler.add(new IPC((String)config.getSection("common.serverConfig.ipc"), msgQueueIn, logger));
-            handler.add(new KeepAlive(dispatcher, keepAlivePingIntervall, logger));
+                Scheduler scheduler = new Scheduler(dispatcher, null);
+                scheduler.addTimedAction(new FunctionExecution(new FunctionTimeTableRepository(database), dispatcher));
+                scheduler.addTimedAction(new TrainRun(new TrainTimeTableRepository(database), trainRunner, trainRepository));
 
-            MessageLoop loop = new MessageLoop(dispatcher, notificationHandler, serverStateMachine);
-            loop.addHandler(new Client(dispatcher));
-            loop.addHandler(new Server(dispatcher, this, allowList, config));
-            loop.addHandler(new Timer(dispatcher, config, scheduler));
-            loop.addHandler(new Environment(dispatcher, new FunctionAddressesRepository(database)));
-            loop.addHandler(new Systems(dispatcher, trackLayoutLock, msgQueueIn, serverStateMachine));
-            loop.addHandler(new Layout(dispatcher, trackLayoutRepository, activeLayout, trackLayoutLock));
-            loop.addHandler(new Interface(dispatcher, serverStateMachine, trainRunner));
-            loop.addHandler(new Control(dispatcher, blockListRepository, switchStateRepository, trainRepository, activeLayout, trackLayoutLock));
-            loop.addHandler(new Messaging(dispatcher, notificationHandler));
+                BackgroundHandlerComposite handler = new BackgroundHandlerComposite();
+                handler.add(new Acceptor(msgQueueIn, dispatcher, port, maxClients, allowList, notificationHandler, logger));
+                handler.add(new IPC((String)config.getSection("common.serverConfig.ipc"), msgQueueIn, logger));
+                handler.add(new KeepAlive(dispatcher, keepAlivePingIntervall, logger));
 
-            handler.start();
-            restart = loop.loop(msgQueueIn);
-            dispatcher.resetDispatcher();
-            handler.halt();
+                MessageLoop loop = new MessageLoop(dispatcher, notificationHandler, serverStateMachine);
+                loop.addHandler(new Client(dispatcher));
+                loop.addHandler(new Server(dispatcher, this, allowList, config));
+                loop.addHandler(new Timer(dispatcher, config, scheduler));
+                loop.addHandler(new Environment(dispatcher, new FunctionAddressesRepository(database)));
+                loop.addHandler(new Systems(dispatcher, trackLayoutLock, msgQueueIn, serverStateMachine));
+                loop.addHandler(new Layout(dispatcher, trackLayoutRepository, activeLayout, trackLayoutLock));
+                loop.addHandler(new Interface(dispatcher, serverStateMachine, trainRunner));
+                loop.addHandler(new Control(dispatcher, blockListRepository, switchStateRepository, trainRepository, activeLayout, trackLayoutLock));
+                loop.addHandler(new Messaging(dispatcher, notificationHandler));
+
+                handler.start();
+                try {
+                    restart = loop.loop(msgQueueIn);
+                } finally {
+                    handler.halt();
+                }
+            }
         } while(restart);
     }
 }
