@@ -80,11 +80,11 @@ public final class TrackLayoutRepository {
 
         try(
             Connection con = database.getConnection();
-            PreparedStatement pstmt = con.prepareStatement(q)
+            PreparedStatement stmt = con.prepareStatement(q)
         ) {
-            pstmt.setLong(1, appId);
-            pstmt.setLong(2, id);
-            if(pstmt.executeUpdate() == 0) {
+            stmt.setLong(1, appId);
+            stmt.setLong(2, id);
+            if(stmt.executeUpdate() == 0) {
                 throw new ClientErrorException(ClientError.DATASET_MISSING, "could not delete <" + id + ">");
             }
         }
@@ -167,46 +167,56 @@ public final class TrackLayoutRepository {
     public void saveLayout(long id, LayoutMap container)
     throws SQLException, ClientErrorException {
 
-        Connection con = database.getConnection();
-        // FIXME: Transaction
-        String stmt = "UPDATE `TrackLayouts` SET `ModificationDate` = NOW() WHERE `Id` = ? ";
+        String q = "UPDATE `TrackLayouts` SET `ModificationDate` = NOW() WHERE `Id` = ? ";
 
-        try (PreparedStatement pstmt = con.prepareStatement(stmt)) {
-            pstmt.setLong(1, id);
-            getLogger().log(Level.INFO, pstmt.toString());
-            if(pstmt.executeUpdate() == 0) {
-                throw new ClientErrorException(ClientError.DATASET_MISSING, "could not save <" + id + ">");
-            }
-        }
-
-        stmt = "DELETE FROM `TrackLayoutSymbols` WHERE `TrackLayoutId` = ?";
-        try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-            pstmt.setLong(1, id);
-            getLogger().log(Level.INFO, pstmt.toString());
-            pstmt.executeUpdate();
-        }
-
-        for (Map.Entry<Position, TrackLayoutSymbolData> entry : container.entrySet()) {
-            Position key = entry.getKey();
-            TrackLayoutSymbolData value = entry.getValue();
-
-            stmt =
-                "INSERT INTO `TrackLayoutSymbols` (`Id`, `TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
-                "VALUES (?, ?, ?, ?, ?)";
-
-            try(PreparedStatement pstmt = con.prepareStatement(stmt)) {
-                if(value.id() == null) {
-                    pstmt.setNull(1, java.sql.Types.INTEGER);
-                } else {
-                    pstmt.setLong(1, value.id());
+        try(Connection con = database.getConnection()) {
+            boolean autoCommit = con.getAutoCommit();
+            con.setAutoCommit(false);
+            try {
+                try(PreparedStatement stmt = con.prepareStatement(q)) {
+                    stmt.setLong(1, id);
+                    logger.log(Level.INFO, stmt.toString());
+                    if(stmt.executeUpdate() == 0) {
+                        throw new ClientErrorException(ClientError.DATASET_MISSING, "could not save <" + id + ">");
+                    }
                 }
 
-                pstmt.setLong(2, id);
-                pstmt.setLong(3, key.getX());
-                pstmt.setLong(4, key.getY());
-                pstmt.setInt(5, value.symbol().toJson());
-                getLogger().log(Level.INFO, pstmt.toString());
-                pstmt.executeUpdate();
+                q = "DELETE FROM `TrackLayoutSymbols` WHERE `TrackLayoutId` = ?";
+                try(PreparedStatement pStmt = con.prepareStatement(q)) {
+                    pStmt.setLong(1, id);
+                    logger.log(Level.INFO, pStmt.toString());
+                    pStmt.executeUpdate();
+                }
+
+                q =
+                    "INSERT INTO `TrackLayoutSymbols` (`Id`, `TrackLayoutId`, `XPos`, `YPos`, `Symbol`) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+
+                try(PreparedStatement pStmt = con.prepareStatement(q)) {
+                    for(Map.Entry<Position, TrackLayoutSymbolData> entry : container.entrySet()) {
+                        Position key = entry.getKey();
+                        TrackLayoutSymbolData value = entry.getValue();
+
+                        if(value.id() == null) {
+                            pStmt.setNull(1, java.sql.Types.INTEGER);
+                        } else {
+                            pStmt.setLong(1, value.id());
+                        }
+
+                        pStmt.setLong(2, id);
+                        pStmt.setLong(3, key.getX());
+                        pStmt.setLong(4, key.getY());
+                        pStmt.setInt(5, value.symbol().toJson());
+                        logger.log(Level.INFO, pStmt.toString());
+                        pStmt.executeUpdate();
+                    }
+                }
+                con.commit();
+            } catch(SQLException | ClientErrorException e) {
+                con.rollback();
+                throw e;
+            } finally {
+                con.setAutoCommit(autoCommit);
             }
         }
     }
@@ -214,12 +224,14 @@ public final class TrackLayoutRepository {
     public DateTime getCreationDate(long id)
     throws SQLException {
         String q = "SELECT `CreationDate` FROM `TrackLayouts` WHERE `Id` = ?;";
-        Connection con = database.getConnection();
 
-        try (PreparedStatement pstmt = con.prepareStatement(q)) {
-            pstmt.setLong(1, id);
-            getLogger().log(Level.INFO, pstmt.toString());
-            ResultSet rs = pstmt.executeQuery();
+        try(
+            Connection con = database.getConnection();
+            PreparedStatement stmt = con.prepareStatement(q)
+        ) {
+            stmt.setLong(1, id);
+            logger.log(Level.INFO, stmt.toString());
+            ResultSet rs = stmt.executeQuery();
             if(!rs.next()) {
                 throw new NoSuchElementException(String.format("no elements found for layout <%4d>", id));
             }
