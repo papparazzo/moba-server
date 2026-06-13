@@ -23,11 +23,9 @@ package moba.server.com;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,9 +36,9 @@ import moba.server.json.streamwriter.JsonStreamWriterStringBuilder;
 import moba.server.messages.Message;
 import moba.server.utilities.logger.MessageLogger;
 
-public class Dispatcher {
-    protected final Set<Endpoint> allEndpoints = new HashSet<>();
-    protected final Map<Long, Set<Endpoint>> groupEP = new HashMap<>();
+public class Dispatcher implements AutoCloseable {
+    protected final Set<Endpoint> allEndpoints = ConcurrentHashMap.newKeySet();
+    protected final Map<Long, Set<Endpoint>> groupEP = new ConcurrentHashMap<>();
 
     protected final MessageLogger messageLogger;
 
@@ -54,11 +52,9 @@ public class Dispatcher {
     public boolean addEndpoint(Endpoint ep) {
         logger.log(Level.INFO, "try to add endpoint <{0}>", new Object[]{ep});
 
-        for(Endpoint endpoint: allEndpoints) {
-            if(endpoint == ep) {
-                logger.log(Level.WARNING, "Endpoint <{0}> already set", new Object[]{ep});
-                return false;
-            }
+        if(allEndpoints.contains(ep)) {
+            logger.log(Level.WARNING, "Endpoint <{0}> already set", new Object[]{ep});
+            return false;
         }
 
         ArrayList<Long> msgGroups = ep.getMsgGroups();
@@ -74,20 +70,7 @@ public class Dispatcher {
     }
 
     public void removeEndpoint(Endpoint ep) {
-        Iterator<Endpoint> iter = allEndpoints.iterator();
-
-        boolean removed = false;
-
-        while(iter.hasNext()) {
-            if(iter.next() != ep) {
-                continue;
-            }
-            iter.remove();
-            removed = true;
-            break;
-        }
-
-        if(!removed) {
+        if(!allEndpoints.remove(ep)) {
             logger.log(Level.WARNING, "could not remove endpoint <{0}> from set!", new Object[]{ep});
         }
 
@@ -98,32 +81,27 @@ public class Dispatcher {
     }
 
     protected void addEndpointToGroup(Long grpId, Endpoint ep) {
-        Set<Endpoint> set;
-        if(groupEP.containsKey(grpId)) {
-            set = groupEP.get(grpId);
-        } else {
-            set = new HashSet<>();
-        }
-        set.add(ep);
-        groupEP.put(grpId, set);
+        groupEP.computeIfAbsent(grpId, k->ConcurrentHashMap.newKeySet()).add(ep);
     }
 
     protected void removeEndpointFromGroup(Long grpId, Endpoint ep) {
-        if(!groupEP.containsKey(grpId)) {
+        Set<Endpoint> endpoints = groupEP.get(grpId);
+        if(endpoints == null) {
             return;
         }
-
-        groupEP.get(grpId).removeIf(endpoint->endpoint == ep);
+        endpoints.remove(ep);
+        if(endpoints.isEmpty()) {
+            groupEP.remove(grpId, endpoints);
+        }
     }
 
     public int getEndPointsCount() {
         return allEndpoints.size();
     }
 
-    public void resetDispatcher() {
-        for(Endpoint endpoint : allEndpoints) {
-            endpoint.closeEndpoint();
-        }
+    @Override
+    public void close() {
+        allEndpoints.forEach(Endpoint::closeEndpoint);
         allEndpoints.clear();
         groupEP.clear();
     }
@@ -176,9 +154,13 @@ public class Dispatcher {
             int msgId = message.getMessageId();
             String data = getMessageData(message);
 
-            for(Endpoint ep : allEndpoints) {
-                sendMessage(grpId, msgId, data, ep);
-            }
+            allEndpoints.forEach(ep->{
+                try {
+                    sendMessage(grpId, msgId, data, ep);
+                } catch(IOException e) {
+                    logger.log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
+                }
+            });
         } catch(IOException | JsonException e) {
             logger.log(Level.SEVERE, "<{0}>", new Object[]{e.toString()});
         }
@@ -196,10 +178,11 @@ public class Dispatcher {
 
     protected void sendBroadCastMessage(int grpId, int msgId, String data, int groupKey)
     throws IOException, JsonException {
-        if(!this.groupEP.containsKey((long)groupKey)) {
+        Set<Endpoint> endpoints = this.groupEP.get((long)groupKey);
+        if(endpoints == null) {
             return;
         }
-        for(Endpoint ep : this.groupEP.get((long)groupKey)) {
+        for(Endpoint ep : endpoints) {
             sendMessage(grpId, msgId, data, ep);
         }
     }
