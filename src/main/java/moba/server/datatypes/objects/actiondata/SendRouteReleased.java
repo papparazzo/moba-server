@@ -26,15 +26,15 @@ import moba.server.datatypes.objects.ActionData;
 import java.util.HashMap;
 
 public final class SendRouteReleased extends ActionData {
-    private final long routeId;
+    private final long trainId;
 
-    public SendRouteReleased(long routeId) {
+    public SendRouteReleased(long trainId) {
         super(ActionType.SEND_ROUTE_RELEASED);
-        this.routeId = routeId;
+        this.trainId = trainId;
     }
 
     @Override
     protected void appendData(HashMap<String, Object> action) {
-        action.put("routeId", routeId);
+        action.put("trainId", trainId);
     }
 }

@@ -21,8 +21,10 @@
 package moba.server.datatypes.enumerations;
 
 public enum TrainType {
-    FREIGHT_TRAIN,       // Güterzug
-    SUBURBAN_TRAIN,      // Nahverkehr
-    LONG_DISTANCE_TRAIN, // Fernverkehr
-    SHUNTING_TRAIN       // Rangierzug
+    FREIGHT_TRAIN,       // -> Güterzug
+    REGIONAL_TRAIN,      // -> Nahverkehr
+    LONG_DISTANCE_TRAIN, // -> Fernverkehr
+    SHUNTING_TRAIN,      // -> Rangierzug
+    SERVICE_TRAIN,       // -> Bahndienst
+    LOCAL_FREIGHT_TRAIN  // -> Orts- / Nahgüterzug
 }

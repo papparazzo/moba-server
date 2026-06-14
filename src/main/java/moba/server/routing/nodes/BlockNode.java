@@ -32,13 +32,6 @@ final public class BlockNode extends AbstractNode {
     private final Set<TrainType> trainTypes;
     private final boolean hasCatenary;
 
-    // TODO: Limitations!
-    //       Güterzug
-    //       Nahverkehr
-    //       Fernverkehr
-    //       Oberleitung
-    //       Rangierzug
-
     private NodeInterface in = null;
     private NodeInterface out = null;
 
@@ -115,6 +108,10 @@ final public class BlockNode extends AbstractNode {
             return false;
         }
 
+        if(trainTypes.isEmpty()) {
+            return true;
+        }
+
         return trainTypes.contains(train.trainType());
     }
-};
+}

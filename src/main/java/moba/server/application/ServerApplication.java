@@ -156,9 +156,9 @@ final public class ServerApplication {
                 SimpleRouter router = new SimpleRouter(blocks);
 
                 ActionListGenerator generator = new ActionListGenerator(blockContacts, switchStates, dispatcher);
-                TrainRunner trainRunner = new TrainRunner(router, interlockBlock, interlockRoute, switchStateRepository, generator);
+                TrainRunner trainRunner = new TrainRunner(router, interlockBlock, interlockRoute, switchStateRepository, generator, activeLayout);
 
-                Scheduler scheduler = new Scheduler(dispatcher, null);
+                Scheduler scheduler = new Scheduler(dispatcher, null, notificationHandler);
                 scheduler.addTimedAction(new FunctionExecution(new FunctionTimeTableRepository(database), dispatcher));
                 scheduler.addTimedAction(new TrainRun(new TrainTimeTableRepository(database), trainRunner, trainRepository));
 

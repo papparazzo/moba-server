@@ -29,7 +29,7 @@ public final class SendBlockReleased extends ActionData {
     private final long blockId;
 
     public SendBlockReleased(long blockId) {
-        super(ActionType.LOCO_SPEED);
+        super(ActionType.SEND_BLOCK_RELEASED);
         this.blockId = blockId;
     }
 

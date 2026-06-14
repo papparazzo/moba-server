@@ -126,7 +126,6 @@ final public class Acceptor extends Thread implements BackgroundHandlerInterface
                 }
                 (new Endpoint(id, socket, msgQueue, logger)).start();
             } catch(Exception e) {
-                logger.log(Level.WARNING, "<{0}>", new Object[]{e.toString()});
                 notificationHandler.add(new NotificationData(e));
             }
         }

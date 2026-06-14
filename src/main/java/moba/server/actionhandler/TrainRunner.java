@@ -29,26 +29,30 @@ import moba.server.routing.router.routinglistitems.Block;
 import moba.server.routing.router.routinglistitems.Route;
 import moba.server.routing.router.routinglistitems.RoutingElementInterface;
 import moba.server.routing.typedefs.SwitchStateData;
+import moba.server.utilities.layout.ActiveTrackLayout;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Collections;
+import java.util.List;
 
-// FIXME: ThreadSafety!!!
 final public class TrainRunner {
 
     private final SimpleRouter routing;
 
     private final ActionListGenerator generator;
 
-    private final LinkedList<TrainJourney> trainQueue = new LinkedList<>();
+    private final List<TrainJourney> trainQueue = Collections.synchronizedList(new LinkedList<>());
 
     private final InterlockBlock interlockBlock;
 
     private final InterlockRoute interlockRoute;
 
     private final SwitchStateRepository repo;
+
+    private final ActiveTrackLayout activeLayout;
 
     /*
      *  TODO: Hier muss auch der Bahnübergang mit berücksichtigt werden (Function-GlobalPortAddressData in Environment)
@@ -57,12 +61,20 @@ final public class TrainRunner {
      *  TODO: Für Weichen und Bahnübergang benötigen wir benötigen wir noch ein Feedback, das alle Weichen und
      *        Bahnübergänge geschaltet wurden. Bahnübergang benötigt Zeit!
      */
-    public TrainRunner(SimpleRouter routing, InterlockBlock interlock, InterlockRoute interlockRoute, SwitchStateRepository repo, ActionListGenerator generator) {
+    public TrainRunner(
+        SimpleRouter routing,
+        InterlockBlock interlock,
+        InterlockRoute interlockRoute,
+        SwitchStateRepository repo,
+        ActionListGenerator generator,
+        ActiveTrackLayout activeLayout
+    ) {
         this.generator = generator;
         this.interlockBlock = interlock;
         this.interlockRoute = interlockRoute;
         this.repo = repo;
         this.routing = routing;
+        this.activeLayout = activeLayout;
     }
 
     // Aufruf nach Fahrplan
@@ -93,9 +105,9 @@ final public class TrainRunner {
         pushTrain();
     }
 
-    public void releaseBlock(int trainId, int blockId)
+    public void releaseBlock(int blockId)
     throws SQLException, ClientErrorException {
-        interlockBlock.releaseBlock(trainId, blockId);
+        interlockBlock.releaseBlock(blockId);
         pushTrain();
     }
 
@@ -136,12 +148,10 @@ final public class TrainRunner {
         return false;
     }
 
-    private boolean handleTrain(TrainJourney trainDestination) {
+    private boolean handleTrain(TrainJourney trainJourney) {
+        ArrayList<Long> blocks = new ArrayList<>();
         try {
-            ArrayList<RoutingElementInterface> routingElements = routing.getRoute(trainDestination);
-
-            ArrayList<Long> blocks = new ArrayList<>();
-            //  generator.sendBlockActionList(trainDestination.train(), blocks);
+            ArrayList<RoutingElementInterface> routingElements = routing.getRoute(trainJourney);
 
             // Zug befindet sich bereits im Ziel!
             if(routingElements.isEmpty()) {
@@ -150,11 +160,13 @@ final public class TrainRunner {
 
             for(RoutingElementInterface element : routingElements) {
                 if(element instanceof Route) {
-                    if(!handleSwitchingList(((Route)element).switchingList(), trainDestination.train().trainId())) {
+                    if(!handleSwitchingList(((Route)element).switchingList(), trainJourney.train().trainId())) {
+                        generator.sendBlockActionList(trainJourney.train(), blocks);
                         return false;
                     }
                 } else {
-                    if(!interlockBlock.setBlock(trainDestination.train().trainId(), ((Block)element).id())) {
+                    if(!interlockBlock.setBlock(trainJourney.train().trainId(), ((Block)element).id())) {
+                        generator.sendBlockActionList(trainJourney.train(), blocks);
                         return false;
                     }
                     blocks.add(((Block)element).id());
@@ -165,14 +177,14 @@ final public class TrainRunner {
             throw new RuntimeException(e);
         }
 
-        // Zug ist am Ziel
+        // Zug kann bis zum Ziel fahren
+        generator.sendBlockActionList(trainJourney.train(), blocks);
         return true;
     }
 
-    private boolean handleSwitchingList(ArrayList<SwitchStateData> switchingList, int trainId)
+    private boolean handleSwitchingList(ArrayList<SwitchStateData> switchingList, long trainId)
     throws SQLException, ClientErrorException {
-        // FIXME: Die routeId muss hier noch gesetzt werden!
-        int routeId = 4;
+        long routeId = activeLayout.getActiveLayout();
 
         switch(interlockRoute.setRoute(trainId, switchingList)) {
             case NOT_BLOCKED:
@@ -198,7 +210,7 @@ final public class TrainRunner {
             return true;
         }
 
-        generator.sendSwitchActionList(routeId, switchingList);
+        generator.sendSwitchActionList(trainId, switchingList);
         return false;
     }
 }

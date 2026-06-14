@@ -116,9 +116,7 @@ final public class Interface extends AbstractMessageHandler {
     private void releaseBlock(Message msg)
     throws Exception {
         int blockId = (int)msg.getData();
-        // TODO: Wir brauchen hier noch die TrainId
-        int trainId = 0;
-        runner.releaseBlock(trainId, blockId);
+        runner.releaseBlock(blockId);
         checkServerState(msg.getEndpoint());
     }
 

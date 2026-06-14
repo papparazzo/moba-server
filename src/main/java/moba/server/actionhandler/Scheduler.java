@@ -22,9 +22,11 @@ package moba.server.actionhandler;
 
 import moba.server.com.Dispatcher;
 import moba.server.datatypes.objects.GlobalTimerData;
+import moba.server.datatypes.objects.NotificationData;
 import moba.server.messages.Message;
 import moba.server.messages.messagetypes.TimerMessage;
 import moba.server.timedaction.TimedActionInterface;
+import moba.server.utilities.messaging.NotificationHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,8 @@ final public class Scheduler implements Runnable {
     // @formatter:off
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final Dispatcher                 dispatcher;
+    private final NotificationHandler        notificationHandler;
+
     private GlobalTimerData                  timerData;
 
     private final List<TimedActionInterface> timedActions = new ArrayList<>();
@@ -52,9 +56,9 @@ final public class Scheduler implements Runnable {
     private volatile boolean                 isRunning = false;
     // @formatter:on
 
-    public Scheduler(Dispatcher dispatcher, GlobalTimerData timerData) {
+    public Scheduler(Dispatcher dispatcher, GlobalTimerData timerData, NotificationHandler notificationHandler) {
         this.dispatcher = dispatcher;
-
+        this.notificationHandler = notificationHandler;
         this.scheduler.scheduleWithFixedDelay(this, 1, 1, TimeUnit.SECONDS);
         this.timerData = Objects.requireNonNullElseGet(timerData, GlobalTimerData::new);
     }
@@ -94,8 +98,9 @@ final public class Scheduler implements Runnable {
             for(TimedActionInterface timedAction : timedActions) {
                 timedAction.trigger(timerData.getModelTime(), timerData.getMultiplicator());
             }
-        } catch(Throwable ignored) {
-
+        } catch(Throwable e) {
+            // FIXME: Hier zumindest ein Nothalt auslösen...
+            notificationHandler.add(new NotificationData(e));
         }
     }
 }

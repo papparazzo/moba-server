@@ -49,7 +49,7 @@ import moba.server.exceptions.ClientErrorException;
  *
  *      Environment Applikation muss beim Shutdown speichern, welche Aktion gerade an war.
  *
- * FIXME: Müssen wir in der Tabelle FunktionAddresses speichern ob Kontakt nur "triggable" ist? -> nein!
+ * FIXME: Müssen wir in der Tabelle FunktionAddresses speichern ob Kontakt nur "triggerable" ist? -> nein!
  *
  */
 
@@ -94,7 +94,7 @@ final public class Environment extends AbstractMessageHandler {
                 );
                 break;
          */
-             // TODO: SET_FUNCTIONS muss intern noch gespeichert werden!
+                 // TODO: SET_FUNCTIONS muss intern noch gespeichert werden!
             case SET_FUNCTIONS,
                  SET_AMBIENCE,
                  FUNCTION_STATE_CHANGED -> dispatcher.sendGroup(msg);

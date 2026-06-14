@@ -37,9 +37,12 @@ final public class InterlockBlock {
         this.database = database;
     }
 
-    public boolean setBlock(long trainId, long blockId) throws SQLException {
+    public boolean setBlock(long trainId, long blockId)
+    throws SQLException {
 
-        String q = "UPDATE `BlockSections` SET `TrainId` = ? WHERE (`TrainId` IS NULL OR `TrainId` = ?) AND `id` = ?";
+        String q =
+            "UPDATE `BlockSections` SET `ReservedTrainId` = ? " +
+            "WHERE (`ReservedTrainId` IS NULL OR `ReservedTrainId` = ?) AND `id` = ?";
 
         try(
             Connection con = database.getConnection();
@@ -53,21 +56,21 @@ final public class InterlockBlock {
         }
     }
 
-    public void releaseBlock(long trainId, long blockId)
+    public void releaseBlock(long blockId)
     throws SQLException, ClientErrorException {
-        String q = "UPDATE `BlockSections` SET `TrainId` = NULL WHERE `TrainId` = ? AND `id` = ?";
+        String q =
+            "UPDATE `BlockSections` SET `ReservedTrainId` = NULL, CurrentTrainId = `ReservedTrainId` WHERE `id` = ?";
 
         try(
             Connection con = database.getConnection();
             PreparedStatement stmt = con.prepareStatement(q)
         ) {
-            stmt.setLong(1, trainId);
-            stmt.setLong(2, blockId);
+            stmt.setLong(1, blockId);
 
             if(stmt.executeUpdate() != 1) {
                 throw new ClientErrorException(
                     ClientError.OPERATION_NOT_ALLOWED,
-                    "block not set for train <" + trainId + ">"
+                    "block not set for block <" + blockId + ">"
                 );
             }
         }

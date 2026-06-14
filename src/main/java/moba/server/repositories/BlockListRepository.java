@@ -43,7 +43,7 @@ public final class BlockListRepository {
     public BlockContactDataMap getBlockList(long id)
     throws SQLException {
         String q =
-            "SELECT `BlockSections`.`Id`, `BlockSections`.`TrainId`, " +
+            "SELECT `BlockSections`.`Id`, `BlockSections`.`CurrentTrainId`, " +
             "`TriggerContact`.`ModulAddress` AS `TriggerModulAddress`, " +
             "`TriggerContact`.`ContactNumber` AS `TriggerModulContactNumber`, " +
             "`BlockContact`.`ModulAddress` AS `BlockModulAddress`, " +
@@ -68,7 +68,7 @@ public final class BlockListRepository {
             ResultSet rs = stmt.executeQuery();
 
             while(rs.next()) {
-                Integer trainId = rs.getInt("TrainId");
+                Integer trainId = rs.getInt("CurrentTrainId");
                 trainId = rs.wasNull() ? null : trainId;
                 map.put(
                     rs.getLong("Id"),
@@ -119,7 +119,7 @@ public final class BlockListRepository {
 
                 stmt =
                     "INSERT INTO `BlockSections` " +
-                    "(`Id`, `BrakeTriggerContactId`, `BlockContactId`, `TrainId`) " +
+                    "(`Id`, `BrakeTriggerContactId`, `BlockContactId`, `CurrentTrainId`) " +
                     "VALUES (?, " +
                         "(SELECT `Id` FROM `FeedbackContacts` WHERE `ModulAddress` = ? AND `ContactNumber` = ?), " +
                         "(SELECT `Id` FROM `FeedbackContacts` WHERE `ModulAddress` = ? AND `ContactNumber` = ?), ?)";

@@ -47,7 +47,7 @@ final public class ActionListGenerator {
         this.dispatcher = dispatcher;
     }
 
-    public void sendSwitchActionList(int routeId, ArrayList<SwitchStateData> switchingList) {
+    public void sendSwitchActionList(long trainId, ArrayList<SwitchStateData> switchingList) {
         ActionDataByLocalIdCollection actionLists = new ActionDataByLocalIdCollection();
 
         for(SwitchStateData switchState : switchingList) {
@@ -55,7 +55,7 @@ final public class ActionListGenerator {
             actionLists.addActionList(new ActionDataList().addAction(new Switching(s)));
         }
 
-        actionLists.addActionList(new ActionDataList().addAction(new SendRouteSwitched(routeId)));
+        actionLists.addActionList(new ActionDataList().addAction(new SendRouteSwitched(trainId)));
         this.dispatcher.sendGroup(new Message(InterfaceMessage.SET_ACTION_LIST, actionLists));
     }
 
@@ -76,7 +76,7 @@ final public class ActionListGenerator {
             } else if(blockNodeId != last) {
                 setMiddleListEntry(blockContactData, previousBlock, actionLists);
             } else {
-                setLastListEntry(blockContactData, previousBlock, actionLists);
+                setLastListEntry(blockContactData, previousBlock, train.trainId(), actionLists);
             }
             previousBlock = blockNodeId;
         }
@@ -126,7 +126,7 @@ final public class ActionListGenerator {
      *           * release the previous block if passed!
      *     - brake-trigger: stop lok
      */
-    private void setLastListEntry(BlockContactData c, long previousBlock, ActionDataByLocalIdCollection actionLists) {
+    private void setLastListEntry(BlockContactData c, long previousBlock, long trainId, ActionDataByLocalIdCollection actionLists) {
         actionLists.addTriggerList(
             new ActionDataByContactCollection(c.blockContact()).
                 addActionList(
@@ -138,7 +138,9 @@ final public class ActionListGenerator {
         );
         actionLists.addTriggerList(
             new ActionDataByContactCollection(c.brakeTriggerContact()).
-                addActionList(new ActionDataList().addAction(new LocoSpeed(0)))
+                addActionList(new ActionDataList().
+                    addAction(new LocoSpeed(0)).
+                    addAction(new SendRouteReleased(trainId)))
         );
     }
 }

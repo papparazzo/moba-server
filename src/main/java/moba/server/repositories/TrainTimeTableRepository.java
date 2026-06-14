@@ -24,15 +24,15 @@ import moba.server.datatypes.base.Time;
 import moba.server.datatypes.enumerations.Day;
 import moba.server.datatypes.objects.PointInTime;
 import moba.server.repositories.datatypes.ScheduleType;
-import moba.server.repositories.datatypes.TrainTimeTableEntry;
-import moba.server.utilities.database.Database;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import moba.server.repositories.datatypes.TrainTimeTableEntry;
+import moba.server.utilities.database.Database;
 
 final public class TrainTimeTableRepository {
     private final Database database;
@@ -93,14 +93,14 @@ final public class TrainTimeTableRepository {
                 "SELECT TTT.Id, TTT.TrainId, `BS`.`Id` AS FromBlockId , ToBlockId, ScheduleType " +
                 "FROM TrainTimeTable TTT " +
                 "LEFT JOIN BlockSections BS " +
-                "ON BS.TrainId = TTT.TrainId " +
+                "ON BS.CurrentTrainId = TTT.TrainId " +
                 "WHERE ((Weekdays = ? AND Time >= ?) OR (Time < ? AND Weekdays = ?)) ";
         } else {
             return /* language=SQL */
                 "SELECT TTT.id, TTT.TrainId, `BS`.`Id` AS FromBlockId , ToBlockId, ScheduleType " +
                 "FROM TrainTimeTable TTT " +
                 "LEFT JOIN BlockSections BS " +
-                "ON BS.TrainId = TTT.TrainId " +
+                "ON BS.CurrentTrainId = TTT.TrainId " +
                 "WHERE Weekdays = ? AND Time >= ? AND Time < ? ";
         }
     }
