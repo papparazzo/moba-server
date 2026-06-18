@@ -77,9 +77,6 @@ final public class Interface extends AbstractMessageHandler {
             case BLOCK_RELEASED
                 -> releaseBlock(msg);
 
-            case PUSH_TRAIN
-                -> pushTrain(msg);
-
             case SET_ACTION_LIST,
                  REPLACE_ACTION_LIST,
                  DELETE_ACTION_LIST
@@ -119,15 +116,6 @@ final public class Interface extends AbstractMessageHandler {
         runner.releaseBlock(blockId);
         checkServerState(msg.getEndpoint());
     }
-
-    private void pushTrain(Message msg)
-    throws SQLException {
-        TrainJourney train = (TrainJourney)msg.getData();
-
-        runner.pushTrain(train);
-        checkServerState(msg.getEndpoint());
-    }
-
 
     private void checkServerState(Endpoint endpoint)
     throws SQLException {

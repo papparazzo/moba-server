@@ -33,8 +33,7 @@ public enum InterfaceMessage implements MessageTypeInterface {
 	DELETE_ACTION_LIST (5),
     ROUTE_SWITCHED     (6),
 	ROUTE_RELEASED     (7),
-	BLOCK_RELEASED     (8),
-    PUSH_TRAIN         (9);
+	BLOCK_RELEASED     (8);
     // @formatter:on
 
     public final static int GROUP_ID = 6;

@@ -52,7 +52,6 @@ import moba.server.exceptions.ClientErrorException;
  * FIXME: Müssen wir in der Tabelle FunktionAddresses speichern ob Kontakt nur "triggerable" ist? -> nein!
  *
  */
-
 final public class Environment extends AbstractMessageHandler {
     private final FunctionAddressesRepository addressesRepo;
 
