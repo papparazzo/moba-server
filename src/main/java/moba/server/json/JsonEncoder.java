@@ -108,7 +108,7 @@ public class JsonEncoder {
                 continue;
             }
 
-            key = 
+            key =
                 key.substring(0, 1).toLowerCase(Locale.ROOT) +
                 key.substring(1);
 
@@ -121,7 +121,7 @@ public class JsonEncoder {
             writer.write("\":");
             try {
                 addJSONValue(method.invoke(object));
-            } catch (IllegalAccessException | InvocationTargetException exception) {
+            } catch(IllegalAccessException | InvocationTargetException exception) {
                 throw new JsonException("error in invoking method <" + methodName + ">", exception);
             }
             firstIteration = false;

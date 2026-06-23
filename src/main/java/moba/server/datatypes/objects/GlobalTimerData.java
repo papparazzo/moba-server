@@ -31,7 +31,7 @@ import moba.server.exceptions.ClientErrorException;
 public class GlobalTimerData {
     protected PointInTime modelTime = new PointInTime();
 
-    protected int  multiplicator = 4;
+    protected int multiplicator = 4;
 
     protected Time nightStartTime = new Time();
     protected Time sunriseStartTime = new Time();
