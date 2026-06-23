@@ -27,7 +27,7 @@ import moba.server.datatypes.enumerations.TrainType;
 public record Train(
     long trainId,
     int address,
-    int speed,
+    Speed speed,
     DrivingDirection drivingDirection,
     TrainType trainType,
     boolean hasPantograph,
@@ -37,7 +37,7 @@ public record Train(
         return new Train(trainId, address, speed, drivingDirection, trainType, hasPantograph, noDirectionalControl);
     }
 
-    public Train withSpeed(int speed) {
+    public Train withSpeed(Speed speed) {
         return new Train(trainId, address, speed, drivingDirection, trainType, hasPantograph, noDirectionalControl);
     }
 /*
