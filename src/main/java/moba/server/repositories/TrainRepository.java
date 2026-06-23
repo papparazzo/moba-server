@@ -25,6 +25,7 @@ import moba.server.apiconnector.TrainApiConnector;
 import moba.server.datatypes.collections.TrainList;
 import moba.server.datatypes.enumerations.DrivingDirection;
 import moba.server.datatypes.enumerations.TrainType;
+import moba.server.datatypes.objects.Speed;
 import moba.server.datatypes.objects.Train;
 import moba.server.exceptions.ClientErrorException;
 import moba.server.utilities.CheckedEnum;
@@ -34,6 +35,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.NoSuchElementException;
 
 public final class TrainRepository {
 
@@ -45,70 +47,49 @@ public final class TrainRepository {
         this.trainApi = trainApi;
     }
 
-    public TrainList getTrainList(long trackLayoutId)
+    public Train getTrainById(int trainId)
     throws SQLException, ClientErrorException, ApiConnectorException {
-
-        // Stell den aktuellen IST-Zustand (wo befindet sich welcher Zug) dar!
-        String q =
-            "SELECT " +
-                "Trains.Id, " +             // Interne Id
-                "Trains.TrainId, " +        // fünfstellige "Zugnummer" für die Verknüpfung mit der API (Inventory)
-                "Address, " +               // Lokadresse des Zugs
-                "Speed, " +                 // FIXME: Brauchen wir das? Kommt aus der API!
-                "DrivingDirection " +       // FIXME: Brauchen wir das? Kommt aus der CS2!
-            "FROM Trains " +
-            "LEFT JOIN BlockSections " +
-            "ON BlockSections.TrainId = Trains.Id " +
-            "LEFT JOIN `TrackLayoutSymbols` " +
-            "ON `TrackLayoutSymbols`.`Id` = `BlockSections`.`Id` " +
-            "WHERE `TrackLayoutSymbols`.`TrackLayoutId` = ? ";
+        String q = "SELECT TrainId, Address, DrivingDirection FROM Trains WHERE `Trains`.`id` = ? ";
 
         try(
             Connection con = database.getConnection();
             PreparedStatement stmt = con.prepareStatement(q)
         ) {
-            stmt.setLong(1, trackLayoutId);
+            stmt.setLong(1, trainId);
 
-            TrainList map = new TrainList();
             ResultSet rs = stmt.executeQuery();
 
-            while(rs.next()) {
-                int trainId = rs.getInt("Id");
-
-                var x = trainApi.getTrain(trainId);
-
-                map.add(
-                    new Train(
-                        rs.getInt("Id"),
-                        rs.getInt("Address"),
-                        rs.getInt("Speed"),
-                        CheckedEnum.getFromString(DrivingDirection.class, rs.getString("DrivingDirection")),
-                        // TODO: Get this information from the api-endpoint!
-                        TrainType.FREIGHT_TRAIN,
-                        true,
-                        true
-                    )
-                );
+            if(!rs.next()) {
+                throw new NoSuchElementException("No Train found for id <" + trainId + ">");
             }
-            return map;
-        } catch(Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
 
-    public Train getTrainById(long trainId) {
-        // TODO get this from Repository and API
+            var x = trainApi.getTrain(trainId);
+
+            return
+                new Train(
+                    rs.getInt("Id"),
+                    rs.getInt("Address"),
+                    new Speed(70),
+                    CheckedEnum.getFromString(DrivingDirection.class, rs.getString("DrivingDirection")),
+                    TrainType.FREIGHT_TRAIN,
+                    true,
+                    true
+                );
+        }
+
+        /*
+
         return new Train(
-            4,
+            trainId,
             16410, //            int address,
-            100,   //            int speed,
+            new Speed(100),   //            int speed,
             DrivingDirection.FORWARD,
             TrainType.FREIGHT_TRAIN,
             false,
             false
         );
 
-        /*
+
 int address,
     int speed,
     DrivingDirection drivingDirection,
