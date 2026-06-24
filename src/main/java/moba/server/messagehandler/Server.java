@@ -22,14 +22,12 @@ package moba.server.messagehandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import moba.server.application.ServerApplication;
 import moba.server.com.Dispatcher;
 import moba.server.com.Endpoint;
-import moba.server.datatypes.base.Date;
-import moba.server.datatypes.base.DateTime;
 import moba.server.datatypes.enumerations.ClientError;
+import moba.server.datatypes.objects.ServerData;
 import moba.server.messages.AbstractMessageHandler;
 import moba.server.messages.Message;
 import moba.server.messages.MessageTypeInterface;
@@ -111,25 +109,6 @@ final public class Server extends AbstractMessageHandler {
     }
 
     private void handleServerInfoReq(Endpoint ep) {
-        HashMap<String, Object> map = new HashMap<>();
-
-        // @formatter:off
-        map.put("appName",           app.getAppName());
-        map.put("version",           app.getVersion());
-        map.put("buildDate",         new Date(app.getBuildDate()));
-        map.put("startTime",         new DateTime(app.getStartTime()));
-
-        map.put("maxClients",        app.getMaxClients());
-        map.put("connectedClients",  dispatcher.getEndPointsCount());
-
-        map.put("osArch",            java.lang.System.getProperty("os.arch", ""));
-        map.put("osName",            java.lang.System.getProperty("os.name", ""));
-        map.put("osVersion",         java.lang.System.getProperty("os.version", ""));
-
-        map.put("fwType",            java.lang.System.getProperty("java.vm.vendor", ""));
-        map.put("fwVersion",         java.lang.System.getProperty("java.version", ""));
-        // @formatter:on
-
-        dispatcher.sendSingle(new Message(ServerMessage.INFO_RES, map), ep);
+        dispatcher.sendSingle(new Message(ServerMessage.INFO_RES, ServerData.from(app, dispatcher)), ep);
     }
 }
