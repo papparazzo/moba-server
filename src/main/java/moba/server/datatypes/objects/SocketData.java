@@ -22,10 +22,11 @@ package moba.server.datatypes.objects;
 
 import moba.server.json.JsonSerializerInterface;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 
-public class SocketData implements JsonSerializerInterface<Object> {
+public class SocketData implements JsonSerializerInterface<Map<String, Object>> {
     private final java.net.InetAddress inetAddress;
     private final int port;
 
@@ -39,8 +40,8 @@ public class SocketData implements JsonSerializerInterface<Object> {
     }
 
     @Override
-    public Object toJson() {
-        HashMap<String, Object> map = new HashMap<>();
+    public Map<String, Object> toJson() {
+        Map<String, Object> map = new LinkedHashMap<>();
 
         String str = inetAddress.getHostAddress();
 
