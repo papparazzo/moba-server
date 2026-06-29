@@ -99,19 +99,19 @@ final public class TrainRunner {
         // throw new IllegalStateException("Deadlock detected!");
     }
 
-    public void releaseRoute(int routeId)
+    public void releaseRoute(long routeId)
     throws SQLException, ClientErrorException {
         interlockRoute.releaseRoute(routeId);
         pushTrain();
     }
 
-    public void releaseBlock(int blockId)
+    public void releaseBlock(long blockId)
     throws SQLException, ClientErrorException {
         interlockBlock.releaseBlock(blockId);
         pushTrain();
     }
 
-    public void setSwitched(int routeId) {
+    public void setSwitched(long routeId) {
         interlockRoute.routeSet(routeId);
         pushTrain();
     }
