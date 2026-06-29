@@ -98,21 +98,21 @@ final public class Interface extends AbstractMessageHandler {
 
     private void routeSwitched(Message msg)
     throws SQLException {
-        int id = (int)msg.getData();
+        long id = (long)msg.getData();
         runner.setSwitched(id);
         checkServerState(msg.getEndpoint());
     }
 
     private void releaseRoute(Message msg)
     throws SQLException, ClientErrorException {
-        int id = (int)msg.getData();
+        long id = (long)msg.getData();
         runner.releaseRoute(id);
         checkServerState(msg.getEndpoint());
     }
 
     private void releaseBlock(Message msg)
     throws Exception {
-        int blockId = (int)msg.getData();
+        long blockId = (long)msg.getData();
         runner.releaseBlock(blockId);
         checkServerState(msg.getEndpoint());
     }
